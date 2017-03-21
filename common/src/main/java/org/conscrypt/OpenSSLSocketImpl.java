@@ -53,7 +53,10 @@ import javax.security.auth.x500.X500Principal;
  * <li>session tickets
  * <li>Server Name Indication
  * </ul>
+ *
+ * @hide
  */
+@Internal
 public class OpenSSLSocketImpl
         extends javax.net.ssl.SSLSocket
         implements NativeCrypto.SSLHandshakeCallbacks, SSLParametersImpl.AliasChooser,
@@ -155,7 +158,7 @@ public class OpenSSLSocketImpl
      * Private key for the TLS Channel ID extension. This field is client-side
      * only. Set during startHandshake.
      */
-    OpenSSLKey channelIdPrivateKey;
+    private OpenSSLKey channelIdPrivateKey;
 
     /** Set during startHandshake. */
     private AbstractOpenSSLSession sslSession;
@@ -292,9 +295,7 @@ public class OpenSSLSocketImpl
         boolean releaseResources = true;
         try {
             final AbstractSessionContext sessionContext = sslParameters.getSessionContext();
-            final long sslCtxNativePointer = sessionContext.sslCtxNativePointer;
-            sslParameters.setSSLCtxParameters(sslCtxNativePointer);
-            sslNativePointer = NativeCrypto.SSL_new(sslCtxNativePointer);
+            sslNativePointer = NativeCrypto.SSL_new(sessionContext.sslCtxNativePointer);
             Platform.closeGuardOpen(guard, "close");
 
             boolean enableSessionCreation = getEnableSessionCreation();

@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketImpl;
 import java.nio.channels.SocketChannel;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -81,8 +82,7 @@ final class Platform {
             Field f_impl = Socket.class.getDeclaredField("impl");
             f_impl.setAccessible(true);
             Object socketImpl = f_impl.get(s);
-            Class<?> c_socketImpl = Class.forName("java.net.SocketImpl");
-            Field f_fd = c_socketImpl.getDeclaredField("fd");
+            Field f_fd = SocketImpl.class.getDeclaredField("fd");
             f_fd.setAccessible(true);
             return (FileDescriptor) f_fd.get(socketImpl);
         } catch (Exception e) {
@@ -138,6 +138,31 @@ final class Platform {
         if (impl.getUseSni() && AddressUtils.isValidSniHostname(socket.getHostname())) {
             params.setServerNames(Collections.<SNIServerName> singletonList(
                     new SNIHostName(socket.getHostname())));
+        }
+    }
+
+    public static void setSSLParameters(
+            SSLParameters params, SSLParametersImpl impl, OpenSSLEngineImpl engine) {
+        impl.setEndpointIdentificationAlgorithm(params.getEndpointIdentificationAlgorithm());
+        impl.setUseCipherSuitesOrder(params.getUseCipherSuitesOrder());
+        List<SNIServerName> serverNames = params.getServerNames();
+        if (serverNames != null) {
+            for (SNIServerName serverName : serverNames) {
+                if (serverName.getType() == StandardConstants.SNI_HOST_NAME) {
+                    engine.setSniHostname(((SNIHostName) serverName).getAsciiName());
+                    break;
+                }
+            }
+        }
+    }
+
+    public static void getSSLParameters(
+            SSLParameters params, SSLParametersImpl impl, OpenSSLEngineImpl engine) {
+        params.setEndpointIdentificationAlgorithm(impl.getEndpointIdentificationAlgorithm());
+        params.setUseCipherSuitesOrder(impl.getUseCipherSuitesOrder());
+        if (impl.getUseSni() && AddressUtils.isValidSniHostname(engine.getSniHostname())) {
+            params.setServerNames(Collections.<SNIServerName>singletonList(
+                    new SNIHostName(engine.getSniHostname())));
         }
     }
 
