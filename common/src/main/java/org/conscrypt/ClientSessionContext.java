@@ -22,7 +22,10 @@ import javax.net.ssl.SSLSession;
 /**
  * Caches client sessions. Indexes by host and port. Users are typically
  * looking to reuse any session for a given host and port.
+ *
+ * @hide
  */
+@Internal
 public class ClientSessionContext extends AbstractSessionContext {
 
     /**

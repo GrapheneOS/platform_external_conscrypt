@@ -29,7 +29,10 @@ import javax.security.cert.X509Certificate;
 /**
  * Implementation of the ExtendedSSLSession class for OpenSSL. Uses a delegate to maintain backward
  * compatibility with previous versions of Android which don't have ExtendedSSLSession.
+ *
+ * @hide
  */
+@Internal
 public class OpenSSLExtendedSessionImpl extends ExtendedSSLSession {
     private final AbstractOpenSSLSession delegate;
 
@@ -41,6 +44,8 @@ public class OpenSSLExtendedSessionImpl extends ExtendedSSLSession {
         return delegate;
     }
 
+    /* @Override */
+    @SuppressWarnings("MissingOverride") // For Android backward-compatibility.
     public String[] getLocalSupportedSignatureAlgorithms() {
         // From src/ssl/t1_lib.c tls12_sigalgs
         // TODO: use BoringSSL API to actually fetch the real data
@@ -58,6 +63,8 @@ public class OpenSSLExtendedSessionImpl extends ExtendedSSLSession {
         };
     }
 
+    /* @Override */
+    @SuppressWarnings("MissingOverride") // For Android backward-compatibility.
     public String[] getPeerSupportedSignatureAlgorithms() {
         // TODO: use BoringSSL API to actually fetch the real data
         return new String[] {
@@ -66,6 +73,8 @@ public class OpenSSLExtendedSessionImpl extends ExtendedSSLSession {
         };
     }
 
+    /* @Override */
+    @SuppressWarnings("MissingOverride") // For Android backward-compatibility.
     public List<SNIServerName> getRequestedServerNames() {
         String requestedServerName = delegate.getRequestedServerName();
         if (requestedServerName == null) {

@@ -51,6 +51,12 @@ import javax.crypto.BadPaddingException;
 import javax.security.auth.x500.X500Principal;
 import org.conscrypt.OpenSSLX509CertificateFactory.ParsingException;
 
+/**
+ * An implementation of {@link X509Certificate} based on BoringSSL.
+ *
+ * @hide
+ */
+@Internal
 public class OpenSSLX509Certificate extends X509Certificate {
     private static final long serialVersionUID = 1992239142393372128L;
 
@@ -399,7 +405,8 @@ public class OpenSSLX509Certificate extends X509Certificate {
         verifyInternal(key, sigProvider);
     }
 
-    @Override
+    /* @Override */
+    @SuppressWarnings("MissingOverride")  // For compilation with Java 7.
     public void verify(PublicKey key, Provider sigProvider)
             throws CertificateException, NoSuchAlgorithmException, InvalidKeyException,
                    SignatureException {
