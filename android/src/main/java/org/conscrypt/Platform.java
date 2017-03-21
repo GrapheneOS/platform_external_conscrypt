@@ -31,6 +31,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketImpl;
 import java.security.PrivateKey;
 import java.security.Security;
 import java.security.cert.CertificateException;
@@ -73,8 +74,7 @@ final class Platform {
             Field f_impl = Socket.class.getDeclaredField("impl");
             f_impl.setAccessible(true);
             Object socketImpl = f_impl.get(s);
-            Class<?> c_socketImpl = Class.forName("java.net.SocketImpl");
-            Field f_fd = c_socketImpl.getDeclaredField("fd");
+            Field f_fd = SocketImpl.class.getDeclaredField("fd");
             f_fd.setAccessible(true);
             return (FileDescriptor) f_fd.get(socketImpl);
         } catch (Exception e) {
@@ -183,20 +183,45 @@ final class Platform {
         }
     }
 
+    private static void setSSLParametersOnImpl(SSLParameters params, SSLParametersImpl impl)
+            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        Method m_getEndpointIdentificationAlgorithm =
+                params.getClass().getMethod("getEndpointIdentificationAlgorithm");
+        impl.setEndpointIdentificationAlgorithm(
+                (String) m_getEndpointIdentificationAlgorithm.invoke(params));
+
+        Method m_getUseCipherSuitesOrder = params.getClass().getMethod("getUseCipherSuitesOrder");
+        impl.setUseCipherSuitesOrder((boolean) m_getUseCipherSuitesOrder.invoke(params));
+    }
+
     public static void setSSLParameters(
             SSLParameters params, SSLParametersImpl impl, OpenSSLSocketImpl socket) {
         try {
-            Method m_getEndpointIdentificationAlgorithm =
-                    params.getClass().getMethod("getEndpointIdentificationAlgorithm");
-            impl.setEndpointIdentificationAlgorithm(
-                    (String) m_getEndpointIdentificationAlgorithm.invoke(params));
-
-            Method m_getUseCipherSuitesOrder =
-                    params.getClass().getMethod("getUseCipherSuitesOrder");
-            impl.setUseCipherSuitesOrder((boolean) m_getUseCipherSuitesOrder.invoke(params));
+            setSSLParametersOnImpl(params, impl);
 
             if (Build.VERSION.SDK_INT >= 24) {
-                setSocketSniHostname(params, socket);
+                String sniHostname = getSniHostnameFromParams(params);
+                if (sniHostname != null) {
+                    socket.setHostname(sniHostname);
+                }
+            }
+        } catch (NoSuchMethodException ignored) {
+        } catch (IllegalAccessException ignored) {
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e.getCause());
+        }
+    }
+
+    public static void setSSLParameters(
+            SSLParameters params, SSLParametersImpl impl, OpenSSLEngineImpl engine) {
+        try {
+            setSSLParametersOnImpl(params, impl);
+
+            if (Build.VERSION.SDK_INT >= 24) {
+                String sniHostname = getSniHostnameFromParams(params);
+                if (sniHostname != null) {
+                    engine.setSniHostname(sniHostname);
+                }
             }
         } catch (NoSuchMethodException ignored) {
         } catch (IllegalAccessException ignored) {
@@ -206,7 +231,7 @@ final class Platform {
     }
 
     @TargetApi(24)
-    private static void setSocketSniHostname(SSLParameters params, OpenSSLSocketImpl socket)
+    private static String getSniHostnameFromParams(SSLParameters params)
             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         Method m_getServerNames = params.getClass().getMethod("getServerNames");
         @SuppressWarnings("unchecked")
@@ -214,24 +239,30 @@ final class Platform {
         if (serverNames != null) {
             for (SNIServerName serverName : serverNames) {
                 if (serverName.getType() == StandardConstants.SNI_HOST_NAME) {
-                    socket.setHostname(((SNIHostName) serverName).getAsciiName());
-                    break;
+                    return ((SNIHostName) serverName).getAsciiName();
                 }
             }
         }
+
+        return null;
+    }
+
+    private static void getSSLParametersFromImpl(SSLParameters params, SSLParametersImpl impl)
+            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        Method m_setEndpointIdentificationAlgorithm =
+                params.getClass().getMethod("setEndpointIdentificationAlgorithm", String.class);
+        m_setEndpointIdentificationAlgorithm.invoke(
+                params, impl.getEndpointIdentificationAlgorithm());
+
+        Method m_setUseCipherSuitesOrder =
+                params.getClass().getMethod("setUseCipherSuitesOrder", boolean.class);
+        m_setUseCipherSuitesOrder.invoke(params, impl.getUseCipherSuitesOrder());
     }
 
     public static void getSSLParameters(
             SSLParameters params, SSLParametersImpl impl, OpenSSLSocketImpl socket) {
         try {
-            Method m_setEndpointIdentificationAlgorithm =
-                    params.getClass().getMethod("setEndpointIdentificationAlgorithm", String.class);
-            m_setEndpointIdentificationAlgorithm.invoke(
-                    params, impl.getEndpointIdentificationAlgorithm());
-
-            Method m_setUseCipherSuitesOrder =
-                    params.getClass().getMethod("setUseCipherSuitesOrder", boolean.class);
-            m_setUseCipherSuitesOrder.invoke(params, impl.getUseCipherSuitesOrder());
+            getSSLParametersFromImpl(params, impl);
 
             if (Build.VERSION.SDK_INT >= 24) {
                 setParametersSniHostname(params, impl, socket);
@@ -251,6 +282,33 @@ final class Platform {
             Method m_setServerNames = params.getClass().getMethod("setServerNames", List.class);
             m_setServerNames.invoke(params, Collections.<SNIServerName>singletonList(
                                                     new SNIHostName(socket.getHostname())));
+        }
+    }
+
+    public static void getSSLParameters(
+            SSLParameters params, SSLParametersImpl impl, OpenSSLEngineImpl engine) {
+        try {
+            getSSLParametersFromImpl(params, impl);
+
+            if (Build.VERSION.SDK_INT >= 24) {
+                setParametersSniHostname(params, impl, engine);
+            }
+        } catch (NoSuchMethodException ignored) {
+        } catch (IllegalAccessException ignored) {
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e.getCause());
+        }
+    }
+
+    @TargetApi(24)
+    private static void setParametersSniHostname(
+            SSLParameters params, SSLParametersImpl impl, OpenSSLEngineImpl engine)
+            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        if (impl.getUseSni() && AddressUtils.isValidSniHostname(engine.getSniHostname())) {
+            Method m_setServerNames = params.getClass().getMethod("setServerNames", List.class);
+            m_setServerNames.invoke(params,
+                    Collections.<SNIServerName>singletonList(
+                            new SNIHostName(engine.getSniHostname())));
         }
     }
 
@@ -346,6 +404,7 @@ final class Platform {
      * builds since we didn't backport, so return null. This code is from
      * Chromium's net/android/java/src/org/chromium/net/DefaultAndroidKeyStore.java
      */
+    @SuppressWarnings("LiteralClassName")
     public static OpenSSLKey wrapRsaKey(PrivateKey javaKey) {
         // This fixup only applies to pre-JB-MR1
         if (Build.VERSION.SDK_INT >= 17) {
@@ -432,15 +491,16 @@ final class Platform {
     /**
      * Logs to the system EventLog system.
      */
+    @SuppressWarnings("LiteralClassName")
     public static void logEvent(String message) {
         try {
             Class<?> processClass = Class.forName("android.os.Process");
-            Object processInstance = processClass.newInstance();
+            Object processInstance = processClass.getDeclaredConstructor().newInstance();
             Method myUidMethod = processClass.getMethod("myUid", (Class[]) null);
             int uid = (Integer) myUidMethod.invoke(processInstance);
 
             Class<?> eventLogClass = Class.forName("android.util.EventLog");
-            Object eventLogInstance = eventLogClass.newInstance();
+            Object eventLogInstance = eventLogClass.getDeclaredConstructor().newInstance();
             Method writeEventMethod =
                     eventLogClass.getMethod("writeEvent", Integer.TYPE, Object[].class);
             writeEventMethod.invoke(eventLogInstance, 0x534e4554 /* SNET */,
@@ -478,6 +538,7 @@ final class Platform {
     /**
      * Convert from platform's GCMParameterSpec to our internal version.
      */
+    @SuppressWarnings("LiteralClassName")
     public static GCMParameters fromGCMParameterSpec(AlgorithmParameterSpec params) {
         Class<?> gcmSpecClass;
         try {
@@ -512,6 +573,7 @@ final class Platform {
     /**
      * Creates a platform version of {@code GCMParameterSpec}.
      */
+    @SuppressWarnings("LiteralClassName")
     public static AlgorithmParameterSpec toGCMParameterSpec(int tagLenInBits, byte[] iv) {
         Class<?> gcmSpecClass;
         try {
@@ -584,6 +646,7 @@ final class Platform {
     /**
      * OID to Algorithm Name mapping.
      */
+    @SuppressWarnings("LiteralClassName")
     public static String oidToAlgorithmName(String oid) {
         // Old Harmony style
         try {

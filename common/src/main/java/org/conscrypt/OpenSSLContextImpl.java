@@ -29,7 +29,10 @@ import javax.net.ssl.TrustManager;
 
 /**
  * OpenSSL-backed SSLContext service provider interface.
+ *
+ * @hide
  */
+@Internal
 public class OpenSSLContextImpl extends SSLContextSpi {
 
     /**

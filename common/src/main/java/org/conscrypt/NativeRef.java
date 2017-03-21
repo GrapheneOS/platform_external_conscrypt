@@ -19,7 +19,10 @@ package org.conscrypt;
 /**
  * Used to hold onto native OpenSSL references and run finalization on those
  * objects. Individual types must subclass this and implement finalizer.
+ *
+ * @hide
  */
+@Internal
 public abstract class NativeRef {
     final long context;
 

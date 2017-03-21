@@ -21,6 +21,12 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.security.KeyManagementException;
 
+/**
+ * An implementation of {@link javax.net.ssl.SSLServerSocketFactory} using BoringSSL.
+ *
+ * @hide
+ */
+@Internal
 public class OpenSSLServerSocketFactoryImpl extends javax.net.ssl.SSLServerSocketFactory {
     private static boolean useEngineSocketByDefault = SSLUtils.USE_ENGINE_SOCKET_BY_DEFAULT;
 

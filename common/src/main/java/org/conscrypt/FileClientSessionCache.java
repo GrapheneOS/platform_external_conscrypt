@@ -34,7 +34,10 @@ import javax.net.ssl.SSLSession;
 /**
  * File-based cache implementation. Only one process should access the
  * underlying directory at a time.
+ *
+ * @hide
  */
+@Internal
 public class FileClientSessionCache {
     public static final int MAX_SIZE = 12; // ~72k
 
@@ -172,8 +175,6 @@ public class FileClientSessionCache {
                 if (in != null) {
                     try {
                         in.close();
-                    } catch (RuntimeException rethrown) {
-                        throw rethrown;
                     } catch (Exception ignored) {
                     }
                 }
