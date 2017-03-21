@@ -22,7 +22,10 @@ import java.security.NoSuchAlgorithmException;
 
 /**
  * Implements the JDK MessageDigest interface using OpenSSL's EVP API.
+ *
+ * @hide
  */
+@Internal
 public class OpenSSLMessageDigestJDK extends MessageDigestSpi implements Cloneable {
     private final NativeRef.EVP_MD_CTX ctx;
 

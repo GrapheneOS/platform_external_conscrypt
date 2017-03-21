@@ -16,20 +16,16 @@
 
 package org.conscrypt;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import javax.net.ssl.SSLException;
 
 /**
- * Annotates a program element (class, method, package etc) which is internal to Conscrypt, not part
- * of
- * the public API, and should not be used by users of Conscrypt.
+ * Similar in concept to {@link javax.net.ssl.HandshakeCompletedListener}, but used for listening directly
+ * to the engine. Allows the caller to be notified immediately upon completion of the TLS handshake.
  */
-@Internal
-@Retention(RetentionPolicy.SOURCE)
-@Target({ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR, ElementType.FIELD,
-        ElementType.METHOD, ElementType.PACKAGE, ElementType.TYPE})
-@Documented
-public @interface Internal {}
+public interface HandshakeListener {
+
+    /**
+     * Called by the engine when the TLS handshake has completed.
+     */
+    void onHandshakeFinished() throws SSLException;
+}

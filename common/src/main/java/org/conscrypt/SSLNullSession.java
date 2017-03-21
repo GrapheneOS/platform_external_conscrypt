@@ -20,12 +20,16 @@ package org.conscrypt;
 import java.security.Principal;
 import java.security.cert.Certificate;
 import java.util.HashMap;
-import javax.net.ssl.SSLPeerUnverifiedException;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSessionBindingEvent;
-import javax.net.ssl.SSLSessionBindingListener;
-import javax.net.ssl.SSLSessionContext;
+import javax.net.ssl.*;
 
+/**
+ * This is returned in the place of a {@link SSLSession} when no TLS connection could be negotiated,
+ * but one was requested from a method that can't throw an exception such as {@link
+ * SSLSocket#getSession()} before {@link SSLSocket#startHandshake()} is called.
+ *
+ * @hide
+ */
+@Internal
 public final class SSLNullSession implements SSLSession, Cloneable {
 
     /*
