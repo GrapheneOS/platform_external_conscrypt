@@ -84,7 +84,9 @@ import org.conscrypt.ct.CTVerifier;
  * be provided by some certification provider.
  *
  * @see javax.net.ssl.X509ExtendedTrustManager
+ * @hide
  */
+@Internal
 public final class TrustManagerImpl extends X509ExtendedTrustManager {
 
     /**
@@ -842,6 +844,7 @@ public final class TrustManagerImpl extends X509ExtendedTrustManager {
             return SUPPORTED_EXTENSIONS;
         }
 
+        @SuppressWarnings("ReferenceEquality")
         @Override
         public void check(Certificate c, Collection<String> unresolvedCritExts)
                 throws CertPathValidatorException {
