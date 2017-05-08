@@ -80,7 +80,7 @@ cc_library_host_shared {
     host_ldlibs: ["-lpthread"],
 
     static_libs: [
-        "libssl_static-host",
+        "libssl",
         "libcrypto_static",
     ],
 
