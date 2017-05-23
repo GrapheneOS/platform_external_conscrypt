@@ -99,8 +99,7 @@ public class NativeCryptoTest {
 
     @BeforeClass
     public static void getPlatformMethods() throws Exception {
-        Class<?> c_Platform =
-                Class.forName(NativeCryptoTest.class.getPackage().getName() + ".Platform");
+        Class<?> c_Platform = TestUtils.conscryptClass("Platform");
         m_Platform_getFileDescriptor =
                 c_Platform.getDeclaredMethod("getFileDescriptor", Socket.class);
         m_Platform_getFileDescriptor.setAccessible(true);
@@ -2256,15 +2255,11 @@ public class NativeCryptoTest {
 
     @Test
     public void test_SSL_shutdown() throws Exception {
-        // null FileDescriptor
+        // We tolerate a null FileDescriptor
         wrapWithSSLSession(new SSLSessionWrappedTask() {
             @Override
             public void run(long sslSession) throws Exception {
-                try {
-                    NativeCrypto.SSL_shutdown(sslSession, null, DUMMY_CB);
-                    fail();
-                } catch (NullPointerException expected) {
-                }
+                NativeCrypto.SSL_shutdown(sslSession, null, DUMMY_CB);
             }
         });
 
@@ -2276,6 +2271,7 @@ public class NativeCryptoTest {
                     NativeCrypto.SSL_shutdown(sslSession, INVALID_FD, null);
                     fail();
                 } catch (NullPointerException expected) {
+                    // Ignored.
                 }
             }
         });
