@@ -15,13 +15,13 @@
  */
 package org.conscrypt;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.security.Principal;
 import java.security.cert.Certificate;
 import java.util.Collections;
 import java.util.List;
 import javax.net.ssl.ExtendedSSLSession;
-import javax.net.ssl.SNIHostName;
-import javax.net.ssl.SNIServerName;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSessionContext;
 import javax.security.cert.X509Certificate;
@@ -71,14 +71,26 @@ final class OpenSSLExtendedSessionImpl extends ExtendedSSLSession {
     }
 
     /* @Override */
-    @SuppressWarnings("MissingOverride") // For Android backward-compatibility.
-    public List<SNIServerName> getRequestedServerNames() {
-        String requestedServerName = delegate.getRequestedServerName();
-        if (requestedServerName == null) {
-            return null;
-        }
+    // For Android/Java7 backward-compatibility.
+    @SuppressWarnings({"MissingOverride", "unchecked", "rawtypes", "LiteralClassName"})
+    public List getRequestedServerNames() {
+        try {
+            String requestedServerName = delegate.getRequestedServerName();
+            if (requestedServerName == null) {
+                return null;
+            }
 
-        return Collections.<SNIServerName> singletonList(new SNIHostName(requestedServerName));
+            Constructor sniHostNameConstructor =
+                Class.forName("javax.net.ssl.SNIHostName").getConstructor(String.class);
+            return Collections.singletonList(sniHostNameConstructor.newInstance(requestedServerName));
+
+        } catch (NoSuchMethodException e) {
+        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException e) {
+        } catch (ClassNotFoundException e) {
+        } catch (InstantiationException e) {
+        }
+        return null;
     }
 
     @Override
