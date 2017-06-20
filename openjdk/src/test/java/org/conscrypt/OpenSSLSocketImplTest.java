@@ -25,16 +25,15 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -48,77 +47,13 @@ import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 
-@RunWith(Parameterized.class)
 public class OpenSSLSocketImplTest {
     private static final long TIMEOUT_SECONDS = 5;
     private static final char[] EMPTY_PASSWORD = new char[0];
-
-    /**
-     * Various factories for SSL server sockets.
-     */
-    public enum SocketType {
-        DEFAULT(false) {
-            @Override
-            void assertSocketType(Socket socket) {
-                assertTrue("Unexpected socket type: " + socket.getClass().getName(),
-                        socket instanceof OpenSSLSocketImpl);
-            }
-        },
-        ENGINE(true) {
-            @Override
-            void assertSocketType(Socket socket) {
-                assertTrue("Unexpected socket type: " + socket.getClass().getName(),
-                        socket instanceof OpenSSLEngineSocketImpl);
-            }
-        };
-
-        private final boolean useEngineSocket;
-
-        SocketType(boolean useEngineSocket) {
-            this.useEngineSocket = useEngineSocket;
-        }
-
-        OpenSSLSocketImpl createClientSocket(OpenSSLContextImpl context, ServerSocket listener)
-                throws IOException {
-            SSLSocketFactory factory = context.engineGetSocketFactory();
-            Conscrypt.SocketFactories.setUseEngineSocket(factory, useEngineSocket);
-            OpenSSLSocketImpl socket = (OpenSSLSocketImpl) factory.createSocket(
-                    listener.getInetAddress(), listener.getLocalPort());
-            assertSocketType(socket);
-            socket.setUseClientMode(true);
-            return socket;
-        }
-
-        OpenSSLSocketImpl createServerSocket(OpenSSLContextImpl context, ServerSocket listener)
-                throws IOException {
-            SSLSocketFactory factory = context.engineGetSocketFactory();
-            Conscrypt.SocketFactories.setUseEngineSocket(factory, useEngineSocket);
-            OpenSSLSocketImpl socket = (OpenSSLSocketImpl) factory.createSocket(listener.accept(),
-                    null, -1, // hostname, port
-                    true); // autoclose
-            assertSocketType(socket);
-            socket.setUseClientMode(false);
-            return socket;
-        }
-
-        abstract void assertSocketType(Socket socket);
-    }
-
-    @Parameters(name = "{0}")
-    public static Iterable<SocketType> data() {
-        return Arrays.asList(SocketType.DEFAULT, SocketType.ENGINE);
-    }
-
-    @Parameter public SocketType socketType;
 
     private X509Certificate ca;
     private X509Certificate cert;
@@ -126,12 +61,15 @@ public class OpenSSLSocketImplTest {
     private PrivateKey certKey;
 
     private Field contextSSLParameters;
-    private ExecutorService executor;
+    private Field sslParametersTrustManager;
 
     @Before
     public void setUp() throws Exception {
         contextSSLParameters = OpenSSLContextImpl.class.getDeclaredField("sslParameters");
         contextSSLParameters.setAccessible(true);
+
+        sslParametersTrustManager = SSLParametersImpl.class.getDeclaredField("x509TrustManager");
+        sslParametersTrustManager.setAccessible(true);
 
         ca = OpenSSLX509Certificate.fromX509PemInputStream(openTestFile("ca-cert.pem"));
         cert = OpenSSLX509Certificate.fromX509PemInputStream(openTestFile("cert.pem"));
@@ -139,28 +77,18 @@ public class OpenSSLSocketImplTest {
                 OpenSSLX509Certificate.fromX509PemInputStream(openTestFile("cert-ct-embedded.pem"));
         certKey = OpenSSLKey.fromPrivateKeyPemInputStream(openTestFile("cert-key.pem"))
                           .getPrivateKey();
-        executor = Executors.newCachedThreadPool();
-    }
-
-    @After
-    public void teardown() throws Exception {
-        executor.shutdown();
-        executor.awaitTermination(5, TimeUnit.SECONDS);
     }
 
     abstract class Hooks implements HandshakeCompletedListener {
         KeyManager[] keyManagers;
         TrustManager[] trustManagers;
 
-        abstract OpenSSLSocketImpl createSocket(ServerSocket listener) throws IOException;
+        abstract OpenSSLSocketImpl createSocket(SSLSocketFactory factory, ServerSocket listener)
+                throws IOException;
 
-        OpenSSLContextImpl createContext() throws IOException {
+        public OpenSSLContextImpl createContext() throws Exception {
             OpenSSLContextImpl context = OpenSSLContextImpl.getPreferred();
-            try {
-                context.engineInit(keyManagers, trustManagers, null);
-            } catch (KeyManagementException e) {
-                throw new IOException(e);
-            }
+            context.engineInit(keyManagers, trustManagers, null);
             return context;
         }
 
@@ -170,31 +98,39 @@ public class OpenSSLSocketImplTest {
             isHandshakeCompleted = true;
         }
 
-        SSLParametersImpl getContextSSLParameters(OpenSSLContextImpl context)
+        protected SSLParametersImpl getContextSSLParameters(OpenSSLContextImpl context)
                 throws IllegalAccessException {
             return (SSLParametersImpl) contextSSLParameters.get(context);
+        }
+
+        protected TrustManager getSSLParametersTrustManager(SSLParametersImpl params)
+                throws IllegalAccessException {
+            return (TrustManager) sslParametersTrustManager.get(params);
         }
     }
 
     class ClientHooks extends Hooks {
+        boolean ctVerificationEnabled;
         String hostname = "example.com";
 
         @Override
-        public OpenSSLContextImpl createContext() throws IOException {
+        public OpenSSLContextImpl createContext() throws Exception {
             OpenSSLContextImpl context = super.createContext();
-            try {
-                SSLParametersImpl sslParameters = getContextSSLParameters(context);
-                sslParameters.setCTVerificationEnabled(true);
-            } catch (IllegalAccessException e) {
-                throw new IOException(e);
+            SSLParametersImpl sslParameters = getContextSSLParameters(context);
+            if (ctVerificationEnabled) {
+                sslParameters.setCTVerificationEnabled(ctVerificationEnabled);
             }
             return context;
         }
 
         @Override
-        OpenSSLSocketImpl createSocket(ServerSocket listener) throws IOException {
-            OpenSSLSocketImpl socket = socketType.createClientSocket(createContext(), listener);
+        public OpenSSLSocketImpl createSocket(SSLSocketFactory factory, ServerSocket listener)
+                throws IOException {
+            OpenSSLSocketImpl socket = (OpenSSLSocketImpl) factory.createSocket(
+                    listener.getInetAddress(), listener.getLocalPort());
+            socket.setUseClientMode(true);
             socket.setHostname(hostname);
+
             return socket;
         }
     }
@@ -204,21 +140,22 @@ public class OpenSSLSocketImplTest {
         byte[] ocspResponse;
 
         @Override
-        public OpenSSLContextImpl createContext() throws IOException {
+        public OpenSSLContextImpl createContext() throws Exception {
             OpenSSLContextImpl context = super.createContext();
-            try {
-                SSLParametersImpl sslParameters = getContextSSLParameters(context);
-                sslParameters.setSCTExtension(sctTLSExtension);
-                sslParameters.setOCSPResponse(ocspResponse);
-                return context;
-            } catch (IllegalAccessException e) {
-                throw new IOException(e);
-            }
+            SSLParametersImpl sslParameters = getContextSSLParameters(context);
+            sslParameters.setSCTExtension(sctTLSExtension);
+            sslParameters.setOCSPResponse(ocspResponse);
+            return context;
         }
 
         @Override
-        OpenSSLSocketImpl createSocket(ServerSocket listener) throws IOException {
-            return socketType.createServerSocket(createContext(), listener);
+        public OpenSSLSocketImpl createSocket(SSLSocketFactory factory, ServerSocket listener)
+                throws IOException {
+            OpenSSLSocketImpl socket = (OpenSSLSocketImpl) factory.createSocket(listener.accept(),
+                    null, -1, // hostname, port
+                    true); // autoclose
+            socket.setUseClientMode(false);
+            return socket;
         }
     }
 
@@ -232,7 +169,7 @@ public class OpenSSLSocketImplTest {
         Exception clientException;
         Exception serverException;
 
-        TestConnection(X509Certificate[] chain, PrivateKey key) throws Exception {
+        public TestConnection(X509Certificate[] chain, PrivateKey key) throws Exception {
             clientHooks = new ClientHooks();
             serverHooks = new ServerHooks();
             setCertificates(chain, key);
@@ -272,11 +209,12 @@ public class OpenSSLSocketImplTest {
             }
         }
 
-        void doHandshake() throws Exception {
-            ServerSocket listener = newServerSocket();
+        public void doHandshake() throws Exception {
+            ServerSocket listener = new ServerSocket(0);
             Future<OpenSSLSocketImpl> clientFuture = handshake(listener, clientHooks);
             Future<OpenSSLSocketImpl> serverFuture = handshake(listener, serverHooks);
 
+            Exception cause = null;
             try {
                 client = getOrThrowCause(clientFuture, TIMEOUT_SECONDS, TimeUnit.SECONDS);
             } catch (Exception e) {
@@ -290,14 +228,24 @@ public class OpenSSLSocketImplTest {
         }
 
         Future<OpenSSLSocketImpl> handshake(final ServerSocket listener, final Hooks hooks) {
-            return executor.submit(() -> {
-                OpenSSLSocketImpl socket = hooks.createSocket(listener);
-                socket.addHandshakeCompletedListener(hooks);
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            Future<OpenSSLSocketImpl> future = executor.submit(new Callable<OpenSSLSocketImpl>() {
+                @Override
+                public OpenSSLSocketImpl call() throws Exception {
+                    OpenSSLContextImpl context = hooks.createContext();
+                    SSLSocketFactory factory = context.engineGetSocketFactory();
+                    OpenSSLSocketImpl socket = hooks.createSocket(factory, listener);
+                    socket.addHandshakeCompletedListener(hooks);
 
-                socket.startHandshake();
+                    socket.startHandshake();
 
-                return socket;
+                    return socket;
+                }
             });
+
+            executor.shutdown();
+
+            return future;
         }
     }
 
@@ -315,6 +263,8 @@ public class OpenSSLSocketImplTest {
         TestConnection connection =
                 new TestConnection(new X509Certificate[] {certEmbedded, ca}, certKey);
 
+        connection.clientHooks.ctVerificationEnabled = true;
+
         connection.doHandshake();
 
         assertTrue(connection.clientHooks.isHandshakeCompleted);
@@ -325,6 +275,7 @@ public class OpenSSLSocketImplTest {
     public void test_handshakeWithSCTFromOCSPResponse() throws Exception {
         TestConnection connection = new TestConnection(new X509Certificate[] {cert, ca}, certKey);
 
+        connection.clientHooks.ctVerificationEnabled = true;
         connection.serverHooks.ocspResponse = readTestFile("ocsp-response.der");
 
         connection.doHandshake();
@@ -337,6 +288,7 @@ public class OpenSSLSocketImplTest {
     public void test_handshakeWithSCTFromTLSExtension() throws Exception {
         TestConnection connection = new TestConnection(new X509Certificate[] {cert, ca}, certKey);
 
+        connection.clientHooks.ctVerificationEnabled = true;
         connection.serverHooks.sctTLSExtension = readTestFile("ct-signed-timestamp-list");
 
         connection.doHandshake();
@@ -350,6 +302,8 @@ public class OpenSSLSocketImplTest {
     public void test_handshake_failsWithMissingSCT() throws Exception {
         TestConnection connection = new TestConnection(new X509Certificate[] {cert, ca}, certKey);
 
+        connection.clientHooks.ctVerificationEnabled = true;
+
         connection.doHandshake();
         assertThat(connection.clientException, instanceOf(SSLHandshakeException.class));
         assertThat(connection.clientException.getCause(), instanceOf(CertificateException.class));
@@ -360,6 +314,7 @@ public class OpenSSLSocketImplTest {
     public void test_handshake_failsWithInvalidSCT() throws Exception {
         TestConnection connection = new TestConnection(new X509Certificate[] {cert, ca}, certKey);
 
+        connection.clientHooks.ctVerificationEnabled = true;
         connection.serverHooks.sctTLSExtension = readTestFile("ct-signed-timestamp-list-invalid");
 
         connection.doHandshake();
@@ -370,18 +325,20 @@ public class OpenSSLSocketImplTest {
     // http://b/27250522
     @Test
     public void test_setSoTimeout_doesNotCreateSocketImpl() throws Exception {
-        ServerSocket listening = newServerSocket();
+        ServerSocket listening = new ServerSocket(0);
         Socket underlying = new Socket(listening.getInetAddress(), listening.getLocalPort());
 
-        Socket socket = TestUtils.getConscryptSocketFactory(socketType == SocketType.ENGINE)
-                                .createSocket(underlying, null, listening.getLocalPort(), false);
-        socketType.assertSocketType(socket);
-        socket.setSoTimeout(1000);
-        socket.close();
+        Constructor<OpenSSLSocketImpl> cons = OpenSSLSocketImpl.class.getDeclaredConstructor(
+                Socket.class, String.class, Integer.TYPE, Boolean.TYPE, SSLParametersImpl.class);
+        cons.setAccessible(true);
+        OpenSSLSocketImpl simpl =
+                cons.newInstance(underlying, null, listening.getLocalPort(), false, null);
+        simpl.setSoTimeout(1000);
+        simpl.close();
 
         Field f = Socket.class.getDeclaredField("created");
         f.setAccessible(true);
-        assertFalse(f.getBoolean(socket));
+        assertFalse(f.getBoolean(simpl));
     }
 
     @Test
@@ -390,8 +347,9 @@ public class OpenSSLSocketImplTest {
 
         connection.clientHooks = new ClientHooks() {
             @Override
-            public OpenSSLSocketImpl createSocket(ServerSocket listener) throws IOException {
-                OpenSSLSocketImpl socket = super.createSocket(listener);
+            public OpenSSLSocketImpl createSocket(SSLSocketFactory factory, ServerSocket listener)
+                    throws IOException {
+                OpenSSLSocketImpl socket = super.createSocket(factory, listener);
                 socket.setEnabledProtocols(new String[] {"SSLv3"});
                 assertEquals(
                         "SSLv3 should be filtered out", 0, socket.getEnabledProtocols().length);
@@ -407,9 +365,5 @@ public class OpenSSLSocketImplTest {
 
         assertFalse(connection.clientHooks.isHandshakeCompleted);
         assertFalse(connection.serverHooks.isHandshakeCompleted);
-    }
-
-    private static ServerSocket newServerSocket() throws IOException {
-        return new ServerSocket(0, 50, InetAddress.getLoopbackAddress());
     }
 }

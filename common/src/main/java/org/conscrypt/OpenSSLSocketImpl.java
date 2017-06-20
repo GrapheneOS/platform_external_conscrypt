@@ -438,7 +438,7 @@ public class OpenSSLSocketImpl
                 try {
                     shutdownAndFreeSslNative();
                 } catch (IOException ignored) {
-                    // Ignored.
+
                 }
             }
         }
@@ -702,6 +702,8 @@ public class OpenSSLSocketImpl
          * Reads one byte. If there is no data in the underlying buffer,
          * this operation can block until the data will be
          * available.
+         * @return read value.
+         * @throws IOException
          */
         @Override
         public int read() throws IOException {
@@ -820,17 +822,9 @@ public class OpenSSLSocketImpl
     @Override
     public SSLSession getSession() {
         if (sslSession == null) {
-            boolean handshakeCompleted = false;
             try {
-                if (isConnected()) {
-                    waitForHandshake();
-                    handshakeCompleted = true;
-                }
+                waitForHandshake();
             } catch (IOException e) {
-                // Fall through.
-            }
-
-            if (!handshakeCompleted) {
                 // return an invalid session with
                 // invalid cipher suite of "SSL_NULL_WITH_NULL_NULL"
                 return SSLNullSession.getNullSession();
@@ -1120,8 +1114,8 @@ public class OpenSSLSocketImpl
     public void close() throws IOException {
         // TODO: Close SSL sockets using a background thread so they close gracefully.
 
-        SSLInputStream sslInputStream;
-        SSLOutputStream sslOutputStream;
+        SSLInputStream sslInputStream = null;
+        SSLOutputStream sslOutputStream = null;
 
         synchronized (stateLock) {
             if (state == STATE_CLOSED) {

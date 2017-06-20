@@ -189,7 +189,7 @@ public class OpenSSLEngineImplTest {
     @Test
     public void exchangeLargeMessage() throws Exception {
         setupEngines(TestKeyStore.getClient(), TestKeyStore.getServer());
-        TestUtils.doEngineHandshake(clientEngine, serverEngine);
+        TestUtil.doEngineHandshake(clientEngine, serverEngine);
 
         // Create the input message.
         final int largeMessageSize = 16413;

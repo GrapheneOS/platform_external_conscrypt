@@ -568,10 +568,6 @@ size_t RsaMethodSize(const RSA *rsa) {
   return ex_data->cached_size;
 }
 
-// TODO(davidben): Remove this once
-// https://boringssl-review.googlesource.com/c/15864/ is in all Conscrypt
-// consumers.
-#if BORINGSSL_API_VERSION < 4
 int RsaMethodEncrypt(RSA* /* rsa */,
                      size_t* /* out_len */,
                      uint8_t* /* out */,
@@ -582,7 +578,6 @@ int RsaMethodEncrypt(RSA* /* rsa */,
   OPENSSL_PUT_ERROR(RSA, RSA_R_UNKNOWN_ALGORITHM_TYPE);
   return 0;
 }
-#endif
 
 int RsaMethodSignRaw(RSA* rsa,
                      size_t* out_len,
@@ -755,12 +750,8 @@ void init_engine_globals() {
 
     g_rsa_method.common.is_static = 1;
     g_rsa_method.size = RsaMethodSize;
-    // TODO(davidben): Remove this once
-    // https://boringssl-review.googlesource.com/c/15864/ is in all Conscrypt
-    // consumers.
-#if BORINGSSL_API_VERSION < 4
+    // TODO(davidben): Update BoringSSL to ignore this hook and remove this.
     g_rsa_method.encrypt = RsaMethodEncrypt;
-#endif
     g_rsa_method.sign_raw = RsaMethodSignRaw;
     g_rsa_method.decrypt = RsaMethodDecrypt;
     g_rsa_method.flags = RSA_FLAG_OPAQUE;
@@ -7631,6 +7622,8 @@ static void NativeCrypto_SSL_shutdown(JNIEnv* env, jclass, jlong ssl_address,
         return;
     }
     if (fdObject == nullptr) {
+        Errors::jniThrowNullPointerException(env, "fd == null");
+        JNI_TRACE("ssl=%p NativeCrypto_SSL_shutdown => fd == null", ssl);
         return;
     }
     if (shc == nullptr) {

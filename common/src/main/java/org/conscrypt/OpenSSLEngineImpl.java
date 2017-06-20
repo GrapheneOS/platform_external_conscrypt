@@ -369,7 +369,7 @@ final class OpenSSLEngineImpl extends SSLEngine implements NativeCrypto.SSLHands
                 String logMessage = String.format("ssl_unexpected_ccs: host=%s", getSniHostname());
                 Platform.logEvent(logMessage);
             }
-            throw SSLUtils.toSSLHandshakeException(e);
+            throw new SSLException(e);
         } finally {
             if (releaseResources) {
                 engineState = EngineState.CLOSED;
@@ -399,7 +399,7 @@ final class OpenSSLEngineImpl extends SSLEngine implements NativeCrypto.SSLHands
             if (engineState == EngineState.CLOSED || engineState == EngineState.CLOSED_OUTBOUND) {
                 return;
             }
-            if (isHandshakeStarted()) {
+            if (engineState != EngineState.MODE_SET && engineState != EngineState.NEW) {
                 shutdownAndFreeSslNative();
             }
             if (engineState == EngineState.CLOSED_INBOUND) {
@@ -575,7 +575,7 @@ final class OpenSSLEngineImpl extends SSLEngine implements NativeCrypto.SSLHands
     @Override
     public void setUseClientMode(boolean mode) {
         synchronized (stateLock) {
-            if (isHandshakeStarted()) {
+            if (engineState != EngineState.MODE_SET && engineState != EngineState.NEW) {
                 throw new IllegalArgumentException(
                         "Can not change mode after handshake: engineState == " + engineState);
             }
@@ -1317,11 +1317,6 @@ final class OpenSSLEngineImpl extends SSLEngine implements NativeCrypto.SSLHands
     public void onSSLStateChange(int type, int val) {
         synchronized (stateLock) {
             switch (type) {
-                case SSL_CB_HANDSHAKE_START:
-                    // For clients, this will allow the NEED_UNWRAP status to be
-                    // returned.
-                    engineState = EngineState.HANDSHAKE_STARTED;
-                    break;
                 case SSL_CB_HANDSHAKE_DONE:
                     if (engineState != EngineState.HANDSHAKE_STARTED
                             && engineState != EngineState.READY_HANDSHAKE_CUT_THROUGH) {
@@ -1330,7 +1325,11 @@ final class OpenSSLEngineImpl extends SSLEngine implements NativeCrypto.SSLHands
                     }
                     engineState = EngineState.HANDSHAKE_COMPLETED;
                     break;
-
+                case SSL_CB_HANDSHAKE_START:
+                    // For clients, this will allow the NEED_UNWRAP status to be
+                    // returned.
+                    engineState = EngineState.HANDSHAKE_STARTED;
+                    break;
             }
         }
     }
@@ -1357,7 +1356,8 @@ final class OpenSSLEngineImpl extends SSLEngine implements NativeCrypto.SSLHands
                     NativeCrypto.SSL_get1_session(sslNativePointer), null, peerCertChain, ocspData,
                     tlsSctData, getSniHostname(), getPeerPort(), null);
 
-            if (getUseClientMode()) {
+            boolean client = sslParameters.getUseClientMode();
+            if (client) {
                 Platform.checkServerTrusted(x509tm, peerCertChain, authMethod, this);
             } else {
                 String authType = peerCertChain[0].getPublicKey().getAlgorithm();
