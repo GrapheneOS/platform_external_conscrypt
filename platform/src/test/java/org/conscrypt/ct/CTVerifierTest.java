@@ -22,7 +22,7 @@ import static org.conscrypt.TestUtils.readTestFile;
 import java.security.PublicKey;
 import java.util.Arrays;
 import junit.framework.TestCase;
-import org.conscrypt.InternalUtil;
+import org.conscrypt.OpenSSLKey;
 import org.conscrypt.OpenSSLX509Certificate;
 
 public class CTVerifierTest extends TestCase {
@@ -33,17 +33,16 @@ public class CTVerifierTest extends TestCase {
 
     @Override
     public void setUp() throws Exception {
-        super.setUp();
         ca = OpenSSLX509Certificate.fromX509PemInputStream(openTestFile("ca-cert.pem"));
         cert = OpenSSLX509Certificate.fromX509PemInputStream(openTestFile("cert.pem"));
         certEmbedded = OpenSSLX509Certificate.fromX509PemInputStream(
                 openTestFile("cert-ct-embedded.pem"));
 
-        PublicKey key = InternalUtil.readPublicKeyPem(openTestFile("ct-server-key-public.pem"));
+        PublicKey key = OpenSSLKey.fromPublicKeyPemInputStream(
+                openTestFile("ct-server-key-public.pem")).getPublicKey();
 
         final CTLogInfo log = new CTLogInfo(key, "Test Log", "foo");
         CTLogStore store = new CTLogStore() {
-            @Override
             public CTLogInfo getKnownLog(byte[] logId) {
                 if (Arrays.equals(logId, log.getID())) {
                     return log;

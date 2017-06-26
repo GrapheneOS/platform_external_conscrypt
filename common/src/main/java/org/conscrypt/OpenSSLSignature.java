@@ -40,7 +40,7 @@ import java.security.spec.PSSParameterSpec;
  */
 @Internal
 public class OpenSSLSignature extends SignatureSpi {
-    private enum EngineType {
+    private static enum EngineType {
         RSA, EC,
     }
 
@@ -86,7 +86,7 @@ public class OpenSSLSignature extends SignatureSpi {
         this.evpMdRef = evpMdRef;
     }
 
-    private void resetContext() throws InvalidAlgorithmParameterException {
+    private final void resetContext() throws InvalidAlgorithmParameterException {
         NativeRef.EVP_MD_CTX ctxLocal = new NativeRef.EVP_MD_CTX(NativeCrypto.EVP_MD_CTX_create());
         if (signing) {
             evpPkeyCtx = NativeCrypto.EVP_DigestSignInit(ctxLocal, evpMdRef, key.getNativeRef());
@@ -354,7 +354,7 @@ public class OpenSSLSignature extends SignatureSpi {
         private long mgf1EvpMdRef;
         private int saltSizeBytes;
 
-        RSAPSSPadding(
+        public RSAPSSPadding(
                 long contentDigestEvpMdRef, String contentDigestAlgorithm, int saltSizeBytes) {
             super(contentDigestEvpMdRef, EngineType.RSA);
             this.contentDigestAlgorithm = contentDigestAlgorithm;

@@ -24,21 +24,24 @@ import java.io.InputStream;
  * Provides an interface to OpenSSL's BIO system directly from a Java
  * InputStream. It allows an OpenSSL API to read directly from something more
  * flexible interface than a byte array.
+ *
+ * @hide
  */
-class OpenSSLBIOInputStream extends FilterInputStream {
+@Internal
+public class OpenSSLBIOInputStream extends FilterInputStream {
     private long ctx;
 
-    OpenSSLBIOInputStream(InputStream is, boolean isFinite) {
+    public OpenSSLBIOInputStream(InputStream is, boolean isFinite) {
         super(is);
 
         ctx = NativeCrypto.create_BIO_InputStream(this, isFinite);
     }
 
-    long getBioContext() {
+    public long getBioContext() {
         return ctx;
     }
 
-    void release() {
+    public void release() {
         NativeCrypto.BIO_free_all(ctx);
     }
 
@@ -46,7 +49,7 @@ class OpenSSLBIOInputStream extends FilterInputStream {
      * Similar to a {@code readLine} method, but matches what OpenSSL expects
      * from a {@code BIO_gets} method.
      */
-    int gets(byte[] buffer) throws IOException {
+    public int gets(byte[] buffer) throws IOException {
         if (buffer == null || buffer.length == 0) {
             return 0;
         }

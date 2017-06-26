@@ -33,8 +33,11 @@ import org.conscrypt.OpenSSLX509CertificateFactory.ParsingException;
 
 /**
  * An implementation of {@link CertPath} based on BoringSSL.
+ *
+ * @hide
  */
-final class OpenSSLX509CertPath extends CertPath {
+@Internal
+public class OpenSSLX509CertPath extends CertPath {
     private static final long serialVersionUID = -3249106005255170761L;
 
     private static final byte[] PKCS7_MARKER = new byte[] {
@@ -83,7 +86,7 @@ final class OpenSSLX509CertPath extends CertPath {
         return ALL_ENCODINGS.iterator();
     }
 
-    OpenSSLX509CertPath(List<? extends X509Certificate> certificates) {
+    protected OpenSSLX509CertPath(List<? extends X509Certificate> certificates) {
         super("X.509");
 
         mCertificates = certificates;
@@ -233,7 +236,7 @@ final class OpenSSLX509CertPath extends CertPath {
         }
     }
 
-    static CertPath fromEncoding(InputStream inStream, String encoding)
+    public static CertPath fromEncoding(InputStream inStream, String encoding)
             throws CertificateException {
         if (inStream == null) {
             throw new CertificateException("inStream == null");
@@ -247,7 +250,7 @@ final class OpenSSLX509CertPath extends CertPath {
         return fromEncoding(inStream, enc);
     }
 
-    static CertPath fromEncoding(InputStream inStream) throws CertificateException {
+    public static CertPath fromEncoding(InputStream inStream) throws CertificateException {
         if (inStream == null) {
             throw new CertificateException("inStream == null");
         }

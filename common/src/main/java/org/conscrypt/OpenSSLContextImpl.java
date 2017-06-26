@@ -33,7 +33,7 @@ import javax.net.ssl.TrustManager;
  * @hide
  */
 @Internal
-public abstract class OpenSSLContextImpl extends SSLContextSpi {
+public class OpenSSLContextImpl extends SSLContextSpi {
 
     /**
      * The default SSLContextImpl for use with
@@ -51,14 +51,14 @@ public abstract class OpenSSLContextImpl extends SSLContextSpi {
     /** Server session cache. */
     private final ServerSessionContext serverSessionContext;
 
-    SSLParametersImpl sslParameters;
+    protected SSLParametersImpl sslParameters;
 
     /** Allows outside callers to get the preferred SSLContext. */
-    static OpenSSLContextImpl getPreferred() {
+    public static OpenSSLContextImpl getPreferred() {
         return new TLSv12();
     }
 
-    OpenSSLContextImpl(String[] algorithms) {
+    protected OpenSSLContextImpl(String[] algorithms) {
         this.algorithms = algorithms;
         clientSessionContext = new ClientSessionContext();
         serverSessionContext = new ServerSessionContext();
@@ -67,7 +67,7 @@ public abstract class OpenSSLContextImpl extends SSLContextSpi {
     /**
      * Constuctor for the DefaultSSLContextImpl.
      */
-    OpenSSLContextImpl() throws GeneralSecurityException, IOException {
+    protected OpenSSLContextImpl() throws GeneralSecurityException, IOException {
         synchronized (DefaultSSLContextImpl.class) {
             this.algorithms = null;
             if (DEFAULT_SSL_CONTEXT_IMPL == null) {
@@ -147,19 +147,19 @@ public abstract class OpenSSLContextImpl extends SSLContextSpi {
         return clientSessionContext;
     }
 
-    public static final class TLSv12 extends OpenSSLContextImpl {
+    public static class TLSv12 extends OpenSSLContextImpl {
         public TLSv12() {
             super(NativeCrypto.TLSV12_PROTOCOLS);
         }
     }
 
-    public static final class TLSv11 extends OpenSSLContextImpl {
+    public static class TLSv11 extends OpenSSLContextImpl {
         public TLSv11() {
             super(NativeCrypto.TLSV11_PROTOCOLS);
         }
     }
 
-    public static final class TLSv1 extends OpenSSLContextImpl {
+    public static class TLSv1 extends OpenSSLContextImpl {
         public TLSv1() {
             super(NativeCrypto.TLSV1_PROTOCOLS);
         }

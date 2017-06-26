@@ -22,24 +22,27 @@ import java.nio.ByteBuffer;
 
 /**
  * Wrapped by a BoringSSL BIO to act as a source of bytes.
+ *
+ * @hide
  */
-final class OpenSSLBIOSource {
+@Internal
+public final class OpenSSLBIOSource {
     private OpenSSLBIOInputStream source;
 
-    static OpenSSLBIOSource wrap(ByteBuffer buffer) {
+    public static OpenSSLBIOSource wrap(ByteBuffer buffer) {
         return new OpenSSLBIOSource(
             new OpenSSLBIOInputStream(new ByteBufferInputStream(buffer), false));
     }
 
-    private OpenSSLBIOSource(OpenSSLBIOInputStream source) {
+    public OpenSSLBIOSource(OpenSSLBIOInputStream source) {
         this.source = source;
     }
 
-    long getContext() {
+    public long getContext() {
         return source.getBioContext();
     }
 
-    private synchronized void release() {
+    public synchronized void release() {
         if (source != null) {
             NativeCrypto.BIO_free_all(source.getBioContext());
             source = null;
@@ -58,7 +61,7 @@ final class OpenSSLBIOSource {
     private static class ByteBufferInputStream extends InputStream {
         private final ByteBuffer source;
 
-        ByteBufferInputStream(ByteBuffer source) {
+        public ByteBufferInputStream(ByteBuffer source) {
             this.source = source;
         }
 

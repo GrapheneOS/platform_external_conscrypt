@@ -45,8 +45,10 @@ import javax.security.auth.x500.X500Principal;
  * from socket or engine.
  *
  * @see javax.net.ssl.KeyManager
+ * @hide
  */
-class KeyManagerImpl extends X509ExtendedKeyManager {
+@Internal
+public class KeyManagerImpl extends X509ExtendedKeyManager {
 
     // hashed key store information
     private final Hashtable<String, PrivateKeyEntry> hash;
@@ -57,7 +59,7 @@ class KeyManagerImpl extends X509ExtendedKeyManager {
      * @param keyStore
      * @param pwd
      */
-    KeyManagerImpl(KeyStore keyStore, char[] pwd) {
+    public KeyManagerImpl(KeyStore keyStore, char[] pwd) {
         this.hash = new Hashtable<String, PrivateKeyEntry>();
         final Enumeration<String> aliases;
         try {

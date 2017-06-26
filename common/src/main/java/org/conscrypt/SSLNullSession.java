@@ -26,27 +26,30 @@ import javax.net.ssl.*;
  * This is returned in the place of a {@link SSLSession} when no TLS connection could be negotiated,
  * but one was requested from a method that can't throw an exception such as {@link
  * SSLSocket#getSession()} before {@link SSLSocket#startHandshake()} is called.
+ *
+ * @hide
  */
-final class SSLNullSession implements SSLSession, Cloneable {
+@Internal
+public final class SSLNullSession implements SSLSession, Cloneable {
 
     /*
      * Holds default instances so class preloading doesn't create an instance of
      * it.
      */
     private static class DefaultHolder {
-        static final SSLNullSession NULL_SESSION = new SSLNullSession();
+        public static final SSLNullSession NULL_SESSION = new SSLNullSession();
     }
 
     private final HashMap<String, Object> values = new HashMap<String, Object>();
 
-    private long creationTime;
-    private long lastAccessedTime;
+    long creationTime;
+    long lastAccessedTime;
 
-    static SSLSession getNullSession() {
+    public static SSLSession getNullSession() {
         return DefaultHolder.NULL_SESSION;
     }
 
-    SSLNullSession() {
+    public SSLNullSession() {
         creationTime = System.currentTimeMillis();
         lastAccessedTime = creationTime;
     }

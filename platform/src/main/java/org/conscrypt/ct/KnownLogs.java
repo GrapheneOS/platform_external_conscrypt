@@ -19,12 +19,6 @@
 
 package org.conscrypt.ct;
 
-import org.conscrypt.Internal;
-
-/**
- * @hide
- */
-@Internal
 public final class KnownLogs {
     public static final int LOG_COUNT = 8;
     public static final String[] LOG_DESCRIPTIONS = new String[] {

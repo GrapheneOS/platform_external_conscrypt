@@ -19,17 +19,14 @@ import java.io.FileDescriptor;
 import java.io.UnsupportedEncodingException;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
-import java.security.KeyManagementException;
 import java.security.PrivateKey;
 import java.security.Provider;
-import javax.net.ssl.SSLContextSpi;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.X509TrustManager;
 
 /**
  * Core API for creating and configuring all Conscrypt types.
@@ -49,36 +46,6 @@ public final class Conscrypt {
      */
     public static Provider newProvider(String providerName) {
         return new OpenSSLProvider(providerName);
-    }
-
-    /**
-     * Constructs a new instance of the preferred {@link SSLContextSpi}.
-     */
-    public static SSLContextSpi newPreferredSSLContextSpi() {
-        return OpenSSLContextImpl.getPreferred();
-    }
-
-    /**
-     * Gets the default X.509 trust manager.
-     */
-    @ExperimentalApi
-    public static X509TrustManager getDefaultX509TrustManager() throws KeyManagementException {
-        return SSLParametersImpl.getDefaultX509TrustManager();
-    }
-
-    /**
-     * Utility that exposes common TLS constants.
-     */
-    @ExperimentalApi
-    public static final class Constants {
-        private Constants() {}
-
-        /**
-         * Returns the maximum length (in bytes) of an encrypted packet.
-         */
-        public static int maxEncryptedPacketLength() {
-            return NativeConstants.SSL3_RT_MAX_PACKET_SIZE;
-        }
     }
 
     /**

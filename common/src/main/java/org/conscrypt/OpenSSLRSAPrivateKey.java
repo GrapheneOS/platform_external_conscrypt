@@ -34,16 +34,17 @@ import java.security.spec.RSAPrivateKeySpec;
  *
  * @hide
  */
-class OpenSSLRSAPrivateKey implements RSAPrivateKey, OpenSSLKeyHolder {
+@Internal
+public class OpenSSLRSAPrivateKey implements RSAPrivateKey, OpenSSLKeyHolder {
     private static final long serialVersionUID = 4872170254439578735L;
 
-    transient OpenSSLKey key;
+    protected transient OpenSSLKey key;
 
-    transient boolean fetchedParams;
+    protected transient boolean fetchedParams;
 
-    BigInteger modulus;
+    protected BigInteger modulus;
 
-    BigInteger privateExponent;
+    protected BigInteger privateExponent;
 
     OpenSSLRSAPrivateKey(OpenSSLKey key) {
         this.key = key;
@@ -97,7 +98,7 @@ class OpenSSLRSAPrivateKey implements RSAPrivateKey, OpenSSLKeyHolder {
         return new OpenSSLRSAPrivateKey(key, params);
     }
 
-    static OpenSSLKey wrapPlatformKey(RSAPrivateKey rsaPrivateKey)
+    protected static OpenSSLKey wrapPlatformKey(RSAPrivateKey rsaPrivateKey)
             throws InvalidKeyException {
         OpenSSLKey wrapper = Platform.wrapRsaKey(rsaPrivateKey);
         if (wrapper != null) {

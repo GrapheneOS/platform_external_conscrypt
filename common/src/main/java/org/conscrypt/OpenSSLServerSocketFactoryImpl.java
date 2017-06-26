@@ -20,19 +20,21 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.security.KeyManagementException;
-import javax.net.ssl.SSLServerSocketFactory;
 
 /**
- * An implementation of {@link SSLServerSocketFactory} using BoringSSL.
+ * An implementation of {@link javax.net.ssl.SSLServerSocketFactory} using BoringSSL.
+ *
+ * @hide
  */
-final class OpenSSLServerSocketFactoryImpl extends SSLServerSocketFactory {
+@Internal
+public class OpenSSLServerSocketFactoryImpl extends javax.net.ssl.SSLServerSocketFactory {
     private static boolean useEngineSocketByDefault = SSLUtils.USE_ENGINE_SOCKET_BY_DEFAULT;
 
     private SSLParametersImpl sslParameters;
     private IOException instantiationException;
     private boolean useEngineSocket = useEngineSocketByDefault;
 
-    OpenSSLServerSocketFactoryImpl() {
+    public OpenSSLServerSocketFactoryImpl() {
         try {
             this.sslParameters = SSLParametersImpl.getDefault();
             this.sslParameters.setUseClientMode(false);
@@ -43,7 +45,7 @@ final class OpenSSLServerSocketFactoryImpl extends SSLServerSocketFactory {
         }
     }
 
-    OpenSSLServerSocketFactoryImpl(SSLParametersImpl sslParameters) {
+    public OpenSSLServerSocketFactoryImpl(SSLParametersImpl sslParameters) {
         this.sslParameters = (SSLParametersImpl) sslParameters.clone();
         this.sslParameters.setUseClientMode(false);
     }
@@ -51,7 +53,7 @@ final class OpenSSLServerSocketFactoryImpl extends SSLServerSocketFactory {
     /**
      * Configures the default socket to be created for all instances.
      */
-    static void setUseEngineSocketByDefault(boolean useEngineSocket) {
+    public static void setUseEngineSocketByDefault(boolean useEngineSocket) {
         useEngineSocketByDefault = useEngineSocket;
     }
 
@@ -59,7 +61,7 @@ final class OpenSSLServerSocketFactoryImpl extends SSLServerSocketFactory {
      * Configures the socket to be created for this instance. If not called,
      * {@link #useEngineSocketByDefault} will be used.
      */
-    void setUseEngineSocket(boolean useEngineSocket) {
+    public void setUseEngineSocket(boolean useEngineSocket) {
         this.useEngineSocket = useEngineSocket;
     }
 

@@ -28,7 +28,6 @@ public class BlockGuard {
     public static class PolicyWrapper implements Policy {
         private PolicyWrapper() {}
 
-        @Override
         public void onNetwork() {
             throw new UnsupportedOperationException("Stub!");
         }

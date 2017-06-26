@@ -19,11 +19,14 @@ package org.conscrypt;
 /**
  * Used to hold onto native OpenSSL references and run finalization on those
  * objects. Individual types must subclass this and implement finalizer.
+ *
+ * @hide
  */
-abstract class NativeRef {
+@Internal
+public abstract class NativeRef {
     final long context;
 
-    NativeRef(long ctx) {
+    public NativeRef(long ctx) {
         if (ctx == 0) {
             throw new NullPointerException("ctx == 0");
         }
@@ -45,8 +48,8 @@ abstract class NativeRef {
         return (int) context;
     }
 
-    static class EC_GROUP extends NativeRef {
-        EC_GROUP(long ctx) {
+    public static class EC_GROUP extends NativeRef {
+        public EC_GROUP(long ctx) {
             super(ctx);
         }
 
@@ -60,8 +63,8 @@ abstract class NativeRef {
         }
     }
 
-    static class EC_POINT extends NativeRef {
-        EC_POINT(long ctx) {
+    public static class EC_POINT extends NativeRef {
+        public EC_POINT(long ctx) {
             super(ctx);
         }
 
@@ -75,8 +78,8 @@ abstract class NativeRef {
         }
     }
 
-    static class EVP_CIPHER_CTX extends NativeRef {
-        EVP_CIPHER_CTX(long ctx) {
+    public static class EVP_CIPHER_CTX extends NativeRef {
+        public EVP_CIPHER_CTX(long ctx) {
             super(ctx);
         }
 
@@ -90,8 +93,8 @@ abstract class NativeRef {
         }
     }
 
-    static class EVP_MD_CTX extends NativeRef {
-        EVP_MD_CTX(long ctx) {
+    public static class EVP_MD_CTX extends NativeRef {
+        public EVP_MD_CTX(long ctx) {
             super(ctx);
         }
 
@@ -105,8 +108,8 @@ abstract class NativeRef {
         }
     }
 
-    static class EVP_PKEY extends NativeRef {
-        EVP_PKEY(long ctx) {
+    public static class EVP_PKEY extends NativeRef {
+        public EVP_PKEY(long ctx) {
             super(ctx);
         }
 
@@ -120,8 +123,8 @@ abstract class NativeRef {
         }
     }
 
-    static class EVP_PKEY_CTX extends NativeRef {
-        EVP_PKEY_CTX(long ctx) {
+    public static class EVP_PKEY_CTX extends NativeRef {
+        public EVP_PKEY_CTX(long ctx) {
             super(ctx);
         }
 
@@ -135,8 +138,8 @@ abstract class NativeRef {
         }
     }
 
-    static class HMAC_CTX extends NativeRef {
-        HMAC_CTX(long ctx) {
+    public static class HMAC_CTX extends NativeRef {
+        public HMAC_CTX(long ctx) {
             super(ctx);
         }
 

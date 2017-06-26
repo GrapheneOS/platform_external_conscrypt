@@ -49,9 +49,7 @@ import javax.net.ssl.TrustManagerFactorySpi;
  * TrustManagerFactory service provider interface implementation.
  *
  * @see javax.net.ssl.TrustManagerFactorySpi
- * @hide
  */
-@Internal
 public class TrustManagerFactoryImpl extends TrustManagerFactorySpi {
 
     private KeyStore keyStore;

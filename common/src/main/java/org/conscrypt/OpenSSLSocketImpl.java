@@ -177,7 +177,7 @@ public class OpenSSLSocketImpl
 
     private int handshakeTimeoutMilliseconds = -1;  // -1 = same as timeout; 0 = infinite
 
-    OpenSSLSocketImpl(SSLParametersImpl sslParameters) throws IOException {
+    protected OpenSSLSocketImpl(SSLParametersImpl sslParameters) throws IOException {
         this.socket = this;
         this.peerHostname = null;
         this.peerPort = -1;
@@ -185,7 +185,7 @@ public class OpenSSLSocketImpl
         this.sslParameters = sslParameters;
     }
 
-    OpenSSLSocketImpl(String hostname, int port, SSLParametersImpl sslParameters)
+    protected OpenSSLSocketImpl(String hostname, int port, SSLParametersImpl sslParameters)
             throws IOException {
         super(hostname, port);
         this.socket = this;
@@ -195,7 +195,7 @@ public class OpenSSLSocketImpl
         this.sslParameters = sslParameters;
     }
 
-    OpenSSLSocketImpl(InetAddress address, int port, SSLParametersImpl sslParameters)
+    protected OpenSSLSocketImpl(InetAddress address, int port, SSLParametersImpl sslParameters)
             throws IOException {
         super(address, port);
         this.socket = this;
@@ -206,7 +206,7 @@ public class OpenSSLSocketImpl
     }
 
 
-    OpenSSLSocketImpl(String hostname, int port,
+    protected OpenSSLSocketImpl(String hostname, int port,
                                 InetAddress clientAddress, int clientPort,
                                 SSLParametersImpl sslParameters) throws IOException {
         super(hostname, port, clientAddress, clientPort);
@@ -217,7 +217,7 @@ public class OpenSSLSocketImpl
         this.sslParameters = sslParameters;
     }
 
-    OpenSSLSocketImpl(InetAddress address, int port,
+    protected OpenSSLSocketImpl(InetAddress address, int port,
                                 InetAddress clientAddress, int clientPort,
                                 SSLParametersImpl sslParameters) throws IOException {
         super(address, port, clientAddress, clientPort);
@@ -232,7 +232,7 @@ public class OpenSSLSocketImpl
      * Create an SSL socket that wraps another socket. Invoked by
      * OpenSSLSocketImplWrapper constructor.
      */
-    OpenSSLSocketImpl(Socket socket, String hostname, int port,
+    protected OpenSSLSocketImpl(Socket socket, String hostname, int port,
             boolean autoClose, SSLParametersImpl sslParameters) throws IOException {
         this.socket = socket;
         this.peerHostname = hostname;
@@ -672,7 +672,10 @@ public class OpenSSLSocketImpl
                     stateLock.wait();
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
-                    throw new IOException("Interrupted waiting for handshake", e);
+                    IOException ioe = new IOException("Interrupted waiting for handshake");
+                    ioe.initCause(e);
+
+                    throw ioe;
                 }
             }
 
@@ -740,7 +743,7 @@ public class OpenSSLSocketImpl
             }
         }
 
-        void awaitPendingOps() {
+        public void awaitPendingOps() {
             if (DBG_STATE) {
                 synchronized (stateLock) {
                     if (state != STATE_CLOSED) throw new AssertionError("State is: " + state);
@@ -807,7 +810,7 @@ public class OpenSSLSocketImpl
         }
 
 
-        void awaitPendingOps() {
+        public void awaitPendingOps() {
             if (DBG_STATE) {
                 synchronized (stateLock) {
                     if (state != STATE_CLOSED) throw new AssertionError("State is: " + state);

@@ -46,25 +46,22 @@ import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
 import javax.crypto.spec.SecretKeySpec;
 
-/**
- * @hide
- */
 @Internal
 abstract class OpenSSLCipherRSA extends CipherSpi {
     /**
      * The current OpenSSL key we're operating on.
      */
-    OpenSSLKey key;
+    protected OpenSSLKey key;
 
     /**
      * Current key type: private or public.
      */
-    boolean usingPrivateKey;
+    protected boolean usingPrivateKey;
 
     /**
      * Current cipher mode: encrypting or decrypting.
      */
-    boolean encrypting;
+    protected boolean encrypting;
 
     /**
      * Buffer for operations
@@ -85,9 +82,9 @@ abstract class OpenSSLCipherRSA extends CipherSpi {
     /**
      * Current padding mode
      */
-    int padding = NativeConstants.RSA_PKCS1_PADDING;
+    protected int padding = NativeConstants.RSA_PKCS1_PADDING;
 
-    OpenSSLCipherRSA(int padding) {
+    protected OpenSSLCipherRSA(int padding) {
         this.padding = padding;
     }
 
@@ -132,7 +129,7 @@ abstract class OpenSSLCipherRSA extends CipherSpi {
         return paddedBlockSizeBytes();
     }
 
-    int paddedBlockSizeBytes() {
+    protected int paddedBlockSizeBytes() {
         int paddedBlockSizeBytes = keySizeBytes();
         if (padding == NativeConstants.RSA_PKCS1_PADDING) {
             paddedBlockSizeBytes--;  // for 0 prefix
@@ -141,7 +138,7 @@ abstract class OpenSSLCipherRSA extends CipherSpi {
         return paddedBlockSizeBytes;
     }
 
-    int keySizeBytes() {
+    protected int keySizeBytes() {
         if (!isInitialized()) {
             throw new IllegalStateException("cipher is not initialized");
         }
@@ -151,7 +148,7 @@ abstract class OpenSSLCipherRSA extends CipherSpi {
     /**
      * Returns {@code true} if the cipher has been initialized.
      */
-    boolean isInitialized() {
+    protected boolean isInitialized() {
         return key != null;
     }
 
@@ -165,10 +162,10 @@ abstract class OpenSSLCipherRSA extends CipherSpi {
         return null;
     }
 
-    void doCryptoInit(AlgorithmParameterSpec spec)
+    protected void doCryptoInit(AlgorithmParameterSpec spec)
             throws InvalidAlgorithmParameterException {}
 
-    void engineInitInternal(int opmode, Key key, AlgorithmParameterSpec spec)
+    protected void engineInitInternal(int opmode, Key key, AlgorithmParameterSpec spec)
             throws InvalidKeyException, InvalidAlgorithmParameterException {
         if (opmode == Cipher.ENCRYPT_MODE || opmode == Cipher.WRAP_MODE) {
             encrypting = true;
@@ -292,7 +289,7 @@ abstract class OpenSSLCipherRSA extends CipherSpi {
         return output;
     }
 
-    abstract int doCryptoOperation(final byte[] tmpBuf, byte[] output)
+    protected abstract int doCryptoOperation(final byte[] tmpBuf, byte[] output)
             throws BadPaddingException, IllegalBlockSizeException;
 
     @Override
@@ -354,7 +351,7 @@ abstract class OpenSSLCipherRSA extends CipherSpi {
         }
 
         @Override
-        int doCryptoOperation(final byte[] tmpBuf, byte[] output)
+        protected int doCryptoOperation(final byte[] tmpBuf, byte[] output)
                 throws BadPaddingException, IllegalBlockSizeException {
             int resultSize;
             if (encrypting) {
@@ -396,7 +393,7 @@ abstract class OpenSSLCipherRSA extends CipherSpi {
         }
     }
 
-    static class OAEP extends OpenSSLCipherRSA {
+    protected static class OAEP extends OpenSSLCipherRSA {
         private long oaepMd;
         private int oaepMdSizeBytes;
 
@@ -481,7 +478,7 @@ abstract class OpenSSLCipherRSA extends CipherSpi {
         }
 
         @Override
-        void doCryptoInit(AlgorithmParameterSpec spec)
+        protected void doCryptoInit(AlgorithmParameterSpec spec)
                 throws InvalidAlgorithmParameterException {
             pkeyCtx = new NativeRef.EVP_PKEY_CTX(encrypting
                             ? NativeCrypto.EVP_PKEY_encrypt_init(key.getNativeRef())
@@ -501,7 +498,7 @@ abstract class OpenSSLCipherRSA extends CipherSpi {
         }
 
         @Override
-        int paddedBlockSizeBytes() {
+        protected int paddedBlockSizeBytes() {
             int paddedBlockSizeBytes = keySizeBytes();
             // Size described in step 2 of decoding algorithm, but extra byte
             // needed to make sure it's smaller than the RSA key modulus size.
@@ -542,7 +539,7 @@ abstract class OpenSSLCipherRSA extends CipherSpi {
         }
 
         @Override
-        int doCryptoOperation(byte[] tmpBuf, byte[] output)
+        protected int doCryptoOperation(byte[] tmpBuf, byte[] output)
                 throws BadPaddingException, IllegalBlockSizeException {
             if (encrypting) {
                 return NativeCrypto.EVP_PKEY_encrypt(pkeyCtx, output, 0, tmpBuf, 0, tmpBuf.length);

@@ -16,7 +16,6 @@
 
 package org.conscrypt;
 
-import static org.conscrypt.TestUtils.UTF_8;
 import static org.junit.Assert.assertArrayEquals;
 
 import org.junit.Test;
@@ -26,7 +25,7 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public class SSLUtilsTest {
     private static final byte[] VALID_CHARACTERS =
-            "0123456789abcdefghijklmnopqrstuvwxyz".getBytes(UTF_8);
+            "0123456789abcdefghijklmnopqrstuvwxyz".getBytes();
 
     @Test
     public void noProtocolsShouldSucceed() {
@@ -42,7 +41,7 @@ public class SSLUtilsTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void longProtocolShouldThrow() {
-        SSLUtils.toLengthPrefixedList(new String(newValidProtocol(256), UTF_8));
+        SSLUtils.toLengthPrefixedList(new String(newValidProtocol(256)));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -53,9 +52,9 @@ public class SSLUtilsTest {
     @Test
     public void validProtocolsShouldSucceed() {
         byte[][] protocols = new byte[][]{
-                "protocol-1".getBytes(UTF_8),
-                "protocol-2".getBytes(UTF_8),
-                "protocol-3".getBytes(UTF_8),
+                "protocol-1".getBytes(),
+                "protocol-2".getBytes(),
+                "protocol-3".getBytes(),
         };
         byte[] expected = getExpectedEncodedBytes(protocols);
         byte[] actual = SSLUtils.toLengthPrefixedList(toStrings(protocols));
@@ -66,7 +65,7 @@ public class SSLUtilsTest {
         int numProtocols = protocols.length;
         String[] out = new String[numProtocols];
         for(int i = 0; i < numProtocols; ++i) {
-            out[i] = new String(protocols[i], UTF_8);
+            out[i] = new String(protocols[i]);
         }
         return out;
     }

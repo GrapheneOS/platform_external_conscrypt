@@ -40,7 +40,7 @@ import java.security.spec.X509EncodedKeySpec;
  * @hide
  */
 @Internal
-public final class OpenSSLRSAKeyFactory extends KeyFactorySpi {
+public class OpenSSLRSAKeyFactory extends KeyFactorySpi {
 
     @Override
     protected PublicKey engineGeneratePublic(KeySpec keySpec) throws InvalidKeySpecException {

@@ -18,14 +18,10 @@ package org.conscrypt.ct;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import org.conscrypt.Internal;
 
 /**
  * DigitallySigned structure, as defined by RFC5246 Section 4.7.
- *
- * @hide
  */
-@Internal
 public class DigitallySigned {
     public enum HashAlgorithm {
         NONE,

@@ -33,8 +33,11 @@ import java.util.Arrays;
 
 /**
  * An implementation of a {@link PrivateKey} for EC keys based on BoringSSL.
+ *
+ * @hide
  */
-final class OpenSSLECPrivateKey implements ECPrivateKey, OpenSSLKeyHolder {
+@Internal
+public final class OpenSSLECPrivateKey implements ECPrivateKey, OpenSSLKeyHolder {
     private static final long serialVersionUID = -4036633595001083922L;
 
     private static final String ALGORITHM = "EC";
@@ -43,18 +46,18 @@ final class OpenSSLECPrivateKey implements ECPrivateKey, OpenSSLKeyHolder {
 
     protected transient OpenSSLECGroupContext group;
 
-    OpenSSLECPrivateKey(OpenSSLECGroupContext group, OpenSSLKey key) {
+    public OpenSSLECPrivateKey(OpenSSLECGroupContext group, OpenSSLKey key) {
         this.group = group;
         this.key = key;
     }
 
-    OpenSSLECPrivateKey(OpenSSLKey key) {
+    public OpenSSLECPrivateKey(OpenSSLKey key) {
         this.group = new OpenSSLECGroupContext(new NativeRef.EC_GROUP(
                 NativeCrypto.EC_KEY_get1_group(key.getNativeRef())));
         this.key = key;
     }
 
-    OpenSSLECPrivateKey(ECPrivateKeySpec ecKeySpec) throws InvalidKeySpecException {
+    public OpenSSLECPrivateKey(ECPrivateKeySpec ecKeySpec) throws InvalidKeySpecException {
         try {
             group = OpenSSLECGroupContext.getInstance(ecKeySpec.getParams());
             final BigInteger privKey = ecKeySpec.getS();
@@ -65,7 +68,7 @@ final class OpenSSLECPrivateKey implements ECPrivateKey, OpenSSLKeyHolder {
         }
     }
 
-    static OpenSSLKey wrapPlatformKey(ECPrivateKey ecPrivateKey) throws InvalidKeyException {
+    public static OpenSSLKey wrapPlatformKey(ECPrivateKey ecPrivateKey) throws InvalidKeyException {
         OpenSSLECGroupContext group;
         try {
             group = OpenSSLECGroupContext.getInstance(ecPrivateKey.getParams());
@@ -128,12 +131,12 @@ final class OpenSSLECPrivateKey implements ECPrivateKey, OpenSSLKeyHolder {
                 group.getNativeRef()), true);
     }
 
-    static OpenSSLKey getInstance(ECPrivateKey ecPrivateKey) throws InvalidKeyException {
+    public static OpenSSLKey getInstance(ECPrivateKey ecPrivateKey) throws InvalidKeyException {
         try {
             OpenSSLECGroupContext group = OpenSSLECGroupContext.getInstance(ecPrivateKey
                     .getParams());
 
-            /*
+            /**
              * If the key is not encodable (PKCS11-like key), then wrap it and
              * use JNI upcalls to satisfy requests.
              */

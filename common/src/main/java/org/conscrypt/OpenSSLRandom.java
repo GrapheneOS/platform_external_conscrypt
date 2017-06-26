@@ -25,7 +25,7 @@ import java.security.SecureRandomSpi;
  * @hide
  */
 @Internal
-public final class OpenSSLRandom extends SecureRandomSpi implements Serializable {
+public class OpenSSLRandom extends SecureRandomSpi implements Serializable {
     private static final long serialVersionUID = 8506210602917522861L;
 
     @Override

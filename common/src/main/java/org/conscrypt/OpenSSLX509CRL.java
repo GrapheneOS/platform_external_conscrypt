@@ -45,15 +45,18 @@ import org.conscrypt.OpenSSLX509CertificateFactory.ParsingException;
 
 /**
  * An implementation of {@link X509CRL} based on BoringSSL.
+ *
+ * @hide
  */
-final class OpenSSLX509CRL extends X509CRL {
+@Internal
+public class OpenSSLX509CRL extends X509CRL {
     private final long mContext;
 
     private OpenSSLX509CRL(long ctx) {
         mContext = ctx;
     }
 
-    static OpenSSLX509CRL fromX509DerInputStream(InputStream is) throws ParsingException {
+    public static OpenSSLX509CRL fromX509DerInputStream(InputStream is) throws ParsingException {
         final OpenSSLBIOInputStream bis = new OpenSSLBIOInputStream(is, true);
 
         try {
@@ -69,7 +72,7 @@ final class OpenSSLX509CRL extends X509CRL {
         }
     }
 
-    static List<OpenSSLX509CRL> fromPkcs7DerInputStream(InputStream is)
+    public static List<OpenSSLX509CRL> fromPkcs7DerInputStream(InputStream is)
             throws ParsingException {
         OpenSSLBIOInputStream bis = new OpenSSLBIOInputStream(is, true);
 
@@ -92,7 +95,7 @@ final class OpenSSLX509CRL extends X509CRL {
         return certs;
     }
 
-    static OpenSSLX509CRL fromX509PemInputStream(InputStream is) throws ParsingException {
+    public static OpenSSLX509CRL fromX509PemInputStream(InputStream is) throws ParsingException {
         final OpenSSLBIOInputStream bis = new OpenSSLBIOInputStream(is, true);
 
         try {
@@ -108,7 +111,7 @@ final class OpenSSLX509CRL extends X509CRL {
         }
     }
 
-    static List<OpenSSLX509CRL> fromPkcs7PemInputStream(InputStream is)
+    public static List<OpenSSLX509CRL> fromPkcs7PemInputStream(InputStream is)
             throws ParsingException {
         OpenSSLBIOInputStream bis = new OpenSSLBIOInputStream(is, true);
 

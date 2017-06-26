@@ -22,14 +22,9 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.conscrypt.Internal;
-import org.conscrypt.InternalUtil;
+import org.conscrypt.NativeCrypto;
 import org.conscrypt.OpenSSLX509Certificate;
 
-/**
- * @hide
- */
-@Internal
 public class CTVerifier {
     private final CTLogStore store;
 
@@ -218,8 +213,9 @@ public class CTVerifier {
             return Collections.emptyList();
         }
 
-        byte[] extData = InternalUtil.getOcspSingleExtension(data, CTConstants.OCSP_SCT_LIST_OID,
-                                                             chain[0].getContext(), chain[1].getContext());
+        byte[] extData = NativeCrypto.get_ocsp_single_extension(data, CTConstants.OCSP_SCT_LIST_OID,
+                                                                chain[0].getContext(),
+                                                                chain[1].getContext());
         if (extData == null) {
             return Collections.emptyList();
         }

@@ -29,8 +29,11 @@ import java.util.Arrays;
 
 /**
  * An implementation of a {@link java.security.PublicKey} for EC keys based on BoringSSL.
+ *
+ * @hide
  */
-final class OpenSSLECPublicKey implements ECPublicKey, OpenSSLKeyHolder {
+@Internal
+public final class OpenSSLECPublicKey implements ECPublicKey, OpenSSLKeyHolder {
     private static final long serialVersionUID = 3215842926808298020L;
 
     private static final String ALGORITHM = "EC";
@@ -39,18 +42,18 @@ final class OpenSSLECPublicKey implements ECPublicKey, OpenSSLKeyHolder {
 
     protected transient OpenSSLECGroupContext group;
 
-    OpenSSLECPublicKey(OpenSSLECGroupContext group, OpenSSLKey key) {
+    public OpenSSLECPublicKey(OpenSSLECGroupContext group, OpenSSLKey key) {
         this.group = group;
         this.key = key;
     }
 
-    OpenSSLECPublicKey(OpenSSLKey key) {
+    public OpenSSLECPublicKey(OpenSSLKey key) {
         this.group = new OpenSSLECGroupContext(new NativeRef.EC_GROUP(
                 NativeCrypto.EC_KEY_get1_group(key.getNativeRef())));
         this.key = key;
     }
 
-    OpenSSLECPublicKey(ECPublicKeySpec ecKeySpec) throws InvalidKeySpecException {
+    public OpenSSLECPublicKey(ECPublicKeySpec ecKeySpec) throws InvalidKeySpecException {
         try {
             group = OpenSSLECGroupContext.getInstance(ecKeySpec.getParams());
             OpenSSLECPointContext pubKey = OpenSSLECPointContext.getInstance(group,
@@ -62,7 +65,7 @@ final class OpenSSLECPublicKey implements ECPublicKey, OpenSSLKeyHolder {
         }
     }
 
-    static OpenSSLKey getInstance(ECPublicKey ecPublicKey) throws InvalidKeyException {
+    public static OpenSSLKey getInstance(ECPublicKey ecPublicKey) throws InvalidKeyException {
         try {
             OpenSSLECGroupContext group = OpenSSLECGroupContext
                     .getInstance(ecPublicKey.getParams());

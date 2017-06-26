@@ -45,19 +45,19 @@ abstract class AbstractSessionContext implements SSLSessionContext {
      */
     private static final int DEFAULT_SESSION_TIMEOUT_SECONDS = 8 * 60 * 60;
 
-    private volatile int maximumSize;
-    private volatile int timeout = DEFAULT_SESSION_TIMEOUT_SECONDS;
+    volatile int maximumSize;
+    volatile int timeout = DEFAULT_SESSION_TIMEOUT_SECONDS;
 
     final long sslCtxNativePointer = NativeCrypto.SSL_CTX_new();
 
     /** Identifies OpenSSL sessions. */
-    private static final int OPEN_SSL = 1;
+    static final int OPEN_SSL = 1;
 
     /** Identifies OpenSSL sessions with OCSP stapled data. */
-    private static final int OPEN_SSL_WITH_OCSP = 2;
+    static final int OPEN_SSL_WITH_OCSP = 2;
 
     /** Identifies OpenSSL sessions with TLS SCT data. */
-    private static final int OPEN_SSL_WITH_TLS_SCT = 3;
+    static final int OPEN_SSL_WITH_TLS_SCT = 3;
 
     @SuppressWarnings("serial")
     private final Map<ByteArray, SSLSession> sessions = new LinkedHashMap<ByteArray, SSLSession>() {
@@ -140,7 +140,7 @@ abstract class AbstractSessionContext implements SSLSessionContext {
     /**
      * Makes sure cache size is < maximumSize.
      */
-    private void trimToSize() {
+    protected void trimToSize() {
         synchronized (sessions) {
             int size = sessions.size();
             if (size > maximumSize) {
@@ -204,7 +204,7 @@ abstract class AbstractSessionContext implements SSLSessionContext {
      *
      * @return session data as bytes or null if the session can't be converted
      */
-    byte[] toBytes(SSLSession session) {
+    public byte[] toBytes(SSLSession session) {
         // TODO: Support SSLSessionImpl, too.
         if (!(session instanceof OpenSSLSessionImpl)) {
             return null;
@@ -274,7 +274,7 @@ abstract class AbstractSessionContext implements SSLSessionContext {
      *
      * @return a session or null if the session can't be converted
      */
-    OpenSSLSessionImpl toSession(byte[] data, String host, int port) {
+    public OpenSSLSessionImpl toSession(byte[] data, String host, int port) {
         ByteBuffer buf = ByteBuffer.wrap(data);
         try {
             int type = buf.getInt();
@@ -355,7 +355,7 @@ abstract class AbstractSessionContext implements SSLSessionContext {
         }
     }
 
-    SSLSession wrapSSLSessionIfNeeded(SSLSession session) {
+    protected SSLSession wrapSSLSessionIfNeeded(SSLSession session) {
         if (session instanceof AbstractOpenSSLSession) {
             return Platform.wrapSSLSession((AbstractOpenSSLSession) session);
         } else {
@@ -390,7 +390,7 @@ abstract class AbstractSessionContext implements SSLSessionContext {
         }
     }
 
-    private static void log(Throwable t) {
+    static void log(Throwable t) {
         System.out.println("Error inflating SSL session: "
                 + (t.getMessage() != null ? t.getMessage() : t.getClass().getName()));
     }

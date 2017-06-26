@@ -20,7 +20,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import javax.net.ssl.SSLException;
 
-final class NativeCrypto {
+class NativeCrypto {
     public interface SSLHandshakeCallbacks {
         /**
          * Verify that we trust the certificate chain is trusted.
@@ -30,7 +30,7 @@ final class NativeCrypto {
          *
          * @throws CertificateException if the certificate is untrusted
          */
-        void verifyCertificateChain(byte[][] asn1DerEncodedCertificateChain,
+        public void verifyCertificateChain(byte[][] asn1DerEncodedCertificateChain,
                 String authMethod) throws CertificateException;
         /**
          * Called on an SSL client when the server requests (or
@@ -43,7 +43,7 @@ final class NativeCrypto {
          * convertible to strings with #keyType
          * @param asn1DerEncodedX500Principals CAs known to the server
          */
-        void clientCertificateRequested(
+        public void clientCertificateRequested(
                 byte[] keyTypes, byte[][] asn1DerEncodedX500Principals)
                 throws CertificateEncodingException, SSLException;
         /**
@@ -51,6 +51,6 @@ final class NativeCrypto {
          * be after SSL_do_handshake returns when handshake cutthrough
          * is enabled.
          */
-        void handshakeCompleted();
+        public void handshakeCompleted();
     }
 }

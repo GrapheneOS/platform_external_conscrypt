@@ -16,12 +16,6 @@
 
 package org.conscrypt.ct;
 
-import org.conscrypt.Internal;
-
-/**
- * @hide
- */
-@Internal
 public class SerializationException extends Exception {
     public SerializationException() {
     }

@@ -31,9 +31,10 @@ import javax.net.ssl.SSLEngine;
  * Visible for testing only.
  *
  * @deprecated This abstraction is deprecated because it does not work with TLS 1.3.
+ * @hide
  */
 @Deprecated
-final class DuckTypedPSKKeyManager implements PSKKeyManager {
+public class DuckTypedPSKKeyManager implements PSKKeyManager {
 
     private final Object mDelegate;
 
@@ -48,7 +49,7 @@ final class DuckTypedPSKKeyManager implements PSKKeyManager {
      * @throws NoSuchMethodException if {@code obj} does not implement a method of the
      *         {@code PSKKeyManager} interface.
      */
-    static DuckTypedPSKKeyManager getInstance(Object obj) throws NoSuchMethodException {
+    public static DuckTypedPSKKeyManager getInstance(Object obj) throws NoSuchMethodException {
         Class<?> sourceClass = obj.getClass();
         for (Method targetMethod : PSKKeyManager.class.getMethods()) {
             if (targetMethod.isSynthetic()) {

@@ -30,17 +30,20 @@ import java.security.spec.X509EncodedKeySpec;
 
 /**
  * Represents a BoringSSL {@code EVP_PKEY}.
+ *
+ * @hide
  */
-final class OpenSSLKey {
+@Internal
+public class OpenSSLKey {
     private final NativeRef.EVP_PKEY ctx;
 
     private final boolean wrapped;
 
-    OpenSSLKey(long ctx) {
+    public OpenSSLKey(long ctx) {
         this(ctx, false);
     }
 
-    OpenSSLKey(long ctx, boolean wrapped) {
+    public OpenSSLKey(long ctx, boolean wrapped) {
         this.ctx = new NativeRef.EVP_PKEY(ctx);
         this.wrapped = wrapped;
     }
@@ -48,15 +51,15 @@ final class OpenSSLKey {
     /**
      * Returns the EVP_PKEY context for use in JNI calls.
      */
-    NativeRef.EVP_PKEY getNativeRef() {
+    public NativeRef.EVP_PKEY getNativeRef() {
         return ctx;
     }
 
-    boolean isWrapped() {
+    public boolean isWrapped() {
         return wrapped;
     }
 
-    static OpenSSLKey fromPrivateKey(PrivateKey key) throws InvalidKeyException {
+    public static OpenSSLKey fromPrivateKey(PrivateKey key) throws InvalidKeyException {
         if (key instanceof OpenSSLKeyHolder) {
             return ((OpenSSLKeyHolder) key).getOpenSSLKey();
         }
@@ -81,7 +84,7 @@ final class OpenSSLKey {
      *
      * @throws InvalidKeyException if parsing fails
      */
-    static OpenSSLKey fromPrivateKeyPemInputStream(InputStream is)
+    public static OpenSSLKey fromPrivateKeyPemInputStream(InputStream is)
             throws InvalidKeyException {
         OpenSSLBIOInputStream bis = new OpenSSLBIOInputStream(is, true);
         try {
@@ -106,7 +109,7 @@ final class OpenSSLKey {
      * @param publicKey corresponding public key or {@code null} if not available. Some opaque
      *        private keys cannot be used by the TLS/SSL stack without the public key.
      */
-    static OpenSSLKey fromPrivateKeyForTLSStackOnly(
+    public static OpenSSLKey fromPrivateKeyForTLSStackOnly(
             PrivateKey privateKey, PublicKey publicKey) throws InvalidKeyException {
         OpenSSLKey result = getOpenSSLKey(privateKey);
         if (result != null) {
@@ -130,7 +133,7 @@ final class OpenSSLKey {
      *        be used by the TLS/SSL stack without the parameters because the private key itself
      *        might not expose the parameters.
      */
-    static OpenSSLKey fromECPrivateKeyForTLSStackOnly(
+    public static OpenSSLKey fromECPrivateKeyForTLSStackOnly(
             PrivateKey key, ECParameterSpec ecParams) throws InvalidKeyException {
         OpenSSLKey result = getOpenSSLKey(key);
         if (result != null) {
@@ -207,7 +210,7 @@ final class OpenSSLKey {
         }
     }
 
-    static OpenSSLKey fromPublicKey(PublicKey key) throws InvalidKeyException {
+    public static OpenSSLKey fromPublicKey(PublicKey key) throws InvalidKeyException {
         if (key instanceof OpenSSLKeyHolder) {
             return ((OpenSSLKeyHolder) key).getOpenSSLKey();
         }
@@ -233,7 +236,7 @@ final class OpenSSLKey {
      *
      * @throws InvalidKeyException if parsing fails
      */
-    static OpenSSLKey fromPublicKeyPemInputStream(InputStream is)
+    public static OpenSSLKey fromPublicKeyPemInputStream(InputStream is)
             throws InvalidKeyException {
         OpenSSLBIOInputStream bis = new OpenSSLBIOInputStream(is, true);
         try {
@@ -250,7 +253,7 @@ final class OpenSSLKey {
         }
     }
 
-    PublicKey getPublicKey() throws NoSuchAlgorithmException {
+    public PublicKey getPublicKey() throws NoSuchAlgorithmException {
         switch (NativeCrypto.EVP_PKEY_type(ctx)) {
             case NativeConstants.EVP_PKEY_RSA:
                 return new OpenSSLRSAPublicKey(this);
@@ -283,7 +286,7 @@ final class OpenSSLKey {
         }
     }
 
-    PrivateKey getPrivateKey() throws NoSuchAlgorithmException {
+    public PrivateKey getPrivateKey() throws NoSuchAlgorithmException {
         switch (NativeCrypto.EVP_PKEY_type(ctx)) {
             case NativeConstants.EVP_PKEY_RSA:
                 return new OpenSSLRSAPrivateKey(this);

@@ -49,15 +49,15 @@ public class OpenSSLX509CertificateFactory extends CertificateFactorySpi {
     static class ParsingException extends Exception {
         private static final long serialVersionUID = 8390802697728301325L;
 
-        ParsingException(String message) {
+        public ParsingException(String message) {
             super(message);
         }
 
-        ParsingException(Exception cause) {
+        public ParsingException(Exception cause) {
             super(cause);
         }
 
-        ParsingException(String message, Exception cause) {
+        public ParsingException(String message, Exception cause) {
             super(message, cause);
         }
     }
@@ -68,7 +68,7 @@ public class OpenSSLX509CertificateFactory extends CertificateFactorySpi {
      * but it's already written in this language anyway.
      */
     private static abstract class Parser<T> {
-        T generateItem(InputStream inStream) throws ParsingException {
+        public T generateItem(InputStream inStream) throws ParsingException {
             if (inStream == null) {
                 throw new ParsingException("inStream == null");
             }
@@ -122,7 +122,7 @@ public class OpenSSLX509CertificateFactory extends CertificateFactorySpi {
             }
         }
 
-        Collection<? extends T> generateItems(InputStream inStream)
+        public Collection<? extends T> generateItems(InputStream inStream)
                 throws ParsingException {
             if (inStream == null) {
                 throw new ParsingException("inStream == null");
@@ -175,7 +175,7 @@ public class OpenSSLX509CertificateFactory extends CertificateFactorySpi {
              * can't anymore.
              */
             final List<T> coll = new ArrayList<T>();
-            T c;
+            T c = null;
             do {
                 /*
                  * If this stream supports marking, try to mark here in case

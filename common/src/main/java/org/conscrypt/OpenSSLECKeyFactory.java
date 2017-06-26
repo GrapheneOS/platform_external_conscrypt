@@ -34,12 +34,12 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
 /**
- * An implementation of a {@link KeyFactorySpi} for EC keys based on BoringSSL.
+ * An implementation of a {@link KeyFactory} for EC keys based on BoringSSL.
  *
  * @hide
  */
 @Internal
-public final class OpenSSLECKeyFactory extends KeyFactorySpi {
+public class OpenSSLECKeyFactory extends KeyFactorySpi {
 
     @Override
     protected PublicKey engineGeneratePublic(KeySpec keySpec) throws InvalidKeySpecException {
@@ -200,4 +200,5 @@ public final class OpenSSLECKeyFactory extends KeyFactorySpi {
                     + key.getClass().getName());
         }
     }
+
 }
