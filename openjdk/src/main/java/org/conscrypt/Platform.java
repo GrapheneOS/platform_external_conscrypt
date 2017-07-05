@@ -87,8 +87,8 @@ final class Platform {
         }
     }
 
-    static FileDescriptor getFileDescriptorFromSSLSocket(OpenSSLSocketImpl openSSLSocketImpl) {
-        return getFileDescriptor(openSSLSocketImpl);
+    static FileDescriptor getFileDescriptorFromSSLSocket(AbstractConscryptSocket socket) {
+        return getFileDescriptor(socket);
     }
 
     static String getCurveName(ECParameterSpec spec) {
@@ -117,7 +117,7 @@ final class Platform {
 
     @SuppressWarnings("unchecked")
     public static void setSSLParameters(
-            SSLParameters params, SSLParametersImpl impl, OpenSSLSocketImpl socket) {
+            SSLParameters params, SSLParametersImpl impl, AbstractConscryptSocket socket) {
         impl.setEndpointIdentificationAlgorithm(params.getEndpointIdentificationAlgorithm());
         try {
             Method getUseCipherSuitesOrder =
@@ -147,7 +147,7 @@ final class Platform {
 
     @SuppressWarnings({"LiteralClassName", "rawtypes"})
     public static void getSSLParameters(
-            SSLParameters params, SSLParametersImpl impl, OpenSSLSocketImpl socket) {
+            SSLParameters params, SSLParametersImpl impl, AbstractConscryptSocket socket) {
         params.setEndpointIdentificationAlgorithm(impl.getEndpointIdentificationAlgorithm());
         try {
             Method setUseCipherSuitesOrder =
@@ -171,7 +171,7 @@ final class Platform {
 
     @SuppressWarnings("unchecked")
     public static void setSSLParameters(
-            SSLParameters params, SSLParametersImpl impl, OpenSSLEngineImpl engine) {
+            SSLParameters params, SSLParametersImpl impl, ConscryptEngine engine) {
         impl.setEndpointIdentificationAlgorithm(params.getEndpointIdentificationAlgorithm());
         try {
             Method getUseCipherSuitesOrder =
@@ -185,7 +185,7 @@ final class Platform {
                 for (Object serverName : serverNames) {
                     if ((int) serverName.getClass().getMethod("getType").invoke(serverName)
                             == hostNameType) {
-                        engine.setSniHostname((String) serverName.getClass()
+                        engine.setHostname((String) serverName.getClass()
                                                       .getMethod("getAsciiName")
                                                       .invoke(serverName));
                         break;
@@ -200,19 +200,19 @@ final class Platform {
 
     @SuppressWarnings({"LiteralClassName", "rawtypes"})
     public static void getSSLParameters(
-            SSLParameters params, SSLParametersImpl impl, OpenSSLEngineImpl engine) {
+            SSLParameters params, SSLParametersImpl impl, ConscryptEngine engine) {
         params.setEndpointIdentificationAlgorithm(impl.getEndpointIdentificationAlgorithm());
         try {
             Method setUseCipherSuitesOrder =
                     SSLParameters.class.getMethod("setUseCipherSuitesOrder", boolean.class);
             setUseCipherSuitesOrder.invoke(params, impl.getUseCipherSuitesOrder());
             Method setServerNames = SSLParameters.class.getMethod("setServerNames", List.class);
-            if (impl.getUseSni() && AddressUtils.isValidSniHostname(engine.getSniHostname())) {
+            if (impl.getUseSni() && AddressUtils.isValidSniHostname(engine.getHostname())) {
                 Constructor sniHostNameConstructor =
                         Class.forName("javax.net.ssl.SNIHostName").getConstructor(String.class);
                 setServerNames.invoke(params,
                         (Collections.singletonList(
-                                sniHostNameConstructor.newInstance(engine.getSniHostname()))));
+                                sniHostNameConstructor.newInstance(engine.getHostname()))));
             }
         } catch (NoSuchMethodException ignored) {
         } catch (IllegalAccessException ignored) {
@@ -234,7 +234,7 @@ final class Platform {
     }
 
     static void checkClientTrusted(X509TrustManager tm, X509Certificate[] chain, String authType,
-            OpenSSLSocketImpl socket) throws CertificateException {
+            AbstractConscryptSocket socket) throws CertificateException {
         if (tm instanceof X509ExtendedTrustManager) {
             X509ExtendedTrustManager x509etm = (X509ExtendedTrustManager) tm;
             x509etm.checkClientTrusted(chain, authType, socket);
@@ -244,7 +244,7 @@ final class Platform {
     }
 
     static void checkServerTrusted(X509TrustManager tm, X509Certificate[] chain, String authType,
-            OpenSSLSocketImpl socket) throws CertificateException {
+            AbstractConscryptSocket socket) throws CertificateException {
         if (tm instanceof X509ExtendedTrustManager) {
             X509ExtendedTrustManager x509etm = (X509ExtendedTrustManager) tm;
             x509etm.checkServerTrusted(chain, authType, socket);
@@ -254,7 +254,7 @@ final class Platform {
     }
 
     static void checkClientTrusted(X509TrustManager tm, X509Certificate[] chain, String authType,
-            OpenSSLEngineImpl engine) throws CertificateException {
+            ConscryptEngine engine) throws CertificateException {
         if (tm instanceof X509ExtendedTrustManager) {
             X509ExtendedTrustManager x509etm = (X509ExtendedTrustManager) tm;
             x509etm.checkClientTrusted(chain, authType, engine);
@@ -264,7 +264,7 @@ final class Platform {
     }
 
     static void checkServerTrusted(X509TrustManager tm, X509Certificate[] chain, String authType,
-            OpenSSLEngineImpl engine) throws CertificateException {
+            ConscryptEngine engine) throws CertificateException {
         if (tm instanceof X509ExtendedTrustManager) {
             X509ExtendedTrustManager x509etm = (X509ExtendedTrustManager) tm;
             x509etm.checkServerTrusted(chain, authType, engine);
@@ -362,15 +362,16 @@ final class Platform {
      * Pre-Java-8 backward compatibility.
      */
 
-    static SSLSession wrapSSLSession(AbstractOpenSSLSession sslSession) {
-        return new OpenSSLExtendedSessionImpl(sslSession);
+    static SSLSession wrapSSLSession(ActiveSession sslSession) {
+        return new DelegatingExtendedSSLSession(sslSession);
     }
 
     @SuppressWarnings("unused")
     static SSLSession unwrapSSLSession(SSLSession sslSession) {
-        if (sslSession instanceof OpenSSLExtendedSessionImpl) {
-            return ((OpenSSLExtendedSessionImpl) sslSession).getDelegate();
+        if (sslSession instanceof DelegatingExtendedSSLSession) {
+            return ((DelegatingExtendedSSLSession) sslSession).getDelegate();
         }
+
         return sslSession;
     }
 

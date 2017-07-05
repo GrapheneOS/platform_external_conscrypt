@@ -72,6 +72,12 @@ public final class OpenSSLProvider extends Provider {
         put("SSLContext.TLSv1.2", tls12SSLContext);
         put("SSLContext.Default", PREFIX + "DefaultSSLContextImpl");
 
+        /* === AlgorithmParameters === */
+        put("AlgorithmParameters.GCM", PREFIX + "GCMParameters");
+        put("Alg.Alias.AlgorithmParameters.2.16.840.1.101.3.4.1.6", "GCM");
+        put("Alg.Alias.AlgorithmParameters.2.16.840.1.101.3.4.1.26", "GCM");
+        put("Alg.Alias.AlgorithmParameters.2.16.840.1.101.3.4.1.46", "GCM");
+
         /* === Message Digests === */
         put("MessageDigest.SHA-1", PREFIX + "OpenSSLMessageDigestJDK$SHA1");
         put("Alg.Alias.MessageDigest.SHA1", "SHA-1");
@@ -382,17 +388,15 @@ public final class OpenSSLProvider extends Provider {
         put("Alg.Alias.Cipher.1.2.840.113549.3.4", "ARC4");
         put("Alg.Alias.Cipher.OID.1.2.840.113549.3.4", "ARC4");
 
-        if (NativeConstants.HAS_EVP_AEAD) {
-            putSymmetricCipherImplClass("AES/GCM/NoPadding", "OpenSSLCipher$EVP_AEAD$AES$GCM");
-            put("Alg.Alias.Cipher.GCM", "AES/GCM/NoPadding");
-            put("Alg.Alias.Cipher.2.16.840.1.101.3.4.1.6", "AES/GCM/NoPadding");
-            put("Alg.Alias.Cipher.2.16.840.1.101.3.4.1.26", "AES/GCM/NoPadding");
-            put("Alg.Alias.Cipher.2.16.840.1.101.3.4.1.46", "AES/GCM/NoPadding");
-            putSymmetricCipherImplClass(
-                    "AES_128/GCM/NoPadding", "OpenSSLCipher$EVP_AEAD$AES$GCM$AES_128");
-            putSymmetricCipherImplClass(
-                    "AES_256/GCM/NoPadding", "OpenSSLCipher$EVP_AEAD$AES$GCM$AES_256");
-        }
+        putSymmetricCipherImplClass("AES/GCM/NoPadding", "OpenSSLCipher$EVP_AEAD$AES$GCM");
+        put("Alg.Alias.Cipher.GCM", "AES/GCM/NoPadding");
+        put("Alg.Alias.Cipher.2.16.840.1.101.3.4.1.6", "AES/GCM/NoPadding");
+        put("Alg.Alias.Cipher.2.16.840.1.101.3.4.1.26", "AES/GCM/NoPadding");
+        put("Alg.Alias.Cipher.2.16.840.1.101.3.4.1.46", "AES/GCM/NoPadding");
+        putSymmetricCipherImplClass(
+                "AES_128/GCM/NoPadding", "OpenSSLCipher$EVP_AEAD$AES$GCM$AES_128");
+        putSymmetricCipherImplClass(
+                "AES_256/GCM/NoPadding", "OpenSSLCipher$EVP_AEAD$AES$GCM$AES_256");
 
         /* === Mac === */
 
