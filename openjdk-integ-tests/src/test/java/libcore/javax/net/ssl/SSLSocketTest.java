@@ -25,7 +25,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeNotNull;
+import static org.junit.Assume.assumeFalse;
+import static org.junit.Assume.assumeNoException;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.ByteArrayInputStream;
@@ -94,6 +95,7 @@ import javax.net.ssl.KeyManager;
 import javax.net.ssl.SNIHostName;
 import javax.net.ssl.SNIServerName;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLParameters;
@@ -121,7 +123,6 @@ import libcore.tlswire.record.TlsRecord;
 import libcore.tlswire.util.TlsProtocolVersion;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -151,12 +152,14 @@ public class SSLSocketTest extends AbstractSSLTest {
         SSLConfigurationAsserts.assertSSLSocketDefaultConfiguration(
                 (SSLSocket) SSLSocketFactory.getDefault().createSocket());
     }
+
     @Test
     public void test_SSLSocket_getSupportedCipherSuites_returnsCopies() throws Exception {
         SSLSocketFactory sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
         SSLSocket ssl = (SSLSocket) sf.createSocket();
         assertNotSame(ssl.getSupportedCipherSuites(), ssl.getSupportedCipherSuites());
     }
+
     @Test
     public void test_SSLSocket_getSupportedCipherSuites_connect() throws Exception {
         // note the rare usage of non-RSA keys
@@ -183,6 +186,16 @@ public class SSLSocketTest extends AbstractSSLTest {
                     @Override
                     protected SecretKey getKey(
                             String identityHint, String identity, Socket socket) {
+                        return newKey();
+                    }
+
+                    @Override
+                    protected SecretKey getKey(
+                            String identityHint, String identity, SSLEngine engine) {
+                        return newKey();
+                    }
+
+                    private SecretKey newKey() {
                         return new SecretKeySpec("Just an arbitrary key".getBytes(UTF_8), "RAW");
                     }
                 });
@@ -221,10 +234,10 @@ public class SSLSocketTest extends AbstractSSLTest {
                 }
                 String[] clientCipherSuiteArray =
                         new String[] {cipherSuite, StandardNames.CIPHER_SUITE_SECURE_RENEGOTIATION};
-                SSLSocket[] pair = TestSSLSocketPair.connect(
-                        c, clientCipherSuiteArray, clientCipherSuiteArray);
-                SSLSocket server = pair[0];
-                SSLSocket client = pair[1];
+                TestSSLSocketPair socketPair = TestSSLSocketPair.create(c).connect(
+                        clientCipherSuiteArray, clientCipherSuiteArray);
+                SSLSocket server = socketPair.server;
+                SSLSocket client = socketPair.client;
                 // Check that the client can read the message sent by the server
                 server.getOutputStream().write(serverToClient);
                 byte[] clientFromServer = new byte[serverToClient.length];
@@ -265,12 +278,14 @@ public class SSLSocketTest extends AbstractSSLTest {
         }
         c.close();
     }
+
     @Test
     public void test_SSLSocket_getEnabledCipherSuites_returnsCopies() throws Exception {
         SSLSocketFactory sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
         SSLSocket ssl = (SSLSocket) sf.createSocket();
         assertNotSame(ssl.getEnabledCipherSuites(), ssl.getEnabledCipherSuites());
     }
+
     @Test
     public void test_SSLSocket_setEnabledCipherSuites_storesCopy() throws Exception {
         SSLSocketFactory sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
@@ -281,6 +296,7 @@ public class SSLSocketTest extends AbstractSSLTest {
         array[0] = "Modified after having been set";
         assertEquals(originalFirstElement, ssl.getEnabledCipherSuites()[0]);
     }
+
     @Test
     public void test_SSLSocket_setEnabledCipherSuites() throws Exception {
         SSLSocketFactory sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
@@ -311,18 +327,21 @@ public class SSLSocketTest extends AbstractSSLTest {
         ssl.setEnabledCipherSuites(cipherSuites);
         assertEquals(Arrays.asList(cipherSuites), Arrays.asList(ssl.getEnabledCipherSuites()));
     }
+
     @Test
     public void test_SSLSocket_getSupportedProtocols_returnsCopies() throws Exception {
         SSLSocketFactory sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
         SSLSocket ssl = (SSLSocket) sf.createSocket();
         assertNotSame(ssl.getSupportedProtocols(), ssl.getSupportedProtocols());
     }
+
     @Test
     public void test_SSLSocket_getEnabledProtocols_returnsCopies() throws Exception {
         SSLSocketFactory sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
         SSLSocket ssl = (SSLSocket) sf.createSocket();
         assertNotSame(ssl.getEnabledProtocols(), ssl.getEnabledProtocols());
     }
+
     @Test
     public void test_SSLSocket_setEnabledProtocols_storesCopy() throws Exception {
         SSLSocketFactory sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
@@ -333,6 +352,7 @@ public class SSLSocketTest extends AbstractSSLTest {
         array[0] = "Modified after having been set";
         assertEquals(originalFirstElement, ssl.getEnabledProtocols()[0]);
     }
+
     @Test
     public void test_SSLSocket_setEnabledProtocols() throws Exception {
         SSLSocketFactory sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
@@ -375,6 +395,7 @@ public class SSLSocketTest extends AbstractSSLTest {
             }
         }
     }
+
     @Test
     public void test_SSLSocket_getSession() throws Exception {
         SSLSocketFactory sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
@@ -383,6 +404,7 @@ public class SSLSocketTest extends AbstractSSLTest {
         assertNotNull(session);
         assertFalse(session.isValid());
     }
+
     @Test
     public void test_SSLSocket_getHandshakeSession() throws Exception {
         SSLSocketFactory sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
@@ -390,6 +412,7 @@ public class SSLSocketTest extends AbstractSSLTest {
         SSLSession session = ssl.getHandshakeSession();
         assertNull(session);
     }
+
     @Test
     public void test_SSLSocket_startHandshake() throws Exception {
         final TestSSLContext c = TestSSLContext.create();
@@ -410,8 +433,7 @@ public class SSLSocketTest extends AbstractSSLTest {
             assertNotNull(localCertificates);
             TestKeyStore.assertChainLength(localCertificates);
             assertNotNull(localCertificates[0]);
-            TestSSLContext.assertServerCertificateChain(
-                    c.serverTrustManager, localCertificates);
+            TestSSLContext.assertServerCertificateChain(c.serverTrustManager, localCertificates);
             TestSSLContext.assertCertificateInKeyStore(localCertificates[0], c.serverKeyStore);
             return null;
         });
@@ -442,6 +464,7 @@ public class SSLSocketTest extends AbstractSSLTest {
             return server.getSession().getId();
         }
     }
+
     @Test
     public void test_SSLSocket_confirmSessionReuse() throws Exception {
         final TestSSLContext c = TestSSLContext.create();
@@ -472,6 +495,7 @@ public class SSLSocketTest extends AbstractSSLTest {
         assertTrue(Arrays.equals(clientSessionId1, clientSessionId2));
         c.close();
     }
+
     @Test
     public void test_SSLSocket_NoEnabledCipherSuites_Failure() throws Exception {
         TestSSLContext c = TestSSLContext.newBuilder()
@@ -503,13 +527,14 @@ public class SSLSocketTest extends AbstractSSLTest {
         client.close();
         c.close();
     }
+
     @Test
     public void test_SSLSocket_startHandshake_noKeyStore() throws Exception {
         TestSSLContext c = TestSSLContext.newBuilder()
-                .useDefaults(false)
-                .clientContext(SSLContext.getDefault())
-                .serverContext(SSLContext.getDefault())
-                .build();
+                                   .useDefaults(false)
+                                   .clientContext(SSLContext.getDefault())
+                                   .serverContext(SSLContext.getDefault())
+                                   .build();
         SSLSocket client =
                 (SSLSocket) c.clientContext.getSocketFactory().createSocket(c.host, c.port);
         final SSLSocket server = (SSLSocket) c.serverSocket.accept();
@@ -533,6 +558,7 @@ public class SSLSocketTest extends AbstractSSLTest {
         client.close();
         c.close();
     }
+
     @Test
     public void test_SSLSocket_startHandshake_noClientCertificate() throws Exception {
         TestSSLContext c = TestSSLContext.create();
@@ -550,6 +576,7 @@ public class SSLSocketTest extends AbstractSSLTest {
         server.close();
         c.close();
     }
+
     @Test
     public void test_SSLSocket_HandshakeCompletedListener() throws Exception {
         final TestSSLContext c = TestSSLContext.create();
@@ -576,20 +603,16 @@ public class SSLSocketTest extends AbstractSSLTest {
                 byte[] id = session.getId();
                 assertNotNull(id);
                 assertEquals(32, id.length);
-                assertNotNull(c.clientContext.getClientSessionContext().getSession(id));
                 assertNotNull(cipherSuite);
-                assertTrue(
-                        Arrays.asList(client.getEnabledCipherSuites()).contains(cipherSuite));
+                assertTrue(Arrays.asList(client.getEnabledCipherSuites()).contains(cipherSuite));
                 assertTrue(Arrays.asList(c.serverSocket.getEnabledCipherSuites())
                                    .contains(cipherSuite));
                 assertNull(localCertificates);
                 assertNotNull(peerCertificates);
                 TestKeyStore.assertChainLength(peerCertificates);
                 assertNotNull(peerCertificates[0]);
-                TestSSLContext.assertServerCertificateChain(
-                        c.clientTrustManager, peerCertificates);
-                TestSSLContext.assertCertificateInKeyStore(
-                        peerCertificates[0], c.serverKeyStore);
+                TestSSLContext.assertServerCertificateChain(c.clientTrustManager, peerCertificates);
+                TestSSLContext.assertCertificateInKeyStore(peerCertificates[0], c.serverKeyStore);
                 assertNotNull(peerCertificateChain);
                 TestKeyStore.assertChainLength(peerCertificateChain);
                 assertNotNull(peerCertificateChain[0]);
@@ -614,8 +637,8 @@ public class SSLSocketTest extends AbstractSSLTest {
         });
         client.startHandshake();
         future.get();
-        assertNotNull(c.serverContext.getServerSessionContext().getSession(
-                    client.getSession().getId()));
+        assertNotNull(
+                c.serverContext.getServerSessionContext().getSession(client.getSession().getId()));
         synchronized (handshakeCompletedListenerCalled) {
             while (!handshakeCompletedListenerCalled[0]) {
                 handshakeCompletedListenerCalled.wait();
@@ -633,6 +656,7 @@ public class SSLSocketTest extends AbstractSSLTest {
             actualException = ex;
         }
     }
+
     @Test
     public void test_SSLSocket_HandshakeCompletedListener_RuntimeException() throws Exception {
         final Thread self = Thread.currentThread();
@@ -648,9 +672,7 @@ public class SSLSocketTest extends AbstractSSLTest {
             server.startHandshake();
             return null;
         });
-        client.addHandshakeCompletedListener(event -> {
-            throw expectedException;
-        });
+        client.addHandshakeCompletedListener(event -> { throw expectedException; });
         client.startHandshake();
         future.get();
         client.close();
@@ -659,6 +681,7 @@ public class SSLSocketTest extends AbstractSSLTest {
         assertSame(expectedException, test.actualException);
         self.setUncaughtExceptionHandler(original);
     }
+
     @Test
     public void test_SSLSocket_getUseClientMode() throws Exception {
         TestSSLContext c = TestSSLContext.create();
@@ -671,27 +694,38 @@ public class SSLSocketTest extends AbstractSSLTest {
         server.close();
         c.close();
     }
+
     @Test
-    public void test_SSLSocket_setUseClientMode() throws Exception {
-        // client is client, server is server
+    public void testClientMode_normal() throws Exception {
+        // Client is client and server is server.
         test_SSLSocket_setUseClientMode(true, false);
-        // client is server, server is client
-        test_SSLSocket_setUseClientMode(true, false);
-        // both are client
-        try {
-            test_SSLSocket_setUseClientMode(true, true);
-            fail();
-        } catch (SSLProtocolException | SSLHandshakeException expected) {
-            // Ignored.
-        }
-        // both are server
+    }
+
+    @Test(expected = SSLHandshakeException.class)
+    public void testClientMode_reverse() throws Exception {
+        // Client is server and server is client.
+        test_SSLSocket_setUseClientMode(false, true);
+    }
+
+    @Test(expected = SSLHandshakeException.class)
+    public void testClientMode_bothClient() throws Exception {
+        test_SSLSocket_setUseClientMode(true, true);
+    }
+
+    @Test
+    public void testClientMode_bothServer() throws Exception {
         try {
             test_SSLSocket_setUseClientMode(false, false);
             fail();
         } catch (SocketTimeoutException expected) {
-            // Ignored.
+            // Ignore
+        } catch (SSLHandshakeException expected) {
+            // Depending on the timing of the socket closures, this can happen as well.
+            assertTrue("Unexpected handshake error: " + expected.getMessage(),
+                    expected.getMessage().toLowerCase().contains("connection closed"));
         }
     }
+
     private void test_SSLSocket_setUseClientMode(
             final boolean clientClientMode, final boolean serverClientMode) throws Exception {
         TestSSLContext c = TestSSLContext.create();
@@ -723,10 +757,11 @@ public class SSLSocketTest extends AbstractSSLTest {
         server.close();
         c.close();
     }
+
     @Test
     public void test_SSLSocket_setUseClientMode_afterHandshake() throws Exception {
         // can't set after handshake
-        TestSSLSocketPair pair = TestSSLSocketPair.create();
+        TestSSLSocketPair pair = TestSSLSocketPair.create().connect();
         try {
             pair.server.setUseClientMode(false);
             fail();
@@ -740,6 +775,7 @@ public class SSLSocketTest extends AbstractSSLTest {
             // Ignored.
         }
     }
+
     @Test
     public void test_SSLSocket_untrustedServer() throws Exception {
         TestSSLContext c =
@@ -767,6 +803,7 @@ public class SSLSocketTest extends AbstractSSLTest {
         server.close();
         c.close();
     }
+
     @Test
     public void test_SSLSocket_clientAuth() throws Exception {
         TestSSLContext c = TestSSLContext.create(
@@ -802,6 +839,7 @@ public class SSLSocketTest extends AbstractSSLTest {
         server.close();
         c.close();
     }
+
     @Test
     public void test_SSLSocket_clientAuth_bogusAlias() throws Exception {
         TestSSLContext c = TestSSLContext.create();
@@ -861,14 +899,17 @@ public class SSLSocketTest extends AbstractSSLTest {
         server.close();
         c.close();
     }
+
     @Test
     public void test_SSLSocket_clientAuth_OpaqueKey_RSA() throws Exception {
         run_SSLSocket_clientAuth_OpaqueKey(TestKeyStore.getClientCertificate());
     }
+
     @Test
     public void test_SSLSocket_clientAuth_OpaqueKey_EC_RSA() throws Exception {
         run_SSLSocket_clientAuth_OpaqueKey(TestKeyStore.getClientEcRsaCertificate());
     }
+
     @Test
     public void test_SSLSocket_clientAuth_OpaqueKey_EC_EC() throws Exception {
         run_SSLSocket_clientAuth_OpaqueKey(TestKeyStore.getClientEcEcCertificate());
@@ -1137,6 +1178,7 @@ public class SSLSocketTest extends AbstractSSLTest {
             return delegate;
         }
     }
+
     @Test
     public void test_SSLSocket_TrustManagerRuntimeException() throws Exception {
         TestSSLContext c = TestSSLContext.create();
@@ -1181,6 +1223,7 @@ public class SSLSocketTest extends AbstractSSLTest {
         server.close();
         c.close();
     }
+
     @Test
     public void test_SSLSocket_getEnableSessionCreation() throws Exception {
         TestSSLContext c = TestSSLContext.create();
@@ -1193,6 +1236,7 @@ public class SSLSocketTest extends AbstractSSLTest {
         server.close();
         c.close();
     }
+
     @Test
     public void test_SSLSocket_setEnableSessionCreation_server() throws Exception {
         TestSSLContext c = TestSSLContext.create();
@@ -1220,6 +1264,7 @@ public class SSLSocketTest extends AbstractSSLTest {
         server.close();
         c.close();
     }
+
     @Test
     public void test_SSLSocket_setEnableSessionCreation_client() throws Exception {
         TestSSLContext c = TestSSLContext.create();
@@ -1247,6 +1292,7 @@ public class SSLSocketTest extends AbstractSSLTest {
         server.close();
         c.close();
     }
+
     @Test
     public void test_SSLSocket_getSSLParameters() throws Exception {
         SSLSocketFactory sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
@@ -1269,6 +1315,7 @@ public class SSLSocketTest extends AbstractSSLTest {
         p.setEndpointIdentificationAlgorithm("FOO");
         assertEquals("FOO", p.getEndpointIdentificationAlgorithm());
     }
+
     @Test
     public void test_SSLSocket_setSSLParameters() throws Exception {
         SSLSocketFactory sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
@@ -1314,9 +1361,10 @@ public class SSLSocketTest extends AbstractSSLTest {
             assertFalse(ssl.getWantClientAuth());
         }
     }
+
     @Test
     public void test_SSLSocket_close() throws Exception {
-        TestSSLSocketPair pair = TestSSLSocketPair.create();
+        TestSSLSocketPair pair = TestSSLSocketPair.create().connect();
         SSLSocket server = pair.server;
         SSLSocket client = pair.client;
         assertFalse(server.isClosed());
@@ -1433,12 +1481,14 @@ public class SSLSocketTest extends AbstractSSLTest {
         // because the peer has closed, but it shouldn't throw.
         server.close();
     }
+
     @Test
     public void test_SSLSocket_endpointIdentification_Success() throws Exception {
         final TestSSLContext c = TestSSLContext.create();
         SSLSocket client = (SSLSocket) c.clientContext.getSocketFactory().createSocket();
         SSLParameters p = client.getSSLParameters();
         p.setEndpointIdentificationAlgorithm("HTTPS");
+        client.setSSLParameters(p);
         client.connect(new InetSocketAddress(c.host, c.port));
         final SSLSocket server = (SSLSocket) c.serverSocket.accept();
         Future<Void> future = runAsync(() -> {
@@ -1470,6 +1520,7 @@ public class SSLSocketTest extends AbstractSSLTest {
         server.close();
         c.close();
     }
+
     @Test
     public void test_SSLSocket_endpointIdentification_Failure() throws Exception {
         final TestSSLContext c = TestSSLContext.create();
@@ -1503,6 +1554,7 @@ public class SSLSocketTest extends AbstractSSLTest {
             }
         }
     }
+
     @Test
     public void test_SSLSocket_setSoTimeout_basic() throws Exception {
         ServerSocket listening = new ServerSocket(0);
@@ -1522,6 +1574,7 @@ public class SSLSocketTest extends AbstractSSLTest {
         assertEquals(0, wrapping.getSoTimeout());
         assertEquals(0, underlying.getSoTimeout());
     }
+
     @Test
     public void test_SSLSocket_setSoTimeout_wrapper() throws Exception {
         ServerSocket listening = new ServerSocket(0);
@@ -1543,6 +1596,7 @@ public class SSLSocketTest extends AbstractSSLTest {
         underlying.close();
         listening.close();
     }
+
     @Test(expected = SocketTimeoutException.class)
     public void test_SSLSocket_setSoWriteTimeout() throws Exception {
         // Only run this test on Linux since it relies on non-posix methods.
@@ -1556,9 +1610,6 @@ public class SSLSocketTest extends AbstractSSLTest {
 
         SSLSocket client =
                 (SSLSocket) c.clientContext.getSocketFactory().createSocket(c.host, c.port);
-
-        Method writeTimeoutMethod = getWriteTimeoutSetter(client);
-        assumeNotNull("Client socket does not support setting write timeout", writeTimeoutMethod);
 
         // Try to make the client SO_SNDBUF size as small as possible
         // (it can default to 512k or even megabytes).  Note that
@@ -1578,8 +1629,9 @@ public class SSLSocketTest extends AbstractSSLTest {
         });
         server.startHandshake();
 
-        writeTimeoutMethod.invoke(client, 1);
         try {
+            setWriteTimeout(client, 1);
+
             // Add extra space to the write to exceed the send buffer
             // size and cause the write to block.
             final int extra = 1;
@@ -1592,37 +1644,45 @@ public class SSLSocketTest extends AbstractSSLTest {
         }
     }
 
-    private static Method getWriteTimeoutSetter(Object socket) {
-        try {
-            return socket.getClass().getDeclaredMethod("setSoWriteTimeout", int.class);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    private static String osName() {
-        return System.getProperty("os.name").toLowerCase(Locale.US).replaceAll("[^a-z0-9]+", "");
-    }
-
-    private static boolean isLinux() {
-        return osName().startsWith("linux");
-    }
-
-    @Ignore("TODO(nmittler): Fix this.")
+    // TODO(nmittler): Conscrypt socket read may return -1 instead of SocketException.
     @Test
-    public void test_SSLSocket_interrupt() throws Exception {
+    public void test_SSLSocket_interrupt_readUnderlyingAndCloseUnderlying() throws Exception {
         test_SSLSocket_interrupt_case(true, true);
+    }
+
+    // TODO(nmittler): Conscrypt socket read may return -1 instead of SocketException.
+    @Test
+    public void test_SSLSocket_interrupt_readUnderlyingAndCloseWrapper() throws Exception {
         test_SSLSocket_interrupt_case(true, false);
+    }
+
+    // TODO(nmittler): FD socket gets stuck in read on Windows and OSX.
+    @Test
+    public void test_SSLSocket_interrupt_readWrapperAndCloseUnderlying() throws Exception {
         test_SSLSocket_interrupt_case(false, true);
+    }
+
+    // TODO(nmittler): Conscrypt socket read may return -1 instead of SocketException.
+    @Test
+    public void test_SSLSocket_interrupt_readWrapperAndCloseWrapper() throws Exception {
         test_SSLSocket_interrupt_case(false, false);
     }
+
     private void test_SSLSocket_interrupt_case(boolean readUnderlying, boolean closeUnderlying)
             throws Exception {
         final int readingTimeoutMillis = 5000;
         TestSSLContext c = TestSSLContext.create();
         final Socket underlying = new Socket(c.host, c.port);
-        final SSLSocket clientWrapping = (SSLSocket) c.clientContext.getSocketFactory().createSocket(
-                underlying, c.host.getHostName(), c.port, false);
+        final SSLSocket clientWrapping =
+                (SSLSocket) c.clientContext.getSocketFactory().createSocket(
+                        underlying, c.host.getHostName(), c.port, true);
+
+        if (isConscryptFdSocket(clientWrapping) && !readUnderlying && closeUnderlying) {
+            // TODO(nmittler): FD socket gets stuck in the read on Windows and OSX.
+            assumeFalse("Skipping interrupt test on Windows", isWindows());
+            assumeFalse("Skipping interrupt test on OSX", isOsx());
+        }
+
         SSLSocket server = (SSLSocket) c.serverSocket.accept();
 
         // Start the handshake.
@@ -1646,12 +1706,10 @@ public class SSLSocketTest extends AbstractSSLTest {
         // Read from the socket.
         try {
             toRead.setSoTimeout(readingTimeoutMillis);
-            final InputStream inputStream = toRead.getInputStream();
-            @SuppressWarnings("unused")
-            int value = inputStream.read();
+            toRead.getInputStream().read();
             fail();
         } catch (SocketException expected) {
-            // Ignored.
+            // Expected
         }
 
         future.get();
@@ -1659,22 +1717,33 @@ public class SSLSocketTest extends AbstractSSLTest {
         underlying.close();
         server.close();
     }
+
     /**
      * b/7014266 Test to confirm that an SSLSocket.close() on one
      * thread will interrupt another thread blocked reading on the same
      * socket.
      */
+    // TODO(nmittler): Interrupts do not work with the engine-based socket.
     @Test
-    public void test_SSLSocket_interrupt_read() throws Exception {
+    public void test_SSLSocket_interrupt_read_withoutAutoClose() throws Exception {
         final int readingTimeoutMillis = 5000;
         TestSSLContext c = TestSSLContext.create();
         final Socket underlying = new Socket(c.host, c.port);
         final SSLSocket wrapping = (SSLSocket) c.clientContext.getSocketFactory().createSocket(
                 underlying, c.host.getHostName(), c.port, false);
+
+        // TODO(nmittler): Interrupts do not work with the engine-based socket.
+        assumeFalse(isConscryptEngineSocket(wrapping));
+
         Future<Void> clientFuture = runAsync(() -> {
             wrapping.startHandshake();
-            wrapping.setSoTimeout(readingTimeoutMillis);
-            assertEquals(-1, wrapping.getInputStream().read());
+            try {
+                wrapping.setSoTimeout(readingTimeoutMillis);
+                wrapping.getInputStream().read();
+                fail();
+            } catch (SocketException expected) {
+                // Expected
+            }
             return null;
         });
         SSLSocket server = (SSLSocket) c.serverSocket.accept();
@@ -1701,12 +1770,14 @@ public class SSLSocketTest extends AbstractSSLTest {
         }
 
         wrapping.close();
+
         clientFuture.get();
         server.close();
     }
+
     @Test
     public void test_TestSSLSocketPair_create() {
-        TestSSLSocketPair test = TestSSLSocketPair.create();
+        TestSSLSocketPair test = TestSSLSocketPair.create().connect();
         assertNotNull(test.c);
         assertNotNull(test.server);
         assertNotNull(test.client);
@@ -1720,6 +1791,7 @@ public class SSLSocketTest extends AbstractSSLTest {
         assertTrue(test.client.getSession().isValid());
         test.close();
     }
+
     @Test
     public void test_SSLSocket_ClientHello_record_size() throws Exception {
         // This test checks the size of ClientHello of the default SSLSocket. TLS/SSL handshakes
@@ -1733,25 +1805,11 @@ public class SSLSocketTest extends AbstractSSLTest {
             protected SSLSocket configureSocket(SSLSocket socket) {
                 // Enable SNI extension on the socket (this is typically enabled by default)
                 // to increase the size of ClientHello.
-                try {
-                    Method setHostname = socket.getClass().getMethod("setHostname", String.class);
-                    setHostname.invoke(socket, "sslsockettest.androidcts.google.com");
-                } catch (NoSuchMethodException ignored) {
-                    // Ignored.
-                } catch (Exception e) {
-                    throw new RuntimeException("Failed to enable SNI", e);
-                }
+                setHostname(socket);
+
                 // Enable Session Tickets extension on the socket (this is typically enabled
                 // by default) to increase the size of ClientHello.
-                try {
-                    Method setUseSessionTickets =
-                            socket.getClass().getMethod("setUseSessionTickets", boolean.class);
-                    setUseSessionTickets.invoke(socket, true);
-                } catch (NoSuchMethodException ignored) {
-                    // Ignored.
-                } catch (Exception e) {
-                    throw new RuntimeException("Failed to enable Session Tickets", e);
-                }
+                enableSessionTickets(socket);
                 return socket;
             }
         };
@@ -1767,6 +1825,7 @@ public class SSLSocketTest extends AbstractSSLTest {
                     + " bytes");
         }
     }
+
     @Test
     public void test_SSLSocket_ClientHello_cipherSuites() throws Exception {
         ForEachRunner.runNamed(sslSocketFactory -> {
@@ -1777,8 +1836,7 @@ public class SSLSocketTest extends AbstractSSLTest {
             // indicate that a certain TLS extension should be used.
             HelloExtension renegotiationInfoExtension =
                     clientHello.findExtensionByType(HelloExtension.TYPE_RENEGOTIATION_INFO);
-            if (renegotiationInfoExtension != null
-                    && renegotiationInfoExtension.data.length == 1
+            if (renegotiationInfoExtension != null && renegotiationInfoExtension.data.length == 1
                     && renegotiationInfoExtension.data[0] == 0) {
                 cipherSuites = new String[clientHello.cipherSuites.size() + 1];
                 cipherSuites[clientHello.cipherSuites.size()] =
@@ -1793,6 +1851,7 @@ public class SSLSocketTest extends AbstractSSLTest {
             StandardNames.assertDefaultCipherSuites(cipherSuites);
         }, getSSLSocketFactoriesToTest());
     }
+
     @Test
     public void test_SSLSocket_ClientHello_supportedCurves() throws Exception {
         ForEachRunner.runNamed(sslSocketFactory -> {
@@ -1814,6 +1873,7 @@ public class SSLSocketTest extends AbstractSSLTest {
             StandardNames.assertDefaultEllipticCurves(supportedCurves);
         }, getSSLSocketFactoriesToTest());
     }
+
     @Test
     public void test_SSLSocket_ClientHello_clientProtocolVersion() throws Exception {
         ForEachRunner.runNamed(sslSocketFactory -> {
@@ -1821,6 +1881,7 @@ public class SSLSocketTest extends AbstractSSLTest {
             assertEquals(TlsProtocolVersion.TLSv1_2, clientHello.clientVersion);
         }, getSSLSocketFactoriesToTest());
     }
+
     @Test
     public void test_SSLSocket_ClientHello_compressionMethods() throws Exception {
         ForEachRunner.runNamed(sslSocketFactory -> {
@@ -1829,6 +1890,7 @@ public class SSLSocketTest extends AbstractSSLTest {
                     clientHello.compressionMethods);
         }, getSSLSocketFactoriesToTest());
     }
+
     @Test
     public void test_SSLSocket_ClientHello_SNI() throws Exception {
         ForEachRunner.runNamed(sslSocketFactory -> {
@@ -1843,8 +1905,7 @@ public class SSLSocketTest extends AbstractSSLTest {
     }
     private List<Pair<String, SSLSocketFactory>> getSSLSocketFactoriesToTest()
             throws NoSuchAlgorithmException, KeyManagementException {
-        List<Pair<String, SSLSocketFactory>> result =
-                new ArrayList<>();
+        List<Pair<String, SSLSocketFactory>> result = new ArrayList<>();
         result.add(Pair.of("default", (SSLSocketFactory) SSLSocketFactory.getDefault()));
         for (String sslContextProtocol : StandardNames.SSL_CONTEXT_PROTOCOLS) {
             SSLContext sslContext = SSLContext.getInstance(sslContextProtocol);
@@ -1898,21 +1959,20 @@ public class SSLSocketTest extends AbstractSSLTest {
             listeningSocket = ServerSocketFactory.getDefault().createServerSocket(0);
             final ServerSocket finalListeningSocket = listeningSocket;
             // 2. (in background) Wait for an incoming connection and read its first chunk.
-            final Future<byte[]> readFirstReceivedChunkFuture =
-                    runAsync(() -> {
-                        Socket socket = finalListeningSocket.accept();
-                        sockets[1] = socket;
-                        try {
-                            byte[] buffer = new byte[64 * 1024];
-                            int bytesRead = socket.getInputStream().read(buffer);
-                            if (bytesRead == -1) {
-                                throw new EOFException("Failed to read anything");
-                            }
-                            return Arrays.copyOf(buffer, bytesRead);
-                        } finally {
-                            closeQuietly(socket);
-                        }
-                    });
+            final Future<byte[]> readFirstReceivedChunkFuture = runAsync(() -> {
+                Socket socket = finalListeningSocket.accept();
+                sockets[1] = socket;
+                try {
+                    byte[] buffer = new byte[64 * 1024];
+                    int bytesRead = socket.getInputStream().read(buffer);
+                    if (bytesRead == -1) {
+                        throw new EOFException("Failed to read anything");
+                    }
+                    return Arrays.copyOf(buffer, bytesRead);
+                } finally {
+                    closeQuietly(socket);
+                }
+            });
             // 3. Create a client socket, connect it to the server socket, and start the TLS/SSL
             //    handshake.
             runAsync((Callable<Void>) () -> {
@@ -1924,8 +1984,7 @@ public class SSLSocketTest extends AbstractSSLTest {
                     // server socket receives a ClientHello.
                     try {
                         SSLSocket sslSocket = (SSLSocket) sslSocketFactory.createSocket(client,
-                                "localhost.localdomain", finalListeningSocket.getLocalPort(),
-                                true);
+                                "localhost.localdomain", finalListeningSocket.getLocalPort(), true);
                         sslSocket.startHandshake();
                         fail();
                         return null;
@@ -1949,28 +2008,22 @@ public class SSLSocketTest extends AbstractSSLTest {
     @Test
     public void test_SSLSocket_getPortWithSNI() throws Exception {
         TestSSLContext context = TestSSLContext.create();
-        try (SSLSocket client = (SSLSocket) context.clientContext.getSocketFactory()
-                .createSocket()) {
+        try (SSLSocket client =
+                        (SSLSocket) context.clientContext.getSocketFactory().createSocket()) {
             client.connect(new InetSocketAddress(context.host, context.port));
-            try {
-                // This is crucial to reproducing issue 18428603.
-                Method setHostname = client.getClass().getMethod("setHostname", String.class);
-                setHostname.invoke(client, "sslsockettest.androidcts.google.com");
-            } catch (NoSuchMethodException ignored) {
-                // Ignored.
-            }
+            setHostname(client);
             assertTrue(client.getPort() > 0);
         } finally {
             context.close();
         }
     }
+
     @Test
     public void test_SSLSocket_SNIHostName() throws Exception {
         TestSSLContext c = TestSSLContext.create();
         final SSLSocket client = (SSLSocket) c.clientContext.getSocketFactory().createSocket();
         SSLParameters clientParams = client.getSSLParameters();
-        clientParams.setServerNames(
-                Collections.singletonList(new SNIHostName("www.example.com")));
+        clientParams.setServerNames(Collections.singletonList(new SNIHostName("www.example.com")));
         client.setSSLParameters(clientParams);
         SSLParameters serverParams = c.serverSocket.getSSLParameters();
         serverParams.setSNIMatchers(
@@ -1996,6 +2049,7 @@ public class SSLSocketTest extends AbstractSSLTest {
         SNIHostName serverHostName = (SNIHostName) serverName;
         assertEquals("www.example.com", serverHostName.getAsciiName());
     }
+
     @Test
     public void test_SSLSocket_sendsTlsFallbackScsv_Fallback_Success() throws Exception {
         TestSSLContext context = TestSSLContext.create();
@@ -2050,10 +2104,13 @@ public class SSLSocketTest extends AbstractSSLTest {
         server.close();
         context.close();
     }
+
     private static void assertInappropriateFallbackIsCause(Throwable cause) {
-        assertTrue(cause.getMessage(), cause.getMessage().contains("inappropriate fallback")
+        assertTrue(cause.getMessage(),
+                cause.getMessage().contains("inappropriate fallback")
                         || cause.getMessage().contains("INAPPROPRIATE_FALLBACK"));
     }
+
     @Test
     public void test_SSLSocket_sendsTlsFallbackScsv_InappropriateFallback_Failure()
             throws Exception {
@@ -2098,6 +2155,7 @@ public class SSLSocketTest extends AbstractSSLTest {
         server.close();
         context.close();
     }
+
     @Test
     public void test_SSLSocket_ClientGetsAlertDuringHandshake_HasGoodExceptionMessage()
             throws Exception {
@@ -2123,11 +2181,9 @@ public class SSLSocketTest extends AbstractSSLTest {
             int bytesRead = server.getInputStream().read(scratch);
             // Write a bogus TLS alert:
             // TLSv1.2 Record Layer: Alert (Level: Warning, Description: Protocol Version)
-            server.getOutputStream().write(
-                    new byte[] {0x15, 0x03, 0x03, 0x00, 0x02, 0x01, 0x46});
+            server.getOutputStream().write(new byte[] {0x15, 0x03, 0x03, 0x00, 0x02, 0x01, 0x46});
             // TLSv1.2 Record Layer: Alert (Level: Warning, Description: Close Notify)
-            server.getOutputStream().write(
-                    new byte[] {0x15, 0x03, 0x03, 0x00, 0x02, 0x01, 0x00});
+            server.getOutputStream().write(new byte[] {0x15, 0x03, 0x03, 0x00, 0x02, 0x01, 0x00});
             return null;
         });
         c.get(5, TimeUnit.SECONDS);
@@ -2137,6 +2193,7 @@ public class SSLSocketTest extends AbstractSSLTest {
         listener.close();
         context.close();
     }
+
     @Test
     public void test_SSLSocket_ServerGetsAlertDuringHandshake_HasGoodExceptionMessage()
             throws Exception {
@@ -2203,12 +2260,10 @@ public class SSLSocketTest extends AbstractSSLTest {
             // Write a bogus TLS alert:
             // TLSv1.2 Record Layer: Alert (Level: Warning, Description:
             // Protocol Version)
-            client.getOutputStream().write(
-                    new byte[] {0x15, 0x03, 0x03, 0x00, 0x02, 0x01, 0x46});
+            client.getOutputStream().write(new byte[] {0x15, 0x03, 0x03, 0x00, 0x02, 0x01, 0x46});
             // TLSv1.2 Record Layer: Alert (Level: Warning, Description:
             // Close Notify)
-            client.getOutputStream().write(
-                    new byte[] {0x15, 0x03, 0x03, 0x00, 0x02, 0x01, 0x00});
+            client.getOutputStream().write(new byte[] {0x15, 0x03, 0x03, 0x00, 0x02, 0x01, 0x00});
             return null;
         });
         c.get(5, TimeUnit.SECONDS);
@@ -2217,6 +2272,7 @@ public class SSLSocketTest extends AbstractSSLTest {
         server.close();
         context.close();
     }
+
     @Test
     public void test_SSLSocket_SSLv3Unsupported() throws Exception {
         TestSSLContext context = TestSSLContext.create();
@@ -2231,6 +2287,73 @@ public class SSLSocketTest extends AbstractSSLTest {
         } catch (IllegalArgumentException expected) {
             // Ignored.
         }
+    }
+
+    private static void setWriteTimeout(Object socket, int timeout) {
+        Exception ex = null;
+        try {
+            Method method = socket.getClass().getMethod("setSoWriteTimeout", int.class);
+            method.setAccessible(true);
+            method.invoke(socket, timeout);
+        } catch (Exception e) {
+            ex = e;
+        }
+        // Engine-based socket currently has the method but throws UnsupportedOperationException.
+        assumeNoException("Client socket does not support setting write timeout", ex);
+    }
+
+    private static void setHostname(SSLSocket socket) {
+        try {
+            Method method = socket.getClass().getMethod("setHostname", String.class);
+            method.setAccessible(true);
+            method.invoke(socket, "sslsockettest.androidcts.google.com");
+        } catch (NoSuchMethodException ignored) {
+            // Ignored.
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to enable SNI", e);
+        }
+    }
+
+    private static void enableSessionTickets(SSLSocket socket) {
+        try {
+            Method method =
+                    socket.getClass().getMethod("setUseSessionTickets", boolean.class);
+            method.setAccessible(true);
+            method.invoke(socket, true);
+        } catch (NoSuchMethodException ignored) {
+            // Ignored.
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to enable Session Tickets", e);
+        }
+    }
+
+    private static boolean isConscryptSocket(Socket socket) {
+        return isConscryptFdSocket(socket) || isConscryptEngineSocket(socket);
+    }
+
+    private static boolean isConscryptFdSocket(Socket socket) {
+        return "ConscryptFileDescriptorSocket".equals(socket.getClass().getSimpleName());
+    }
+
+    private static boolean isConscryptEngineSocket(Socket socket) {
+        return "ConscryptEngineSocket".equals(socket.getClass().getSimpleName());
+    }
+
+    private static String osName() {
+        return System.getProperty("os.name").toLowerCase(Locale.US).replaceAll("[^a-z0-9]+", "");
+    }
+
+    private static boolean isLinux() {
+        return osName().startsWith("linux");
+    }
+
+    private static boolean isWindows() {
+        return osName().startsWith("windows");
+    }
+
+    private static boolean isOsx() {
+        String name = osName();
+        return name.startsWith("macosx") || name.startsWith("osx");
     }
 
     private <T> Future<T> runAsync(Callable<T> callable) {
