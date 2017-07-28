@@ -18,6 +18,13 @@ package org.conscrypt;
 
 import static org.conscrypt.NativeConstants.SSL_MODE_CBC_RECORD_SPLITTING;
 import static org.conscrypt.NativeConstants.SSL_MODE_ENABLE_FALSE_START;
+import static org.conscrypt.NativeConstants.SSL_OP_NO_SSLv3;
+import static org.conscrypt.NativeConstants.SSL_OP_NO_TLSv1;
+import static org.conscrypt.NativeConstants.SSL_OP_NO_TLSv1_1;
+import static org.conscrypt.NativeConstants.SSL_OP_NO_TLSv1_2;
+import static org.conscrypt.NativeConstants.SSL_VERIFY_FAIL_IF_NO_PEER_CERT;
+import static org.conscrypt.NativeConstants.SSL_VERIFY_NONE;
+import static org.conscrypt.NativeConstants.SSL_VERIFY_PEER;
 import static org.conscrypt.TestUtils.openTestFile;
 import static org.conscrypt.TestUtils.readTestFile;
 import static org.junit.Assert.assertEquals;
@@ -89,10 +96,12 @@ public class NativeCryptoTest {
 
     private static OpenSSLKey SERVER_PRIVATE_KEY;
     private static OpenSSLX509Certificate[] SERVER_CERTIFICATES_HOLDER;
-    private static long[] SERVER_CERTIFICATES;
+    private static long[] SERVER_CERTIFICATE_REFS;
+    private static byte[][] ENCODED_SERVER_CERTIFICATES;
     private static OpenSSLKey CLIENT_PRIVATE_KEY;
     private static OpenSSLX509Certificate[] CLIENT_CERTIFICATES_HOLDER;
-    private static long[] CLIENT_CERTIFICATES;
+    private static long[] CLIENT_CERTIFICATE_REFS;
+    private static byte[][] ENCODED_CLIENT_CERTIFICATES;
     private static byte[][] CA_PRINCIPALS;
     private static OpenSSLKey CHANNEL_ID_PRIVATE_KEY;
     private static byte[] CHANNEL_ID;
@@ -116,9 +125,14 @@ public class NativeCryptoTest {
         return SERVER_PRIVATE_KEY;
     }
 
-    private static long[] getServerCertificates() {
+    private static long[] getServerCertificateRefs() {
         initCerts();
-        return SERVER_CERTIFICATES;
+        return SERVER_CERTIFICATE_REFS;
+    }
+
+    private static byte[][] getEncodedServerCertificates() {
+        initCerts();
+        return ENCODED_SERVER_CERTIFICATES;
     }
 
     private static OpenSSLKey getClientPrivateKey() {
@@ -126,9 +140,14 @@ public class NativeCryptoTest {
         return CLIENT_PRIVATE_KEY;
     }
 
-    private static long[] getClientCertificates() {
+    private static long[] getClientCertificateRefs() {
         initCerts();
-        return CLIENT_CERTIFICATES;
+        return CLIENT_CERTIFICATE_REFS;
+    }
+
+    private static byte[][] getEncodedClientCertificates() {
+        initCerts();
+        return ENCODED_CLIENT_CERTIFICATES;
     }
 
     private static byte[][] getCaPrincipals() {
@@ -150,14 +169,16 @@ public class NativeCryptoTest {
             SERVER_PRIVATE_KEY = OpenSSLKey.fromPrivateKey(serverPrivateKeyEntry.getPrivateKey());
             SERVER_CERTIFICATES_HOLDER =
                     encodeCertificateList(serverPrivateKeyEntry.getCertificateChain());
-            SERVER_CERTIFICATES = getCertificateReferences(SERVER_CERTIFICATES_HOLDER);
+            SERVER_CERTIFICATE_REFS = getCertificateReferences(SERVER_CERTIFICATES_HOLDER);
+            ENCODED_SERVER_CERTIFICATES = getEncodedCertificates(SERVER_CERTIFICATES_HOLDER);
 
             PrivateKeyEntry clientPrivateKeyEntry =
                     TestKeyStore.getClientCertificate().getPrivateKey("RSA", "RSA");
             CLIENT_PRIVATE_KEY = OpenSSLKey.fromPrivateKey(clientPrivateKeyEntry.getPrivateKey());
             CLIENT_CERTIFICATES_HOLDER =
                     encodeCertificateList(clientPrivateKeyEntry.getCertificateChain());
-            CLIENT_CERTIFICATES = getCertificateReferences(CLIENT_CERTIFICATES_HOLDER);
+            CLIENT_CERTIFICATE_REFS = getCertificateReferences(CLIENT_CERTIFICATES_HOLDER);
+            ENCODED_CLIENT_CERTIFICATES = getEncodedCertificates(CLIENT_CERTIFICATES_HOLDER);
 
             KeyStore ks = TestKeyStore.getClient().keyStore;
             String caCertAlias = ks.aliases().nextElement();
@@ -176,6 +197,18 @@ public class NativeCryptoTest {
             certRefs[i] = certs[i].getContext();
         }
         return certRefs;
+    }
+
+    private static byte[][] getEncodedCertificates(OpenSSLX509Certificate[] certs) {
+        try {
+            final byte[][] encoded = new byte[certs.length][];
+            for (int i = 0; i < certs.length; i++) {
+                encoded[i] = certs[i].getEncoded();
+            }
+            return encoded;
+        } catch (CertificateEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static OpenSSLX509Certificate[] encodeCertificateList(Certificate[] chain)
@@ -204,7 +237,8 @@ public class NativeCryptoTest {
         CHANNEL_ID = new BigInteger(
                 "702b07871fd7955c320b26f15e244e47eed60272124c92b9ebecf0b42f90069b"
                         + "ab53592ebfeb4f167dbf3ce61513afb0e354c479b1c1b69874fa471293494f77",
-                16).toByteArray();
+                16)
+                             .toByteArray();
     }
 
     private static RSAPrivateCrtKey generateRsaKey() throws Exception {
@@ -346,10 +380,10 @@ public class NativeCryptoTest {
         long s = NativeCrypto.SSL_new(c);
 
         assertTrue(s != NULL);
-        assertTrue((NativeCrypto.SSL_get_options(s) & NativeConstants.SSL_OP_NO_SSLv3) == 0);
-        assertTrue((NativeCrypto.SSL_get_options(s) & NativeConstants.SSL_OP_NO_TLSv1) == 0);
-        assertTrue((NativeCrypto.SSL_get_options(s) & NativeConstants.SSL_OP_NO_TLSv1_1) == 0);
-        assertTrue((NativeCrypto.SSL_get_options(s) & NativeConstants.SSL_OP_NO_TLSv1_2) == 0);
+        assertTrue((NativeCrypto.SSL_get_options(s) & SSL_OP_NO_SSLv3) == 0);
+        assertTrue((NativeCrypto.SSL_get_options(s) & SSL_OP_NO_TLSv1) == 0);
+        assertTrue((NativeCrypto.SSL_get_options(s) & SSL_OP_NO_TLSv1_1) == 0);
+        assertTrue((NativeCrypto.SSL_get_options(s) & SSL_OP_NO_TLSv1_2) == 0);
 
         long s2 = NativeCrypto.SSL_new(c);
         assertTrue(s != s2);
@@ -360,16 +394,29 @@ public class NativeCryptoTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void SSL_use_certificate_NullArguments() throws Exception {
-        NativeCrypto.SSL_use_certificate(NULL, null);
+    public void setLocalCertsAndPrivateKey_withNullSSLShouldThrow() throws Exception {
+        NativeCrypto.setLocalCertsAndPrivateKey(
+                NULL, getEncodedServerCertificates(), getServerPrivateKey().getNativeRef());
     }
 
     @Test(expected = NullPointerException.class)
-    public void SSL_use_certificate_withNullShouldThrow() throws Exception {
+    public void setLocalCertsAndPrivateKey_withNullCertificatesShouldThrow() throws Exception {
         long c = NativeCrypto.SSL_CTX_new();
         long s = NativeCrypto.SSL_new(c);
         try {
-            NativeCrypto.SSL_use_certificate(s, null);
+            NativeCrypto.setLocalCertsAndPrivateKey(s, null, getServerPrivateKey().getNativeRef());
+        } finally {
+            NativeCrypto.SSL_free(s);
+            NativeCrypto.SSL_CTX_free(c);
+        }
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void setLocalCertsAndPrivateKey_withNullKeyShouldThrow() throws Exception {
+        long c = NativeCrypto.SSL_CTX_new();
+        long s = NativeCrypto.SSL_new(c);
+        try {
+            NativeCrypto.setLocalCertsAndPrivateKey(s, getEncodedServerCertificates(), null);
         } finally {
             NativeCrypto.SSL_free(s);
             NativeCrypto.SSL_CTX_free(c);
@@ -377,11 +424,12 @@ public class NativeCryptoTest {
     }
 
     @Test
-    public void test_SSL_use_certificate() throws Exception {
+    public void setLocalCertsAndPrivateKey() throws Exception {
         long c = NativeCrypto.SSL_CTX_new();
         long s = NativeCrypto.SSL_new(c);
 
-        NativeCrypto.SSL_use_certificate(s, getServerCertificates());
+        NativeCrypto.setLocalCertsAndPrivateKey(
+                s, getEncodedServerCertificates(), getServerPrivateKey().getNativeRef());
 
         NativeCrypto.SSL_free(s);
         NativeCrypto.SSL_CTX_free(c);
@@ -416,117 +464,6 @@ public class NativeCryptoTest {
         // Use the key natively. This works because the initChannelIdKey method ensures that the
         // key is backed by OpenSSL.
         NativeCrypto.SSL_set1_tls_channel_id(s, CHANNEL_ID_PRIVATE_KEY.getNativeRef());
-
-        NativeCrypto.SSL_free(s);
-        NativeCrypto.SSL_CTX_free(c);
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void SSL_use_PrivateKey_withNullSslShouldThrow() throws Exception {
-        NativeCrypto.SSL_use_PrivateKey(NULL, null);
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void SSL_use_PrivateKeyWithNullKeyShouldThrow() throws Exception {
-        long c = NativeCrypto.SSL_CTX_new();
-        long s = NativeCrypto.SSL_new(c);
-
-        try {
-            NativeCrypto.SSL_use_PrivateKey(s, null);
-        } finally {
-            NativeCrypto.SSL_free(s);
-            NativeCrypto.SSL_CTX_free(c);
-        }
-
-        NativeCrypto.SSL_use_PrivateKey(s, getServerPrivateKey().getNativeRef());
-
-        NativeCrypto.SSL_free(s);
-        NativeCrypto.SSL_CTX_free(c);
-    }
-
-    @Test
-    public void test_SSL_use_PrivateKey() throws Exception {
-        long c = NativeCrypto.SSL_CTX_new();
-        long s = NativeCrypto.SSL_new(c);
-
-        NativeCrypto.SSL_use_PrivateKey(s, getServerPrivateKey().getNativeRef());
-
-        NativeCrypto.SSL_free(s);
-        NativeCrypto.SSL_CTX_free(c);
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void SSL_check_private_key_withNullShouldThrow() throws Exception {
-        NativeCrypto.SSL_check_private_key(NULL);
-    }
-
-    @Test(expected = SSLException.class)
-    public void SSL_check_private_key_withNoKeyOrCertShouldThrow() throws Exception {
-        long c = NativeCrypto.SSL_CTX_new();
-        long s = NativeCrypto.SSL_new(c);
-
-        // neither private or certificate set
-        try {
-            NativeCrypto.SSL_check_private_key(s);
-        } finally {
-            NativeCrypto.SSL_free(s);
-            NativeCrypto.SSL_CTX_free(c);
-        }
-    }
-
-    @Test(expected = SSLException.class)
-    public void SSL_check_private_key_withNoKeyShouldThrow() throws Exception {
-        long c = NativeCrypto.SSL_CTX_new();
-        long s = NativeCrypto.SSL_new(c);
-
-        // Certificate but no private key
-        NativeCrypto.SSL_use_certificate(s, getServerCertificates());
-
-        try {
-            NativeCrypto.SSL_check_private_key(s);
-        } finally {
-            NativeCrypto.SSL_free(s);
-            NativeCrypto.SSL_CTX_free(c);
-        }
-    }
-
-    @Test(expected = SSLException.class)
-    public void test_SSL_check_private_NoCertificateShouldThrow() throws Exception {
-        long c = NativeCrypto.SSL_CTX_new();
-        long s = NativeCrypto.SSL_new(c);
-
-        // first private, then certificate
-        NativeCrypto.SSL_use_PrivateKey(s, getServerPrivateKey().getNativeRef());
-        try {
-            NativeCrypto.SSL_check_private_key(s);
-        } finally {
-            NativeCrypto.SSL_free(s);
-            NativeCrypto.SSL_CTX_free(c);
-        }
-    }
-
-    @Test
-    public void test_SSL_check_private_key_certThenKey() throws Exception {
-        long c = NativeCrypto.SSL_CTX_new();
-        long s = NativeCrypto.SSL_new(c);
-
-        NativeCrypto.SSL_use_certificate(s, getServerCertificates());
-        NativeCrypto.SSL_use_PrivateKey(s, getServerPrivateKey().getNativeRef());
-        NativeCrypto.SSL_check_private_key(s);
-
-        NativeCrypto.SSL_free(s);
-        NativeCrypto.SSL_CTX_free(c);
-    }
-
-    @Test
-    public void test_SSL_check_private_key_keyThenCert() throws Exception {
-        long c = NativeCrypto.SSL_CTX_new();
-        long s = NativeCrypto.SSL_new(c);
-
-        // first private, then certificate
-        NativeCrypto.SSL_use_PrivateKey(s, getServerPrivateKey().getNativeRef());
-        NativeCrypto.SSL_use_certificate(s, getServerCertificates());
-        NativeCrypto.SSL_check_private_key(s);
 
         NativeCrypto.SSL_free(s);
         NativeCrypto.SSL_CTX_free(c);
@@ -595,9 +532,9 @@ public class NativeCryptoTest {
     public void test_SSL_set_options() throws Exception {
         long c = NativeCrypto.SSL_CTX_new();
         long s = NativeCrypto.SSL_new(c);
-        assertTrue((NativeCrypto.SSL_get_options(s) & NativeConstants.SSL_OP_NO_SSLv3) == 0);
-        NativeCrypto.SSL_set_options(s, NativeConstants.SSL_OP_NO_SSLv3);
-        assertTrue((NativeCrypto.SSL_get_options(s) & NativeConstants.SSL_OP_NO_SSLv3) != 0);
+        assertTrue((NativeCrypto.SSL_get_options(s) & SSL_OP_NO_SSLv3) == 0);
+        NativeCrypto.SSL_set_options(s, SSL_OP_NO_SSLv3);
+        assertTrue((NativeCrypto.SSL_get_options(s) & SSL_OP_NO_SSLv3) != 0);
         NativeCrypto.SSL_free(s);
         NativeCrypto.SSL_CTX_free(c);
     }
@@ -611,11 +548,11 @@ public class NativeCryptoTest {
     public void test_SSL_clear_options() throws Exception {
         long c = NativeCrypto.SSL_CTX_new();
         long s = NativeCrypto.SSL_new(c);
-        assertTrue((NativeCrypto.SSL_get_options(s) & NativeConstants.SSL_OP_NO_SSLv3) == 0);
-        NativeCrypto.SSL_set_options(s, NativeConstants.SSL_OP_NO_SSLv3);
-        assertTrue((NativeCrypto.SSL_get_options(s) & NativeConstants.SSL_OP_NO_SSLv3) != 0);
-        NativeCrypto.SSL_clear_options(s, NativeConstants.SSL_OP_NO_SSLv3);
-        assertTrue((NativeCrypto.SSL_get_options(s) & NativeConstants.SSL_OP_NO_SSLv3) == 0);
+        assertTrue((NativeCrypto.SSL_get_options(s) & SSL_OP_NO_SSLv3) == 0);
+        NativeCrypto.SSL_set_options(s, SSL_OP_NO_SSLv3);
+        assertTrue((NativeCrypto.SSL_get_options(s) & SSL_OP_NO_SSLv3) != 0);
+        NativeCrypto.SSL_clear_options(s, SSL_OP_NO_SSLv3);
+        assertTrue((NativeCrypto.SSL_get_options(s) & SSL_OP_NO_SSLv3) == 0);
         NativeCrypto.SSL_free(s);
         NativeCrypto.SSL_CTX_free(c);
     }
@@ -709,11 +646,10 @@ public class NativeCryptoTest {
     public void test_SSL_set_verify() throws Exception {
         long c = NativeCrypto.SSL_CTX_new();
         long s = NativeCrypto.SSL_new(c);
-        NativeCrypto.SSL_set_verify(s, NativeCrypto.SSL_VERIFY_NONE);
-        NativeCrypto.SSL_set_verify(s, NativeCrypto.SSL_VERIFY_PEER);
-        NativeCrypto.SSL_set_verify(s, NativeCrypto.SSL_VERIFY_FAIL_IF_NO_PEER_CERT);
-        NativeCrypto.SSL_set_verify(
-                s, (NativeCrypto.SSL_VERIFY_PEER | NativeCrypto.SSL_VERIFY_FAIL_IF_NO_PEER_CERT));
+        NativeCrypto.SSL_set_verify(s, SSL_VERIFY_NONE);
+        NativeCrypto.SSL_set_verify(s, SSL_VERIFY_PEER);
+        NativeCrypto.SSL_set_verify(s, SSL_VERIFY_FAIL_IF_NO_PEER_CERT);
+        NativeCrypto.SSL_set_verify(s, (SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT));
         NativeCrypto.SSL_free(s);
         NativeCrypto.SSL_CTX_free(c);
     }
@@ -723,9 +659,9 @@ public class NativeCryptoTest {
     public static class Hooks {
         String negotiatedCipherSuite;
         private OpenSSLKey channelIdPrivateKey;
-         boolean pskEnabled;
-         byte[] pskKey;
-         List<String> enabledCipherSuites;
+        boolean pskEnabled;
+        byte[] pskKey;
+        List<String> enabledCipherSuites;
 
         /**
          * @throws SSLException if an error occurs creating the context.
@@ -758,7 +694,8 @@ public class NativeCryptoTest {
         }
         public void configureCallbacks(
                 @SuppressWarnings("unused") TestSSLHandshakeCallbacks callbacks) {}
-        public void clientCertificateRequested(@SuppressWarnings("unused") long s) {}
+        public void clientCertificateRequested(@SuppressWarnings("unused") long s)
+                throws CertificateEncodingException, SSLException {}
         public void afterHandshake(long session, long ssl, long context, Socket socket,
                 FileDescriptor fd, SSLHandshakeCallbacks callback) throws Exception {
             if (session != NULL) {
@@ -798,15 +735,17 @@ public class NativeCryptoTest {
         private boolean verifyCertificateChainCalled;
 
         @Override
-        public void verifyCertificateChain(long[] certChainRefs, String authMethod)
-                throws CertificateException {
-            if (DEBUG) {
-                System.out.println("ssl=0x" + Long.toString(sslNativePointer, 16)
-                        + " verifyCertificateChain"
-                        + " asn1DerEncodedCertificateChain=" + Arrays.toString(certChainRefs)
-                        + " authMethod=" + authMethod);
+        public void verifyCertificateChain(byte[][] certs, String authMethod)
+            throws CertificateException {
+            certificateChainRefs = new long[certs.length];
+            for (int i = 0; i < certs.length; ++i) {
+                byte[] cert = certs[i];
+                try {
+                    certificateChainRefs[i] = NativeCrypto.d2i_X509(cert);
+                } catch (ParsingException e) {
+                    throw new RuntimeException(e);
+                }
             }
-            this.certificateChainRefs = certChainRefs;
             this.authMethod = authMethod;
             this.verifyCertificateChainCalled = true;
         }
@@ -817,7 +756,8 @@ public class NativeCryptoTest {
 
         @Override
         public void clientCertificateRequested(
-                byte[] keyTypes, byte[][] asn1DerEncodedX500Principals) {
+                byte[] keyTypes, byte[][] asn1DerEncodedX500Principals)
+                throws CertificateEncodingException, SSLException {
             if (DEBUG) {
                 System.out.println("ssl=0x" + Long.toString(sslNativePointer, 16)
                         + " clientCertificateRequested"
@@ -959,7 +899,7 @@ public class NativeCryptoTest {
 
     static class ServerHooks extends Hooks {
         private final OpenSSLKey privateKey;
-        private final long[] certificates;
+        private final byte[][] certificates;
         private boolean channelIdEnabled;
         private byte[] channelIdAfterHandshake;
         private Throwable channelIdAfterHandshakeException;
@@ -970,7 +910,7 @@ public class NativeCryptoTest {
             this(null, null);
         }
 
-        ServerHooks(OpenSSLKey privateKey, long[] certificates) {
+        ServerHooks(OpenSSLKey privateKey, byte[][] certificates) {
             this.privateKey = privateKey;
             this.certificates = certificates;
         }
@@ -978,11 +918,8 @@ public class NativeCryptoTest {
         @Override
         public long beforeHandshake(long c) throws SSLException {
             long s = super.beforeHandshake(c);
-            if (privateKey != null) {
-                NativeCrypto.SSL_use_PrivateKey(s, privateKey.getNativeRef());
-            }
-            if (certificates != null) {
-                NativeCrypto.SSL_use_certificate(s, certificates);
+            if (privateKey != null && certificates != null) {
+                NativeCrypto.setLocalCertsAndPrivateKey(s, certificates, privateKey.getNativeRef());
             }
             if (channelIdEnabled) {
                 NativeCrypto.SSL_enable_tls_channel_id(s);
@@ -991,7 +928,7 @@ public class NativeCryptoTest {
                 NativeCrypto.set_SSL_psk_server_callback_enabled(s, true);
                 NativeCrypto.SSL_use_psk_identity_hint(s, pskIdentityHint);
             }
-            NativeCrypto.SSL_set_verify(s, NativeCrypto.SSL_VERIFY_NONE);
+            NativeCrypto.SSL_set_verify(s, SSL_VERIFY_NONE);
             return s;
         }
 
@@ -1035,14 +972,14 @@ public class NativeCryptoTest {
                             @SuppressWarnings("resource")
                             // Socket needs to remain open after the handshake
                             Socket socket = (client ? new Socket(listener.getInetAddress(),
-                                    listener.getLocalPort())
-                                    : listener.accept());
+                                                              listener.getLocalPort())
+                                                    : listener.accept());
                             if (timeout == -1) {
                                 return new TestSSLHandshakeCallbacks(socket, 0, null);
                             }
                             FileDescriptor fd =
-                                    (FileDescriptor) m_Platform_getFileDescriptor
-                                            .invoke(null, socket);
+                                    (FileDescriptor) m_Platform_getFileDescriptor.invoke(
+                                            null, socket);
                             long c = hooks.getContext();
                             long s = hooks.beforeHandshake(c);
                             TestSSLHandshakeCallbacks callback =
@@ -1051,8 +988,8 @@ public class NativeCryptoTest {
                             if (DEBUG) {
                                 System.out.println("ssl=0x" + Long.toString(s, 16) + " handshake"
                                         + " context=0x" + Long.toString(c, 16) + " socket=" + socket
-                                        + " fd=" + fd + " timeout=" + timeout + " client="
-                                        + client);
+                                        + " fd=" + fd + " timeout=" + timeout
+                                        + " client=" + client);
                             }
                             long session = NULL;
                             try {
@@ -1065,9 +1002,9 @@ public class NativeCryptoTest {
                                 NativeCrypto.SSL_do_handshake(s, fd, callback, timeout);
                                 session = NativeCrypto.SSL_get1_session(s);
                                 if (DEBUG) {
-                                    System.out
-                                            .println("ssl=0x" + Long.toString(s, 16) + " handshake"
-                                                    + " session=0x" + Long.toString(session, 16));
+                                    System.out.println("ssl=0x" + Long.toString(s, 16)
+                                            + " handshake"
+                                            + " session=0x" + Long.toString(session, 16));
                                 }
                             } finally {
                                 // Ensure afterHandshake is called to free resources
@@ -1120,13 +1057,14 @@ public class NativeCryptoTest {
         // normal client and server case
         final ServerSocket listener = newServerSocket();
         Hooks cHooks = new Hooks();
-        Hooks sHooks = new ServerHooks(getServerPrivateKey(), getServerCertificates());
+        Hooks sHooks = new ServerHooks(getServerPrivateKey(), getEncodedServerCertificates());
         Future<TestSSLHandshakeCallbacks> client = handshake(listener, 0, true, cHooks, null);
         Future<TestSSLHandshakeCallbacks> server = handshake(listener, 0, false, sHooks, null);
         TestSSLHandshakeCallbacks clientCallback = client.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         TestSSLHandshakeCallbacks serverCallback = server.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         assertTrue(clientCallback.verifyCertificateChainCalled);
-        assertEqualCertificateChains(getServerCertificates(), clientCallback.certificateChainRefs);
+        assertEqualCertificateChains(
+                getServerCertificateRefs(), clientCallback.certificateChainRefs);
         assertEquals("ECDHE_RSA", clientCallback.authMethod);
         assertFalse(serverCallback.verifyCertificateChainCalled);
         assertFalse(clientCallback.clientCertificateRequestedCalled);
@@ -1146,15 +1084,14 @@ public class NativeCryptoTest {
         // normal client and server case
         final ServerSocket listener = newServerSocket();
 
-        Future<TestSSLHandshakeCallbacks> client1 =
-                handshake(listener, 0, true, new ClientHooks() {
-                    @Override
-                    public void configureCallbacks(TestSSLHandshakeCallbacks callbacks) {
-                        callbacks.onNewSessionEstablishedSaveSession = true;
-                    }
-                }, null);
+        Future<TestSSLHandshakeCallbacks> client1 = handshake(listener, 0, true, new ClientHooks() {
+            @Override
+            public void configureCallbacks(TestSSLHandshakeCallbacks callbacks) {
+                callbacks.onNewSessionEstablishedSaveSession = true;
+            }
+        }, null);
         Future<TestSSLHandshakeCallbacks> server1 = handshake(listener, 0,
-                false, new ServerHooks(getServerPrivateKey(), getServerCertificates()) {
+                false, new ServerHooks(getServerPrivateKey(), getEncodedServerCertificates()) {
                     @Override
                     public void configureCallbacks(TestSSLHandshakeCallbacks callbacks) {
                         callbacks.onNewSessionEstablishedSaveSession = true;
@@ -1163,7 +1100,8 @@ public class NativeCryptoTest {
         TestSSLHandshakeCallbacks clientCallback1 = client1.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         TestSSLHandshakeCallbacks serverCallback1 = server1.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         assertTrue(clientCallback1.verifyCertificateChainCalled);
-        assertEqualCertificateChains(getServerCertificates(), clientCallback1.certificateChainRefs);
+        assertEqualCertificateChains(
+                getServerCertificateRefs(), clientCallback1.certificateChainRefs);
         assertEquals("ECDHE_RSA", clientCallback1.authMethod);
         assertFalse(serverCallback1.verifyCertificateChainCalled);
         assertFalse(clientCallback1.clientCertificateRequestedCalled);
@@ -1182,17 +1120,16 @@ public class NativeCryptoTest {
         final long serverSessionContext =
                 serverCallback1.onNewSessionEstablishedSessionNativePointer;
 
-        Future<TestSSLHandshakeCallbacks> client2 =
-                handshake(listener, 0, true, new ClientHooks() {
-                    @Override
-                    public long beforeHandshake(long c) throws SSLException {
-                        long sslNativePtr = super.beforeHandshake(c);
-                        NativeCrypto.SSL_set_session(sslNativePtr, clientSessionContext);
-                        return sslNativePtr;
-                    }
-                }, null);
+        Future<TestSSLHandshakeCallbacks> client2 = handshake(listener, 0, true, new ClientHooks() {
+            @Override
+            public long beforeHandshake(long c) throws SSLException {
+                long sslNativePtr = super.beforeHandshake(c);
+                NativeCrypto.SSL_set_session(sslNativePtr, clientSessionContext);
+                return sslNativePtr;
+            }
+        }, null);
         Future<TestSSLHandshakeCallbacks> server2 = handshake(listener, 0,
-                false, new ServerHooks(getServerPrivateKey(), getServerCertificates()) {
+                false, new ServerHooks(getServerPrivateKey(), getEncodedServerCertificates()) {
                     @Override
                     public long beforeHandshake(long c) throws SSLException {
                         long sslNativePtr = super.beforeHandshake(c);
@@ -1203,7 +1140,8 @@ public class NativeCryptoTest {
         TestSSLHandshakeCallbacks clientCallback2 = client2.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         TestSSLHandshakeCallbacks serverCallback2 = server2.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         assertTrue(clientCallback2.verifyCertificateChainCalled);
-        assertEqualCertificateChains(getServerCertificates(), clientCallback2.certificateChainRefs);
+        assertEqualCertificateChains(
+                getServerCertificateRefs(), clientCallback2.certificateChainRefs);
         assertEquals("ECDHE_RSA", clientCallback2.authMethod);
         assertFalse(serverCallback2.verifyCertificateChainCalled);
         assertFalse(clientCallback2.clientCertificateRequestedCalled);
@@ -1228,18 +1166,19 @@ public class NativeCryptoTest {
 
         Hooks cHooks = new Hooks() {
             @Override
-            public void clientCertificateRequested(long s) {
+            public void clientCertificateRequested(long s)
+                    throws CertificateEncodingException, SSLException {
                 super.clientCertificateRequested(s);
-                NativeCrypto.SSL_use_PrivateKey(s, getClientPrivateKey().getNativeRef());
-                NativeCrypto.SSL_use_certificate(s, getClientCertificates());
+                NativeCrypto.setLocalCertsAndPrivateKey(
+                        s, getEncodedClientCertificates(), getClientPrivateKey().getNativeRef());
             }
         };
-        Hooks sHooks = new ServerHooks(getServerPrivateKey(), getServerCertificates()) {
+        Hooks sHooks = new ServerHooks(getServerPrivateKey(), getEncodedServerCertificates()) {
             @Override
             public long beforeHandshake(long c) throws SSLException {
                 long s = super.beforeHandshake(c);
                 NativeCrypto.SSL_set_client_CA_list(s, getCaPrincipals());
-                NativeCrypto.SSL_set_verify(s, NativeCrypto.SSL_VERIFY_PEER);
+                NativeCrypto.SSL_set_verify(s, SSL_VERIFY_PEER);
                 return s;
             }
         };
@@ -1248,10 +1187,12 @@ public class NativeCryptoTest {
         TestSSLHandshakeCallbacks clientCallback = client.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         TestSSLHandshakeCallbacks serverCallback = server.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         assertTrue(clientCallback.verifyCertificateChainCalled);
-        assertEqualCertificateChains(getServerCertificates(), clientCallback.certificateChainRefs);
+        assertEqualCertificateChains(
+                getServerCertificateRefs(), clientCallback.certificateChainRefs);
         assertEquals("ECDHE_RSA", clientCallback.authMethod);
         assertTrue(serverCallback.verifyCertificateChainCalled);
-        assertEqualCertificateChains(getClientCertificates(), serverCallback.certificateChainRefs);
+        assertEqualCertificateChains(
+                getClientCertificateRefs(), serverCallback.certificateChainRefs);
         assertEquals("ECDHE_RSA", serverCallback.authMethod);
 
         assertTrue(clientCallback.clientCertificateRequestedCalled);
@@ -1277,13 +1218,13 @@ public class NativeCryptoTest {
         final ServerSocket listener = newServerSocket();
         try {
             Hooks cHooks = new Hooks();
-            Hooks sHooks = new ServerHooks(getServerPrivateKey(), getServerCertificates()) {
+            Hooks sHooks = new ServerHooks(getServerPrivateKey(), getEncodedServerCertificates()) {
                 @Override
                 public long beforeHandshake(long c) throws SSLException {
                     long s = super.beforeHandshake(c);
                     NativeCrypto.SSL_set_client_CA_list(s, getCaPrincipals());
-                    NativeCrypto.SSL_set_verify(s, NativeCrypto.SSL_VERIFY_PEER
-                                    | NativeCrypto.SSL_VERIFY_FAIL_IF_NO_PEER_CERT);
+                    NativeCrypto.SSL_set_verify(
+                            s, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT);
                     return s;
                 }
             };
@@ -1304,7 +1245,7 @@ public class NativeCryptoTest {
         Socket serverSocket = null;
         try {
             Hooks cHooks = new Hooks();
-            Hooks sHooks = new ServerHooks(getServerPrivateKey(), getServerCertificates());
+            Hooks sHooks = new ServerHooks(getServerPrivateKey(), getEncodedServerCertificates());
             Future<TestSSLHandshakeCallbacks> client = handshake(listener, 1, true, cHooks, null);
             Future<TestSSLHandshakeCallbacks> server = handshake(listener, -1, false, sHooks, null);
             serverSocket = server.get(TIMEOUT_SECONDS, TimeUnit.SECONDS).getSocket();
@@ -1328,7 +1269,7 @@ public class NativeCryptoTest {
         Socket clientSocket = null;
         try {
             Hooks cHooks = new Hooks();
-            Hooks sHooks = new ServerHooks(getServerPrivateKey(), getServerCertificates());
+            Hooks sHooks = new ServerHooks(getServerPrivateKey(), getEncodedServerCertificates());
             Future<TestSSLHandshakeCallbacks> client = handshake(listener, -1, true, cHooks, null);
             Future<TestSSLHandshakeCallbacks> server = handshake(listener, 1, false, sHooks, null);
             clientSocket = client.get(TIMEOUT_SECONDS, TimeUnit.SECONDS).getSocket();
@@ -1352,7 +1293,7 @@ public class NativeCryptoTest {
         cHooks.channelIdPrivateKey = CHANNEL_ID_PRIVATE_KEY;
         // TLS Channel ID currently requires ECDHE-based key exchanges.
         cHooks.enabledCipherSuites = Collections.singletonList("ECDHE-RSA-AES128-SHA");
-        ServerHooks sHooks = new ServerHooks(getServerPrivateKey(), getServerCertificates());
+        ServerHooks sHooks = new ServerHooks(getServerPrivateKey(), getEncodedServerCertificates());
         sHooks.channelIdEnabled = true;
         sHooks.enabledCipherSuites = cHooks.enabledCipherSuites;
         Future<TestSSLHandshakeCallbacks> client = handshake(listener, 0, true, cHooks, null);
@@ -1360,7 +1301,8 @@ public class NativeCryptoTest {
         TestSSLHandshakeCallbacks clientCallback = client.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         TestSSLHandshakeCallbacks serverCallback = server.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         assertTrue(clientCallback.verifyCertificateChainCalled);
-        assertEqualCertificateChains(getServerCertificates(), clientCallback.certificateChainRefs);
+        assertEqualCertificateChains(
+                getServerCertificateRefs(), clientCallback.certificateChainRefs);
         assertEquals("ECDHE_RSA", clientCallback.authMethod);
         assertFalse(serverCallback.verifyCertificateChainCalled);
         assertFalse(clientCallback.clientCertificateRequestedCalled);
@@ -1387,7 +1329,7 @@ public class NativeCryptoTest {
         cHooks.channelIdPrivateKey = CHANNEL_ID_PRIVATE_KEY;
         // TLS Channel ID currently requires ECDHE-based key exchanges.
         cHooks.enabledCipherSuites = Collections.singletonList("ECDHE-RSA-AES128-SHA");
-        ServerHooks sHooks = new ServerHooks(getServerPrivateKey(), getServerCertificates());
+        ServerHooks sHooks = new ServerHooks(getServerPrivateKey(), getEncodedServerCertificates());
         sHooks.channelIdEnabled = false;
         sHooks.enabledCipherSuites = cHooks.enabledCipherSuites;
         Future<TestSSLHandshakeCallbacks> client = handshake(listener, 0, true, cHooks, null);
@@ -1395,7 +1337,8 @@ public class NativeCryptoTest {
         TestSSLHandshakeCallbacks clientCallback = client.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         TestSSLHandshakeCallbacks serverCallback = server.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         assertTrue(clientCallback.verifyCertificateChainCalled);
-        assertEqualCertificateChains(getServerCertificates(), clientCallback.certificateChainRefs);
+        assertEqualCertificateChains(
+                getServerCertificateRefs(), clientCallback.certificateChainRefs);
         assertEquals("ECDHE_RSA", clientCallback.authMethod);
         assertFalse(serverCallback.verifyCertificateChainCalled);
         assertFalse(clientCallback.clientCertificateRequestedCalled);
@@ -1422,7 +1365,7 @@ public class NativeCryptoTest {
         cHooks.channelIdPrivateKey = null;
         // TLS Channel ID currently requires ECDHE-based key exchanges.
         cHooks.enabledCipherSuites = Collections.singletonList("ECDHE-RSA-AES128-SHA");
-        ServerHooks sHooks = new ServerHooks(getServerPrivateKey(), getServerCertificates());
+        ServerHooks sHooks = new ServerHooks(getServerPrivateKey(), getEncodedServerCertificates());
         sHooks.channelIdEnabled = true;
         sHooks.enabledCipherSuites = cHooks.enabledCipherSuites;
         Future<TestSSLHandshakeCallbacks> client = handshake(listener, 0, true, cHooks, null);
@@ -1430,7 +1373,8 @@ public class NativeCryptoTest {
         TestSSLHandshakeCallbacks clientCallback = client.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         TestSSLHandshakeCallbacks serverCallback = server.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         assertTrue(clientCallback.verifyCertificateChainCalled);
-        assertEqualCertificateChains(getServerCertificates(), clientCallback.certificateChainRefs);
+        assertEqualCertificateChains(
+                getServerCertificateRefs(), clientCallback.certificateChainRefs);
         assertEquals("ECDHE_RSA", clientCallback.authMethod);
         assertFalse(serverCallback.verifyCertificateChainCalled);
         assertFalse(clientCallback.clientCertificateRequestedCalled);
@@ -1664,7 +1608,7 @@ public class NativeCryptoTest {
             }
         };
 
-        Hooks sHooks = new ServerHooks(getServerPrivateKey(), getServerCertificates()) {
+        Hooks sHooks = new ServerHooks(getServerPrivateKey(), getEncodedServerCertificates()) {
             @Override
             public long beforeHandshake(long c) throws SSLException {
                 long s = super.beforeHandshake(c);
@@ -1706,7 +1650,7 @@ public class NativeCryptoTest {
             }
         };
 
-        Hooks sHooks = new ServerHooks(getServerPrivateKey(), getServerCertificates()) {
+        Hooks sHooks = new ServerHooks(getServerPrivateKey(), getEncodedServerCertificates()) {
             @Override
             public long beforeHandshake(long c) throws SSLException {
                 long s = super.beforeHandshake(c);
@@ -1785,7 +1729,8 @@ public class NativeCryptoTest {
                         clientSession[0] = session;
                     }
                 };
-                Hooks sHooks = new ServerHooks(getServerPrivateKey(), getServerCertificates()) {
+                Hooks sHooks = new ServerHooks(
+                        getServerPrivateKey(), getEncodedServerCertificates()) {
                     @Override
                     public long getContext() throws SSLException {
                         return serverContext;
@@ -1824,7 +1769,8 @@ public class NativeCryptoTest {
                         super.afterHandshake(NULL, s, NULL, sock, fd, callback);
                     }
                 };
-                Hooks sHooks = new ServerHooks(getServerPrivateKey(), getServerCertificates()) {
+                Hooks sHooks = new ServerHooks(
+                        getServerPrivateKey(), getEncodedServerCertificates()) {
                     @Override
                     public long getContext() throws SSLException {
                         return serverContext;
@@ -1876,7 +1822,7 @@ public class NativeCryptoTest {
                     return s;
                 }
             };
-            Hooks sHooks = new ServerHooks(getServerPrivateKey(), getServerCertificates());
+            Hooks sHooks = new ServerHooks(getServerPrivateKey(), getEncodedServerCertificates());
             Future<TestSSLHandshakeCallbacks> client = handshake(listener, 0, true, cHooks, null);
             @SuppressWarnings("unused")
             Future<TestSSLHandshakeCallbacks> server = handshake(listener, 0, false, sHooks, null);
@@ -1897,7 +1843,7 @@ public class NativeCryptoTest {
         // negative test case for SSL_set_session_creation_enabled(false) on server
         {
             Hooks cHooks = new Hooks();
-            Hooks sHooks = new ServerHooks(getServerPrivateKey(), getServerCertificates()) {
+            Hooks sHooks = new ServerHooks(getServerPrivateKey(), getEncodedServerCertificates()) {
                 @Override
                 public long beforeHandshake(long c) throws SSLException {
                     long s = super.beforeHandshake(c);
@@ -1980,7 +1926,7 @@ public class NativeCryptoTest {
                 return s;
             }
         };
-        Hooks sHooks = new ServerHooks(getServerPrivateKey(), getServerCertificates()) {
+        Hooks sHooks = new ServerHooks(getServerPrivateKey(), getEncodedServerCertificates()) {
             @Override
             public void afterHandshake(long session, long s, long c, Socket sock, FileDescriptor fd,
                     SSLHandshakeCallbacks callback) throws Exception {
@@ -1997,11 +1943,43 @@ public class NativeCryptoTest {
     @Test
     public void test_SSL_AlpnNegotiateSuccess() throws Exception {
         final byte[] clientAlpnProtocols = new byte[] {
-                8, 'h', 't', 't', 'p', '/', '1', '.', '1', 3, 'f', 'o', 'o', 6, 's', 'p', 'd', 'y',
-                '/', '2',
+                8,
+                'h',
+                't',
+                't',
+                'p',
+                '/',
+                '1',
+                '.',
+                '1',
+                3,
+                'f',
+                'o',
+                'o',
+                6,
+                's',
+                'p',
+                'd',
+                'y',
+                '/',
+                '2',
         };
         final byte[] serverAlpnProtocols = new byte[] {
-                6, 's', 'p', 'd', 'y', '/', '2', 3, 'f', 'o', 'o', 3, 'b', 'a', 'r',
+                6,
+                's',
+                'p',
+                'd',
+                'y',
+                '/',
+                '2',
+                3,
+                'f',
+                'o',
+                'o',
+                3,
+                'b',
+                'a',
+                'r',
         };
 
         Hooks cHooks = new Hooks() {
@@ -2013,7 +1991,7 @@ public class NativeCryptoTest {
                 super.afterHandshake(session, ssl, context, socket, fd, callback);
             }
         };
-        Hooks sHooks = new ServerHooks(getServerPrivateKey(), getServerCertificates()) {
+        Hooks sHooks = new ServerHooks(getServerPrivateKey(), getEncodedServerCertificates()) {
             @Override
             public void afterHandshake(long session, long ssl, long c, Socket sock,
                     FileDescriptor fd, SSLHandshakeCallbacks callback) throws Exception {
@@ -2049,37 +2027,6 @@ public class NativeCryptoTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void SSL_get_certificate_withNullShouldThrow() throws Exception {
-        NativeCrypto.SSL_get_certificate(NULL);
-    }
-
-    @Test
-    public void test_SSL_get_certificate() throws Exception {
-        final ServerSocket listener = newServerSocket();
-        Hooks cHooks = new Hooks() {
-            @Override
-            public void afterHandshake(long session, long s, long c, Socket sock, FileDescriptor fd,
-                    SSLHandshakeCallbacks callback) throws Exception {
-                assertNull(NativeCrypto.SSL_get_certificate(s));
-                super.afterHandshake(session, s, c, sock, fd, callback);
-            }
-        };
-        Hooks sHooks = new ServerHooks(getServerPrivateKey(), getServerCertificates()) {
-            @Override
-            public void afterHandshake(long session, long s, long c, Socket sock, FileDescriptor fd,
-                    SSLHandshakeCallbacks callback) throws Exception {
-                assertEqualCertificateChains(
-                        getServerCertificates(), NativeCrypto.SSL_get_certificate(s));
-                super.afterHandshake(session, s, c, sock, fd, callback);
-            }
-        };
-        Future<TestSSLHandshakeCallbacks> client = handshake(listener, 0, true, cHooks, null);
-        Future<TestSSLHandshakeCallbacks> server = handshake(listener, 0, false, sHooks, null);
-        client.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
-        server.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
-    }
-
-    @Test(expected = NullPointerException.class)
     public void SSL_get_peer_cert_chain_withNullShouldThrow() throws Exception {
         NativeCrypto.SSL_get_peer_cert_chain(NULL);
     }
@@ -2093,14 +2040,14 @@ public class NativeCryptoTest {
             public void afterHandshake(long session, long s, long c, Socket sock, FileDescriptor fd,
                     SSLHandshakeCallbacks callback) throws Exception {
                 long[] cc = NativeCrypto.SSL_get_peer_cert_chain(s);
-                assertEqualCertificateChains(getServerCertificates(), cc);
+                assertEqualCertificateChains(getServerCertificateRefs(), cc);
                 for (long ref : cc) {
                     NativeCrypto.X509_free(ref);
                 }
                 super.afterHandshake(session, s, c, sock, fd, callback);
             }
         };
-        Hooks sHooks = new ServerHooks(getServerPrivateKey(), getServerCertificates());
+        Hooks sHooks = new ServerHooks(getServerPrivateKey(), getEncodedServerCertificates());
         Future<TestSSLHandshakeCallbacks> client = handshake(listener, 0, true, cHooks, null);
         Future<TestSSLHandshakeCallbacks> server = handshake(listener, 0, false, sHooks, null);
         client.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
@@ -2111,7 +2058,7 @@ public class NativeCryptoTest {
     public void test_SSL_cipher_names() throws Exception {
         final ServerSocket listener = newServerSocket();
         Hooks cHooks = new Hooks();
-        Hooks sHooks = new ServerHooks(getServerPrivateKey(), getServerCertificates());
+        Hooks sHooks = new ServerHooks(getServerPrivateKey(), getEncodedServerCertificates());
         // Both legacy and standard names are accepted.
         cHooks.enabledCipherSuites = Collections.singletonList("ECDHE-RSA-AES128-GCM-SHA256");
         sHooks.enabledCipherSuites =
@@ -2199,7 +2146,7 @@ public class NativeCryptoTest {
                     super.afterHandshake(session, s, c, sock, fd, callback);
                 }
             };
-            Hooks sHooks = new ServerHooks(getServerPrivateKey(), getServerCertificates()) {
+            Hooks sHooks = new ServerHooks(getServerPrivateKey(), getEncodedServerCertificates()) {
                 @Override
                 public void afterHandshake(long session, long s, long c, Socket sock,
                         FileDescriptor fd, SSLHandshakeCallbacks callback) throws Exception {
@@ -2223,7 +2170,7 @@ public class NativeCryptoTest {
                     fail();
                 }
             };
-            Hooks sHooks = new ServerHooks(getServerPrivateKey(), getServerCertificates()) {
+            Hooks sHooks = new ServerHooks(getServerPrivateKey(), getEncodedServerCertificates()) {
                 @Override
                 public void afterHandshake(long session, long s, long c, Socket sock,
                         FileDescriptor fd, SSLHandshakeCallbacks callback) throws Exception {
@@ -2322,7 +2269,7 @@ public class NativeCryptoTest {
                 super.afterHandshake(session, s, c, sock, fd, callback);
             }
         };
-        Hooks sHooks = new ServerHooks(getServerPrivateKey(), getServerCertificates()) {
+        Hooks sHooks = new ServerHooks(getServerPrivateKey(), getEncodedServerCertificates()) {
             @Override
             public void afterHandshake(long session, final long s, long c, Socket sock,
                     FileDescriptor fd, SSLHandshakeCallbacks callback) throws Exception {
@@ -2336,7 +2283,8 @@ public class NativeCryptoTest {
                             // Expected.
                         }
                     }
-                }.start();
+                }
+                        .start();
                 assertEquals(-1, NativeCrypto.SSL_read(s, fd, callback, new byte[1], 0, 1, 0));
                 super.afterHandshake(session, s, c, sock, fd, callback);
             }
@@ -2437,7 +2385,7 @@ public class NativeCryptoTest {
                 super.afterHandshake(session, s, c, sock, fd, callback);
             }
         };
-        Hooks sHooks = new ServerHooks(getServerPrivateKey(), getServerCertificates());
+        Hooks sHooks = new ServerHooks(getServerPrivateKey(), getEncodedServerCertificates());
         Future<TestSSLHandshakeCallbacks> client = handshake(listener, 0, true, cHooks, null);
         Future<TestSSLHandshakeCallbacks> server = handshake(listener, 0, false, sHooks, null);
         client.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
@@ -2464,7 +2412,7 @@ public class NativeCryptoTest {
                     super.afterHandshake(session, s, c, sock, fd, callback);
                 }
             };
-            Hooks sHooks = new ServerHooks(getServerPrivateKey(), getServerCertificates());
+            Hooks sHooks = new ServerHooks(getServerPrivateKey(), getEncodedServerCertificates());
             Future<TestSSLHandshakeCallbacks> client = handshake(listener, 0, true, cHooks, null);
             Future<TestSSLHandshakeCallbacks> server = handshake(listener, 0, false, sHooks, null);
             client.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
@@ -2490,7 +2438,7 @@ public class NativeCryptoTest {
                 super.afterHandshake(session, s, c, sock, fd, callback);
             }
         };
-        Hooks sHooks = new ServerHooks(getServerPrivateKey(), getServerCertificates());
+        Hooks sHooks = new ServerHooks(getServerPrivateKey(), getEncodedServerCertificates());
         Future<TestSSLHandshakeCallbacks> client = handshake(listener, 0, true, cHooks, null);
         Future<TestSSLHandshakeCallbacks> server = handshake(listener, 0, false, sHooks, null);
         client.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
@@ -2518,7 +2466,7 @@ public class NativeCryptoTest {
                 super.afterHandshake(session, s, c, sock, fd, callback);
             }
         };
-        Hooks sHooks = new ServerHooks(getServerPrivateKey(), getServerCertificates());
+        Hooks sHooks = new ServerHooks(getServerPrivateKey(), getEncodedServerCertificates());
         Future<TestSSLHandshakeCallbacks> client = handshake(listener, 0, true, cHooks, null);
         Future<TestSSLHandshakeCallbacks> server = handshake(listener, 0, false, sHooks, null);
         client.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
@@ -2561,7 +2509,7 @@ public class NativeCryptoTest {
                 super.afterHandshake(session, s, c, sock, fd, callback);
             }
         };
-        Hooks sHooks = new ServerHooks(getServerPrivateKey(), getServerCertificates());
+        Hooks sHooks = new ServerHooks(getServerPrivateKey(), getEncodedServerCertificates());
         Future<TestSSLHandshakeCallbacks> client = handshake(listener, 0, true, cHooks, null);
         Future<TestSSLHandshakeCallbacks> server = handshake(listener, 0, false, sHooks, null);
         client.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
@@ -2729,9 +2677,22 @@ public class NativeCryptoTest {
      * openssl rand -hex 16
      */
     private static final byte[] AES_128_KEY = new byte[] {
-            (byte) 0x3d, (byte) 0x4f, (byte) 0x89, (byte) 0x70, (byte) 0xb1, (byte) 0xf2,
-            (byte) 0x75, (byte) 0x37, (byte) 0xf4, (byte) 0x0a, (byte) 0x39, (byte) 0x29,
-            (byte) 0x8a, (byte) 0x41, (byte) 0x55, (byte) 0x5f,
+            (byte) 0x3d,
+            (byte) 0x4f,
+            (byte) 0x89,
+            (byte) 0x70,
+            (byte) 0xb1,
+            (byte) 0xf2,
+            (byte) 0x75,
+            (byte) 0x37,
+            (byte) 0xf4,
+            (byte) 0x0a,
+            (byte) 0x39,
+            (byte) 0x29,
+            (byte) 0x8a,
+            (byte) 0x41,
+            (byte) 0x55,
+            (byte) 0x5f,
     };
 
     @Test

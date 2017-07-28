@@ -303,21 +303,12 @@ final class ActiveSession implements SSLSession {
      * Configures the peer information once it has been received by the handshake.
      */
     void onPeerCertificatesReceived(
-            String peerHost, int peerPort, OpenSSLX509Certificate[] peerCertificates) {
+            String peerHost, int peerPort, X509Certificate[] peerCertificates) {
         configurePeer(peerHost, peerPort, peerCertificates);
     }
 
-    /**
-     * Configures the peer and local state from a newly created BoringSSL session.
-     */
-    void onSessionEstablished(String peerHost, int peerPort) {
-        id = null;
-        this.localCertificates = ssl.getLocalCertificates();
-        configurePeer(peerHost, peerPort, ssl.getPeerCertificates());
-    }
-
     private void configurePeer(
-            String peerHost, int peerPort, OpenSSLX509Certificate[] peerCertificates) {
+            String peerHost, int peerPort, X509Certificate[] peerCertificates) {
         this.peerHost = peerHost;
         this.peerPort = peerPort;
         this.peerCertificates = peerCertificates;
@@ -325,11 +316,19 @@ final class ActiveSession implements SSLSession {
         this.peerTlsSctData = ssl.getPeerTlsSctData();
     }
 
-    private X509Certificate[] getX509PeerCertificates() throws SSLPeerUnverifiedException {
-        if (peerCertificates == null || peerCertificates.length == 0) {
-            throw new SSLPeerUnverifiedException("No peer certificates");
+    /**
+     * Updates the session after the handshake has completed.
+     */
+    void onHandshakeCompleted(String peerHost, int peerPort) {
+        id = null;
+        this.localCertificates = ssl.getLocalCertificates();
+        if (this.peerCertificates == null) {
+            // When resuming a session, the cert_verify_callback (which calls
+            // onPeerCertificatesReceived) isn't called by BoringSSL during the handshake because
+            // it presumes the certs were verified in the previous connection on that session,
+            // leaving us without the peer certificates.  If that happens, fetch them explicitly.
+            configurePeer(peerHost, peerPort, ssl.getPeerCertificates());
         }
-        return peerCertificates;
     }
 
     /**
