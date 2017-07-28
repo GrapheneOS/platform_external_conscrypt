@@ -59,8 +59,7 @@ public final class NativeCrypto {
     /**
      * Does nothing. Just for forcing static initialization.
      */
-    static void checkAvailability() {
-    }
+    static void checkAvailability() {}
 
     // --- DSA/RSA public/private key handling functions -----------------------
 
@@ -79,11 +78,11 @@ public final class NativeCrypto {
 
     static native byte[] EVP_marshal_private_key(NativeRef.EVP_PKEY pkey);
 
-    static native long EVP_parse_private_key(byte[] data);
+    static native long EVP_parse_private_key(byte[] data) throws ParsingException;
 
     static native byte[] EVP_marshal_public_key(NativeRef.EVP_PKEY pkey);
 
-    static native long EVP_parse_public_key(byte[] data);
+    static native long EVP_parse_public_key(byte[] data) throws ParsingException;
 
     static native long PEM_read_bio_PUBKEY(long bioCtx);
 
@@ -161,8 +160,12 @@ public final class NativeCrypto {
 
     static native long EC_KEY_get_public_key(NativeRef.EVP_PKEY keyRef);
 
+    static native byte[] EC_KEY_marshal_curve_name(NativeRef.EC_GROUP groupRef) throws IOException;
+
+    static native long EC_KEY_parse_curve_name(byte[] encoded) throws IOException;
+
     static native int ECDH_compute_key(byte[] out, int outOffset, NativeRef.EVP_PKEY publicKeyRef,
-            NativeRef.EVP_PKEY privateKeyRef) throws InvalidKeyException;
+            NativeRef.EVP_PKEY privateKeyRef) throws InvalidKeyException, IndexOutOfBoundsException;
 
     static native int ECDSA_size(NativeRef.EVP_PKEY pkey);
 
@@ -219,18 +222,20 @@ public final class NativeCrypto {
 
     static native byte[] EVP_DigestSignFinal(NativeRef.EVP_MD_CTX ctx);
 
-    static native boolean EVP_DigestVerifyFinal(
-            NativeRef.EVP_MD_CTX ctx, byte[] signature, int offset, int length);
+    static native boolean EVP_DigestVerifyFinal(NativeRef.EVP_MD_CTX ctx, byte[] signature,
+            int offset, int length) throws IndexOutOfBoundsException;
 
-    static native long EVP_PKEY_encrypt_init(NativeRef.EVP_PKEY pkey);
+    static native long EVP_PKEY_encrypt_init(NativeRef.EVP_PKEY pkey) throws InvalidKeyException;
 
     static native int EVP_PKEY_encrypt(NativeRef.EVP_PKEY_CTX ctx, byte[] out, int outOffset,
-            byte[] input, int inOffset, int inLength);
+            byte[] input, int inOffset, int inLength)
+            throws IndexOutOfBoundsException, BadPaddingException;
 
-    static native long EVP_PKEY_decrypt_init(NativeRef.EVP_PKEY pkey);
+    static native long EVP_PKEY_decrypt_init(NativeRef.EVP_PKEY pkey) throws InvalidKeyException;
 
     static native int EVP_PKEY_decrypt(NativeRef.EVP_PKEY_CTX ctx, byte[] out, int outOffset,
-            byte[] input, int inOffset, int inLength);
+            byte[] input, int inOffset, int inLength)
+            throws IndexOutOfBoundsException, BadPaddingException;
 
     static native void EVP_PKEY_CTX_free(long pkeyCtx);
 
@@ -258,7 +263,7 @@ public final class NativeCrypto {
             byte[] iv, boolean encrypting);
 
     static native int EVP_CipherUpdate(NativeRef.EVP_CIPHER_CTX ctx, byte[] out, int outOffset,
-            byte[] in, int inOffset, int inLength);
+            byte[] in, int inOffset, int inLength) throws IndexOutOfBoundsException;
 
     static native int EVP_CipherFinal_ex(NativeRef.EVP_CIPHER_CTX ctx, byte[] out, int outOffset)
             throws BadPaddingException, IllegalBlockSizeException;
@@ -291,11 +296,11 @@ public final class NativeCrypto {
 
     static native int EVP_AEAD_CTX_seal(long evpAead, byte[] key, int tagLengthInBytes, byte[] out,
             int outOffset, byte[] nonce, byte[] in, int inOffset, int inLength, byte[] ad)
-            throws BadPaddingException;
+            throws BadPaddingException, IndexOutOfBoundsException;
 
     static native int EVP_AEAD_CTX_open(long evpAead, byte[] key, int tagLengthInBytes, byte[] out,
             int outOffset, byte[] nonce, byte[] in, int inOffset, int inLength, byte[] ad)
-            throws BadPaddingException;
+            throws BadPaddingException, IndexOutOfBoundsException;
 
     // --- HMAC functions ------------------------------------------------------
 
@@ -369,7 +374,7 @@ public final class NativeCrypto {
 
     static native byte[] ASN1_seq_pack_X509(long[] x509CertRefs);
 
-    static native long[] ASN1_seq_unpack_X509_bio(long bioRef);
+    static native long[] ASN1_seq_unpack_X509_bio(long bioRef) throws ParsingException;
 
     static native void X509_free(long x509ctx);
 
@@ -426,6 +431,8 @@ public final class NativeCrypto {
 
     static native int get_X509_ex_flags(long x509ctx);
 
+    // Used by Android platform TrustedCertificateStore.
+    @SuppressWarnings("unused")
     static native int X509_check_issued(long ctx, long ctx2);
 
     // --- PKCS7 ---------------------------------------------------------------
@@ -437,7 +444,7 @@ public final class NativeCrypto {
     static final int PKCS7_CRLS = 2;
 
     /** Returns an array of X509 or X509_CRL pointers. */
-    static native long[] d2i_PKCS7_bio(long bioCtx, int which);
+    static native long[] d2i_PKCS7_bio(long bioCtx, int which) throws ParsingException;
 
     /** Returns an array of X509 or X509_CRL pointers. */
     static native byte[] i2d_PKCS7(long[] certs);
@@ -526,7 +533,7 @@ public final class NativeCrypto {
      * asn1_read_* functions to read the ASN.1-encoded data in val.  The returned object must
      * be freed after use by calling asn1_read_free.
      */
-    static native long asn1_read_init(byte[] val);
+    static native long asn1_read_init(byte[] val) throws IOException;
 
     /**
      * Allocates and returns an opaque reference to an object that can be used with other
@@ -534,6 +541,19 @@ public final class NativeCrypto {
      * object must be freed after use by calling asn1_read_free.
      */
     static native long asn1_read_sequence(long cbsRef) throws IOException;
+
+    /**
+     * Returns whether the next object in the given reference is explicitly tagged with the
+     * given tag number.
+     */
+    static native boolean asn1_read_next_tag_is(long cbsRef, int tag) throws IOException;
+
+    /**
+     * Allocates and returns an opaque reference to an object that can be used with
+     * other asn1_read_* functions to read the ASN.1 data pointed to by cbsRef.  The returned
+     * object must be freed after use by calling asn1_read_free.
+     */
+    static native long asn1_read_tagged(long cbsRef) throws IOException;
 
     /**
      * Returns the contents of an ASN.1 octet string from the given reference.
@@ -545,6 +565,17 @@ public final class NativeCrypto {
      * in a uint64, this method will throw an IOException.
      */
     static native long asn1_read_uint64(long cbsRef) throws IOException;
+
+    /**
+     * Consumes an ASN.1 NULL from the given reference.
+     */
+    static native void asn1_read_null(long cbsRef) throws IOException;
+
+    /**
+     * Returns an ASN.1 OID in dotted-decimal notation (eg, "1.3.14.3.2.26" for SHA-1) from the
+     * given reference.
+     */
+    static native String asn1_read_oid(long cbsRef) throws IOException;
 
     /**
      * Returns whether or not the given reference has been read completely.
@@ -575,6 +606,15 @@ public final class NativeCrypto {
     static native long asn1_write_sequence(long cbbRef) throws IOException;
 
     /**
+     * Allocates and returns an opaque reference to an object that can be used with other
+     * asn1_write_* functions to write a explicitly-tagged ASN.1 object with the given tag
+     * into the given reference. The returned reference may only be used until the next
+     * call on the parent reference.  The returned object must be freed after use by
+     * calling asn1_write_free.
+     */
+    static native long asn1_write_tag(long cbbRef, int tag) throws IOException;
+
+    /**
      * Writes the given data into the given reference as an ASN.1-encoded octet string.
      */
     static native void asn1_write_octetstring(long cbbRef, byte[] data) throws IOException;
@@ -583,6 +623,24 @@ public final class NativeCrypto {
      * Writes the given value into the given reference as an ASN.1-encoded integer.
      */
     static native void asn1_write_uint64(long cbbRef, long value) throws IOException;
+
+    /**
+     * Writes a NULL value into the given reference.
+     */
+    static native void asn1_write_null(long cbbRef) throws IOException;
+
+    /**
+     * Writes the given OID (which must be in dotted-decimal notation) into the given reference.
+     */
+    static native void asn1_write_oid(long cbbRef, String oid) throws IOException;
+
+    /**
+     * Flushes the given reference, invalidating any child references and completing their
+     * operations.  This must be called if the child references are to be freed before
+     * asn1_write_finish is called on the ultimate parent.  The child references must still
+     * be freed.
+     */
+    static native void asn1_write_flush(long cbbRef) throws IOException;
 
     /**
      * Completes any in-progress operations and returns the ASN.1-encoded data.  Either this
@@ -624,7 +682,7 @@ public final class NativeCrypto {
 
     // SUPPORTED_LEGACY_CIPHER_SUITES_SET contains all the supported cipher suites using the legacy
     // OpenSSL-style names.
-    static final Set<String> SUPPORTED_LEGACY_CIPHER_SUITES_SET = new HashSet<String>();
+    private static final Set<String> SUPPORTED_LEGACY_CIPHER_SUITES_SET = new HashSet<String>();
 
     /**
      * TLS_EMPTY_RENEGOTIATION_INFO_SCSV is RFC 5746's renegotiation
@@ -668,7 +726,7 @@ public final class NativeCrypto {
      * to indicate to the server that this is a fallback protocol
      * request.
      */
-    static final String TLS_FALLBACK_SCSV = "TLS_FALLBACK_SCSV";
+    private static final String TLS_FALLBACK_SCSV = "TLS_FALLBACK_SCSV";
 
     private static final String[] SUPPORTED_CIPHER_SUITES;
     static {
@@ -719,7 +777,7 @@ public final class NativeCrypto {
     // prevent apps from connecting to servers they were previously able to connect to.
 
     /** X.509 based cipher suites enabled by default (if requested), in preference order. */
-    static final boolean HAS_AES_HARDWARE = EVP_has_aes_hardware() == 1;
+    private static final boolean HAS_AES_HARDWARE = EVP_has_aes_hardware() == 1;
     static final String[] DEFAULT_X509_CIPHER_SUITES = HAS_AES_HARDWARE ?
             new String[] {
                     "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
@@ -781,13 +839,19 @@ public final class NativeCrypto {
 
     static native void SSL_set1_tls_channel_id(long ssl, NativeRef.EVP_PKEY pkey);
 
-    static native void SSL_use_certificate(long ssl, long[] x509refs);
+    /**
+     * Sets the local certificates and private key.
+     *
+     * @param ssl the SSL reference.
+     * @param encodedCertificates the encoded form of the local certificate chain.
+     * @param pkey a reference to the private key.
+     * @throws SSLException if a problem occurs setting the cert/key.
+     */
+    static native void setLocalCertsAndPrivateKey(long ssl, byte[][] encodedCertificates,
+        NativeRef.EVP_PKEY pkey) throws SSLException;
 
-    static native void SSL_use_PrivateKey(long ssl, NativeRef.EVP_PKEY pkey);
-
-    static native void SSL_check_private_key(long ssl) throws SSLException;
-
-    static native void SSL_set_client_CA_list(long ssl, byte[][] asn1DerEncodedX500Principals);
+    static native void SSL_set_client_CA_list(long ssl, byte[][] asn1DerEncodedX500Principals)
+            throws SSLException;
 
     static native long SSL_set_mode(long ssl, long mode);
 
@@ -939,18 +1003,11 @@ public final class NativeCrypto {
                 // TODO log warning about using backward compatability
                 continue;
             }
-            throw new IllegalArgumentException("cipherSuite " + cipherSuites[i] + " is not supported.");
+            throw new IllegalArgumentException(
+                    "cipherSuite " + cipherSuites[i] + " is not supported.");
         }
         return cipherSuites;
     }
-
-    /*
-     * See the OpenSSL ssl.h header file for more information.
-     */
-    // TODO(nathanmittler): Should these move to NativeConstants.java?
-    static final int SSL_VERIFY_NONE = 0x00;
-    static final int SSL_VERIFY_PEER = 0x01;
-    static final int SSL_VERIFY_FAIL_IF_NO_PEER_CERT = 0x02;
 
     static native void SSL_set_accept_state(long sslNativePointer);
 
@@ -986,11 +1043,6 @@ public final class NativeCrypto {
     public static native String SSL_get_version(long sslNativePointer);
 
     /**
-     * Returns the local X509 certificate references. Must X509_free when done.
-     */
-    static native long[] SSL_get_certificate(long sslNativePointer);
-
-    /**
      * Returns the peer X509 certificate references. Must X509_free when done.
      */
     static native long[] SSL_get_peer_cert_chain(long sslNativePointer);
@@ -1012,9 +1064,6 @@ public final class NativeCrypto {
     static native void SSL_interrupt(long sslNativePointer);
     static native void SSL_shutdown(
             long sslNativePointer, FileDescriptor fd, SSLHandshakeCallbacks shc) throws IOException;
-
-    static native void SSL_shutdown_BIO(long sslNativePointer, long sourceBioRef, long sinkBioRef,
-            SSLHandshakeCallbacks shc) throws IOException;
 
     static native int SSL_get_shutdown(long sslNativePointer);
 
@@ -1052,14 +1101,15 @@ public final class NativeCrypto {
      */
     interface SSLHandshakeCallbacks {
         /**
-         * Verify that we trust the certificate chain is trusted.
+         * Verify that the certificate chain is trusted.
          *
-         * @param certificateChainRefs chain of X.509 certificate references
+         * @param certificateChain chain of X.509 certificates in their encoded form
          * @param authMethod auth algorithm name
          *
          * @throws CertificateException if the certificate is untrusted
          */
-        void verifyCertificateChain(long[] certificateChainRefs, String authMethod)
+        @SuppressWarnings("unused")
+        void verifyCertificateChain(byte[][] certificateChain, String authMethod)
                 throws CertificateException;
 
         /**
@@ -1073,6 +1123,7 @@ public final class NativeCrypto {
          * convertible to strings with #keyType
          * @param asn1DerEncodedX500Principals CAs known to the server
          */
+        @SuppressWarnings("unused")
         void clientCertificateRequested(byte[] keyTypes, byte[][] asn1DerEncodedX500Principals)
                 throws CertificateEncodingException, SSLException;
 
@@ -1108,12 +1159,14 @@ public final class NativeCrypto {
         /**
          * Called when SSL state changes. This could be handshake completion.
          */
+        @SuppressWarnings("unused")
         void onSSLStateChange(int type, int val);
 
         /**
          * Called when a new session has been established and may be added to the session cache.
          * The callee is responsible for incrementing the reference count on the returned session.
          */
+        @SuppressWarnings("unused")
         void onNewSessionEstablished(long sslSessionNativePtr);
 
         /**
@@ -1127,6 +1180,7 @@ public final class NativeCrypto {
          * @param id the ID of the session to find.
          * @return the cached session or {@code 0} if no session was found matching the given ID.
          */
+        @SuppressWarnings("unused")
         long serverSessionRequested(byte[] id);
     }
 
@@ -1148,11 +1202,7 @@ public final class NativeCrypto {
 
     static native long SSL_BIO_new(long ssl) throws SSLException;
 
-    static native int SSL_get_last_error_number();
-
     static native int SSL_get_error(long ssl, int ret);
-
-    static native String SSL_get_error_string(long errorNumber);
 
     static native void SSL_clear_error();
 
@@ -1202,35 +1252,11 @@ public final class NativeCrypto {
             SSLHandshakeCallbacks shc) throws IOException, CertificateException;
 
     /**
-     * Variant of the {@link #SSL_read} for a heap {@link java.nio.ByteBuffer} used by {@link
-     * ConscryptEngine}.
-     *
-     * @return if positive, represents the number of bytes read into the given buffer.
-     * Returns {@code -SSL_ERROR_WANT_READ} if more data is needed. Returns
-     * {@code -SSL_ERROR_WANT_WRITE} if data needs to be written out to flush the BIO.
-     *
-     * @throws java.io.InterruptedIOException if the read was interrupted.
-     * @throws java.io.EOFException if the end of stream has been reached.
-     * @throws CertificateException if the application's certificate verification callback failed.
-     * Only occurs during handshake processing.
-     * @throws SSLException if any other error occurs.
-     */
-    static native int ENGINE_SSL_read_heap(long sslNativePointer, byte[] destJava, int destOffset,
-            int destLength, SSLHandshakeCallbacks shc) throws IOException, CertificateException;
-
-    /**
      * Variant of the {@link #SSL_write} for a direct {@link java.nio.ByteBuffer} used by {@link
      * ConscryptEngine}. This version does not lock or and does no error pre-processing.
      */
     static native int ENGINE_SSL_write_direct(long sslNativePointer, long address, int length,
             SSLHandshakeCallbacks shc) throws IOException;
-
-    /**
-     * Variant of the {@link #SSL_write} for a heap {@link java.nio.ByteBuffer} used by {@link
-     * ConscryptEngine}. This version does not lock or and does no error pre-processing.
-     */
-    static native int ENGINE_SSL_write_heap(long sslNativePointer, byte[] sourceJava,
-            int sourceOffset, int sourceLength, SSLHandshakeCallbacks shc) throws IOException;
 
     /**
      * Writes data from the given direct {@link java.nio.ByteBuffer} to the BIO.
@@ -1242,7 +1268,8 @@ public final class NativeCrypto {
      * Writes data from the given array to the BIO.
      */
     static native int ENGINE_SSL_write_BIO_heap(long sslRef, long bioRef, byte[] sourceJava,
-            int sourceOffset, int sourceLength, SSLHandshakeCallbacks shc) throws IOException;
+            int sourceOffset, int sourceLength, SSLHandshakeCallbacks shc)
+            throws IOException, IndexOutOfBoundsException;
 
     /**
      * Reads data from the given BIO into a direct {@link java.nio.ByteBuffer}.
@@ -1254,7 +1281,8 @@ public final class NativeCrypto {
      * Reads data from the given BIO into an array.
      */
     static native int ENGINE_SSL_read_BIO_heap(long sslRef, long bioRef, byte[] destJava,
-            int destOffset, int destLength, SSLHandshakeCallbacks shc) throws IOException;
+            int destOffset, int destLength, SSLHandshakeCallbacks shc)
+            throws IOException, IndexOutOfBoundsException;
 
     /**
      * Variant of the {@link #SSL_shutdown} used by {@link ConscryptEngine}. This version does not
@@ -1266,9 +1294,9 @@ public final class NativeCrypto {
     /**
      * Used for testing only.
      */
-    static native int BIO_read(long bioRef, byte[] buffer);
+    static native int BIO_read(long bioRef, byte[] buffer) throws IOException;
     static native void BIO_write(long bioRef, byte[] buffer, int offset, int length)
-            throws IOException;
+            throws IOException, IndexOutOfBoundsException;
     static native long ERR_peek_last_error();
     static native long SSL_clear_mode(long ssl, long mode);
     static native long SSL_get_mode(long ssl);
