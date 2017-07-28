@@ -16,8 +16,14 @@
 
 package org.conscrypt;
 
+import static org.conscrypt.NativeConstants.SSL_MODE_CBC_RECORD_SPLITTING;
+import static org.conscrypt.NativeConstants.SSL_OP_CIPHER_SERVER_PREFERENCE;
+import static org.conscrypt.NativeConstants.SSL_OP_NO_TICKET;
 import static org.conscrypt.NativeConstants.SSL_RECEIVED_SHUTDOWN;
 import static org.conscrypt.NativeConstants.SSL_SENT_SHUTDOWN;
+import static org.conscrypt.NativeConstants.SSL_VERIFY_FAIL_IF_NO_PEER_CERT;
+import static org.conscrypt.NativeConstants.SSL_VERIFY_NONE;
+import static org.conscrypt.NativeConstants.SSL_VERIFY_PEER;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -49,6 +55,7 @@ final class SslWrapper {
     private final SSLHandshakeCallbacks handshakeCallbacks;
     private final AliasChooser aliasChooser;
     private final PSKCallbacks pskCallbacks;
+    private X509Certificate[] localCertificates;
     private long ssl;
 
     static SslWrapper newInstance(SSLParametersImpl parameters,
@@ -105,12 +112,12 @@ final class SslWrapper {
         return NativeCrypto.cipherSuiteToJava(NativeCrypto.SSL_get_current_cipher(ssl));
     }
 
-    OpenSSLX509Certificate[] getLocalCertificates() {
-        return OpenSSLX509Certificate.createCertChain(NativeCrypto.SSL_get_certificate(ssl));
+    X509Certificate[] getPeerCertificates() {
+        return OpenSSLX509Certificate.createCertChain(NativeCrypto.SSL_get_peer_cert_chain(ssl));
     }
 
-    OpenSSLX509Certificate[] getPeerCertificates() {
-        return OpenSSLX509Certificate.createCertChain(NativeCrypto.SSL_get_peer_cert_chain(ssl));
+    X509Certificate[] getLocalCertificates() {
+        return localCertificates;
     }
 
     byte[] getPeerCertificateOcspData() {
@@ -220,54 +227,33 @@ final class SslWrapper {
         if (privateKey == null) {
             return;
         }
-        X509Certificate[] certificates = keyManager.getCertificateChain(alias);
-        if (certificates == null) {
+        localCertificates = keyManager.getCertificateChain(alias);
+        if (localCertificates == null) {
             return;
         }
-        PublicKey publicKey = (certificates.length > 0) ? certificates[0].getPublicKey() : null;
+        int numLocalCerts = localCertificates.length;
+        PublicKey publicKey = (numLocalCerts > 0) ? localCertificates[0].getPublicKey() : null;
 
-        /*
-         * Make sure we keep a reference to the OpenSSLX509Certificate by using
-         * this array. Otherwise, if they're not OpenSSLX509Certificate
-         * instances originally, they may be garbage collected before we
-         * complete our JNI calls.
-         */
-        OpenSSLX509Certificate[] openSslCerts = new OpenSSLX509Certificate[certificates.length];
-        long[] x509refs = new long[certificates.length];
-        for (int i = 0; i < certificates.length; i++) {
-            OpenSSLX509Certificate openSslCert =
-                    OpenSSLX509Certificate.fromCertificate(certificates[i]);
-            openSslCerts[i] = openSslCert;
-            x509refs[i] = openSslCert.getContext();
+        // Encode the local certificates.
+        byte[][] encodedLocalCerts = new byte[numLocalCerts][];
+        for (int i = 0; i < numLocalCerts; ++i) {
+            encodedLocalCerts[i] = localCertificates[i].getEncoded();
         }
 
-        // Note that OpenSSL says to use SSL_use_certificate before
-        // SSL_use_PrivateKey.
-        NativeCrypto.SSL_use_certificate(ssl, x509refs);
-
+        // Convert the key so we can access a native reference.
         final OpenSSLKey key;
         try {
             key = OpenSSLKey.fromPrivateKeyForTLSStackOnly(privateKey, publicKey);
-            NativeCrypto.SSL_use_PrivateKey(ssl, key.getNativeRef());
         } catch (InvalidKeyException e) {
             throw new SSLException(e);
         }
 
-        // We may not have access to all the information to check the private key
-        // if it's a wrapped platform key, so skip this check.
-        if (!key.isWrapped()) {
-            // Makes sure the set PrivateKey and X509Certificate refer to the same
-            // key by comparing the public values.
-            NativeCrypto.SSL_check_private_key(ssl);
-        }
+        // Set the local certs and private key.
+        NativeCrypto.setLocalCertsAndPrivateKey(ssl, encodedLocalCerts, key.getNativeRef());
     }
 
     String getVersion() {
         return NativeCrypto.SSL_get_version(ssl);
-    }
-
-    boolean isReused() {
-        return NativeCrypto.SSL_session_reused(ssl);
     }
 
     String getRequestedServerName() {
@@ -311,9 +297,12 @@ final class SslWrapper {
                     + NativeCrypto.OBSOLETE_PROTOCOL_SSLV3
                     + " is no longer supported and was filtered from the list");
         }
-        NativeCrypto.SSL_configure_alpn(ssl, isClient(), parameters.alpnProtocols);
         NativeCrypto.setEnabledProtocols(ssl, parameters.enabledProtocols);
         NativeCrypto.setEnabledCipherSuites(ssl, parameters.enabledCipherSuites);
+
+        if (parameters.alpnProtocols != null) {
+            NativeCrypto.SSL_configure_alpn(ssl, isClient(), parameters.alpnProtocols);
+        }
 
         // setup server certificates and private keys.
         // clients will receive a call back to request certificates.
@@ -336,7 +325,7 @@ final class SslWrapper {
                 }
             }
 
-            NativeCrypto.SSL_set_options(ssl, NativeConstants.SSL_OP_CIPHER_SERVER_PREFERENCE);
+            NativeCrypto.SSL_set_options(ssl, SSL_OP_CIPHER_SERVER_PREFERENCE);
 
             if (parameters.sctExtension != null) {
                 NativeCrypto.SSL_set_signed_cert_timestamp_list(ssl, parameters.sctExtension);
@@ -350,10 +339,10 @@ final class SslWrapper {
         enablePSKKeyManagerIfRequested();
 
         if (parameters.useSessionTickets) {
-            NativeCrypto.SSL_clear_options(ssl, NativeConstants.SSL_OP_NO_TICKET);
+            NativeCrypto.SSL_clear_options(ssl, SSL_OP_NO_TICKET);
         } else {
             NativeCrypto.SSL_set_options(
-                    ssl, NativeCrypto.SSL_get_options(ssl) | NativeConstants.SSL_OP_NO_TICKET);
+                    ssl, NativeCrypto.SSL_get_options(ssl) | SSL_OP_NO_TICKET);
         }
 
         if (parameters.getUseSni() && AddressUtils.isValidSniHostname(hostname)) {
@@ -362,7 +351,7 @@ final class SslWrapper {
 
         // BEAST attack mitigation (1/n-1 record splitting for CBC cipher suites
         // with TLSv1 and SSLv3).
-        NativeCrypto.SSL_set_mode(ssl, NativeConstants.SSL_MODE_CBC_RECORD_SPLITTING);
+        NativeCrypto.SSL_set_mode(ssl, SSL_MODE_CBC_RECORD_SPLITTING);
 
         setCertificateValidation(ssl);
         setTlsChannelId(channelIdPrivateKey);
@@ -437,16 +426,16 @@ final class SslWrapper {
             // needing client auth takes priority...
             boolean certRequested;
             if (parameters.getNeedClientAuth()) {
-                NativeCrypto.SSL_set_verify(sslNativePointer, NativeCrypto.SSL_VERIFY_PEER
-                                | NativeCrypto.SSL_VERIFY_FAIL_IF_NO_PEER_CERT);
+                NativeCrypto.SSL_set_verify(sslNativePointer, SSL_VERIFY_PEER
+                                | SSL_VERIFY_FAIL_IF_NO_PEER_CERT);
                 certRequested = true;
                 // ... over just wanting it...
             } else if (parameters.getWantClientAuth()) {
-                NativeCrypto.SSL_set_verify(sslNativePointer, NativeCrypto.SSL_VERIFY_PEER);
+                NativeCrypto.SSL_set_verify(sslNativePointer, SSL_VERIFY_PEER);
                 certRequested = true;
                 // ... and we must disable verification if we don't want client auth.
             } else {
-                NativeCrypto.SSL_set_verify(sslNativePointer, NativeCrypto.SSL_VERIFY_NONE);
+                NativeCrypto.SSL_set_verify(sslNativePointer, SSL_VERIFY_NONE);
                 certRequested = false;
             }
 
@@ -493,20 +482,9 @@ final class SslWrapper {
                 ssl, destAddress, destLength, handshakeCallbacks);
     }
 
-    int readArray(byte[] destJava, int destOffset, int destLength)
-            throws IOException, CertificateException {
-        return NativeCrypto.ENGINE_SSL_read_heap(
-                ssl, destJava, destOffset, destLength, handshakeCallbacks);
-    }
-
     int writeDirectByteBuffer(long sourceAddress, int sourceLength) throws IOException {
         return NativeCrypto.ENGINE_SSL_write_direct(
                 ssl, sourceAddress, sourceLength, handshakeCallbacks);
-    }
-
-    int writeArray(byte[] sourceJava, int sourceOffset, int sourceLength) throws IOException {
-        return NativeCrypto.ENGINE_SSL_write_heap(
-                ssl, sourceJava, sourceOffset, sourceLength, handshakeCallbacks);
     }
 
     int getPendingReadableBytes() {
@@ -557,19 +535,9 @@ final class SslWrapper {
                     ssl, bio, address, length, handshakeCallbacks);
         }
 
-        int writeArray(byte[] sourceJava, int sourceOffset, int sourceLength) throws IOException {
-            return NativeCrypto.ENGINE_SSL_write_BIO_heap(
-                    ssl, bio, sourceJava, sourceOffset, sourceLength, handshakeCallbacks);
-        }
-
         int readDirectByteBuffer(long destAddress, int destLength) throws IOException {
             return NativeCrypto.ENGINE_SSL_read_BIO_direct(
                     ssl, bio, destAddress, destLength, handshakeCallbacks);
-        }
-
-        int readArray(byte[] destJava, int destOffset, int destLength) throws IOException {
-            return NativeCrypto.ENGINE_SSL_read_BIO_heap(
-                    ssl, bio, destJava, destOffset, destLength, handshakeCallbacks);
         }
 
         void close() {
