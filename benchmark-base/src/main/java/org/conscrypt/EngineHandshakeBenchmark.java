@@ -47,12 +47,12 @@ public final class EngineHandshakeBenchmark {
      */
     interface Config {
         BufferType bufferType();
-        EngineType engineType();
+        EngineFactory engineFactory();
         String cipher();
         boolean useAlpn();
     }
 
-    private final EngineType engineType;
+    private final EngineFactory engineFactory;
     private final String cipher;
     private final boolean useAlpn;
 
@@ -62,13 +62,13 @@ public final class EngineHandshakeBenchmark {
     private final ByteBuffer serverPacketBuffer;
 
     EngineHandshakeBenchmark(Config config) throws Exception {
-        engineType = config.engineType();
+        engineFactory = config.engineFactory();
         cipher = config.cipher();
         useAlpn = config.useAlpn();
         BufferType bufferType = config.bufferType();
 
-        SSLEngine clientEngine = engineType.newClientEngine(cipher, useAlpn);
-        SSLEngine serverEngine = engineType.newServerEngine(cipher, useAlpn);
+        SSLEngine clientEngine = engineFactory.newClientEngine(cipher, useAlpn);
+        SSLEngine serverEngine = engineFactory.newServerEngine(cipher, useAlpn);
 
         // Create the application and packet buffers for both endpoints.
         clientApplicationBuffer = bufferType.newApplicationBuffer(clientEngine);
@@ -76,13 +76,13 @@ public final class EngineHandshakeBenchmark {
         clientPacketBuffer = bufferType.newPacketBuffer(clientEngine);
         serverPacketBuffer = bufferType.newPacketBuffer(serverEngine);
 
-        engineType.dispose(clientEngine);
-        engineType.dispose(serverEngine);
+        engineFactory.dispose(clientEngine);
+        engineFactory.dispose(serverEngine);
     }
 
     void handshake() throws SSLException {
-        SSLEngine client = engineType.newClientEngine(cipher, useAlpn);
-        SSLEngine server = engineType.newServerEngine(cipher, useAlpn);
+        SSLEngine client = engineFactory.newClientEngine(cipher, useAlpn);
+        SSLEngine server = engineFactory.newServerEngine(cipher, useAlpn);
         clientApplicationBuffer.clear();
         clientPacketBuffer.clear();
         serverApplicationBuffer.clear();
@@ -90,39 +90,7 @@ public final class EngineHandshakeBenchmark {
 
         doEngineHandshake(client, server, clientApplicationBuffer, clientPacketBuffer,
                 serverApplicationBuffer, serverPacketBuffer);
-        engineType.dispose(client);
-        engineType.dispose(server);
-    }
-
-    /**
-     * A simple main for profiling.
-     */
-    public static void main(String[] args) throws Exception {
-        EngineHandshakeBenchmark bm = new EngineHandshakeBenchmark(new Config() {
-            @Override
-            public BufferType bufferType() {
-                return BufferType.DIRECT;
-            }
-
-            @Override
-            public EngineType engineType() {
-                return EngineType.CONSCRYPT_UNPOOLED;
-            }
-
-            @Override
-            public String cipher() {
-                return TestUtils.TEST_CIPHER;
-            }
-
-            @Override
-            public boolean useAlpn() {
-                return false;
-            }
-        });
-
-        // Just run forever for profiling.
-        while (true) {
-            bm.handshake();
-        }
+        engineFactory.dispose(client);
+        engineFactory.dispose(server);
     }
 }
