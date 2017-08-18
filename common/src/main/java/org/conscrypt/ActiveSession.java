@@ -20,6 +20,7 @@ import static org.conscrypt.Preconditions.checkNotNull;
 
 import java.security.Principal;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.HashMap;
@@ -62,7 +63,9 @@ final class ActiveSession implements SSLSession {
     @Override
     public byte[] getId() {
         if (id == null) {
-            id = ssl.getSessionId();
+            synchronized (ssl) {
+                id = ssl.getSessionId();
+            }
         }
         return id != null ? id.clone() : EmptyArray.BYTE;
     }
@@ -82,7 +85,9 @@ final class ActiveSession implements SSLSession {
     @Override
     public long getCreationTime() {
         if (creationTime == 0) {
-            creationTime = ssl.getTime();
+            synchronized (ssl) {
+                creationTime = ssl.getTime();
+            }
         }
         return creationTime;
     }
@@ -139,19 +144,25 @@ final class ActiveSession implements SSLSession {
     }
 
     String getRequestedServerName() {
-        return ssl.getRequestedServerName();
+        synchronized (ssl) {
+            return ssl.getRequestedServerName();
+        }
     }
 
     @Override
     public void invalidate() {
-        ssl.setTimeout(0L);
+        synchronized (ssl) {
+            ssl.setTimeout(0L);
+        }
     }
 
     @Override
     public boolean isValid() {
-        long creationTimeMillis = ssl.getTime();
-        long timeoutMillis = ssl.getTimeout();
-        return (System.currentTimeMillis() - timeoutMillis) < creationTimeMillis;
+        synchronized (ssl) {
+            long creationTimeMillis = ssl.getTime();
+            long timeoutMillis = ssl.getTimeout();
+            return (System.currentTimeMillis() - timeoutMillis) < creationTimeMillis;
+        }
     }
 
     @Override
@@ -264,7 +275,9 @@ final class ActiveSession implements SSLSession {
     @Override
     public String getCipherSuite() {
         if (cipherSuite == null) {
-            cipherSuite = ssl.getCipherSuite();
+            synchronized (ssl) {
+                cipherSuite = ssl.getCipherSuite();
+            }
         }
         return cipherSuite;
     }
@@ -273,7 +286,9 @@ final class ActiveSession implements SSLSession {
     public String getProtocol() {
         String protocol = this.protocol;
         if (protocol == null) {
-            protocol = ssl.getVersion();
+            synchronized (ssl) {
+                protocol = ssl.getVersion();
+            }
             this.protocol = protocol;
         }
         return protocol;
@@ -307,27 +322,32 @@ final class ActiveSession implements SSLSession {
         configurePeer(peerHost, peerPort, peerCertificates);
     }
 
-    private void configurePeer(
-            String peerHost, int peerPort, X509Certificate[] peerCertificates) {
+    private void configurePeer(String peerHost, int peerPort, X509Certificate[] peerCertificates) {
         this.peerHost = peerHost;
         this.peerPort = peerPort;
         this.peerCertificates = peerCertificates;
-        this.peerCertificateOcspData = ssl.getPeerCertificateOcspData();
-        this.peerTlsSctData = ssl.getPeerTlsSctData();
+        synchronized (ssl) {
+            this.peerCertificateOcspData = ssl.getPeerCertificateOcspData();
+            this.peerTlsSctData = ssl.getPeerTlsSctData();
+        }
     }
 
     /**
-     * Updates the session after the handshake has completed.
+     * Updates the cached peer certificate after the handshake has completed
+     * (or entered False Start).
      */
-    void onHandshakeCompleted(String peerHost, int peerPort) {
-        id = null;
-        this.localCertificates = ssl.getLocalCertificates();
-        if (this.peerCertificates == null) {
-            // When resuming a session, the cert_verify_callback (which calls
-            // onPeerCertificatesReceived) isn't called by BoringSSL during the handshake because
-            // it presumes the certs were verified in the previous connection on that session,
-            // leaving us without the peer certificates.  If that happens, fetch them explicitly.
-            configurePeer(peerHost, peerPort, ssl.getPeerCertificates());
+    void onPeerCertificateAvailable(String peerHost, int peerPort) throws CertificateException {
+        synchronized (ssl) {
+            id = null;
+            this.localCertificates = ssl.getLocalCertificates();
+            if (this.peerCertificates == null) {
+                // When resuming a session, the cert_verify_callback (which calls
+                // onPeerCertificatesReceived) isn't called by BoringSSL during the handshake
+                // because it presumes the certs were verified in the previous connection on that
+                // session, leaving us without the peer certificates.  If that happens, fetch them
+                // explicitly.
+                configurePeer(peerHost, peerPort, ssl.getPeerCertificates());
+            }
         }
     }
 

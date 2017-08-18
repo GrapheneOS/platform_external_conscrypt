@@ -42,7 +42,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -630,7 +629,7 @@ public class NativeCryptoTest {
         long c = NativeCrypto.SSL_CTX_new();
         long s = NativeCrypto.SSL_new(c);
 
-        List<String> ciphers = new ArrayList<>(NativeCrypto.SUPPORTED_CIPHER_SUITES_SET);
+        List<String> ciphers = new ArrayList<String>(NativeCrypto.SUPPORTED_CIPHER_SUITES_SET);
         NativeCrypto.SSL_set_cipher_lists(s, ciphers.toArray(new String[ciphers.size()]));
 
         NativeCrypto.SSL_free(s);
@@ -1012,7 +1011,6 @@ public class NativeCryptoTest {
                             }
                             return callback;
                         } catch (Exception e) {
-                            e.printStackTrace();
                             throw e;
                         }
                     }
@@ -1197,7 +1195,7 @@ public class NativeCryptoTest {
 
         assertTrue(clientCallback.clientCertificateRequestedCalled);
         assertNotNull(clientCallback.keyTypes);
-        assertEquals(new HashSet<>(Arrays.asList("EC", "RSA")),
+        assertEquals(new HashSet<String>(Arrays.asList("EC", "RSA")),
                 SSLUtils.getSupportedClientKeyTypes(clientCallback.keyTypes));
         assertEqualPrincipals(getCaPrincipals(), clientCallback.asn1DerEncodedX500Principals);
         assertFalse(serverCallback.clientCertificateRequestedCalled);
@@ -1252,9 +1250,6 @@ public class NativeCryptoTest {
             client.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
             fail();
         } catch (ExecutionException expected) {
-            if (SocketTimeoutException.class != expected.getCause().getClass()) {
-                expected.printStackTrace();
-            }
             assertEquals(SocketTimeoutException.class, expected.getCause().getClass());
         } finally {
             // Manually close peer socket when testing timeout
@@ -2027,23 +2022,20 @@ public class NativeCryptoTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void SSL_get_peer_cert_chain_withNullShouldThrow() throws Exception {
-        NativeCrypto.SSL_get_peer_cert_chain(NULL);
+    public void SSL_get0_peer_certificates_withNullShouldThrow() throws Exception {
+        NativeCrypto.SSL_get0_peer_certificates(NULL);
     }
 
     @Test
-    public void test_SSL_get_peer_cert_chain() throws Exception {
+    public void test_SSL_get0_peer_certificates() throws Exception {
         final ServerSocket listener = newServerSocket();
 
         Hooks cHooks = new Hooks() {
             @Override
             public void afterHandshake(long session, long s, long c, Socket sock, FileDescriptor fd,
                     SSLHandshakeCallbacks callback) throws Exception {
-                long[] cc = NativeCrypto.SSL_get_peer_cert_chain(s);
-                assertEqualCertificateChains(getServerCertificateRefs(), cc);
-                for (long ref : cc) {
-                    NativeCrypto.X509_free(ref);
-                }
+                byte[][] cc = NativeCrypto.SSL_get0_peer_certificates(s);
+                assertEqualByteArrays(getEncodedServerCertificates(), cc);
                 super.afterHandshake(session, s, c, sock, fd, callback);
             }
         };
@@ -3014,6 +3006,6 @@ public class NativeCryptoTest {
     }
 
     private static ServerSocket newServerSocket() throws IOException {
-        return new ServerSocket(0, 50, InetAddress.getLoopbackAddress());
+        return new ServerSocket(0, 50, TestUtils.getLoopbackAddress());
     }
 }
