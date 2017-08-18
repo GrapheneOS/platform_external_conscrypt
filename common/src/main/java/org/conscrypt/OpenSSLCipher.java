@@ -231,7 +231,7 @@ public abstract class OpenSSLCipher extends CipherSpi {
 
     @Override
     protected int engineGetOutputSize(int inputLen) {
-        return getOutputSizeForFinal(inputLen);
+        return Math.max(getOutputSizeForUpdate(inputLen), getOutputSizeForFinal(inputLen));
     }
 
     @Override
@@ -1196,7 +1196,10 @@ public abstract class OpenSSLCipher extends CipherSpi {
                 AlgorithmParameters params = AlgorithmParameters.getInstance("GCM");
                 params.init(spec);
                 return params;
-            } catch (NoSuchAlgorithmException | InvalidParameterSpecException e) {
+            } catch (NoSuchAlgorithmException e) {
+                // We should not get here.
+                throw (Error) new AssertionError("GCM not supported").initCause(e);
+            } catch (InvalidParameterSpecException e) {
                 // This may happen since Conscrypt doesn't provide this itself.
                 return null;
             }

@@ -14,22 +14,40 @@
  * limitations under the License.
  */
 
+/*
+ * Copyright 2013 The Netty Project
+ *
+ * The Netty Project licenses this file to you under the Apache License,
+ * version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at:
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.conscrypt;
 
+import java.io.File;
 import java.io.FileDescriptor;
-import java.lang.reflect.Constructor;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
-import java.net.InetSocketAddress;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketImpl;
 import java.nio.channels.SocketChannel;
+import java.security.AccessController;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.PrivilegedAction;
 import java.security.Security;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -38,11 +56,13 @@ import java.security.spec.ECParameterSpec;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.X509ExtendedTrustManager;
 import javax.net.ssl.X509TrustManager;
 import sun.security.x509.AlgorithmId;
 
@@ -52,16 +72,19 @@ import sun.security.x509.AlgorithmId;
  * Uses reflection to implement Java 8 SSL features for backwards compatibility.
  */
 final class Platform {
-    private static final boolean JAVA8;
+    private static final Logger logger = Logger.getLogger(NativeLibraryLoader.class.getName());
+
+    private static final int JAVA_VERSION = javaVersion0();
+    private static final String TEMP_DIR_PROPERTY_NAME = "org.conscrypt.tmpdir";
     private static final Method GET_CURVE_NAME_METHOD;
-    private static final Method SET_USE_CIPHER_SUITES_ORDER_METHOD;
-    private static final Method GET_USE_CIPHER_SUITES_ORDER_METHOD;
-    private static final Method SET_SERVER_NAMES_METHOD;
-    private static final Method GET_SERVER_NAMES_METHOD;
-    private static final Method GET_TYPE_METHOD;
-    private static final Method GET_ASCII_NAME_METHOD;
-    private static final Constructor<?> SNI_HOST_NAME_CONSTRUCTOR;
+
+    static final OperatingSystem OS;
+    static final Architecture ARCH;
+
     static {
+        OS = getOperatingSystem(System.getProperty("os.name", ""));
+        ARCH = getArchitecture(System.getProperty("os.arch", ""));
+
         Method getCurveNameMethod = null;
         try {
             getCurveNameMethod = ECParameterSpec.class.getDeclaredMethod("getCurveName");
@@ -69,43 +92,178 @@ final class Platform {
         } catch (Exception ignored) {
         }
         GET_CURVE_NAME_METHOD = getCurveNameMethod;
+    }
 
-        // Java 8 methods.
-        boolean java8 = false;
-        Method setUseCipherSuitesOrderMethod = null;
-        Method getUseCipherSuitesOrderMethod = null;
-        Method setServerNamesMethod = null;
-        Method getServerNamesMethod = null;
-        Method getTypeMethod = null;
-        Method getAsciiNameMethod = null;
-        Constructor<?> sniHostNameConstructor = null;
-        try {
-            setUseCipherSuitesOrderMethod =
-                SSLParameters.class.getMethod("setUseCipherSuitesOrder", boolean.class);
-            getUseCipherSuitesOrderMethod = SSLParameters.class.getMethod("getUseCipherSuitesOrder");
-            setServerNamesMethod = SSLParameters.class.getMethod("setServerNames", List.class);
-            getServerNamesMethod = SSLParameters.class.getMethod("getServerNames");
-            Class<?> sniHostNameClass = Class.forName("javax.net.ssl.SNIHostName");
-            getTypeMethod = sniHostNameClass.getMethod("getType");
-            getAsciiNameMethod = sniHostNameClass.getMethod("getAsciiName");
-            sniHostNameConstructor = sniHostNameClass.getConstructor(String.class);
-            java8 = true;
-        } catch (Exception ignored) {
-            // Ignored.
-        }
-        SET_USE_CIPHER_SUITES_ORDER_METHOD = java8 ? setUseCipherSuitesOrderMethod : null;
-        GET_USE_CIPHER_SUITES_ORDER_METHOD = java8 ? getUseCipherSuitesOrderMethod : null;
-        SET_SERVER_NAMES_METHOD = java8 ? setServerNamesMethod : null;
-        GET_SERVER_NAMES_METHOD = java8 ? getServerNamesMethod : null;
-        GET_TYPE_METHOD = java8 ? getTypeMethod : null;
-        GET_ASCII_NAME_METHOD = java8 ? getAsciiNameMethod : null;
-        SNI_HOST_NAME_CONSTRUCTOR = java8 ? sniHostNameConstructor : null;
-        JAVA8 = java8;
+    /**
+     * Enumeration of operating systems.
+     */
+    enum OperatingSystem {
+        AIX,
+        HPUX,
+        OS400,
+        LINUX,
+        OSX,
+        FREEBSD,
+        OPENBSD,
+        NETBSD,
+        SUNOS,
+        WINDOWS,
+        UNKNOWN
+    }
+
+    /**
+     * Enumeration of architectures.
+     */
+    enum Architecture {
+        X86_64,
+        X86_32,
+        ITANIUM_64,
+        SPARC_32,
+        SPARC_64,
+        ARM_32,
+        AARCH_64,
+        PPC_32,
+        PPC_64,
+        PPCLE_64,
+        S390_32,
+        S390_64,
+        UNKNOWN
     }
 
     private Platform() {}
 
     static void setup() {}
+
+    static boolean isWindows() {
+        return Platform.OS == OperatingSystem.WINDOWS;
+    }
+
+    static boolean isOSX() {
+        return Platform.OS == OperatingSystem.OSX;
+    }
+
+    static File getTempDir() {
+        File f;
+        try {
+            // First, see if the application specified a temp dir for conscrypt.
+            f = toDirectory(System.getProperty(TEMP_DIR_PROPERTY_NAME));
+            if (f != null) {
+                return f;
+            }
+
+            // Use the Java system property if available.
+            f = toDirectory(System.getProperty("java.io.tmpdir"));
+            if (f != null) {
+                return f;
+            }
+
+            // This shouldn't happen, but just in case ..
+            if (isWindows()) {
+                f = toDirectory(System.getenv("TEMP"));
+                if (f != null) {
+                    return f;
+                }
+
+                String userprofile = System.getenv("USERPROFILE");
+                if (userprofile != null) {
+                    f = toDirectory(userprofile + "\\AppData\\Local\\Temp");
+                    if (f != null) {
+                        return f;
+                    }
+
+                    f = toDirectory(userprofile + "\\Local Settings\\Temp");
+                    if (f != null) {
+                        return f;
+                    }
+                }
+            } else {
+                f = toDirectory(System.getenv("TMPDIR"));
+                if (f != null) {
+                    return f;
+                }
+            }
+        } catch (Exception ignored) {
+            // Environment variable inaccessible
+        }
+
+        // Last resort.
+        if (isWindows()) {
+            f = new File("C:\\Windows\\Temp");
+        } else {
+            f = new File("/tmp");
+        }
+
+        logger.log(Level.WARNING,
+            "Failed to get the temporary directory; falling back to: {0}", f);
+        return f;
+    }
+
+    /**
+     * Approximates the behavior of File.createTempFile without depending on SecureRandom.
+     */
+    static File createTempFile(String prefix, String suffix, File directory)
+        throws IOException {
+        if (directory == null) {
+            throw new NullPointerException();
+        }
+        long time = System.currentTimeMillis();
+        prefix = new File(prefix).getName();
+        IOException suppressed = null;
+        for (int i = 0; i < 10000; i++) {
+            String tempName = String.format(Locale.US, "%s%d%04d%s", prefix, time, i, suffix);
+            File tempFile = new File(directory, tempName);
+            if (!tempName.equals(tempFile.getName())) {
+                // The given prefix or suffix contains path separators.
+                throw new IOException("Unable to create temporary file: " + tempFile);
+            }
+            try {
+                if (tempFile.createNewFile()) {
+                    return tempFile.getCanonicalFile();
+                }
+            } catch (IOException e) {
+                // This may just be a transient error; store it just in case.
+                suppressed = e;
+            }
+        }
+        if (suppressed != null) {
+            throw suppressed;
+        } else {
+            throw new IOException("Unable to create temporary file");
+        }
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private static File toDirectory(String path) {
+        if (path == null) {
+            return null;
+        }
+
+        File f = new File(path);
+        f.mkdirs();
+
+        if (!f.isDirectory()) {
+            return null;
+        }
+
+        try {
+            return f.getAbsoluteFile();
+        } catch (Exception ignored) {
+            return f;
+        }
+    }
+
+    static boolean canExecuteExecutable(File file) throws IOException {
+        if (JAVA_VERSION >= 7) {
+            return Java7PlatformUtil.canExecuteExecutable(file);
+        }
+        return true;
+    }
+
+    static void addSuppressed(Throwable t, Throwable suppressed) {
+        if (JAVA_VERSION >= 7) {
+            Java7PlatformUtil.addSuppressed(t, suppressed);
+        }
+    }
 
     static FileDescriptor getFileDescriptor(Socket s) {
         try {
@@ -131,10 +289,12 @@ final class Platform {
         }
     }
 
+    @SuppressWarnings("unused")
     static FileDescriptor getFileDescriptorFromSSLSocket(AbstractConscryptSocket socket) {
         return getFileDescriptor(socket);
     }
 
+    @SuppressWarnings("unused")
     static String getCurveName(ECParameterSpec spec) {
         if (GET_CURVE_NAME_METHOD != null) {
             try {
@@ -146,6 +306,7 @@ final class Platform {
         return null;
     }
 
+    @SuppressWarnings("unused")
     static void setCurveName(@SuppressWarnings("unused") ECParameterSpec spec,
             @SuppressWarnings("unused") String curveName) {
         // This doesn't appear to be needed.
@@ -154,97 +315,45 @@ final class Platform {
     /*
      * Call Os.setsockoptTimeval via reflection.
      */
+    @SuppressWarnings("unused")
     static void setSocketWriteTimeout(@SuppressWarnings("unused") Socket s,
             @SuppressWarnings("unused") long timeoutMillis) throws SocketException {
         // TODO: figure this out on the RI
     }
 
-    @SuppressWarnings("unchecked")
-    public static void setSSLParameters(
+    static void setSSLParameters(
             SSLParameters params, SSLParametersImpl impl, AbstractConscryptSocket socket) {
-        impl.setEndpointIdentificationAlgorithm(params.getEndpointIdentificationAlgorithm());
-        if (JAVA8) {
-            try {
-                impl.setUseCipherSuitesOrder(
-                    (boolean) GET_USE_CIPHER_SUITES_ORDER_METHOD.invoke(params));
-                List<Object> serverNames = (List<Object>) GET_SERVER_NAMES_METHOD.invoke(params);
-
-                // javax.net.ssl.StandardConstants.SNI_HOST_NAME
-                int hostNameType = 0;
-                if (serverNames != null) {
-                    for (Object serverName : serverNames) {
-                        if ((int) GET_TYPE_METHOD.invoke(serverName) == hostNameType) {
-                            socket.setHostname((String) GET_ASCII_NAME_METHOD.invoke(serverName));
-                            break;
-                        }
-                    }
-                }
-            } catch (IllegalAccessException ignored) {
-            } catch (InvocationTargetException ignored) {
-            }
+        if (JAVA_VERSION >= 8) {
+            Java8PlatformUtil.setSSLParameters(params, impl, socket);
+        } else if (JAVA_VERSION >= 7) {
+            Java7PlatformUtil.setSSLParameters(params, impl);
         }
     }
 
-    @SuppressWarnings({"LiteralClassName", "rawtypes"})
-    public static void getSSLParameters(
+    static void getSSLParameters(
             SSLParameters params, SSLParametersImpl impl, AbstractConscryptSocket socket) {
-        params.setEndpointIdentificationAlgorithm(impl.getEndpointIdentificationAlgorithm());
-        if (JAVA8) {
-            try {
-                SET_USE_CIPHER_SUITES_ORDER_METHOD.invoke(params, impl.getUseCipherSuitesOrder());
-                if (impl.getUseSni() && AddressUtils.isValidSniHostname(socket.getHostname())) {
-                    SET_SERVER_NAMES_METHOD.invoke(params,
-                        (Collections.singletonList(
-                            SNI_HOST_NAME_CONSTRUCTOR.newInstance(socket.getHostname()))));
-                }
-            } catch (IllegalAccessException ignored) {
-            } catch (InvocationTargetException ignored) {
-            } catch (InstantiationException ignored) {
-            }
+        if (JAVA_VERSION >= 8) {
+            Java8PlatformUtil.getSSLParameters(params, impl, socket);
+        } else if (JAVA_VERSION >= 7) {
+            Java7PlatformUtil.getSSLParameters(params, impl);
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public static void setSSLParameters(
+    static void setSSLParameters(
             SSLParameters params, SSLParametersImpl impl, ConscryptEngine engine) {
-        impl.setEndpointIdentificationAlgorithm(params.getEndpointIdentificationAlgorithm());
-        if (JAVA8) {
-            try {
-                impl.setUseCipherSuitesOrder(
-                    (boolean) GET_USE_CIPHER_SUITES_ORDER_METHOD.invoke(params));
-                List<Object> serverNames = (List<Object>) GET_SERVER_NAMES_METHOD.invoke(params);
-
-                int hostNameType = 0;
-                if (serverNames != null) {
-                    for (Object serverName : serverNames) {
-                        if ((int) GET_TYPE_METHOD.invoke(serverName) == hostNameType) {
-                            engine.setHostname((String) GET_ASCII_NAME_METHOD.invoke(serverName));
-                            break;
-                        }
-                    }
-                }
-            } catch (IllegalAccessException ignored) {
-            } catch (InvocationTargetException ignored) {
-            }
+        if (JAVA_VERSION >= 8) {
+            Java8PlatformUtil.setSSLParameters(params, impl, engine);
+        } else if (JAVA_VERSION >= 7) {
+            Java7PlatformUtil.setSSLParameters(params, impl);
         }
     }
 
-    @SuppressWarnings({"LiteralClassName", "rawtypes"})
-    public static void getSSLParameters(
+    static void getSSLParameters(
             SSLParameters params, SSLParametersImpl impl, ConscryptEngine engine) {
-        params.setEndpointIdentificationAlgorithm(impl.getEndpointIdentificationAlgorithm());
-        if (JAVA8) {
-            try {
-                SET_USE_CIPHER_SUITES_ORDER_METHOD.invoke(params, impl.getUseCipherSuitesOrder());
-                if (impl.getUseSni() && AddressUtils.isValidSniHostname(engine.getHostname())) {
-                    SET_SERVER_NAMES_METHOD.invoke(params,
-                        (Collections.singletonList(
-                            SNI_HOST_NAME_CONSTRUCTOR.newInstance(engine.getHostname()))));
-                }
-            } catch (IllegalAccessException ignored) {
-            } catch (InvocationTargetException ignored) {
-            } catch (InstantiationException ignored) {
-            }
+        if (JAVA_VERSION >= 8) {
+            Java8PlatformUtil.getSSLParameters(params, impl, engine);
+        } else if (JAVA_VERSION >= 7) {
+            Java7PlatformUtil.getSSLParameters(params, impl);
         }
     }
 
@@ -259,41 +368,41 @@ final class Platform {
         return params.getEndpointIdentificationAlgorithm();
     }
 
+    @SuppressWarnings("unused")
     static void checkClientTrusted(X509TrustManager tm, X509Certificate[] chain, String authType,
             AbstractConscryptSocket socket) throws CertificateException {
-        if (tm instanceof X509ExtendedTrustManager) {
-            X509ExtendedTrustManager x509etm = (X509ExtendedTrustManager) tm;
-            x509etm.checkClientTrusted(chain, authType, socket);
+        if (JAVA_VERSION >= 7) {
+            Java7PlatformUtil.checkClientTrusted(tm, chain, authType, socket);
         } else {
             tm.checkClientTrusted(chain, authType);
         }
     }
 
+    @SuppressWarnings("unused")
     static void checkServerTrusted(X509TrustManager tm, X509Certificate[] chain, String authType,
             AbstractConscryptSocket socket) throws CertificateException {
-        if (tm instanceof X509ExtendedTrustManager) {
-            X509ExtendedTrustManager x509etm = (X509ExtendedTrustManager) tm;
-            x509etm.checkServerTrusted(chain, authType, socket);
+        if (JAVA_VERSION >= 7) {
+            Java7PlatformUtil.checkServerTrusted(tm, chain, authType, socket);
         } else {
             tm.checkServerTrusted(chain, authType);
         }
     }
 
+    @SuppressWarnings("unused")
     static void checkClientTrusted(X509TrustManager tm, X509Certificate[] chain, String authType,
             ConscryptEngine engine) throws CertificateException {
-        if (tm instanceof X509ExtendedTrustManager) {
-            X509ExtendedTrustManager x509etm = (X509ExtendedTrustManager) tm;
-            x509etm.checkClientTrusted(chain, authType, engine);
+        if (JAVA_VERSION >= 7) {
+            Java7PlatformUtil.checkClientTrusted(tm, chain, authType, engine);
         } else {
             tm.checkClientTrusted(chain, authType);
         }
     }
 
+    @SuppressWarnings("unused")
     static void checkServerTrusted(X509TrustManager tm, X509Certificate[] chain, String authType,
             ConscryptEngine engine) throws CertificateException {
-        if (tm instanceof X509ExtendedTrustManager) {
-            X509ExtendedTrustManager x509etm = (X509ExtendedTrustManager) tm;
-            x509etm.checkServerTrusted(chain, authType, engine);
+        if (JAVA_VERSION >= 7) {
+            Java7PlatformUtil.checkServerTrusted(tm, chain, authType, engine);
         } else {
             tm.checkServerTrusted(chain, authType);
         }
@@ -302,6 +411,7 @@ final class Platform {
     /**
      * Wraps an old AndroidOpenSSL key instance. This is not needed on RI.
      */
+    @SuppressWarnings("unused")
     static OpenSSLKey wrapRsaKey(@SuppressWarnings("unused") PrivateKey javaKey) {
         return null;
     }
@@ -309,11 +419,13 @@ final class Platform {
     /**
      * Logs to the system EventLog system.
      */
+    @SuppressWarnings("unused")
     static void logEvent(@SuppressWarnings("unused") String message) {}
 
     /**
      * Returns true if the supplied hostname is an literal IP address.
      */
+    @SuppressWarnings("unused")
     static boolean isLiteralIpAddress(String hostname) {
         // TODO: any RI API to make this better?
         return AddressUtils.isLiteralIpAddress(hostname);
@@ -330,6 +442,7 @@ final class Platform {
     /**
      * Currently we don't wrap anything from the RI.
      */
+    @SuppressWarnings("unused")
     static SSLSocketFactory wrapSocketFactoryIfNeeded(OpenSSLSocketFactoryImpl factory) {
         return factory;
     }
@@ -337,6 +450,7 @@ final class Platform {
     /**
      * Convert from platform's GCMParameterSpec to our internal version.
      */
+    @SuppressWarnings("unused")
     static GCMParameters fromGCMParameterSpec(AlgorithmParameterSpec params) {
         if (params instanceof GCMParameterSpec) {
             GCMParameterSpec gcmParams = (GCMParameterSpec) params;
@@ -348,6 +462,7 @@ final class Platform {
     /**
      * Creates a platform version of {@code GCMParameterSpec}.
      */
+    @SuppressWarnings("unused")
     static AlgorithmParameterSpec toGCMParameterSpec(int tagLenInBits, byte[] iv) {
         return new GCMParameterSpec(tagLenInBits, iv);
     }
@@ -356,26 +471,32 @@ final class Platform {
      * CloseGuard functions.
      */
 
+    @SuppressWarnings("unused")
     static Object closeGuardGet() {
         return null;
     }
 
+    @SuppressWarnings("unused")
     static void closeGuardOpen(@SuppressWarnings("unused") Object guardObj,
             @SuppressWarnings("unused") String message) {}
 
+    @SuppressWarnings("unused")
     static void closeGuardClose(@SuppressWarnings("unused") Object guardObj) {}
 
+    @SuppressWarnings("unused")
     static void closeGuardWarnIfOpen(@SuppressWarnings("unused") Object guardObj) {}
 
     /*
      * BlockGuard functions.
      */
 
+    @SuppressWarnings("unused")
     static void blockGuardOnNetwork() {}
 
     /**
      * OID to Algorithm Name mapping.
      */
+    @SuppressWarnings("unused")
     static String oidToAlgorithmName(String oid) {
         try {
             return AlgorithmId.get(oid).getName();
@@ -388,17 +509,14 @@ final class Platform {
      * Pre-Java-8 backward compatibility.
      */
 
+    @SuppressWarnings("unused")
     static SSLSession wrapSSLSession(ActiveSession sslSession) {
-        return new DelegatingExtendedSSLSession(sslSession);
+        return ExtendedSessionAdapter.wrap(sslSession);
     }
 
     @SuppressWarnings("unused")
     static SSLSession unwrapSSLSession(SSLSession sslSession) {
-        if (sslSession instanceof DelegatingExtendedSSLSession) {
-            return ((DelegatingExtendedSSLSession) sslSession).getDelegate();
-        }
-
-        return sslSession;
+        return ExtendedSessionAdapter.getDelegate(sslSession);
     }
 
     public static String getOriginalHostNameFromInetAddress(InetAddress addr) {
@@ -427,8 +545,12 @@ final class Platform {
      * Pre-Java-7 backward compatibility.
      */
 
+    @SuppressWarnings("unused")
     static String getHostStringFromInetSocketAddress(InetSocketAddress addr) {
-        return addr.getHostString();
+        if (JAVA_VERSION >= 7) {
+            return Java7PlatformUtil.getHostStringFromInetSocketAddress(addr);
+        }
+        return null;
     }
 
     /**
@@ -478,5 +600,162 @@ final class Platform {
             enable = Boolean.valueOf(property.toLowerCase());
         }
         return enable;
+    }
+
+    private static boolean isAndroid() {
+        boolean android;
+        try {
+            Class.forName("android.app.Application", false, getSystemClassLoader());
+            android = true;
+        } catch (Throwable ignored) {
+            // Failed to load the class uniquely available in Android.
+            android = false;
+        }
+        return android;
+    }
+
+    static int javaVersion() {
+        return JAVA_VERSION;
+    }
+
+    private static int javaVersion0() {
+        final int majorVersion;
+
+        if (isAndroid()) {
+            majorVersion = 6;
+        } else {
+            majorVersion = majorVersionFromJavaSpecificationVersion();
+        }
+
+        return majorVersion;
+    }
+
+    private static int majorVersionFromJavaSpecificationVersion() {
+        return majorVersion(System.getProperty("java.specification.version", "1.6"));
+    }
+
+    private static int majorVersion(final String javaSpecVersion) {
+        final String[] components = javaSpecVersion.split("\\.");
+        final int[] version = new int[components.length];
+        for (int i = 0; i < components.length; i++) {
+            version[i] = Integer.parseInt(components[i]);
+        }
+
+        if (version[0] == 1) {
+            assert version[1] >= 6;
+            return version[1];
+        } else {
+            return version[0];
+        }
+    }
+
+    private static ClassLoader getSystemClassLoader() {
+        if (System.getSecurityManager() == null) {
+            return ClassLoader.getSystemClassLoader();
+        } else {
+            return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                @Override
+                public ClassLoader run() {
+                    return ClassLoader.getSystemClassLoader();
+                }
+            });
+        }
+    }
+
+    /**
+     * Normalizes the os.name value into the value used by the Maven os plugin
+     * (https://github.com/trustin/os-maven-plugin). This plugin is used to generate
+     * platform-specific
+     * classifiers for artifacts.
+     */
+    private static OperatingSystem getOperatingSystem(String value) {
+        value = normalize(value);
+        if (value.startsWith("aix")) {
+            return OperatingSystem.AIX;
+        }
+        if (value.startsWith("hpux")) {
+            return OperatingSystem.HPUX;
+        }
+        if (value.startsWith("os400")) {
+            // Avoid the names such as os4000
+            if (value.length() <= 5 || !Character.isDigit(value.charAt(5))) {
+                return OperatingSystem.OS400;
+            }
+        }
+        if (value.startsWith("linux")) {
+            return OperatingSystem.LINUX;
+        }
+        if (value.startsWith("macosx") || value.startsWith("osx")) {
+            return OperatingSystem.OSX;
+        }
+        if (value.startsWith("freebsd")) {
+            return OperatingSystem.FREEBSD;
+        }
+        if (value.startsWith("openbsd")) {
+            return OperatingSystem.OPENBSD;
+        }
+        if (value.startsWith("netbsd")) {
+            return OperatingSystem.NETBSD;
+        }
+        if (value.startsWith("solaris") || value.startsWith("sunos")) {
+            return OperatingSystem.SUNOS;
+        }
+        if (value.startsWith("windows")) {
+            return OperatingSystem.WINDOWS;
+        }
+
+        return OperatingSystem.UNKNOWN;
+    }
+
+    /**
+     * Normalizes the os.arch value into the value used by the Maven os plugin
+     * (https://github.com/trustin/os-maven-plugin). This plugin is used to generate
+     * platform-specific
+     * classifiers for artifacts.
+     */
+    private static Architecture getArchitecture(String value) {
+        value = normalize(value);
+        if (value.matches("^(x8664|amd64|ia32e|em64t|x64)$")) {
+            return Architecture.X86_64;
+        }
+        if (value.matches("^(x8632|x86|i[3-6]86|ia32|x32)$")) {
+            return Architecture.X86_32;
+        }
+        if (value.matches("^(ia64|itanium64)$")) {
+            return Architecture.ITANIUM_64;
+        }
+        if (value.matches("^(sparc|sparc32)$")) {
+            return Architecture.SPARC_32;
+        }
+        if (value.matches("^(sparcv9|sparc64)$")) {
+            return Architecture.SPARC_64;
+        }
+        if (value.matches("^(arm|arm32)$")) {
+            return Architecture.ARM_32;
+        }
+        if ("aarch64".equals(value)) {
+            return Architecture.AARCH_64;
+        }
+        if (value.matches("^(ppc|ppc32)$")) {
+            return Architecture.PPC_32;
+        }
+        if ("ppc64".equals(value)) {
+            return Architecture.PPC_64;
+        }
+        if ("ppc64le".equals(value)) {
+            return Architecture.PPCLE_64;
+        }
+        if ("s390".equals(value)) {
+            return Architecture.S390_32;
+        }
+        if ("s390x".equals(value)) {
+            return Architecture.S390_64;
+        }
+
+        return Architecture.UNKNOWN;
+    }
+
+    private static String normalize(String value) {
+        return value.toLowerCase(Locale.US).replaceAll("[^a-z0-9]+", "");
     }
 }

@@ -60,7 +60,8 @@ core_cppflags := -Wall -Wextra -Werror -Wunused -fvisibility=hidden
 #
 
 include $(CLEAR_VARS)
-LOCAL_SRC_FILES := constants/src/gen/cpp/generate_constants.cpp
+LOCAL_CPP_EXTENSION := .cc
+LOCAL_SRC_FILES := constants/src/gen/cpp/generate_constants.cc
 LOCAL_MODULE := conscrypt_generate_constants
 LOCAL_SHARED_LIBRARIES := libcrypto libssl
 include $(BUILD_HOST_EXECUTABLE)
@@ -130,7 +131,7 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := $(bundled_test_java_files)
 LOCAL_JAVA_RESOURCE_DIRS := openjdk/src/test/resources
 LOCAL_NO_STANDARD_LIBRARIES := true
-LOCAL_JAVA_LIBRARIES := core-oj core-libart junit bouncycastle mockito-target-minus-junit4
+LOCAL_JAVA_LIBRARIES := core-oj core-libart junit bouncycastle-nojarjar mockito-target-minus-junit4
 LOCAL_STATIC_JAVA_LIBRARIES := core-tests-support conscrypt-nojarjar
 LOCAL_JAVACFLAGS := $(local_javac_flags)
 LOCAL_MODULE_TAGS := optional
@@ -139,10 +140,31 @@ LOCAL_REQUIRED_MODULES := libjavacrypto
 LOCAL_JARJAR_RULES := $(LOCAL_PATH)/jarjar-rules.txt
 LOCAL_JAVA_LANGUAGE_VERSION := 1.7
 include $(BUILD_STATIC_JAVA_LIBRARY)
+
+bundled_benchmark_java_files := $(call all-java-files-under,testing/src/main/java)
+bundled_benchmark_java_files := $(foreach j,$(bundled_benchmark_java_files),\
+	$(if $(findstring testing/src/main/java/libcore/,$(j)),,$(j)))
+bundled_benchmark_java_files += $(call all-java-files-under,benchmark-base/src/main/java)
+bundled_benchmark_java_files += $(call all-java-files-under,benchmark-android/src/main/java)
+
+# Make the conscrypt-benchmarks library.
+include $(CLEAR_VARS)
+LOCAL_SRC_FILES := $(bundled_benchmark_java_files)
+LOCAL_NO_STANDARD_LIBRARIES := true
+LOCAL_JAVA_LIBRARIES := core-oj core-libart junit bouncycastle-nojarjar caliper-api-target
+LOCAL_STATIC_JAVA_LIBRARIES := core-tests-support conscrypt-nojarjar
+LOCAL_JAVACFLAGS := $(local_javac_flags)
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE := conscrypt-benchmarks
+LOCAL_REQUIRED_MODULES := libjavacrypto
+LOCAL_JARJAR_RULES := $(LOCAL_PATH)/jarjar-rules.txt
+LOCAL_JAVA_LANGUAGE_VERSION := 1.7
+include $(BUILD_STATIC_JAVA_LIBRARY)
 endif
 
 # Platform conscrypt crypto JNI library
 include $(CLEAR_VARS)
+LOCAL_CPP_EXTENSION := .cc
 LOCAL_CFLAGS += $(core_cflags)
 LOCAL_CFLAGS += -DJNI_JARJAR_PREFIX="com/android/"
 LOCAL_CPPFLAGS += $(core_cppflags)
@@ -184,6 +206,7 @@ include $(BUILD_STATIC_JAVA_LIBRARY)
 
 # Static unbundled Conscrypt crypto JNI library
 include $(CLEAR_VARS)
+LOCAL_CPP_EXTENSION := .cc
 LOCAL_CFLAGS += $(core_cflags)
 LOCAL_CPPFLAGS += $(core_cppflags) \
         -DJNI_JARJAR_PREFIX="com/google/android/gms/" \
@@ -237,7 +260,7 @@ ifeq ($(LIBCORE_SKIP_TESTS),)
     include $(CLEAR_VARS)
     LOCAL_SRC_FILES := $(bundled_test_java_files)
     LOCAL_JAVA_RESOURCE_DIRS := openjdk/src/test/resources
-    LOCAL_JAVA_LIBRARIES := bouncycastle-hostdex junit-hostdex core-tests-support-hostdex mockito-api-hostdex
+    LOCAL_JAVA_LIBRARIES := bouncycastle-hostdex-nojarjar junit-hostdex core-tests-support-hostdex mockito-api-hostdex
     LOCAL_STATIC_JAVA_LIBRARIES := conscrypt-hostdex-nojarjar
     LOCAL_JAVACFLAGS := $(local_javac_flags)
     LOCAL_MODULE_TAGS := optional
@@ -250,6 +273,7 @@ endif
 
 # Conscrypt native library for host
 include $(CLEAR_VARS)
+LOCAL_CPP_EXTENSION := .cc
 LOCAL_SRC_FILES := $(call all-cpp-files-under,common/src/jni/main/cpp)
 LOCAL_C_INCLUDES += \
         external/openssl/include \
