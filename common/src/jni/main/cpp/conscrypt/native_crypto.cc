@@ -6076,7 +6076,15 @@ static int new_session_callback(SSL* ssl, SSL_SESSION* session) {
     return 0;
 }
 
-static SSL_SESSION* server_session_requested_callback(SSL* ssl, uint8_t* id, int id_len,
+// TODO(davidben): Remove the version check once BoringSSL has switched to
+// advertising OpenSSL 1.1.0.
+static SSL_SESSION* server_session_requested_callback(SSL* ssl,
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+                                                      uint8_t* id,
+#else
+                                                      const uint8_t* id,
+#endif
+                                                      int id_len,
                                                       int* out_copy) {
     JNI_TRACE("ssl=%p server_session_requested_callback", ssl);
 
@@ -7924,7 +7932,6 @@ static void NativeCrypto_SSL_shutdown(JNIEnv* env, jclass, jlong ssl_address, jo
     }
 
     ERR_clear_error();
-    safeSslClear(ssl);
 }
 
 static jint NativeCrypto_SSL_get_shutdown(JNIEnv* env, jclass, jlong ssl_address) {
@@ -7965,13 +7972,15 @@ static jbyteArray NativeCrypto_SSL_SESSION_session_id(JNIEnv* env, jclass,
     if (ssl_session == nullptr) {
         return nullptr;
     }
-    jbyteArray result = env->NewByteArray(static_cast<jsize>(ssl_session->session_id_length));
+    unsigned length;
+    const uint8_t* id = SSL_SESSION_get_id(ssl_session, &length);
+    jbyteArray result = env->NewByteArray(static_cast<jsize>(length));
     if (result != nullptr) {
-        jbyte* src = reinterpret_cast<jbyte*>(ssl_session->session_id);
-        env->SetByteArrayRegion(result, 0, static_cast<jsize>(ssl_session->session_id_length), src);
+        const jbyte* src = reinterpret_cast<const jbyte*>(id);
+        env->SetByteArrayRegion(result, 0, static_cast<jsize>(length), src);
     }
-    JNI_TRACE("ssl_session=%p NativeCrypto_SSL_SESSION_session_id => %p session_id_length=%d",
-              ssl_session, result, ssl_session->session_id_length);
+    JNI_TRACE("ssl_session=%p NativeCrypto_SSL_SESSION_session_id => %p length=%d", ssl_session,
+              result, length);
     return result;
 }
 
@@ -8779,7 +8788,6 @@ static void NativeCrypto_ENGINE_SSL_shutdown(JNIEnv* env, jclass, jlong ssl_addr
     }
 
     ERR_clear_error();
-    safeSslClear(ssl);
 }
 
 static jint NativeCrypto_ENGINE_SSL_read_direct(JNIEnv* env, jclass, jlong sslRef, jlong address,
@@ -8831,10 +8839,8 @@ static jint NativeCrypto_ENGINE_SSL_read_direct(JNIEnv* env, jclass, jlong sslRe
             break;
         }
         case SSL_ERROR_ZERO_RETURN: {
-            // TODO(nmittler): Can this happen with memory BIOs?
-            // Read zero bytes. End of stream reached.
-            conscrypt::jniutil::jniThrowException(env, "java/io/EOFException", "Read error");
-            break;
+            // A close_notify was received, this stream is finished.
+            return -SSL_ERROR_ZERO_RETURN;
         }
         case SSL_ERROR_WANT_READ:
         case SSL_ERROR_WANT_WRITE: {

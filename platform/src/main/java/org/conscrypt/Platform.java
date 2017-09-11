@@ -71,6 +71,14 @@ final class Platform {
 
     private Platform() {}
 
+    /**
+     * Default name used in the {@link java.security.Security JCE system} by {@code OpenSSLProvider}
+     * if the default constructor is used.
+     */
+    static String getDefaultProviderName() {
+        return "AndroidOpenSSL";
+    }
+
     static FileDescriptor getFileDescriptor(Socket s) {
         return s.getFileDescriptor$();
     }
@@ -358,8 +366,10 @@ final class Platform {
             return originalHostName;
         } catch (InvocationTargetException e) {
             throw new RuntimeException("Failed to get originalHostName", e);
-        } catch (ReflectiveOperationException ignore) {
+        } catch (ClassNotFoundException ignore) {
             // passthrough and return addr.getHostAddress()
+        } catch (IllegalAccessException ignore) {
+        } catch (NoSuchMethodException ignore) {
         }
         return addr.getHostAddress();
     }
