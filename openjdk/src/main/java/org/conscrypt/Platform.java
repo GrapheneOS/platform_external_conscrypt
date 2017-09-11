@@ -72,7 +72,7 @@ import sun.security.x509.AlgorithmId;
  * Uses reflection to implement Java 8 SSL features for backwards compatibility.
  */
 final class Platform {
-    private static final Logger logger = Logger.getLogger(NativeLibraryLoader.class.getName());
+    private static final Logger logger = Logger.getLogger(Platform.class.getName());
 
     private static final int JAVA_VERSION = javaVersion0();
     private static final String TEMP_DIR_PROPERTY_NAME = "org.conscrypt.tmpdir";
@@ -250,6 +250,14 @@ final class Platform {
         } catch (Exception ignored) {
             return f;
         }
+    }
+
+    /**
+     * Default name used in the {@link java.security.Security JCE system} by {@code OpenSSLProvider}
+     * if the default constructor is used.
+     */
+    static String getDefaultProviderName() {
+        return "Conscrypt";
     }
 
     static boolean canExecuteExecutable(File file) throws IOException {
@@ -535,9 +543,12 @@ final class Platform {
             return originalHostName;
         } catch (InvocationTargetException e) {
             throw new RuntimeException("Failed to get originalHostName", e);
-        } catch (ReflectiveOperationException ignore) {
+        } catch (ClassNotFoundException ignore) {
             // passthrough and return addr.getHostAddress()
+        } catch (IllegalAccessException ignore) {
+        } catch (NoSuchMethodException ignore) {
         }
+
         return addr.getHostAddress();
     }
 
