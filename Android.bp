@@ -48,8 +48,6 @@ cc_defaults {
         "common/src/jni/unbundled/include",
     ],
 
-    host_ldlibs: ["-ldl"],
-
     shared_libs: [
         "liblog",
     ],
@@ -78,8 +76,6 @@ cc_library_host_shared {
     local_include_dirs: [
         "common/src/jni/unbundled/include",
     ],
-
-    host_ldlibs: ["-lpthread"],
 
     static_libs: [
         "libssl",
