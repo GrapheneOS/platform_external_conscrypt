@@ -18,7 +18,6 @@ package org.conscrypt;
 import static io.netty.handler.ssl.SslProvider.OPENSSL;
 import static io.netty.handler.ssl.SslProvider.OPENSSL_REFCNT;
 import static org.conscrypt.TestUtils.initClientSslContext;
-import static org.conscrypt.TestUtils.initEngine;
 import static org.conscrypt.TestUtils.initServerSslContext;
 
 import io.netty.buffer.PooledByteBufAllocator;
@@ -37,6 +36,15 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
 import libcore.java.security.TestKeyStore;
+
+final class OpenJdkEngineFactoryConfig {
+    private OpenJdkEngineFactoryConfig() {}
+
+    static final ApplicationProtocolConfig NETTY_ALPN_CONFIG =
+            new ApplicationProtocolConfig(Protocol.ALPN, SelectorFailureBehavior.NO_ADVERTISE,
+                    SelectedListenerFailureBehavior.ACCEPT, ApplicationProtocolNames.HTTP_2);
+    static final String PROTOCOL = "TLSv1.2";
+}
 
 /**
  * Enumeration of various types of engines for use with engine-based benchmarks.
@@ -65,7 +73,7 @@ public enum OpenJdkEngineFactory implements EngineFactory {
 
         private SSLContext newContext() {
             try {
-                return SSLContext.getInstance(PROTOCOL);
+                return SSLContext.getInstance(OpenJdkEngineFactoryConfig.PROTOCOL);
             } catch (NoSuchAlgorithmException e) {
                 throw new RuntimeException(e);
             }
@@ -79,8 +87,7 @@ public enum OpenJdkEngineFactory implements EngineFactory {
         public SSLEngine newClientEngine(String cipher, boolean useAlpn) {
             SSLEngine engine = initEngine(clientContext.createSSLEngine(), cipher, true);
             if (useAlpn) {
-                Conscrypt.Engines.setAlpnProtocols(
-                        engine, new String[] {ApplicationProtocolNames.HTTP_2});
+                Conscrypt.setApplicationProtocols(engine, new String[] {ApplicationProtocolNames.HTTP_2});
             }
             return engine;
         }
@@ -89,15 +96,15 @@ public enum OpenJdkEngineFactory implements EngineFactory {
         public SSLEngine newServerEngine(String cipher, boolean useAlpn) {
             SSLEngine engine = initEngine(serverContext.createSSLEngine(), cipher, false);
             if (useAlpn) {
-                Conscrypt.Engines.setAlpnProtocols(
-                        engine, new String[] {ApplicationProtocolNames.HTTP_2});
+                Conscrypt.setApplicationProtocols(engine, new String[] {ApplicationProtocolNames.HTTP_2});
             }
             return engine;
         }
 
         private SSLContext newContext() {
             try {
-                return SSLContext.getInstance(PROTOCOL, new OpenSSLProvider());
+                return SSLContext.getInstance(
+                        OpenJdkEngineFactoryConfig.PROTOCOL, new OpenSSLProvider());
             } catch (NoSuchAlgorithmException e) {
                 throw new RuntimeException(e);
             }
@@ -110,10 +117,9 @@ public enum OpenJdkEngineFactory implements EngineFactory {
         @Override
         public SSLEngine newClientEngine(String cipher, boolean useAlpn) {
             SSLEngine engine = initEngine(clientContext.createSSLEngine(), cipher, true);
-            Conscrypt.Engines.setBufferAllocator(engine, NettyBufferAllocator.getInstance());
+            Conscrypt.setBufferAllocator(engine, NettyBufferAllocator.getInstance());
             if (useAlpn) {
-                Conscrypt.Engines.setAlpnProtocols(
-                        engine, new String[] {ApplicationProtocolNames.HTTP_2});
+                Conscrypt.setApplicationProtocols(engine, new String[] {ApplicationProtocolNames.HTTP_2});
             }
             return engine;
         }
@@ -121,17 +127,17 @@ public enum OpenJdkEngineFactory implements EngineFactory {
         @Override
         public SSLEngine newServerEngine(String cipher, boolean useAlpn) {
             SSLEngine engine = initEngine(serverContext.createSSLEngine(), cipher, false);
-            Conscrypt.Engines.setBufferAllocator(engine, NettyBufferAllocator.getInstance());
+            Conscrypt.setBufferAllocator(engine, NettyBufferAllocator.getInstance());
             if (useAlpn) {
-                Conscrypt.Engines.setAlpnProtocols(
-                        engine, new String[] {ApplicationProtocolNames.HTTP_2});
+                Conscrypt.setApplicationProtocols(engine, new String[] {ApplicationProtocolNames.HTTP_2});
             }
             return engine;
         }
 
         private SSLContext newContext() {
             try {
-                return SSLContext.getInstance(PROTOCOL, new OpenSSLProvider());
+                return SSLContext.getInstance(
+                        OpenJdkEngineFactoryConfig.PROTOCOL, new OpenSSLProvider());
             } catch (NoSuchAlgorithmException e) {
                 throw new RuntimeException(e);
             }
@@ -225,7 +231,7 @@ public enum OpenJdkEngineFactory implements EngineFactory {
                             .trustManager((X509Certificate[]) server.getPrivateKey("RSA", "RSA")
                                                   .getCertificateChain());
             if (useAlpn) {
-                ctx.applicationProtocolConfig(NETTY_ALPN_CONFIG);
+                ctx.applicationProtocolConfig(OpenJdkEngineFactoryConfig.NETTY_ALPN_CONFIG);
             }
             return ctx.build();
         } catch (SSLException e) {
@@ -243,7 +249,7 @@ public enum OpenJdkEngineFactory implements EngineFactory {
                                     (X509Certificate[]) server.getCertificateChain())
                             .sslProvider(sslProvider);
             if (useAlpn) {
-                ctx.applicationProtocolConfig(NETTY_ALPN_CONFIG);
+                ctx.applicationProtocolConfig(OpenJdkEngineFactoryConfig.NETTY_ALPN_CONFIG);
             }
             return ctx.build();
         } catch (SSLException e) {
@@ -251,8 +257,10 @@ public enum OpenJdkEngineFactory implements EngineFactory {
         }
     }
 
-    private static final ApplicationProtocolConfig NETTY_ALPN_CONFIG =
-            new ApplicationProtocolConfig(Protocol.ALPN, SelectorFailureBehavior.NO_ADVERTISE,
-                    SelectedListenerFailureBehavior.ACCEPT, ApplicationProtocolNames.HTTP_2);
-    private static final String PROTOCOL = TestUtils.getProtocols()[0];
+    static SSLEngine initEngine(SSLEngine engine, String cipher, boolean client) {
+        engine.setEnabledProtocols(new String[]{OpenJdkEngineFactoryConfig.PROTOCOL});
+        engine.setEnabledCipherSuites(new String[] {cipher});
+        engine.setUseClientMode(client);
+        return engine;
+    }
 }
