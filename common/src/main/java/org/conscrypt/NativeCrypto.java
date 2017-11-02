@@ -304,6 +304,8 @@ public final class NativeCrypto {
 
     static native long EVP_aead_aes_256_gcm();
 
+    static native long EVP_aead_chacha20_poly1305();
+
     static native int EVP_AEAD_max_overhead(long evpAead);
 
     static native int EVP_AEAD_nonce_length(long evpAead);
@@ -1043,11 +1045,6 @@ public final class NativeCrypto {
             throws SSLException;
     static native String SSL_get_servername(long sslNativePointer);
 
-    /**
-     * Returns the selected ALPN protocol. If the server did not select a
-     * protocol, {@code null} will be returned.
-     */
-    static native byte[] SSL_get0_alpn_selected(long sslPointer);
     static native void SSL_do_handshake(
             long sslNativePointer, FileDescriptor fd, SSLHandshakeCallbacks shc, int timeoutMillis)
             throws SSLException, SocketTimeoutException, CertificateException;
@@ -1230,10 +1227,25 @@ public final class NativeCrypto {
     static native int SSL_max_seal_overhead(long ssl);
 
     /**
-     * Sets the list of supported ALPN protocols in wire-format (length-prefixed 8-bit strings).
+     * Enables ALPN for this TLS endpoint and sets the list of supported ALPN protocols in
+     * wire-format (length-prefixed 8-bit strings).
      */
-    static native void SSL_configure_alpn(
-            long sslNativePointer, boolean clientMode, byte[] alpnProtocols) throws IOException;
+    static native void setApplicationProtocols(
+            long sslNativePointer, boolean client, byte[] protocols) throws IOException;
+
+    /**
+     * Called for a server endpoint only. Enables ALPN and sets a BiFunction that will
+     * be called to delegate protocol selection to the application. Calling this method overrides
+     * {@link #setApplicationProtocols(long, boolean, byte[])}.
+     */
+    static native void setApplicationProtocolSelector(
+            long sslNativePointer, ApplicationProtocolSelectorAdapter selector) throws IOException;
+
+    /**
+     * Returns the selected ALPN protocol. If the server did not select a
+     * protocol, {@code null} will be returned.
+     */
+    static native byte[] getApplicationProtocol(long sslNativePointer);
 
     /**
      * Variant of the {@link #SSL_do_handshake} used by {@link ConscryptEngine}. This differs
