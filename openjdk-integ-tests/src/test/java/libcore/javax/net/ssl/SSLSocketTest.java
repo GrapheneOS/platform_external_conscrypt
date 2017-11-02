@@ -2457,6 +2457,42 @@ public class SSLSocketTest extends AbstractSSLTest {
         }
     }
 
+    // Under some circumstances, the file descriptor socket may get finalized but still
+    // be reused by the JDK's built-in HTTP connection reuse code.  Ensure that a
+    // SocketException is thrown if that happens.
+    @Test
+    public void test_SSLSocket_finalizeThrowsProperException() throws Exception {
+        TestSSLSocketPair test = TestSSLSocketPair.create().connect();
+        try {
+            if (isConscryptFdSocket(test.client)) {
+                // The finalize method might be declared on a superclass rather than this
+                // class.
+                Method method = null;
+                Class<?> clazz = test.client.getClass();
+                while (clazz != null) {
+                    try {
+                        method = clazz.getDeclaredMethod("finalize");
+                        break;
+                    } catch (NoSuchMethodException e) {
+                        // Try the superclass
+                    }
+                    clazz = clazz.getSuperclass();
+                }
+                assertNotNull(method);
+                method.setAccessible(true);
+                method.invoke(test.client);
+                try {
+                    test.client.getOutputStream().write(new byte[] { 0x01 });
+                    fail("The socket shouldn't work after being finalized");
+                } catch (SocketException expected) {
+                    // Expected
+                }
+            }
+        } finally {
+            test.close();
+        }
+    }
+
     private static void setWriteTimeout(Object socket, int timeout) {
         Exception ex = null;
         try {
@@ -2495,16 +2531,24 @@ public class SSLSocketTest extends AbstractSSLTest {
         }
     }
 
-    private static boolean isConscryptSocket(Socket socket) {
+    private static boolean isConscryptSocket(SSLSocket socket) {
         return isConscryptFdSocket(socket) || isConscryptEngineSocket(socket);
     }
 
-    private static boolean isConscryptFdSocket(Socket socket) {
-        return "ConscryptFileDescriptorSocket".equals(socket.getClass().getSimpleName());
+    private static boolean isConscryptFdSocket(SSLSocket socket) {
+        Class<?> clazz = socket.getClass();
+        while (clazz != Object.class && !"ConscryptFileDescriptorSocket".equals(clazz.getSimpleName())) {
+            clazz = clazz.getSuperclass();
+        }
+        return "ConscryptFileDescriptorSocket".equals(clazz.getSimpleName());
     }
 
-    private static boolean isConscryptEngineSocket(Socket socket) {
-        return "ConscryptEngineSocket".equals(socket.getClass().getSimpleName());
+    private static boolean isConscryptEngineSocket(SSLSocket socket) {
+        Class<?> clazz = socket.getClass();
+        while (clazz != Object.class && !"ConscryptEngineSocket".equals(clazz.getSimpleName())) {
+            clazz = clazz.getSuperclass();
+        }
+        return "ConscryptEngineSocket".equals(clazz.getSimpleName());
     }
 
     private static String osName() {
