@@ -15,8 +15,6 @@
  */
 package org.conscrypt;
 
-import static org.conscrypt.TestUtils.initEngine;
-
 import java.security.NoSuchAlgorithmException;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -34,7 +32,7 @@ public enum AndroidEngineFactory implements EngineFactory {
         public SSLEngine newClientEngine(String cipher, boolean useAlpn) {
             SSLEngine engine = initEngine(clientContext.createSSLEngine(), cipher, true);
             if (useAlpn) {
-                Conscrypt.setAlpnProtocols(engine, new String[] {"h2"});
+                Conscrypt.setApplicationProtocols(engine, new String[] {"h2"});
             }
             return engine;
         }
@@ -43,7 +41,7 @@ public enum AndroidEngineFactory implements EngineFactory {
         public SSLEngine newServerEngine(String cipher, boolean useAlpn) {
             SSLEngine engine = initEngine(serverContext.createSSLEngine(), cipher, false);
             if (useAlpn) {
-                Conscrypt.setAlpnProtocols(engine, new String[] {"h2"});
+                Conscrypt.setApplicationProtocols(engine, new String[] {"h2"});
             }
             return engine;
         }
@@ -71,5 +69,12 @@ public enum AndroidEngineFactory implements EngineFactory {
 
     private static SSLContext newConscryptServerContext() {
         return TestUtils.newServerSslContext(TestUtils.getConscryptProvider());
+    }
+
+    static SSLEngine initEngine(SSLEngine engine, String cipher, boolean client) {
+        engine.setEnabledProtocols(new String[]{"TLSv1.2"});
+        engine.setEnabledCipherSuites(new String[] {cipher});
+        engine.setUseClientMode(client);
+        return engine;
     }
 }

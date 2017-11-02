@@ -28,7 +28,7 @@ import static org.conscrypt.NativeConstants.SSL_VERIFY_PEER;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.SocketTimeoutException;
+import java.net.SocketException;
 import java.security.InvalidKeyException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -301,8 +301,11 @@ final class SslWrapper {
         NativeCrypto.setEnabledProtocols(ssl, parameters.enabledProtocols);
         NativeCrypto.setEnabledCipherSuites(ssl, parameters.enabledCipherSuites);
 
-        if (parameters.alpnProtocols != null) {
-            NativeCrypto.SSL_configure_alpn(ssl, isClient(), parameters.alpnProtocols);
+        if (parameters.applicationProtocols.length > 0) {
+            NativeCrypto.setApplicationProtocols(ssl, isClient(), parameters.applicationProtocols);
+        }
+        if (!isClient() && parameters.applicationProtocolSelector != null) {
+            NativeCrypto.setApplicationProtocolSelector(ssl, parameters.applicationProtocolSelector);
         }
 
         // setup server certificates and private keys.
@@ -360,7 +363,10 @@ final class SslWrapper {
 
     // TODO(nathanmittler): Remove once after we switch to the engine socket.
     void doHandshake(FileDescriptor fd, int timeoutMillis)
-            throws CertificateException, SocketTimeoutException, SSLException {
+            throws CertificateException, IOException {
+        if (isClosed() || fd == null || !fd.valid()) {
+            throw new SocketException("Socket is closed");
+        }
         NativeCrypto.SSL_do_handshake(ssl, fd, handshakeCallbacks, timeoutMillis);
     }
 
@@ -371,12 +377,18 @@ final class SslWrapper {
     // TODO(nathanmittler): Remove once after we switch to the engine socket.
     int read(FileDescriptor fd, byte[] buf, int offset, int len, int timeoutMillis)
             throws IOException {
+        if (isClosed() || fd == null || !fd.valid()) {
+            throw new SocketException("Socket is closed");
+        }
         return NativeCrypto.SSL_read(ssl, fd, handshakeCallbacks, buf, offset, len, timeoutMillis);
     }
 
     // TODO(nathanmittler): Remove once after we switch to the engine socket.
     void write(FileDescriptor fd, byte[] buf, int offset, int len, int timeoutMillis)
             throws IOException {
+        if (isClosed() || fd == null || !fd.valid()) {
+            throw new SocketException("Socket is closed");
+        }
         NativeCrypto.SSL_write(ssl, fd, handshakeCallbacks, buf, offset, len, timeoutMillis);
     }
 
@@ -509,8 +521,8 @@ final class SslWrapper {
         return NativeCrypto.SSL_get_error(ssl, result);
     }
 
-    byte[] getAlpnSelectedProtocol() {
-        return NativeCrypto.SSL_get0_alpn_selected(ssl);
+    byte[] getApplicationProtocol() {
+        return NativeCrypto.getApplicationProtocol(ssl);
     }
 
     private boolean isClient() {
