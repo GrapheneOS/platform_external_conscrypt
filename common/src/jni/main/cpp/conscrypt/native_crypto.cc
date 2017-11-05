@@ -3266,6 +3266,12 @@ static jlong NativeCrypto_EVP_aead_aes_256_gcm(JNIEnv*, jclass) {
     return reinterpret_cast<jlong>(ctx);
 }
 
+static jlong NativeCrypto_EVP_aead_chacha20_poly1305(JNIEnv*, jclass) {
+    const EVP_AEAD* ctx = EVP_aead_chacha20_poly1305();
+    JNI_TRACE("EVP_aead_chacha20_poly1305 => ctx=%p", ctx);
+    return reinterpret_cast<jlong>(ctx);
+}
+
 static jint NativeCrypto_EVP_AEAD_max_overhead(JNIEnv* env, jclass, jlong evpAeadRef) {
     const EVP_AEAD* evpAead = reinterpret_cast<const EVP_AEAD*>(evpAeadRef);
     JNI_TRACE("EVP_AEAD_max_overhead(%p)", evpAead);
@@ -6066,15 +6072,7 @@ static int new_session_callback(SSL* ssl, SSL_SESSION* session) {
     return 0;
 }
 
-// TODO(davidben): Remove the version check once BoringSSL has switched to
-// advertising OpenSSL 1.1.0.
-static SSL_SESSION* server_session_requested_callback(SSL* ssl,
-#if OPENSSL_VERSION_NUMBER < 0x10100000L
-                                                      uint8_t* id,
-#else
-                                                      const uint8_t* id,
-#endif
-                                                      int id_len,
+static SSL_SESSION* server_session_requested_callback(SSL* ssl, const uint8_t* id, int id_len,
                                                       int* out_copy) {
     JNI_TRACE("ssl=%p server_session_requested_callback", ssl);
 
@@ -7029,68 +7027,188 @@ static jstring NativeCrypto_SSL_get_servername(JNIEnv* env, jclass, jlong ssl_ad
  * Selects the ALPN protocol to use. The list of protocols in "primary" is considered the order
  * which should take precedence.
  */
-static int proto_select(SSL* ssl, unsigned char** out, unsigned char* outLength,
-                        const unsigned char* primary, const unsigned int primaryLength,
-                        const unsigned char* secondary, const unsigned int secondaryLength) {
-    if (primary != nullptr && secondary != nullptr) {
-        JNI_TRACE("primary=%p, length=%d", primary, primaryLength);
+static int selectApplicationProtocol(SSL* ssl, unsigned char** out, unsigned char* outLength,
+                                     const unsigned char* primary,
+                                     const unsigned int primaryLength,
+                                     const unsigned char* secondary,
+                                     const unsigned int secondaryLength) {
+    JNI_TRACE("primary=%p, length=%d", primary, primaryLength);
 
-        int status = SSL_select_next_proto(out, outLength, primary, primaryLength, secondary,
-                                           secondaryLength);
-        switch (status) {
-            case OPENSSL_NPN_NEGOTIATED:
-                JNI_TRACE("ssl=%p proto_select ALPN negotiated", ssl);
-                return SSL_TLSEXT_ERR_OK;
-                break;
-            case OPENSSL_NPN_UNSUPPORTED:
-                JNI_TRACE("ssl=%p proto_select ALPN unsupported", ssl);
-                break;
-            case OPENSSL_NPN_NO_OVERLAP:
-                JNI_TRACE("ssl=%p proto_select ALPN no overlap", ssl);
-                break;
-        }
-    } else {
-        if (out != nullptr && outLength != nullptr) {
-            *out = nullptr;
-            *outLength = 0;
-        }
-        JNI_TRACE("protocols=null");
+    int status = SSL_select_next_proto(out, outLength, primary, primaryLength, secondary,
+                                       secondaryLength);
+    switch (status) {
+        case OPENSSL_NPN_NEGOTIATED:
+            JNI_TRACE("ssl=%p selectApplicationProtocol ALPN negotiated", ssl);
+            return SSL_TLSEXT_ERR_OK;
+            break;
+        case OPENSSL_NPN_UNSUPPORTED:
+            JNI_TRACE("ssl=%p selectApplicationProtocol ALPN unsupported", ssl);
+            break;
+        case OPENSSL_NPN_NO_OVERLAP:
+            JNI_TRACE("ssl=%p selectApplicationProtocol ALPN no overlap", ssl);
+            break;
     }
     return SSL_TLSEXT_ERR_NOACK;
 }
 
 /**
- * Callback for the server to select an ALPN protocol.
+ * Calls out to an application-provided selector to choose the ALPN protocol.
  */
-static int alpn_select_callback(SSL* ssl, const unsigned char** out, unsigned char* outlen,
-                                const unsigned char* in, unsigned int inlen, void*) {
-    JNI_TRACE("ssl=%p alpn_select_callback", ssl);
+static int selectApplicationProtocol(SSL* ssl, JNIEnv* env, jobject selector,
+                                     unsigned char** out,
+                                     unsigned char* outLen, const unsigned char* in,
+                                     const unsigned int inLen) {
+    // Copy the input array.
+    ScopedLocalRef<jbyteArray> protocols(env, env->NewByteArray(static_cast<jsize>(inLen)));
+    if (protocols.get() == nullptr) {
+        JNI_TRACE("ssl=%p selectApplicationProtocol failed allocating array", ssl);
+        return SSL_TLSEXT_ERR_NOACK;
+    }
+    env->SetByteArrayRegion(protocols.get(), 0, (static_cast<jsize>(inLen)),
+        reinterpret_cast<const jbyte*>(in));
 
-    AppData* appData = toAppData(ssl);
-    JNI_TRACE("AppData=%p", appData);
+    // Invoke the selection method.
+    jclass cls = env->GetObjectClass(selector);
+    jmethodID methodID = env->GetMethodID(cls, "selectApplicationProtocol", "([B)I");
+    jint offset = env->CallIntMethod(selector, methodID, protocols.get());
 
-    return proto_select(ssl, const_cast<unsigned char**>(out), outlen,
-                        reinterpret_cast<unsigned char*>(appData->alpnProtocolsData),
-                        static_cast<unsigned int>(appData->alpnProtocolsLength), in, inlen);
+    if (offset < 0) {
+        JNI_TRACE("ssl=%p selectApplicationProtocol selection failed", ssl);
+        return SSL_TLSEXT_ERR_NOACK;
+    }
+
+    // Point the output to the selected protocol.
+    *outLen = *(in + offset);
+    *out = const_cast<unsigned char*>(in + offset + 1);
+
+    return SSL_TLSEXT_ERR_OK;
 }
 
-static jbyteArray NativeCrypto_SSL_get0_alpn_selected(JNIEnv* env, jclass, jlong ssl_address) {
+/**
+ * Callback for the server to select an ALPN protocol.
+ */
+static int alpn_select_callback(SSL* ssl, const unsigned char** out, unsigned char* outLen,
+                                const unsigned char* in, unsigned int inLen, void*) {
+    JNI_TRACE("ssl=%p alpn_select_callback in=%p inLen=%d", ssl, in, inLen);
+
+    AppData* appData = toAppData(ssl);
+    if (appData == nullptr) {
+        JNI_TRACE("ssl=%p alpn_select_callback appData => 0", ssl);
+        return SSL_TLSEXT_ERR_NOACK;
+    }
+    JNIEnv* env = appData->env;
+    if (env == nullptr) {
+        ALOGE("AppData->env missing in alpn_select_callback");
+        JNI_TRACE("ssl=%p alpn_select_callback => 0", ssl);
+        return SSL_TLSEXT_ERR_NOACK;
+    }
+
+    if (in == nullptr ||
+        (appData->applicationProtocolsData == nullptr
+         && appData->applicationProtocolSelector == nullptr)) {
+        if (out != nullptr && outLen != nullptr) {
+            *out = nullptr;
+            *outLen = 0;
+        }
+        JNI_TRACE("ssl=%p alpn_select_callback protocols => 0", ssl);
+        return SSL_TLSEXT_ERR_NOACK;
+    }
+
+    if (appData->applicationProtocolSelector != nullptr) {
+        return selectApplicationProtocol(ssl, env, appData->applicationProtocolSelector,
+                                  const_cast<unsigned char**>(out), outLen, in, inLen);
+    }
+
+    return selectApplicationProtocol(ssl, const_cast<unsigned char**>(out), outLen,
+                              reinterpret_cast<unsigned char*>(appData->applicationProtocolsData),
+                              static_cast<unsigned int>(appData->applicationProtocolsLength),
+                              in, inLen);
+}
+
+static jbyteArray NativeCrypto_getApplicationProtocol(JNIEnv* env, jclass,
+                                                              jlong ssl_address) {
     SSL* ssl = to_SSL(env, ssl_address, true);
-    JNI_TRACE("ssl=%p SSL_get0_alpn_selected", ssl);
+    JNI_TRACE("ssl=%p NativeCrypto_getApplicationProtocol", ssl);
     if (ssl == nullptr) {
         return nullptr;
     }
-    const jbyte* alpn;
-    unsigned int alpnLength;
-    SSL_get0_alpn_selected(ssl, reinterpret_cast<const unsigned char**>(&alpn), &alpnLength);
-    if (alpnLength == 0) {
+    const jbyte* protocol;
+    unsigned int protocolLength;
+    SSL_get0_alpn_selected(ssl, reinterpret_cast<const unsigned char**>(&protocol),
+                           &protocolLength);
+    if (protocolLength == 0) {
         return nullptr;
     }
-    jbyteArray result = env->NewByteArray(static_cast<jsize>(alpnLength));
+    jbyteArray result = env->NewByteArray(static_cast<jsize>(protocolLength));
     if (result != nullptr) {
-        env->SetByteArrayRegion(result, 0, (static_cast<jsize>(alpnLength)), alpn);
+        env->SetByteArrayRegion(result, 0, (static_cast<jsize>(protocolLength)), protocol);
     }
     return result;
+}
+
+static void NativeCrypto_setApplicationProtocols(JNIEnv* env, jclass, jlong ssl_address,
+                                                 jboolean client_mode, jbyteArray protocols) {
+    SSL* ssl = to_SSL(env, ssl_address, true);
+    if (ssl == nullptr) {
+        return;
+    }
+    AppData* appData = toAppData(ssl);
+    if (appData == nullptr) {
+        conscrypt::jniutil::throwSSLExceptionStr(env, "Unable to retrieve application data");
+        JNI_TRACE("ssl=%p NativeCrypto_setApplicationProtocols appData => 0", ssl);
+        return;
+    }
+
+    if (protocols != nullptr) {
+        if (client_mode) {
+            ScopedByteArrayRO protosBytes(env, protocols);
+            if (protosBytes.get() == nullptr) {
+                JNI_TRACE(
+                        "ssl=%p NativeCrypto_setApplicationProtocols protocols=%p => "
+                        "protosBytes == null",
+                        ssl, protocols);
+                return;
+            }
+
+            const unsigned char* tmp = reinterpret_cast<const unsigned char*>(protosBytes.get());
+            int ret = SSL_set_alpn_protos(ssl, tmp, static_cast<unsigned int>(protosBytes.size()));
+            if (ret != 0) {
+                conscrypt::jniutil::throwSSLExceptionStr(env,
+                                                         "Unable to set ALPN protocols for client");
+                JNI_TRACE("ssl=%p NativeCrypto_setApplicationProtocols => exception", ssl);
+                return;
+            }
+        } else {
+            // Server mode - configure the ALPN protocol selection callback.
+            if (!appData->setApplicationProtocols(env, protocols)) {
+                conscrypt::jniutil::throwSSLExceptionStr(env,
+                                                         "Unable to set ALPN protocols for server");
+                JNI_TRACE("ssl=%p NativeCrypto_setApplicationProtocols => exception", ssl);
+                return;
+            }
+            SSL_CTX_set_alpn_select_cb(SSL_get_SSL_CTX(ssl), alpn_select_callback, nullptr);
+        }
+    }
+}
+
+static void NativeCrypto_setApplicationProtocolSelector(JNIEnv* env, jclass, jlong ssl_address,
+                                                 jobject selector) {
+    SSL* ssl = to_SSL(env, ssl_address, true);
+    JNI_TRACE("ssl=%p NativeCrypto_setApplicationProtocolSelector selector=%p", ssl, selector);
+    if (ssl == nullptr) {
+        return;
+    }
+    AppData* appData = toAppData(ssl);
+    if (appData == nullptr) {
+        conscrypt::jniutil::throwSSLExceptionStr(env, "Unable to retrieve application data");
+        JNI_TRACE("ssl=%p NativeCrypto_setApplicationProtocolSelector appData => 0", ssl);
+        return;
+    }
+
+    appData->setApplicationProtocolSelector(env, selector);
+    if (selector != nullptr) {
+        SSL_CTX_set_alpn_select_cb(SSL_get_SSL_CTX(ssl), alpn_select_callback, nullptr);
+    }
 }
 
 /**
@@ -7263,6 +7381,10 @@ static jstring NativeCrypto_SSL_get_current_cipher(JNIEnv* env, jclass, jlong ss
         return nullptr;
     }
     const SSL_CIPHER* cipher = SSL_get_current_cipher(ssl);
+    if (cipher == nullptr) {
+        JNI_TRACE("ssl=%p NativeCrypto_SSL_get_current_cipher cipher => null", ssl);
+        return nullptr;
+    }
     const char* name = SSL_CIPHER_standard_name(cipher);
     JNI_TRACE("ssl=%p NativeCrypto_SSL_get_current_cipher => %s", ssl, name);
     return env->NewStringUTF(name);
@@ -8073,13 +8195,15 @@ static jbyteArray NativeCrypto_SSL_session_id(JNIEnv* env, jclass, jlong ssl_add
         return nullptr;
     }
 
-    jbyteArray result = env->NewByteArray(static_cast<jsize>(ssl_session->session_id_length));
+    unsigned session_id_length;
+    const uint8_t* session_id = SSL_SESSION_get_id(ssl_session, &session_id_length);
+    jbyteArray result = env->NewByteArray(static_cast<jsize>(session_id_length));
     if (result != nullptr) {
-        jbyte* src = reinterpret_cast<jbyte*>(ssl_session->session_id);
-        env->SetByteArrayRegion(result, 0, static_cast<jsize>(ssl_session->session_id_length), src);
+        const jbyte* src = reinterpret_cast<const jbyte*>(session_id);
+        env->SetByteArrayRegion(result, 0, static_cast<jsize>(session_id_length), src);
     }
     JNI_TRACE("ssl_session=%p NativeCrypto_SSL_session_id => %p session_id_length=%d", ssl_session,
-              result, ssl_session->session_id_length);
+              result, session_id_length);
     return result;
 }
 
@@ -8555,51 +8679,6 @@ static jlong NativeCrypto_SSL_BIO_new(JNIEnv* env, jclass, jlong ssl_address) {
 
     JNI_TRACE("ssl=%p NativeCrypto_SSL_BIO_new => network_bio=%p", ssl, network_bio);
     return reinterpret_cast<uintptr_t>(network_bio);
-}
-
-static void NativeCrypto_SSL_configure_alpn(JNIEnv* env, jclass, jlong ssl_address,
-                                            jboolean client_mode, jbyteArray alpn_protocols) {
-    SSL* ssl = to_SSL(env, ssl_address, true);
-    if (ssl == nullptr) {
-        return;
-    }
-    AppData* appData = toAppData(ssl);
-    if (appData == nullptr) {
-        conscrypt::jniutil::throwSSLExceptionStr(env, "Unable to retrieve application data");
-        JNI_TRACE("ssl=%p NativeCrypto_SSL_configure_alpn appData => 0", ssl);
-        return;
-    }
-
-    if (alpn_protocols != nullptr) {
-        if (client_mode) {
-            ScopedByteArrayRO protosBytes(env, alpn_protocols);
-            if (protosBytes.get() == nullptr) {
-                JNI_TRACE(
-                        "ssl=%p NativeCrypto_SSL_configure_alpn alpn_protocols=%p => "
-                        "protosBytes == null",
-                        ssl, alpn_protocols);
-                return;
-            }
-
-            const unsigned char* tmp = reinterpret_cast<const unsigned char*>(protosBytes.get());
-            int ret = SSL_set_alpn_protos(ssl, tmp, static_cast<unsigned int>(protosBytes.size()));
-            if (ret != 0) {
-                conscrypt::jniutil::throwSSLExceptionStr(env,
-                                                         "Unable to set ALPN protocols for client");
-                JNI_TRACE("ssl=%p NativeCrypto_SSL_configure_alpn => exception", ssl);
-                return;
-            }
-        } else {
-            // Server mode - configure the ALPN protocol selection callback.
-            if (!appData->setAlpnCallbackState(env, alpn_protocols)) {
-                conscrypt::jniutil::throwSSLExceptionStr(env,
-                                                         "Unable to set ALPN protocols for server");
-                JNI_TRACE("ssl=%p NativeCrypto_SSL_configure_alpn => exception", ssl);
-                return;
-            }
-            SSL_CTX_set_alpn_select_cb(SSL_get_SSL_CTX(ssl), alpn_select_callback, nullptr);
-        }
-    }
 }
 
 static jint NativeCrypto_ENGINE_SSL_do_handshake(JNIEnv* env, jclass, jlong ssl_address,
@@ -9239,6 +9318,8 @@ static jlong NativeCrypto_SSL_get1_session(JNIEnv* env, jclass, jlong ssl_addres
 #define FILE_DESCRIPTOR "Ljava/io/FileDescriptor;"
 #define SSL_CALLBACKS \
     "L" TO_STRING(JNI_JARJAR_PREFIX) "org/conscrypt/NativeCrypto$SSLHandshakeCallbacks;"
+#define ALPN_PROTOCOL_SELECTOR \
+    "L" TO_STRING(JNI_JARJAR_PREFIX) "org/conscrypt/ApplicationProtocolSelectorAdapter;"
 #define REF_EC_GROUP "L" TO_STRING(JNI_JARJAR_PREFIX) "org/conscrypt/NativeRef$EC_GROUP;"
 #define REF_EC_POINT "L" TO_STRING(JNI_JARJAR_PREFIX) "org/conscrypt/NativeRef$EC_POINT;"
 #define REF_EVP_CIPHER_CTX \
@@ -9341,6 +9422,7 @@ static JNINativeMethod sNativeCryptoMethods[] = {
         CONSCRYPT_NATIVE_METHOD(EVP_CIPHER_CTX_free, "(J)V"),
         CONSCRYPT_NATIVE_METHOD(EVP_aead_aes_128_gcm, "()J"),
         CONSCRYPT_NATIVE_METHOD(EVP_aead_aes_256_gcm, "()J"),
+        CONSCRYPT_NATIVE_METHOD(EVP_aead_chacha20_poly1305, "()J"),
         CONSCRYPT_NATIVE_METHOD(EVP_AEAD_max_overhead, "(J)I"),
         CONSCRYPT_NATIVE_METHOD(EVP_AEAD_nonce_length, "(J)I"),
         CONSCRYPT_NATIVE_METHOD(EVP_AEAD_CTX_seal, "(J[BI[BI[B[BII[B)I"),
@@ -9498,7 +9580,9 @@ static JNINativeMethod sNativeCryptoMethods[] = {
         CONSCRYPT_NATIVE_METHOD(SSL_SESSION_free, "(J)V"),
         CONSCRYPT_NATIVE_METHOD(i2d_SSL_SESSION, "(J)[B"),
         CONSCRYPT_NATIVE_METHOD(d2i_SSL_SESSION, "([B)J"),
-        CONSCRYPT_NATIVE_METHOD(SSL_get0_alpn_selected, "(J)[B"),
+        CONSCRYPT_NATIVE_METHOD(getApplicationProtocol, "(J)[B"),
+        CONSCRYPT_NATIVE_METHOD(setApplicationProtocols, "(JZ[B)V"),
+        CONSCRYPT_NATIVE_METHOD(setApplicationProtocolSelector, "(J" ALPN_PROTOCOL_SELECTOR ")V"),
         CONSCRYPT_NATIVE_METHOD(ERR_peek_last_error, "()J"),
         CONSCRYPT_NATIVE_METHOD(SSL_CIPHER_get_kx_name, "(J)Ljava/lang/String;"),
         CONSCRYPT_NATIVE_METHOD(get_cipher_names, "(Ljava/lang/String;)[Ljava/lang/String;"),
@@ -9510,7 +9594,6 @@ static JNINativeMethod sNativeCryptoMethods[] = {
         CONSCRYPT_NATIVE_METHOD(SSL_pending_readable_bytes, "(J)I"),
         CONSCRYPT_NATIVE_METHOD(SSL_pending_written_bytes_in_BIO, "(J)I"),
         CONSCRYPT_NATIVE_METHOD(SSL_get_error, "(JI)I"),
-        CONSCRYPT_NATIVE_METHOD(SSL_configure_alpn, "(JZ[B)V"),
         CONSCRYPT_NATIVE_METHOD(ENGINE_SSL_do_handshake, "(J" SSL_CALLBACKS ")I"),
         CONSCRYPT_NATIVE_METHOD(ENGINE_SSL_read_direct, "(JJI" SSL_CALLBACKS ")I"),
         CONSCRYPT_NATIVE_METHOD(ENGINE_SSL_write_direct, "(JJI" SSL_CALLBACKS ")I"),
