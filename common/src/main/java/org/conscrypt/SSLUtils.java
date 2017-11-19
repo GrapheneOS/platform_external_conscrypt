@@ -46,6 +46,7 @@ import java.nio.charset.Charset;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import javax.net.ssl.SSLException;
@@ -345,7 +346,9 @@ final class SSLUtils {
     /**
      * Decodes the given list of protocols into {@link String}s.
      * @param protocols the encoded protocol list
-     * @return the decoded protocols or {@code null} if {@code protocols} is {@code null}.
+     * @return the decoded protocols or {@link EmptyArray#BYTE} if {@code protocols} is
+     * empty.
+     * @throws NullPointerException if protocols is {@code null}.
      */
     static String[] decodeProtocols(byte[] protocols) {
         if (protocols.length == 0) {
@@ -357,7 +360,9 @@ final class SSLUtils {
             int protocolLength = protocols[i];
             if (protocolLength < 0 || protocolLength > protocols.length - i) {
                 throw new IllegalArgumentException(
-                        "Protocol has invalid length (" + protocolLength + "): " + protocols[i]);
+                    "Protocol has invalid length (" + protocolLength + " at position " + i
+                        + "): " + (protocols.length < 50
+                        ? Arrays.toString(protocols) : protocols.length + " byte array"));
             }
 
             numProtocols++;
@@ -382,6 +387,8 @@ final class SSLUtils {
      *
      * @param protocols the list of protocols to be encoded
      * @return the encoded form of the protocol list.
+     * @throws IllegalArgumentException if protocols is {@code null}, or if any element is
+     * {@code null} or an empty string.
      */
     static byte[] encodeProtocols(String[] protocols) {
         if (protocols == null) {
