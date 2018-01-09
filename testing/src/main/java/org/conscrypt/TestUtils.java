@@ -45,8 +45,8 @@ import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocketFactory;
 import libcore.io.Streams;
-import libcore.java.security.TestKeyStore;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.conscrypt.java.security.TestKeyStore;
 import org.junit.Assume;
 
 /**
@@ -103,14 +103,25 @@ public final class TestUtils {
     public static void assumeSetEndpointIdentificationAlgorithmAvailable() {
         boolean supported = false;
         try {
-            SSLParameters.class.getMethod("Skipping test: "
-                            + "SSLParameters.setEndpointIdentificationAlgorithm unavailable",
-                    String.class);
+            SSLParameters.class.getMethod("setEndpointIdentificationAlgorithm", String.class);
             supported = true;
         } catch (NoSuchMethodException ignore) {
             // Ignored
         }
-        Assume.assumeTrue(supported);
+        Assume.assumeTrue("Skipping test: "
+                + "SSLParameters.setEndpointIdentificationAlgorithm unavailable", supported);
+    }
+
+    public static void assumeAndroid() {
+        boolean android;
+        try {
+            Class.forName("android.app.Application", false, ClassLoader.getSystemClassLoader());
+            android = true;
+        } catch (Throwable ignored) {
+            // Failed to load the class uniquely available in Android.
+            android = false;
+        }
+        Assume.assumeTrue(android);
     }
 
     public static InetAddress getLoopbackAddress() {
