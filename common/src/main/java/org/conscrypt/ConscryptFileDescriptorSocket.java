@@ -165,12 +165,8 @@ class ConscryptFileDescriptorSocket extends OpenSSLSocketImpl
     }
 
     private static NativeSsl newSsl(SSLParametersImpl sslParameters,
-            ConscryptFileDescriptorSocket engine) {
-        try {
-            return NativeSsl.newInstance(sslParameters, engine, engine, engine);
-        } catch (SSLException e) {
-            throw new RuntimeException(e);
-        }
+            ConscryptFileDescriptorSocket engine) throws SSLException {
+        return NativeSsl.newInstance(sslParameters, engine, engine, engine);
     }
 
     /**
@@ -942,6 +938,12 @@ class ConscryptFileDescriptorSocket extends OpenSSLSocketImpl
         SSLInputStream sslInputStream;
         SSLOutputStream sslOutputStream;
 
+        if (ssl == null) {
+            // close() has been called before we've initialized the socket, so just
+            // return.
+            return;
+        }
+
         synchronized (ssl) {
             if (state == STATE_CLOSED) {
                 // close() has already been called, so do nothing and return.
@@ -1048,7 +1050,9 @@ class ConscryptFileDescriptorSocket extends OpenSSLSocketImpl
             if (guard != null) {
                 Platform.closeGuardWarnIfOpen(guard);
             }
-            free();
+            synchronized (ssl) {
+                transitionTo(STATE_CLOSED);
+            }
         } finally {
             super.finalize();
         }
