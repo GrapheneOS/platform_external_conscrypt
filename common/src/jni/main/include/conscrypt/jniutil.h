@@ -146,25 +146,28 @@ extern bool isGetByteArrayElementsLikelyToReturnACopy(size_t size);
  *
  * Returns 0 on success, nonzero if something failed (e.g. the exception
  * class couldn't be found, so *an* exception will still be pending).
- *
- * Currently aborts the VM if it can't throw the exception.
  */
-extern int jniThrowException(JNIEnv* env, const char* className, const char* msg);
+extern int throwException(JNIEnv* env, const char* className, const char* msg);
 
 /**
  * Throw a java.lang.RuntimeException, with an optional message.
  */
-extern int jniThrowRuntimeException(JNIEnv* env, const char* msg);
+extern int throwRuntimeException(JNIEnv* env, const char* msg);
+
+/**
+ * Throw a java.lang.AssertionError, with an optional message.
+ */
+extern int throwAssertionError(JNIEnv* env, const char* msg);
 
 /*
  * Throw a java.lang.NullPointerException, with an optional message.
  */
-extern int jniThrowNullPointerException(JNIEnv* env, const char* msg);
+extern int throwNullPointerException(JNIEnv* env, const char* msg);
 
 /**
  * Throws a OutOfMemoryError with the given string as a message.
  */
-extern int jniThrowOutOfMemory(JNIEnv* env, const char* message);
+extern int throwOutOfMemory(JNIEnv* env, const char* message);
 
 /**
  * Throws a BadPaddingException with the given string as a message.
@@ -219,14 +222,13 @@ extern int throwForX509Error(JNIEnv* env, int reason, const char* message,
                              int (*defaultThrow)(JNIEnv*, const char*));
 
 /*
- * Checks this thread's OpenSSL error queue and throws a RuntimeException if
- * necessary.
- *
- * @return true if an exception was thrown, false if not.
+ * Checks this thread's OpenSSL error stack and throws an appropriate exception
+ * type based on the type of error found.  If no error is present, throws
+ * AssertionError.
  */
-extern bool throwExceptionIfNecessary(JNIEnv* env, const char* location,
-                                      int (*defaultThrow)(JNIEnv*,
-                                                          const char*) = jniThrowRuntimeException);
+extern void throwExceptionFromBoringSSLError(JNIEnv* env, const char* location,
+                                             int (*defaultThrow)(JNIEnv*,
+                                                                 const char*) = throwRuntimeException);
 
 /**
  * Throws an SocketTimeoutException with the given string as a message.
@@ -262,6 +264,39 @@ extern int throwSSLExceptionWithSslErrors(JNIEnv* env, SSL* ssl, int sslErrorCod
                                           const char* message,
                                           int (*actualThrow)(JNIEnv*,
                                                              const char*) = throwSSLExceptionStr);
+
+#ifdef CONSCRYPT_CHECK_ERROR_QUEUE
+/**
+ * Class that checks that the error queue is empty on destruction.  It should only be used
+ * via the macro CHECK_ERROR_QUEUE_ON_RETURN, which can be placed at the top of a function to
+ * ensure that the error queue is empty whenever the function exits.
+ */
+class ErrorQueueChecker {
+public:
+    ErrorQueueChecker(JNIEnv* env) : env(env) {}
+    ~ErrorQueueChecker() {
+        if (ERR_peek_error() != 0) {
+            const char* file;
+            int line;
+            unsigned long error = ERR_get_error_line(&file, &line);
+            char message[256];
+            ERR_error_string_n(error, message, sizeof(message));
+            char result[500];
+            snprintf(result, sizeof(result), "Error queue should have been empty but was (%s:%d) %s", file, line, message);
+            // If there's a pending exception, we want to throw the assertion error instead
+            env->ExceptionClear();
+            throwAssertionError(env, result);
+        }
+    }
+private:
+    JNIEnv* env;
+};
+
+#define CHECK_ERROR_QUEUE_ON_RETURN conscrypt::jniutil::ErrorQueueChecker __checker(env)
+#else
+#define CHECK_ERROR_QUEUE_ON_RETURN UNUSED_ARGUMENT(env)
+#endif  // CONSCRYPT_CHECK_ERROR_QUEUE
+
 }  // namespace jniutil
 }  // namespace conscrypt
 
