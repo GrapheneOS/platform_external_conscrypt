@@ -1228,7 +1228,7 @@ final class ConscryptEngine extends SSLEngine implements NativeCrypto.SSLHandsha
                     }
                 } else {
                     // The heap method will update the position on the dst buffer automatically.
-                    bytesRead = readEncryptedDataHeap(dst, pos, len);
+                    bytesRead = readEncryptedDataHeap(dst, len);
                 }
             }
 
@@ -1242,7 +1242,7 @@ final class ConscryptEngine extends SSLEngine implements NativeCrypto.SSLHandsha
         return networkBio.readDirectByteBuffer(directByteBufferAddress(dst, pos), len);
     }
 
-    private int readEncryptedDataHeap(ByteBuffer dst, int pos, int len) throws IOException {
+    private int readEncryptedDataHeap(ByteBuffer dst, int len) throws IOException {
         AllocatedBuffer allocatedBuffer = null;
         try {
             final ByteBuffer buffer;
@@ -1257,7 +1257,7 @@ final class ConscryptEngine extends SSLEngine implements NativeCrypto.SSLHandsha
             }
 
             int bytesToRead = min(len, buffer.remaining());
-            int bytesRead = readEncryptedDataDirect(buffer, pos, bytesToRead);
+            int bytesRead = readEncryptedDataDirect(buffer, 0, bytesToRead);
             if (bytesRead > 0) {
                 buffer.position(bytesRead);
                 buffer.flip();
