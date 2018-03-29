@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Set;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.ShortBufferException;
 import javax.net.ssl.SSLException;
 import javax.security.auth.x500.X500Principal;
 import org.conscrypt.OpenSSLX509CertificateFactory.ParsingException;
@@ -327,11 +328,11 @@ public final class NativeCrypto {
 
     static native int EVP_AEAD_CTX_seal(long evpAead, byte[] key, int tagLengthInBytes, byte[] out,
             int outOffset, byte[] nonce, byte[] in, int inOffset, int inLength, byte[] ad)
-            throws BadPaddingException, IndexOutOfBoundsException;
+            throws ShortBufferException, BadPaddingException, IndexOutOfBoundsException;
 
     static native int EVP_AEAD_CTX_open(long evpAead, byte[] key, int tagLengthInBytes, byte[] out,
             int outOffset, byte[] nonce, byte[] in, int inOffset, int inLength, byte[] ad)
-            throws BadPaddingException, IndexOutOfBoundsException;
+            throws ShortBufferException, BadPaddingException, IndexOutOfBoundsException;
 
     // --- HMAC functions ------------------------------------------------------
 
@@ -555,7 +556,7 @@ public final class NativeCrypto {
 
     // --- ASN1_TIME -----------------------------------------------------------
 
-    static native void ASN1_TIME_to_Calendar(long asn1TimeCtx, Calendar cal);
+    static native void ASN1_TIME_to_Calendar(long asn1TimeCtx, Calendar cal) throws ParsingException;
 
     // --- ASN1 Encoding -------------------------------------------------------
 
@@ -903,6 +904,12 @@ public final class NativeCrypto {
     static native void SSL_set_ocsp_response(long ssl, NativeSsl ssl_holder, byte[] response);
 
     static native byte[] SSL_get_tls_unique(long ssl, NativeSsl ssl_holder);
+
+    static native void SSL_set_token_binding_params(long ssl, NativeSsl ssl_holder, int[] params) throws SSLException;
+
+    static native int SSL_get_token_binding_params(long ssl, NativeSsl ssl_holder);
+
+    static native byte[] SSL_export_keying_material(long ssl, NativeSsl ssl_holder, byte[] label, byte[] context, int num_bytes) throws SSLException;
 
     static native void SSL_use_psk_identity_hint(long ssl, NativeSsl ssl_holder, String identityHint) throws SSLException;
 

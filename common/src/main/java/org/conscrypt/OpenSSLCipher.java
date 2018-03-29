@@ -1168,6 +1168,22 @@ public abstract class OpenSSLCipher extends CipherSpi {
         }
 
         @Override
+        protected int engineDoFinal(byte[] input, int inputOffset, int inputLen, byte[] output,
+                int outputOffset) throws ShortBufferException, IllegalBlockSizeException,
+                BadPaddingException {
+            // Because the EVP_AEAD updateInternal processes input but doesn't create any output
+            // (and thus can't check the output buffer), we need to add this check before the
+            // superclass' processing to ensure that updateInternal is never called if the
+            // output buffer isn't large enough.
+            if (output != null) {
+                if (getOutputSizeForFinal(inputLen) > output.length - outputOffset) {
+                    throw new ShortBufferException("Insufficient output space");
+                }
+            }
+            return super.engineDoFinal(input, inputOffset, inputLen, output, outputOffset);
+        }
+
+        @Override
         int updateInternal(byte[] input, int inputOffset, int inputLen, byte[] output,
                 int outputOffset, int maximumLen) throws ShortBufferException {
             checkInitialization();
@@ -1214,7 +1230,7 @@ public abstract class OpenSSLCipher extends CipherSpi {
 
         @Override
         int doFinalInternal(byte[] output, int outputOffset, int maximumLen)
-                throws IllegalBlockSizeException, BadPaddingException {
+                throws ShortBufferException, IllegalBlockSizeException, BadPaddingException {
             checkInitialization();
             final int bytesWritten;
             try {
@@ -1369,6 +1385,18 @@ public abstract class OpenSSLCipher extends CipherSpi {
                     }
                 }
 
+                @Override
+                int getOutputSizeForFinal(int inputLen) {
+                    // For GCM, the tag is a fixed length and there is no padding or other
+                    // concerns, so we can calculate the exact length required without a
+                    // native call
+                    if (isEncrypting()) {
+                        return bufCount + inputLen + tagLengthInBytes;
+                    } else {
+                        return Math.max(0, bufCount + inputLen - tagLengthInBytes);
+                    }
+                }
+
                 public static class AES_128 extends GCM {
                     @Override
                     void checkSupportedKeySize(int keyLength) throws InvalidKeyException {
@@ -1427,6 +1455,18 @@ public abstract class OpenSSLCipher extends CipherSpi {
                     return NativeCrypto.EVP_aead_chacha20_poly1305();
                 } else {
                     throw new RuntimeException("Unexpected key length: " + keyLength);
+                }
+            }
+
+            @Override
+            int getOutputSizeForFinal(int inputLen) {
+                // For ChaCha20+Poly1305, the tag is always 16 bytes long and there is no
+                // padding or other concerns, so we can calculate the exact length required
+                // without a native call
+                if (isEncrypting()) {
+                    return bufCount + inputLen + 16;
+                } else {
+                    return Math.max(0, bufCount + inputLen - 16);
                 }
             }
         }
