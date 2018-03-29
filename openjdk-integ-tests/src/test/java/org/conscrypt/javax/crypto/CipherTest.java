@@ -111,12 +111,12 @@ public final class CipherTest {
     private static final int GCM_TAG_SIZE_BITS = 96;
 
     private static final String[] RSA_PROVIDERS = ((StandardNames.IS_RI)
-                                                   ? new String[] { "SunJCE", "Conscrypt" }
-                                                   : new String[] { "BC" , "AndroidOpenSSL" });
+        ? new String[] { "SunJCE", StandardNames.JSSE_PROVIDER_NAME }
+        : new String[] { "BC" , StandardNames.JSSE_PROVIDER_NAME });
 
     private static final String[] AES_PROVIDERS = ((StandardNames.IS_RI)
-                                                   ? new String[] { "SunJCE", "Conscrypt" }
-                                                   : new String[] { "BC", "AndroidOpenSSL" });
+        ? new String[] { "SunJCE", StandardNames.JSSE_PROVIDER_NAME }
+        : new String[] { "BC", StandardNames.JSSE_PROVIDER_NAME });
 
     private static boolean isSupported(String algorithm, String provider) {
         if (algorithm.equals("RC2")) {
@@ -1318,6 +1318,16 @@ public final class CipherTest {
             assertEquals(cipherID,
                          Arrays.toString(decryptedPlainText),
                          Arrays.toString(decryptedPlainText2));
+
+            // Use a new encrypt spec so that AEAD algorithms that prohibit IV reuse don't complain
+            encryptSpec = getEncryptAlgorithmParameterSpec(algorithm);
+            test_Cipher_ShortBufferException(c, algorithm, Cipher.ENCRYPT_MODE, encryptSpec,
+                    encryptKey, getActualPlainText(algorithm));
+            decryptSpec = getDecryptAlgorithmParameterSpec(encryptSpec, c);
+            test_Cipher_ShortBufferException(c, algorithm, Cipher.DECRYPT_MODE, decryptSpec,
+                    decryptKey, cipherText);
+
+            test_Cipher_aborted_doFinal(c, algorithm, providerName, encryptKey, decryptKey);
         }
     }
 
@@ -1471,6 +1481,62 @@ public final class CipherTest {
                 throw e;
             }
         }
+    }
+
+    // Checks that the Cipher throws ShortBufferException when given a too-short buffer
+    private void test_Cipher_ShortBufferException(Cipher c, String algorithm, int encryptMode,
+            AlgorithmParameterSpec spec, Key key, byte[] text) throws Exception {
+        c.init(encryptMode, key, spec);
+        if (isAEAD(algorithm)) {
+            c.updateAAD(new byte[24]);
+        }
+        if (c.getOutputSize(text.length) > 0) {
+            byte[] output;
+            if (algorithm.startsWith("RSA/")) {
+                // RSA encryption pads the input data to a full block before encrypting,
+                // so unlike most algorithms, getOutputSize can't determine how much space
+                // is necessary until the data is actually decrypted.
+                output = new byte[1];
+            } else {
+                // Other algorithms can much more easily forsee how much output data there
+                // will be, so don't let them get away with being overly conservative.
+                output = new byte[c.getOutputSize(text.length) - 1];
+            }
+            try {
+                c.doFinal(text, 0, text.length, output);
+                fail("Short buffer should have thrown ShortBufferException");
+            } catch (ShortBufferException expected) {
+                // Ignored
+            }
+        }
+    }
+
+    // Checks that if the cipher operation is aborted by a ShortBufferException the output
+    // is still correct.
+    private void test_Cipher_aborted_doFinal(Cipher c, String algorithm, String provider,
+            Key encryptKey, Key decryptKey) throws Exception {
+        byte[] text = getActualPlainText(algorithm);
+        AlgorithmParameterSpec encryptSpec = getEncryptAlgorithmParameterSpec(algorithm);
+        c.init(Cipher.ENCRYPT_MODE, encryptKey, encryptSpec);
+        if (isAEAD(algorithm)) {
+            c.updateAAD(new byte[24]);
+        }
+        try {
+            c.doFinal(text, 0, text.length, new byte[0]);
+            fail("Short buffer should have thrown ShortBufferException");
+        } catch (ShortBufferException expected) {
+            // Ignored
+        }
+        byte[] cipherText = c.doFinal(text);
+        c.init(Cipher.DECRYPT_MODE, decryptKey, getDecryptAlgorithmParameterSpec(encryptSpec, c));
+        if (isAEAD(algorithm)) {
+            c.updateAAD(new byte[24]);
+        }
+        byte[] plainText = c.doFinal(cipherText);
+        byte[] expectedPlainText = getExpectedPlainText(algorithm, provider);
+        assertTrue("Expected " + Arrays.toString(expectedPlainText)
+                + " but was " + Arrays.toString(plainText),
+                Arrays.equals(expectedPlainText, plainText));
     }
 
     @Test
