@@ -20,7 +20,6 @@
 #include <jni.h>
 #include <openssl/ssl.h>
 
-#include <conscrypt/logging.h>
 #include <conscrypt/macros.h>
 #include <nativehelper/ScopedLocalRef.h>
 
@@ -67,7 +66,7 @@ inline JNIEnv* getJNIEnv(JavaVM* gJavaVM) {
     int ret = gJavaVM->AttachCurrentThread(reinterpret_cast<void**>(&env), nullptr);
 #endif
     if (ret < 0) {
-        CONSCRYPT_LOG_ERROR("Could not attach JavaVM to find current JNIEnv");
+        ALOGE("Could not attach JavaVM to find current JNIEnv");
         return nullptr;
     }
     return env;
@@ -84,7 +83,7 @@ inline jclass getGlobalRefToClass(JNIEnv* env, const char* className) {
     ScopedLocalRef<jclass> localClass(env, env->FindClass(className));
     jclass globalRef = reinterpret_cast<jclass>(env->NewGlobalRef(localClass.get()));
     if (globalRef == nullptr) {
-        CONSCRYPT_LOG_ERROR("failed to find class %s", className);
+        ALOGE("failed to find class %s", className);
         abort();
     }
     return globalRef;
@@ -93,7 +92,7 @@ inline jclass getGlobalRefToClass(JNIEnv* env, const char* className) {
 inline jmethodID getMethodRef(JNIEnv* env, jclass clazz, const char* name, const char* sig) {
     jmethodID localMethod = env->GetMethodID(clazz, name, sig);
     if (localMethod == nullptr) {
-        CONSCRYPT_LOG_ERROR("could not find method %s", name);
+        ALOGE("could not find method %s", name);
         abort();
     }
     return localMethod;
@@ -102,7 +101,7 @@ inline jmethodID getMethodRef(JNIEnv* env, jclass clazz, const char* name, const
 inline jfieldID getFieldRef(JNIEnv* env, jclass clazz, const char* name, const char* sig) {
     jfieldID localField = env->GetFieldID(clazz, name, sig);
     if (localField == nullptr) {
-        CONSCRYPT_LOG_ERROR("could not find field %s", name);
+        ALOGE("could not find field %s", name);
         abort();
     }
     return localField;
@@ -112,7 +111,7 @@ inline jclass findClass(JNIEnv* env, const char* name) {
     ScopedLocalRef<jclass> localClass(env, env->FindClass(name));
     jclass result = reinterpret_cast<jclass>(env->NewGlobalRef(localClass.get()));
     if (result == nullptr) {
-        CONSCRYPT_LOG_ERROR("failed to find class '%s'", name);
+        ALOGE("failed to find class '%s'", name);
         abort();
     }
     return result;
