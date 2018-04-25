@@ -3514,6 +3514,7 @@ public final class CipherTest {
                 DES_Plaintext1_PKCS5_Padded,
                 DES_Plaintext1_Encrypted_With_DES_112_KEY_And_DESEDE_CBC_PKCS5PADDING_With_DES_IV1
                 ) {
+                    @Override
                     public boolean compatibleWith(String provider) {
                         // SunJCE doesn't support extending 112-bit keys to 168-bit keys
                         return !provider.equals("SunJCE");
@@ -4187,10 +4188,25 @@ public final class CipherTest {
         String msg = "update() should throw IllegalStateException [mode=" + opmode + "]";
         final int bs = createAesCipher(opmode).getBlockSize();
         assertEquals(16, bs); // check test is set up correctly
-        assertIllegalStateException(msg, new Runnable() { public void run() { createAesCipher(opmode).update(new byte[0]); } });
-        assertIllegalStateException(msg, new Runnable() { public void run() { createAesCipher(opmode).update(new byte[2 * bs]); } });
-        assertIllegalStateException(msg, new Runnable() { public void run() { createAesCipher(opmode).update(
-                new byte[2 * bs] /* input */, bs  /* inputOffset */, 0 /* inputLen */); } });
+        assertIllegalStateException(msg, new Runnable() {
+            @Override
+            public void run() {
+                createAesCipher(opmode).update(new byte[0]);
+            }
+        });
+        assertIllegalStateException(msg, new Runnable() {
+            @Override
+            public void run() {
+                createAesCipher(opmode).update(new byte[2 * bs]);
+            }
+        });
+        assertIllegalStateException(msg, new Runnable() {
+            @Override
+            public void run() {
+                createAesCipher(opmode).update(
+                        new byte[2 * bs] /* input */, bs /* inputOffset */, 0 /* inputLen */);
+            }
+        });
         try {
             createAesCipher(opmode).update(new byte[2*bs] /* input */, 0 /* inputOffset */,
                     2 * bs /* inputLen */, new byte[2 * bs] /* output */, 0 /* outputOffset */);
@@ -4791,13 +4807,13 @@ public final class CipherTest {
         SecretKeyFactory skf =
                 SecretKeyFactory.getInstance("PBKDF2WITHHMACSHA1");
         PBEKeySpec pbeks = new PBEKeySpec("password".toCharArray(),
-                "salt".getBytes(),
+                "salt".getBytes(TestUtils.UTF_8),
                 100, 128);
         SecretKey secretKey = skf.generateSecret(pbeks);
 
         Cipher cipher =
                 Cipher.getInstance("PBEWITHSHAAND128BITAES-CBC-BC");
-        PBEParameterSpec paramSpec = new PBEParameterSpec("salt".getBytes(), 100);
+        PBEParameterSpec paramSpec = new PBEParameterSpec("salt".getBytes(TestUtils.UTF_8), 100);
         cipher.init(Cipher.ENCRYPT_MODE, secretKey, paramSpec);
         assertEquals(Arrays.toString(ciphertext), Arrays.toString(cipher.doFinal(plaintext)));
 
@@ -4828,7 +4844,7 @@ public final class CipherTest {
         SecretKeyFactory skf =
                 SecretKeyFactory.getInstance("PBKDF2WITHHMACSHA1");
         PBEKeySpec pbeks = new PBEKeySpec("password".toCharArray(),
-                "salt".getBytes(),
+                "salt".getBytes(TestUtils.UTF_8),
                 100, 128);
         SecretKey secretKey = skf.generateSecret(pbeks);
         Cipher cipher =
