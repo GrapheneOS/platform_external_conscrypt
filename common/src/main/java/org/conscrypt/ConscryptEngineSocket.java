@@ -308,7 +308,6 @@ class ConscryptEngineSocket extends OpenSSLSocketImpl {
      * This method enables Server Name Indication
      *
      * @param hostname the desired SNI hostname, or null to disable
-     * @throws IllegalArgumentException if the supplied hostname is not a valid SNI hostname.
      */
     @Override
     public final void setHostname(String hostname) {
