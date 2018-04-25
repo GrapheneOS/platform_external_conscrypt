@@ -69,7 +69,7 @@ These steps need to be performed once per `X.Y` release series.
 
 ### Create the release branch
 
-We use a branch named `<major>.<minor>.x` for all releases in a series.
+We use a branch named `v<major>.<minor>.x` for all releases in a series.
 
 Create the branch and push it to GitHub:
 
@@ -77,11 +77,6 @@ Create the branch and push it to GitHub:
 $ git checkout -b 1.0.x master
 $ git push upstream 1.0.x
 ```
-
-### Set the branch protection settings
-
-In the GitHub UI, go to Settings -> Branches and mark the new branch as
-protected, with administrators included and restrict pushes to administrators.
 
 ### Update the master version
 
@@ -132,7 +127,7 @@ on Linux.
 1. From the conscrypt source directory:
 
    ```bash
-   $ docker build -t conscrypt-deploy release
+   $ docker build -t conscrypt-deploy .
    ```
 1. Start a Docker container that has the deploy environment set up for you. The
    Conscrypt source is cloned into `/conscrypt`.
