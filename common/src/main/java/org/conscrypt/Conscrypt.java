@@ -214,7 +214,6 @@ public final class Conscrypt {
      *
      * @param socket the socket
      * @param hostname the desired SNI hostname, or null to disable
-     * @throws IllegalArgumentException if the supplied hostname is not a valid SNI hostname.
      */
     public static void setHostname(SSLSocket socket, String hostname) {
         toConscrypt(socket).setHostname(hostname);
