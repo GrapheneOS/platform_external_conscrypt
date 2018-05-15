@@ -509,8 +509,9 @@ final class NativeSsl {
     }
 
     void close() {
-        NativeCrypto.SSL_free(ssl, this);
+        long previousSsl = ssl;
         ssl = 0L;
+        NativeCrypto.SSL_free(previousSsl, this);
     }
 
     boolean isClosed() {
