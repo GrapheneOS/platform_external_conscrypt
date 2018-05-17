@@ -109,7 +109,6 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
             new SSLEngineResult(CLOSED, NEED_WRAP, 0, 0);
     private static final SSLEngineResult CLOSED_NOT_HANDSHAKING =
             new SSLEngineResult(CLOSED, NOT_HANDSHAKING, 0, 0);
-    private static final ByteBuffer EMPTY = ByteBuffer.allocateDirect(0);
 
     private static BufferAllocator defaultBufferAllocator = null;
 
@@ -885,7 +884,7 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
                     // If the capacity of all destination buffers is 0 we need to trigger a SSL_read
                     // anyway to ensure everything is flushed in the BIO pair and so we can detect
                     // it in the pendingInboundCleartextBytes() call.
-                    readPlaintextData(EMPTY);
+                    ssl.forceRead();
                 }
             } catch (SSLException e) {
                 if (pendingOutboundEncryptedBytes() > 0) {
@@ -1286,7 +1285,7 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
                     }
                 } else {
                     // The heap method will update the position on the dst buffer automatically.
-                    bytesRead = readEncryptedDataHeap(dst, pos, len);
+                    bytesRead = readEncryptedDataHeap(dst, len);
                 }
             }
 
@@ -1300,7 +1299,7 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
         return networkBio.readDirectByteBuffer(directByteBufferAddress(dst, pos), len);
     }
 
-    private int readEncryptedDataHeap(ByteBuffer dst, int pos, int len) throws IOException {
+    private int readEncryptedDataHeap(ByteBuffer dst, int len) throws IOException {
         AllocatedBuffer allocatedBuffer = null;
         try {
             final ByteBuffer buffer;
@@ -1315,7 +1314,7 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
             }
 
             int bytesToRead = min(len, buffer.remaining());
-            int bytesRead = readEncryptedDataDirect(buffer, pos, bytesToRead);
+            int bytesRead = readEncryptedDataDirect(buffer, 0, bytesToRead);
             if (bytesRead > 0) {
                 buffer.position(bytesRead);
                 buffer.flip();
