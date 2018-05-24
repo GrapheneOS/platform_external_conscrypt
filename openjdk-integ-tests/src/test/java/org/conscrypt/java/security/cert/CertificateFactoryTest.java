@@ -62,12 +62,32 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
 import org.conscrypt.Conscrypt;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import dalvik.system.VMRuntime;
+import sun.security.jca.Providers;
 
 @RunWith(JUnit4.class)
 public class CertificateFactoryTest {
+
+    // BEGIN Android-Added: Allow access to deprecated BC algorithms.
+    // Allow access to deprecated BC algorithms in this test, so we can ensure they
+    // continue to work
+    @BeforeClass
+    public static void enableDeprecatedAlgorithms() {
+        Providers.setMaximumAllowableApiLevelForBcDeprecation(
+                VMRuntime.getRuntime().getTargetSdkVersion());
+    }
+
+    @AfterClass
+    public static void restoreDeprecatedAlgorithms() {
+        Providers.setMaximumAllowableApiLevelForBcDeprecation(
+                Providers.DEFAULT_MAXIMUM_ALLOWABLE_TARGET_API_LEVEL_FOR_BC_DEPRECATION);
+    }
+    // END Android-Added: Allow access to deprecated BC algorithms.
 
     private static final String VALID_CERTIFICATE_PEM =
             "-----BEGIN CERTIFICATE-----\n"

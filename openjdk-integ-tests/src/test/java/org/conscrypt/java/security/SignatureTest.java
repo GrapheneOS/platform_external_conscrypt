@@ -69,12 +69,32 @@ import java.util.concurrent.TimeUnit;
 import libcore.java.security.StandardNames;
 import org.conscrypt.Conscrypt;
 import org.conscrypt.TestUtils;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import dalvik.system.VMRuntime;
+import sun.security.jca.Providers;
 
 @RunWith(JUnit4.class)
 public class SignatureTest {
+
+    // BEGIN Android-Added: Allow access to deprecated BC algorithms.
+    // Allow access to deprecated BC algorithms in this test, so we can ensure they
+    // continue to work
+    @BeforeClass
+    public static void enableDeprecatedAlgorithms() {
+        Providers.setMaximumAllowableApiLevelForBcDeprecation(
+                VMRuntime.getRuntime().getTargetSdkVersion());
+    }
+
+    @AfterClass
+    public static void restoreDeprecatedAlgorithms() {
+        Providers.setMaximumAllowableApiLevelForBcDeprecation(
+                Providers.DEFAULT_MAXIMUM_ALLOWABLE_TARGET_API_LEVEL_FOR_BC_DEPRECATION);
+    }
+    // END Android-Added: Allow access to deprecated BC algorithms.
 
     // 20 bytes for DSA
     private final byte[] DATA = new byte[20];
