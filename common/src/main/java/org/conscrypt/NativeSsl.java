@@ -552,6 +552,15 @@ final class NativeSsl {
         }
     }
 
+    void forceRead() throws IOException {
+        lock.readLock().lock();
+        try {
+            NativeCrypto.ENGINE_SSL_force_read(ssl, this, handshakeCallbacks);
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
     int getPendingReadableBytes() {
         return NativeCrypto.SSL_pending_readable_bytes(ssl, this);
     }
