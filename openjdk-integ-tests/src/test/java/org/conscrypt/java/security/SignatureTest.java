@@ -69,12 +69,32 @@ import java.util.concurrent.TimeUnit;
 import libcore.java.security.StandardNames;
 import org.conscrypt.Conscrypt;
 import org.conscrypt.TestUtils;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import dalvik.system.VMRuntime;
+import sun.security.jca.Providers;
 
 @RunWith(JUnit4.class)
 public class SignatureTest {
+
+    // BEGIN Android-Added: Allow access to deprecated BC algorithms.
+    // Allow access to deprecated BC algorithms in this test, so we can ensure they
+    // continue to work
+    @BeforeClass
+    public static void enableDeprecatedAlgorithms() {
+        Providers.setMaximumAllowableApiLevelForBcDeprecation(
+                VMRuntime.getRuntime().getTargetSdkVersion());
+    }
+
+    @AfterClass
+    public static void restoreDeprecatedAlgorithms() {
+        Providers.setMaximumAllowableApiLevelForBcDeprecation(
+                Providers.DEFAULT_MAXIMUM_ALLOWABLE_TARGET_API_LEVEL_FOR_BC_DEPRECATION);
+    }
+    // END Android-Added: Allow access to deprecated BC algorithms.
 
     // 20 bytes for DSA
     private final byte[] DATA = new byte[20];
@@ -2650,7 +2670,7 @@ public class SignatureTest {
         final int oneTooBig = RSA_2048_modulus.bitLength() + 1;
         final byte[] vector = new byte[oneTooBig];
         for (int i = 0; i < oneTooBig; i++) {
-            vector[i] = (byte) Vector1Data[i % Vector1Data.length];
+            vector[i] = Vector1Data[i % Vector1Data.length];
         }
         sig.update(vector);
 
@@ -2760,13 +2780,16 @@ public class SignatureTest {
     }
 
     @Test
+    // Suppress ErrorProne's warning about the try block that doesn't call fail() but
+    // expects an exception, it's intentional
+    @SuppressWarnings("MissingFail")
     public void testVerify_NONEwithECDSA_Key_SingleByte_Failure() throws Exception {
         PublicKey pub = getNamedCurveEcPublicKey();
         MessageDigest sha1 = MessageDigest.getInstance("SHA1");
         Signature sig = Signature.getInstance("NONEwithECDSA");
 
         byte[] corrupted = new byte[NAMED_CURVE_SIGNATURE.length];
-        corrupted[0] ^= 1;
+        corrupted[0] = (byte) (corrupted[0] ^ 1);
 
         sig.initVerify(pub);
         sig.update(sha1.digest(NAMED_CURVE_VECTOR));
