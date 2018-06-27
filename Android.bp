@@ -177,6 +177,7 @@ java_library_static {
 java_library {
     name: "conscrypt",
     host_supported: true,
+    installable: true,
     hostdex: true,
     no_framework_libs: true,
     static_libs: ["conscrypt-nojarjar"],
@@ -193,6 +194,7 @@ java_library {
 // not be stripped. See b/24535627.
 java_library {
     name: "conscrypt-testdex",
+    installable: true,
     no_framework_libs: true,
     required: ["libjavacrypto"],
     static_libs: ["conscrypt-nojarjar"],
