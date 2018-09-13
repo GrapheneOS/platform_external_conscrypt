@@ -147,7 +147,7 @@ genrule {
 }
 
 // Create the conscrypt library without jarjar for tests
-java_library_static {
+java_library {
     name: "conscrypt-nojarjar",
     host_supported: true,
     hostdex: true,
@@ -176,17 +176,15 @@ java_library_static {
 // Create the conscrypt library by running jarjar on conscrypt-nojarjar
 java_library {
     name: "conscrypt",
-    host_supported: true,
     installable: true,
     hostdex: true,
-    no_framework_libs: true,
+
     static_libs: ["conscrypt-nojarjar"],
+
+    no_framework_libs: true,
+
+    jarjar_rules: "jarjar-rules.txt",
     required: ["libjavacrypto"],
-    target: {
-        android: {
-            jarjar_rules: "jarjar-rules.txt",
-        },
-    },
 }
 
 // A guaranteed unstripped version of conscrypt.
@@ -195,10 +193,13 @@ java_library {
 java_library {
     name: "conscrypt-testdex",
     installable: true,
-    no_framework_libs: true,
-    required: ["libjavacrypto"],
+
     static_libs: ["conscrypt-nojarjar"],
+
+    no_framework_libs: true,
+
     jarjar_rules: "jarjar-rules.txt",
+    required: ["libjavacrypto"],
 }
 
 // Platform conscrypt crypto JNI library
@@ -243,7 +244,7 @@ cc_library_shared {
 }
 
 // Unbundled Conscrypt jar
-java_library_static {
+java_library {
     name: "conscrypt_unbundled",
 
     srcs: [
@@ -259,7 +260,7 @@ java_library_static {
 }
 
 // Stub library for unbundled builds
-java_library_static {
+java_library {
     name: "conscrypt-stubs",
 
     srcs: ["android-stub/src/main/java/**/*.java"],
