@@ -34,6 +34,9 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketImpl;
 import java.security.AlgorithmParameters;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Security;
 import java.security.cert.CertificateException;
@@ -52,6 +55,8 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.StandardConstants;
 import javax.net.ssl.X509TrustManager;
+import org.conscrypt.ct.CTLogStore;
+import org.conscrypt.ct.CTPolicy;
 
 /**
  * Platform-specific methods for unbundled Android.
@@ -121,6 +126,11 @@ final class Platform {
      */
     public static void setSocketWriteTimeout(Socket s, long timeoutMillis) throws SocketException {
         try {
+            FileDescriptor fd = getFileDescriptor(s);
+            if (fd == null || !fd.valid()) {
+                // Mirror the behavior of platform sockets when calling methods with bad fds
+                throw new SocketException("Socket closed");
+            }
             Class<?> c_structTimeval =
                     getClass("android.system.StructTimeval", "libcore.io.StructTimeval");
             if (c_structTimeval == null) {
@@ -180,7 +190,7 @@ final class Platform {
                 return;
             }
 
-            m_setsockoptTimeval.invoke(instance_os, getFileDescriptor(s), f_SOL_SOCKET.get(null),
+            m_setsockoptTimeval.invoke(instance_os, fd, f_SOL_SOCKET.get(null),
                     f_SO_SNDTIMEO.get(null), timeval);
         } catch (Exception e) {
             // We don't want to spam the logcat since this isn't a fatal error, but we want to know
@@ -952,5 +962,39 @@ final class Platform {
             enable = Boolean.valueOf(property);
         }
         return enable;
+    }
+
+    static boolean supportsConscryptCertStore() {
+        return false;
+    }
+
+    static KeyStore getDefaultCertKeyStore() throws KeyStoreException {
+        KeyStore keyStore = KeyStore.getInstance("AndroidCAStore");
+        try {
+            keyStore.load(null, null);
+        } catch (IOException e) {
+            throw new KeyStoreException(e);
+        } catch (CertificateException e) {
+            throw new KeyStoreException(e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new KeyStoreException(e);
+        }
+        return keyStore;
+    }
+
+    static ConscryptCertStore newDefaultCertStore() {
+        return null;
+    }
+
+    static CertBlacklist newDefaultBlacklist() {
+        return null;
+    }
+
+    static CTLogStore newDefaultLogStore() {
+        return null;
+    }
+
+    static CTPolicy newDefaultPolicy(CTLogStore logStore) {
+        return null;
     }
 }
