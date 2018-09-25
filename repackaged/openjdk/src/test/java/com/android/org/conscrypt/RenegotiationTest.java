@@ -55,6 +55,7 @@ import org.junit.runners.Parameterized.Parameters;
  * This tests that server-initiated cipher renegotiation works properly with a Conscrypt client.
  * BoringSSL does not support user-initiated renegotiation, so we use the JDK implementation for
  * the server.
+ * @hide This class is not part of the Android public SDK API
  */
 @RunWith(Parameterized.class)
 public class RenegotiationTest {

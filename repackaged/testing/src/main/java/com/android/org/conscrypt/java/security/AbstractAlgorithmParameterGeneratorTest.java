@@ -22,6 +22,9 @@ import java.security.AlgorithmParameterGenerator;
 import java.security.AlgorithmParameters;
 import org.junit.Test;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 public abstract class AbstractAlgorithmParameterGeneratorTest {
 
     private final String algorithmName;

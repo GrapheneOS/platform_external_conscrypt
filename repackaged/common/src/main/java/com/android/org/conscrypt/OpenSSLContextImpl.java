@@ -36,6 +36,7 @@ import javax.net.ssl.TrustManager;
  * <p>Public to allow contruction via the provider framework.
  *
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public abstract class OpenSSLContextImpl extends SSLContextSpi {

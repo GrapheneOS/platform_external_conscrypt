@@ -31,6 +31,9 @@ import java.security.PublicKey;
 import junit.framework.TestCase;
 import com.android.org.conscrypt.InternalUtil;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 public class CTLogStoreImplTest extends TestCase {
     private static final String[] LOG_KEYS = new String[] {
         "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEmXg8sUUzwBYaWrRb+V0IopzQ6o3U" +

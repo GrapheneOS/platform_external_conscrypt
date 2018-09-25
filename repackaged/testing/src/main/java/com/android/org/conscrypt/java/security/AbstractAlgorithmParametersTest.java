@@ -20,6 +20,9 @@ import java.security.AlgorithmParameters;
 import java.security.spec.AlgorithmParameterSpec;
 import org.junit.Test;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 public abstract class AbstractAlgorithmParametersTest {
 
     private final String algorithmName;

@@ -32,6 +32,7 @@ import libcore.java.security.StandardNames;
  * TestTrustManager is a simple proxy class that wraps an existing
  * X509ExtendedTrustManager to provide debug logging and recording of
  * values.
+ * @hide This class is not part of the Android public SDK API
  */
 public abstract class TestTrustManager {
     private static final boolean LOG = false;

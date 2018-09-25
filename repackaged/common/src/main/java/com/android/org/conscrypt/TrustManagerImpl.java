@@ -84,6 +84,7 @@ import com.android.org.conscrypt.ct.CTVerifier;
  *
  * @see javax.net.ssl.X509ExtendedTrustManager
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public final class TrustManagerImpl extends X509ExtendedTrustManager {

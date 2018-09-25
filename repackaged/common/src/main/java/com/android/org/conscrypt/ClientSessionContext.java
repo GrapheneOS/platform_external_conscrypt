@@ -28,6 +28,7 @@ import javax.net.ssl.SSLContext;
  * looking to reuse any session for a given host and port.
  *
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public final class ClientSessionContext extends AbstractSessionContext {

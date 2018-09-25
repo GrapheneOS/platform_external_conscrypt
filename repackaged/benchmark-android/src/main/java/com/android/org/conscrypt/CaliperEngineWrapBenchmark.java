@@ -42,6 +42,7 @@ import com.android.org.conscrypt.EngineWrapBenchmark.Config;
 
 /**
  * Benchmark comparing performance of various engine implementations to conscrypt.
+ * @hide This class is not part of the Android public SDK API
  */
 @SuppressWarnings("unused")
 public class CaliperEngineWrapBenchmark {

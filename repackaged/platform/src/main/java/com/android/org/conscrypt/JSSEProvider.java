@@ -38,6 +38,7 @@ import java.security.Provider;
  *     CertificateFactory    X509
  *
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public final class JSSEProvider extends Provider {

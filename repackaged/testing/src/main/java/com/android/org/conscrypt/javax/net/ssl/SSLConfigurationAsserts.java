@@ -36,6 +36,7 @@ import libcore.java.security.StandardNames;
 
 /**
  * Assertions about the configuration of TLS/SSL primitives.
+ * @hide This class is not part of the Android public SDK API
  */
 public class SSLConfigurationAsserts {
     /** Hidden constructor to prevent instantiation. */

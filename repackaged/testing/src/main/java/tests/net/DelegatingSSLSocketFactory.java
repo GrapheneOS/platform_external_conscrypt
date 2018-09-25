@@ -24,6 +24,7 @@ import javax.net.ssl.SSLSocketFactory;
 /**
  * {@link SSLSocketFactory} which delegates all invocations to the provided delegate
  * {@code SSLSocketFactory}.
+ * @hide This class is not part of the Android public SDK API
  */
 public class DelegatingSSLSocketFactory extends SSLSocketFactory {
     private final SSLSocketFactory mDelegate;

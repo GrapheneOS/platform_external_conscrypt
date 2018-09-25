@@ -32,6 +32,7 @@ import java.security.Provider;
  * </ul>
  *
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public final class OpenSSLProvider extends Provider {

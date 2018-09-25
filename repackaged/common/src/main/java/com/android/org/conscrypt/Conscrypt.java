@@ -33,6 +33,7 @@ import javax.net.ssl.X509TrustManager;
 
 /**
  * Core API for creating and configuring all Conscrypt types.
+ * @hide This class is not part of the Android public SDK API
  */
 @SuppressWarnings("unused")
 public final class Conscrypt {

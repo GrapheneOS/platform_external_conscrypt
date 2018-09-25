@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Benchmark for comparing performance of client socket implementations.
+ * @hide This class is not part of the Android public SDK API
  */
 public final class ClientSocketBenchmark {
     /**

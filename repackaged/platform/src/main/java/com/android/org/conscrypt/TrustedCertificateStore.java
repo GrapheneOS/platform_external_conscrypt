@@ -82,6 +82,7 @@ import libcore.io.IoUtils;
  * user.
  *
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public class TrustedCertificateStore implements ConscryptCertStore {

@@ -34,6 +34,7 @@ import com.android.org.conscrypt.ServerEndpoint.MessageProcessor;
 
 /**
  * Benchmark for comparing performance of server socket implementations.
+ * @hide This class is not part of the Android public SDK API
  */
 public final class ServerSocketBenchmark {
     /**

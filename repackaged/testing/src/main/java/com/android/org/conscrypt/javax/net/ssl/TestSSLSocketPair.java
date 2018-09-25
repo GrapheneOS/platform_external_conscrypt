@@ -28,6 +28,7 @@ import javax.net.ssl.SSLSocket;
  * TestSSLSocketPair is a convenience class for other tests that want
  * a pair of connected and handshaked client and server SSLSockets for
  * testing.
+ * @hide This class is not part of the Android public SDK API
  */
 public final class TestSSLSocketPair {
     public final TestSSLContext c;

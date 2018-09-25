@@ -26,6 +26,9 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.HashMap;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 public class DefaultKeys {
     private static final byte[] RSA_private = new byte[] {
         (byte) 0x30, (byte) 0x82, (byte) 0x02, (byte) 0x75, (byte) 0x02, (byte) 0x01, (byte) 0x00, (byte) 0x30, (byte) 0x0D, (byte) 0x06, (byte) 0x09, (byte) 0x2A, (byte) 0x86, (byte) 0x48, (byte) 0x86, (byte) 0xF7, (byte) 0x0D,

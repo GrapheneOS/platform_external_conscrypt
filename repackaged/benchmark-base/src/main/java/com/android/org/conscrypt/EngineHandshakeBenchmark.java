@@ -41,6 +41,7 @@ import javax.net.ssl.SSLException;
 
 /**
  * Benchmark comparing handshake performance of various engine implementations to conscrypt.
+ * @hide This class is not part of the Android public SDK API
  */
 public final class EngineHandshakeBenchmark {
     /**
