@@ -29,6 +29,7 @@ import java.security.SignatureSpi;
  * generation and verification using BoringSSL.
  *
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public class OpenSSLSignatureRawECDSA extends SignatureSpi {

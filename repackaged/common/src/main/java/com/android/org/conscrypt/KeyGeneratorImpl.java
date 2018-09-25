@@ -30,6 +30,7 @@ import javax.crypto.spec.SecretKeySpec;
  * algorithms.
  *
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public abstract class KeyGeneratorImpl extends KeyGeneratorSpi {

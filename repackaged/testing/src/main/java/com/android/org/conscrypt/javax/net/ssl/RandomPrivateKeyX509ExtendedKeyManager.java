@@ -33,6 +33,7 @@ import javax.net.ssl.X509ExtendedKeyManager;
 /**
  * {@link X509ExtendedKeyManager} which forwards all calls to a delegate while substituting
  * the returned private key with its own randomly generated keys of the same type (and parameters).
+ * @hide This class is not part of the Android public SDK API
  */
 public class RandomPrivateKeyX509ExtendedKeyManager extends ForwardingX509ExtendedKeyManager {
     private final Map<String, PrivateKey> cachedKeys = new HashMap<String, PrivateKey>();

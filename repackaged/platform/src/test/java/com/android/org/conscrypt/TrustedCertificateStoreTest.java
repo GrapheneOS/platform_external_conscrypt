@@ -48,6 +48,9 @@ import javax.security.auth.x500.X500Principal;
 import junit.framework.TestCase;
 import com.android.org.conscrypt.java.security.TestKeyStore;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 public class TrustedCertificateStoreTest extends TestCase {
     private static final Random tempFileRandom = new Random();
 

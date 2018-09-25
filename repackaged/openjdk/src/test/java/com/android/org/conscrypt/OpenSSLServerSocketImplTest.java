@@ -41,6 +41,9 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 @RunWith(Parameterized.class)
 public class OpenSSLServerSocketImplTest {
     private static final String CIPHER = "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256";

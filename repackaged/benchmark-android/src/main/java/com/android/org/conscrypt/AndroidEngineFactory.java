@@ -22,6 +22,7 @@ import javax.net.ssl.SSLEngine;
 
 /**
  * Enumeration of various types of engines for use with engine-based benchmarks.
+ * @hide This class is not part of the Android public SDK API
  */
 @SuppressWarnings({"ImmutableEnumChecker", "unused"})
 public enum AndroidEngineFactory implements EngineFactory {

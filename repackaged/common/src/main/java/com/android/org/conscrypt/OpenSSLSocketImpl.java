@@ -31,6 +31,7 @@ import javax.net.ssl.SSLSession;
  * Conscrypt's extended socket API before the introduction of the {@link Conscrypt} class.
  *
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {

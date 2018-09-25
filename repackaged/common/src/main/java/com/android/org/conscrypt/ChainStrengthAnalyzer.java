@@ -28,6 +28,7 @@ import java.util.List;
  * Analyzes the cryptographic strength of a chain of X.509 certificates.
  *
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public final class ChainStrengthAnalyzer {

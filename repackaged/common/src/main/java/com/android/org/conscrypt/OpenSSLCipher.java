@@ -49,6 +49,7 @@ import com.android.org.conscrypt.NativeRef.EVP_CIPHER_CTX;
  * An implementation of {@link Cipher} using BoringSSL as the backing library.
  *
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public abstract class OpenSSLCipher extends CipherSpi {

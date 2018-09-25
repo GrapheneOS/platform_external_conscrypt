@@ -25,6 +25,9 @@ import java.security.KeyPairGenerator;
 import java.security.Signature;
 import java.security.spec.AlgorithmParameterSpec;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 public class AlgorithmParameterSignatureHelper<T extends AlgorithmParameterSpec>
         extends TestHelper<AlgorithmParameters> {
 

@@ -22,6 +22,7 @@ import javax.crypto.NoSuchPaddingException;
 
 /**
  * Factory for {@link Cipher} instances.
+ * @hide This class is not part of the Android public SDK API
  */
 public interface CipherFactory {
   Cipher newCipher(String transformation) throws NoSuchPaddingException, NoSuchAlgorithmException;

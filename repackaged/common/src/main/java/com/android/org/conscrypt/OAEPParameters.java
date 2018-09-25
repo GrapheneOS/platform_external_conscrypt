@@ -32,6 +32,7 @@ import javax.crypto.spec.PSource;
  * as specified in RFC 4055 section 4.1.
  *
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public class OAEPParameters extends AlgorithmParametersSpi {

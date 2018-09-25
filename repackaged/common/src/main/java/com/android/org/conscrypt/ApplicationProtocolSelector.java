@@ -25,6 +25,7 @@ import javax.net.ssl.SSLSocket;
  * Server-side selector for the ALPN protocol. This is a backward-compatibility shim for Java 9's
  * new {@code setHandshakeApplicationProtocolSelector} API, which takes a {@code BiFunction}
  * (available in Java 8+). This interface is provided to support protocol selection in Java < 8.
+ * @hide This class is not part of the Android public SDK API
  */
 public abstract class ApplicationProtocolSelector {
     /**

@@ -27,6 +27,9 @@ import java.util.Collection;
 import javax.net.ssl.X509TrustManager;
 import junit.framework.TestCase;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 public class CertBlacklistTest extends TestCase {
 
     private static final String BLACKLIST_CA = "test_blacklist_ca.pem";

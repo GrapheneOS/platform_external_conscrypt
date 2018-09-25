@@ -34,6 +34,7 @@ import javax.net.ssl.SSLSocketFactory;
 
 /**
  * The type of socket to be wrapped by the Conscrypt socket.
+ * @hide This class is not part of the Android public SDK API
  */
 @SuppressWarnings("unused")
 public enum ChannelType {

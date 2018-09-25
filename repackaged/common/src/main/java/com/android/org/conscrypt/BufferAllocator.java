@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 /**
  * An object responsible for allocation of buffers. This is an extension point to enable buffer
  * pooling within an application.
+ * @hide This class is not part of the Android public SDK API
  */
 @ExperimentalApi
 public abstract class BufferAllocator {

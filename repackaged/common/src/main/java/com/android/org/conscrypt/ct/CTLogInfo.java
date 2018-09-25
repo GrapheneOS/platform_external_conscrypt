@@ -32,6 +32,7 @@ import com.android.org.conscrypt.Internal;
  * It allows verification of SCTs against the log's public key.
  *
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public class CTLogInfo {

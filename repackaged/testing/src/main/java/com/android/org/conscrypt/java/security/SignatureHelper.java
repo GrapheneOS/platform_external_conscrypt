@@ -24,6 +24,9 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 public class SignatureHelper extends TestHelper<KeyPair> {
 
     private final String algorithmName;

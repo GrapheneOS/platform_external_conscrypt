@@ -32,6 +32,7 @@ import javax.net.ssl.SSLSession;
  * TestSSLEnginePair is a convenience class for other tests that want
  * a pair of connected and handshaked client and server SSLEngines for
  * testing.
+ * @hide This class is not part of the Android public SDK API
  */
 public final class TestSSLEnginePair implements Closeable {
     public final TestSSLContext c;

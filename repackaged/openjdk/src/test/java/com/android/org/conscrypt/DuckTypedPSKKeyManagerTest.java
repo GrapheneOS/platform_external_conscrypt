@@ -32,6 +32,9 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import junit.framework.TestCase;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 public class DuckTypedPSKKeyManagerTest extends TestCase {
     private SSLSocket mSSLSocket;
     private SSLEngine mSSLEngine;
