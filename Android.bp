@@ -141,7 +141,7 @@ cc_binary_host {
 }
 
 genrule {
-    name: "conscrypt_generated_constants",
+    name: "conscrypt-nojarjar_generated_constants",
     out: ["org/conscrypt/NativeConstants.java"],
     cmd: "$(location conscrypt_generate_constants) > $(out)",
     tools: ["conscrypt_generate_constants"],
@@ -155,7 +155,7 @@ java_library {
 
     srcs: [
         "common/src/main/java/**/*.java",
-        ":conscrypt_generated_constants",
+        ":conscrypt-nojarjar_generated_constants",
     ],
 
     target: {
@@ -174,17 +174,37 @@ java_library {
     java_version: "1.7",
 }
 
-// Create the conscrypt library by running jarjar on conscrypt-nojarjar
+genrule {
+    name: "conscrypt_generated_constants",
+    out: ["com/android/org/conscrypt/NativeConstants.java"],
+    cmd: "$(location conscrypt_generate_constants) com.android.org.conscrypt > $(out)",
+    tools: ["conscrypt_generate_constants"],
+}
+
+// Create the conscrypt library from the source produced by the srcgen/generate_android_src.sh
+// script.
 java_library {
     name: "conscrypt",
     installable: true,
     hostdex: true,
 
-    static_libs: ["conscrypt-nojarjar"],
+    srcs: [
+        "repackaged/common/src/main/java/**/*.java",
+        ":conscrypt_generated_constants",
+    ],
+
+    target: {
+        android: {
+            srcs: ["repackaged/platform/src/main/java/**/*.java"],
+        },
+        host: {
+            srcs: ["repackaged/openjdk/src/main/java/**/*.java"],
+            javacflags: ["-XDignore.symbol.file"],
+        },
+    },
 
     no_framework_libs: true,
 
-    jarjar_rules: "jarjar-rules.txt",
     required: ["libjavacrypto"],
 }
 
@@ -195,11 +215,10 @@ java_library {
     name: "conscrypt-testdex",
     installable: true,
 
-    static_libs: ["conscrypt-nojarjar"],
+    static_libs: ["conscrypt"],
 
     no_framework_libs: true,
 
-    jarjar_rules: "jarjar-rules.txt",
     required: ["libjavacrypto"],
 }
 
@@ -251,7 +270,7 @@ java_library {
     srcs: [
         "common/src/main/java/**/*.java",
         "android/src/main/java/**/*.java",
-        ":conscrypt_generated_constants",
+        ":conscrypt-nojarjar_generated_constants",
     ],
 
     libs: ["conscrypt-stubs"],
@@ -297,17 +316,13 @@ java_test {
     name: "conscrypt-tests",
     hostdex: true,
     srcs: [
-        "platform/src/test/java/**/*.java",
-        "common/src/test/java/**/*.java",
-        "openjdk-integ-tests/src/test/java/**/*.java",
-        "testing/src/main/java/**/*.java",
-    ],
-    exclude_srcs: [
-        "openjdk-integ-tests/src/test/java/org/conscrypt/ConscryptSuite.java",
-        "openjdk-integ-tests/src/test/java/org/conscrypt/ConscryptJava6Suite.java",
-        "testing/src/main/java/libcore/**/*.java",
+        "repackaged/platform/src/test/java/**/*.java",
+        "repackaged/common/src/test/java/**/*.java",
+        "repackaged/openjdk-integ-tests/src/test/java/**/*.java",
+        "repackaged/testing/src/main/java/**/*.java",
     ],
     java_resource_dirs: [
+        // Resource directories do not need repackaging.
         "openjdk/src/test/resources",
         "openjdk-integ-tests/src/test/resources",
     ],
@@ -318,7 +333,7 @@ java_test {
     ],
     static_libs: [
         "core-tests-support",
-        "conscrypt-nojarjar",
+        "conscrypt",
         "bouncycastle-unbundled",
         "bouncycastle-bcpkix-unbundled",
         "bouncycastle-ocsp-unbundled",
@@ -330,7 +345,6 @@ java_test {
     ],
 
     required: ["libjavacrypto"],
-    jarjar_rules: "jarjar-rules.txt",
     java_version: "1.7",
 }
 
@@ -338,12 +352,9 @@ java_test {
 java_test {
     name: "conscrypt-benchmarks",
     srcs: [
-        "testing/src/main/java/**/*.java",
-        "benchmark-base/src/main/java/**/*.java",
-        "benchmark-android/src/main/java/**/*.java",
-    ],
-    exclude_srcs: [
-        "testing/src/main/java/libcore/**/*.java",
+        "repackaged/testing/src/main/java/**/*.java",
+        "repackaged/benchmark-base/src/main/java/**/*.java",
+        "repackaged/benchmark-android/src/main/java/**/*.java",
     ],
     no_framework_libs: true,
     libs: [
@@ -355,7 +366,7 @@ java_test {
     ],
     static_libs: [
         "core-tests-support",
-        "conscrypt-nojarjar",
+        "conscrypt",
     ],
     javacflags: [
         "-Xmaxwarns 9999999",
@@ -364,6 +375,5 @@ java_test {
     ],
 
     required: ["libjavacrypto"],
-    jarjar_rules: "jarjar-rules.txt",
     java_version: "1.7",
 }
