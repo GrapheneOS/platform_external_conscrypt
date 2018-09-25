@@ -25,6 +25,7 @@ import java.security.NoSuchAlgorithmException;
  * Implements the JDK MessageDigest interface using OpenSSL's EVP API.
  *
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public class OpenSSLMessageDigestJDK extends MessageDigestSpi implements Cloneable {

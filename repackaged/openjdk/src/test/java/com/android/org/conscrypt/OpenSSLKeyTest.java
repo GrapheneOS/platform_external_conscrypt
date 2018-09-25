@@ -21,6 +21,9 @@ import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
 import junit.framework.TestCase;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 public class OpenSSLKeyTest extends TestCase {
     static final String RSA_PUBLIC_KEY =
         "-----BEGIN PUBLIC KEY-----\n" +

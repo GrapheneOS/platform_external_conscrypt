@@ -39,6 +39,7 @@ import javax.net.ssl.SSLSession;
  * underlying directory at a time.
  *
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public final class FileClientSessionCache {

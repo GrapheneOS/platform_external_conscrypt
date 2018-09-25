@@ -49,6 +49,7 @@ import com.android.org.conscrypt.java.security.TestKeyStore;
  * TestSSLContext is a convenience class for other tests that
  * want a canned SSLContext and related state for testing so they
  * don't have to duplicate the logic.
+ * @hide This class is not part of the Android public SDK API
  */
 public final class TestSSLContext {
     /**

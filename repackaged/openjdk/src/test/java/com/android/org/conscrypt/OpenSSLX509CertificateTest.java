@@ -31,6 +31,9 @@ import java.util.Arrays;
 import junit.framework.TestCase;
 import com.android.org.conscrypt.OpenSSLX509CertificateFactory.ParsingException;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 public class OpenSSLX509CertificateTest extends TestCase {
     public void testSerialization_NoContextDeserialization() throws Exception {
         // Set correct serialVersionUID

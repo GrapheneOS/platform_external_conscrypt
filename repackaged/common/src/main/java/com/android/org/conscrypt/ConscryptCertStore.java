@@ -8,6 +8,7 @@ import java.util.Set;
  * A certificate store that supports additional operations that are used in
  * TrustManagerImpl.  This is primarily implemented by the cert store on the
  * Android platform.
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public interface ConscryptCertStore {

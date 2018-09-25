@@ -9,6 +9,7 @@ import javax.net.ssl.SSLSocketFactory;
 
 /**
  * Utility for creating test client and server instances.
+ * @hide This class is not part of the Android public SDK API
  */
 @SuppressWarnings("ImmutableEnumChecker")
 public enum AndroidEndpointFactory implements EndpointFactory {

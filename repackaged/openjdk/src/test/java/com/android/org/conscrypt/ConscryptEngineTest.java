@@ -55,6 +55,9 @@ import org.junit.runners.Parameterized.Parameters;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 @RunWith(Parameterized.class)
 public class ConscryptEngineTest {
     private static final int MESSAGE_SIZE = 4096;

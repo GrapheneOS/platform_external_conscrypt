@@ -25,6 +25,7 @@ import com.android.org.conscrypt.ClientSocketBenchmark.Config;
 
 /**
  * Benchmark for comparing performance of client socket implementations.
+ * @hide This class is not part of the Android public SDK API
  */
 @SuppressWarnings("unused")
 public class CaliperClientSocketBenchmark {

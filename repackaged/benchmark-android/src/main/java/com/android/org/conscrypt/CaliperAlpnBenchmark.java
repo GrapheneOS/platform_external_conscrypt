@@ -25,6 +25,7 @@ import com.android.org.conscrypt.EngineHandshakeBenchmark.Config;
 /**
  * Cipher benchmarks. Only runs on AES currently because of the combinatorial
  * explosion of the test as it stands.
+ * @hide This class is not part of the Android public SDK API
  */
 @SuppressWarnings("unused")
 public class CaliperAlpnBenchmark {

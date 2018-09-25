@@ -23,6 +23,9 @@ import java.security.cert.Certificate;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSessionContext;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 public class FakeSSLSession implements SSLSession {
     private static final Charset UTF_8 = Charset.forName("UTF-8");
     final String host;

@@ -28,6 +28,7 @@ import com.android.org.conscrypt.OpenSSLX509CertificateFactory.ParsingException;
  * as part of the platform.
  *
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public final class InternalUtil {

@@ -83,6 +83,9 @@ import tests.util.ForEachRunner;
 import tests.util.ForEachRunner.Callback;
 import tests.util.Pair;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 @RunWith(JUnit4.class)
 public class SSLSocketTest {
     private ExecutorService executor;

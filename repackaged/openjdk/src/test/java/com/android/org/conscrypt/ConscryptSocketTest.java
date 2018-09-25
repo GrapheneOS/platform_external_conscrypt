@@ -64,6 +64,9 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.Mockito;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 @RunWith(Parameterized.class)
 public class ConscryptSocketTest {
     private static final long TIMEOUT_SECONDS = 5;

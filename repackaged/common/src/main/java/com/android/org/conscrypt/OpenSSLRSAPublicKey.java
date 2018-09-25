@@ -31,6 +31,7 @@ import java.security.spec.RSAPublicKeySpec;
  * perform all the operations.
  *
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public class OpenSSLRSAPublicKey implements RSAPublicKey, OpenSSLKeyHolder {

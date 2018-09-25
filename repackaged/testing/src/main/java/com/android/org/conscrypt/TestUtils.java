@@ -61,6 +61,7 @@ import org.junit.Assume;
 
 /**
  * Utility methods to support testing.
+ * @hide This class is not part of the Android public SDK API
  */
 public final class TestUtils {
     public static final Charset UTF_8 = Charset.forName("UTF-8");

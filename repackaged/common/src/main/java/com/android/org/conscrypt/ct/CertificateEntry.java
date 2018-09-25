@@ -41,6 +41,7 @@ import com.android.org.conscrypt.OpenSSLX509Certificate;
  * } CertificateEntry;
  *
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public class CertificateEntry {

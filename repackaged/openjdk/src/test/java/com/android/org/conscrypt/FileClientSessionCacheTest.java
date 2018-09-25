@@ -22,6 +22,9 @@ import java.io.IOException;
 import junit.framework.TestCase;
 import com.android.org.conscrypt.javax.net.ssl.FakeSSLSession;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 public class FileClientSessionCacheTest extends TestCase {
 
     public void testMaxSize() throws IOException, InterruptedException {
