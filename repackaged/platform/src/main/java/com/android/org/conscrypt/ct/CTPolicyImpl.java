@@ -24,6 +24,7 @@ import com.android.org.conscrypt.Internal;
 
 /**
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public class CTPolicyImpl implements CTPolicy {

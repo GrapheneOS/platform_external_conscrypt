@@ -26,6 +26,8 @@ import com.google.currysrc.api.output.OutputSourceFileGenerator;
 import com.google.currysrc.api.process.DefaultRule;
 import com.google.currysrc.api.process.Processor;
 import com.google.currysrc.api.process.Rule;
+import com.google.currysrc.api.process.ast.TypeLocator;
+import com.google.currysrc.processors.HidePublicClasses;
 import com.google.currysrc.processors.InsertHeader;
 import com.google.currysrc.processors.ModifyQualifiedNames;
 import com.google.currysrc.processors.ModifyStringLiterals;
@@ -34,6 +36,7 @@ import com.google.currysrc.processors.RenamePackage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -71,14 +74,22 @@ public class ConscryptTransform {
         public List<Rule> getRuleList(File ignored) {
             return Arrays.asList(
                     // Doc change: Insert a warning about the source code being generated.
-                    createMandatoryRule(new InsertHeader("/* GENERATED SOURCE. DO NOT MODIFY. */\n")),
+                    createMandatoryRule(
+                            new InsertHeader("/* GENERATED SOURCE. DO NOT MODIFY. */\n")),
                     // AST change: Change the package of each CompilationUnit
                     createMandatoryRule(new RenamePackage(ORIGINAL_PACKAGE, ANDROID_PACKAGE)),
                     // AST change: Change all qualified names in code and javadoc.
                     createOptionalRule(new ModifyQualifiedNames(ORIGINAL_PACKAGE, ANDROID_PACKAGE)),
                     // AST change: Change all string literals containing package names in code.
-                    createOptionalRule(new ModifyStringLiterals(ORIGINAL_PACKAGE, ANDROID_PACKAGE))
-                    );
+                    createOptionalRule(new ModifyStringLiterals(ORIGINAL_PACKAGE, ANDROID_PACKAGE)),
+                    // Doc change: Insert @hide on all public classes.
+                    createHidePublicClassesRule());
+        }
+
+        private static Rule createHidePublicClassesRule() {
+            List<TypeLocator> publicApiClassesWhitelist = Collections.emptyList();
+            return createOptionalRule(new HidePublicClasses(publicApiClassesWhitelist,
+                    "This class is not part of the Android public SDK API"));
         }
 
         @Override

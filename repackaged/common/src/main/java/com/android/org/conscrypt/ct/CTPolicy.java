@@ -20,6 +20,9 @@ package com.android.org.conscrypt.ct;
 import java.security.cert.X509Certificate;
 import com.android.org.conscrypt.Internal;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 @Internal
 public interface CTPolicy {
     boolean doesResultConformToPolicy(CTVerificationResult result, String hostname,

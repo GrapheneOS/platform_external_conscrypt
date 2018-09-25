@@ -22,6 +22,7 @@ import javax.net.ssl.SSLSocketFactory;
  * TestSSLSessions is a convenience class for other tests that want
  * precreated SSLSessions for testing. It contains a connected
  * client/server pair of SSLSession as well as an invalid SSLSession.
+ * @hide This class is not part of the Android public SDK API
  */
 public final class TestSSLSessions {
     /**

@@ -23,6 +23,7 @@ import javax.crypto.Cipher;
 
 /**
  * Benchmark for comparing cipher encrypt performance.
+ * @hide This class is not part of the Android public SDK API
  */
 public final class CipherEncryptBenchmark {
     public enum BufferType {

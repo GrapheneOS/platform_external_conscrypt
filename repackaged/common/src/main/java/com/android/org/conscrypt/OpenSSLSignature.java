@@ -38,6 +38,7 @@ import java.security.spec.PSSParameterSpec;
  * signature verification using OpenSSL.
  *
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public class OpenSSLSignature extends SignatureSpi {

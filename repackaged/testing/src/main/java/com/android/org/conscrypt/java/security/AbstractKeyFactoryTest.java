@@ -24,6 +24,9 @@ import java.security.spec.KeySpec;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 public abstract class AbstractKeyFactoryTest<PublicKeySpec extends KeySpec, PrivateKeySpec extends KeySpec> {
 
     private final String algorithmName;

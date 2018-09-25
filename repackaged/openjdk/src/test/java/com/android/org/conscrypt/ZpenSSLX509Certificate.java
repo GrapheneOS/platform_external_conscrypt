@@ -21,6 +21,7 @@ import java.io.Serializable;
 
 /**
  * This is a fake class to test de-serialization with malicious payloads.
+ * @hide This class is not part of the Android public SDK API
  */
 public class ZpenSSLX509Certificate implements Serializable {
     /** This will be set via reflection in the test. */

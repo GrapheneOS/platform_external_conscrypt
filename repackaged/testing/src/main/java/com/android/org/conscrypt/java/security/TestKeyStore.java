@@ -90,6 +90,7 @@ import com.android.org.conscrypt.javax.net.ssl.TestTrustManager;
  *
  * Creating a key store is relatively slow, so a singleton instance is
  * accessible via TestKeyStore.get().
+ * @hide This class is not part of the Android public SDK API
  */
 public final class TestKeyStore {
     /** Size of DSA keys to generate for testing. */

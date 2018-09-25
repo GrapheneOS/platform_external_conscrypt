@@ -25,6 +25,9 @@ import java.util.Arrays;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 public class AlgorithmParameterSymmetricHelper extends TestHelper<AlgorithmParameters> {
 
     private static final String plainData = "some data to encrypt and decrypt";

@@ -28,6 +28,7 @@ import javax.crypto.spec.IvParameterSpec;
  * supported encoding formats are ASN.1 (primary) and RAW.
  *
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public class IvParameters extends AlgorithmParametersSpi {

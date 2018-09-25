@@ -31,6 +31,9 @@ import javax.net.ssl.SSLSession;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 public abstract class AbstractSessionContextTest<T extends AbstractSessionContext> {
     private T context;
 

@@ -51,6 +51,7 @@ import org.junit.runners.JUnit4;
  * Test for basic compliance for ciphers.  This test uses reference vectors produced by
  * standards bodies and confirms that all implementations produce the correct answer
  * for the given inputs.
+ * @hide This class is not part of the Android public SDK API
  */
 @RunWith(JUnit4.class)
 public final class CipherBasicsTest {

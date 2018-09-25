@@ -17,6 +17,9 @@
 
 package com.android.org.conscrypt.java.security;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 public abstract class TestHelper<T> {
     public abstract void test(T testObject) throws Exception;
 }

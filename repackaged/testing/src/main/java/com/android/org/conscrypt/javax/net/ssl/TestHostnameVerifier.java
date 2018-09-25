@@ -13,6 +13,7 @@ import javax.net.ssl.SSLSession;
 
 /**
  * This class implements the simplest possible HostnameVerifier.
+ * @hide This class is not part of the Android public SDK API
  */
 public class TestHostnameVerifier implements HostnameVerifier {
     @Override

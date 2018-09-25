@@ -21,6 +21,9 @@ import static org.junit.Assert.assertArrayEquals;
 
 import org.junit.Test;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 public class TestSessionBuilderTest {
     @Test
     public void buildsValidBasicSession() {

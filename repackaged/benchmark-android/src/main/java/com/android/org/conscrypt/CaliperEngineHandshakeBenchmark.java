@@ -40,6 +40,7 @@ import com.android.org.conscrypt.EngineHandshakeBenchmark.Config;
 
 /**
  * Benchmark comparing handshake performance of various engine implementations.
+ * @hide This class is not part of the Android public SDK API
  */
 @SuppressWarnings("unused")
 public class CaliperEngineHandshakeBenchmark {

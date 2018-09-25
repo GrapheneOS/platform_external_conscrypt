@@ -40,6 +40,9 @@ import org.junit.runners.JUnit4;
 import dalvik.system.VMRuntime;
 import sun.security.jca.Providers;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 @RunWith(JUnit4.class)
 public class KeyGeneratorTest {
     

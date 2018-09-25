@@ -19,7 +19,7 @@
 // and associated tests.
 //
 
-// Conscrypt is divided into modules.
+// Conscrypt is divided into subdirectories.
 //
 // The structure is:
 //

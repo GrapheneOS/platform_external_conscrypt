@@ -18,6 +18,7 @@ package tests.util;
 /**
  * Runner which executes the provided code under test (via a callback) for each provided input
  * value.
+ * @hide This class is not part of the Android public SDK API
  */
 public final class ForEachRunner {
     /**

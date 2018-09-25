@@ -6,6 +6,7 @@ import java.security.PublicKey;
 
 /**
  * A set of certificates that are blacklisted from trust.
+ * @hide This class is not part of the Android public SDK API
  */
 public interface CertBlacklist {
 

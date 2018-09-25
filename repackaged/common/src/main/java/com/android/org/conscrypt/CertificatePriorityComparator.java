@@ -39,6 +39,7 @@ import java.util.Map;
  * <li>notBefore date descending.</li>
  * </ol>
  * </p>
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public final class CertificatePriorityComparator implements Comparator<X509Certificate> {

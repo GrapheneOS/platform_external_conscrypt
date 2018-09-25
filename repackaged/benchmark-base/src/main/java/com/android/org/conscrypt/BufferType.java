@@ -21,6 +21,7 @@ import javax.net.ssl.SSLEngine;
 
 /**
  * Enumeration that provides allocation of direct or heap buffers.
+ * @hide This class is not part of the Android public SDK API
  */
 @SuppressWarnings("unused")
 public enum BufferType {

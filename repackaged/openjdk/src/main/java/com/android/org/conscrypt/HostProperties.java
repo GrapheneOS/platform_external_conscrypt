@@ -40,6 +40,7 @@ import java.util.logging.Logger;
 
 /**
  * Utilities for interacting with properties of the host being run on.
+ * @hide This class is not part of the Android public SDK API
  */
 public class HostProperties {
     private static final Logger logger = Logger.getLogger(HostProperties.class.getName());

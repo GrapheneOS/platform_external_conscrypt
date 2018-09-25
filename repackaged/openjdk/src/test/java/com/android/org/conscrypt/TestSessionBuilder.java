@@ -23,6 +23,9 @@ import static org.junit.Assert.assertTrue;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 public class TestSessionBuilder {
     private int type;
 

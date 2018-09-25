@@ -19,6 +19,9 @@ package com.android.org.conscrypt;
 
 import junit.framework.TestCase;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 public class NativeRefTest extends TestCase {
     public void test_zeroContextThrowsNullPointException() {
         try {

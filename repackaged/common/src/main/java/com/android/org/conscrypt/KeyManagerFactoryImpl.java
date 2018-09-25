@@ -35,6 +35,7 @@ import javax.net.ssl.ManagerFactoryParameters;
  * KeyManagerFactory implementation.
  * @see KeyManagerFactorySpi
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public class KeyManagerFactoryImpl extends KeyManagerFactorySpi {
