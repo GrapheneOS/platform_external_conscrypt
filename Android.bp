@@ -181,6 +181,15 @@ genrule {
     tools: ["conscrypt_generate_constants"],
 }
 
+filegroup {
+    name: "conscrypt_java_files",
+    srcs: [
+        "repackaged/common/src/main/java/**/*.java",
+        "repackaged/platform/src/main/java/**/*.java",
+        ":conscrypt_generated_constants",
+    ],
+}
+
 // Create the conscrypt library from the source produced by the srcgen/generate_android_src.sh
 // script.
 java_library {
@@ -188,20 +197,7 @@ java_library {
     installable: true,
     hostdex: true,
 
-    srcs: [
-        "repackaged/common/src/main/java/**/*.java",
-        ":conscrypt_generated_constants",
-    ],
-
-    target: {
-        android: {
-            srcs: ["repackaged/platform/src/main/java/**/*.java"],
-        },
-        host: {
-            srcs: ["repackaged/openjdk/src/main/java/**/*.java"],
-            javacflags: ["-XDignore.symbol.file"],
-        },
-    },
+    srcs: [":conscrypt_java_files"],
 
     no_framework_libs: true,
 
