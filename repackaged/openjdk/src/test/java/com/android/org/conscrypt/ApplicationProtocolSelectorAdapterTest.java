@@ -29,6 +29,9 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 public class ApplicationProtocolSelectorAdapterTest {
     private static Charset US_ASCII = Charset.forName("US-ASCII");
     private static final String[] PROTOCOLS = new String[] {"a", "b", "c"};

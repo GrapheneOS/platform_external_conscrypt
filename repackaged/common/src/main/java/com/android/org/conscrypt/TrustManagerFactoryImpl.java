@@ -48,6 +48,7 @@ import javax.net.ssl.TrustManagerFactorySpi;
  *
  * @see javax.net.ssl.TrustManagerFactorySpi
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public class TrustManagerFactoryImpl extends TrustManagerFactorySpi {

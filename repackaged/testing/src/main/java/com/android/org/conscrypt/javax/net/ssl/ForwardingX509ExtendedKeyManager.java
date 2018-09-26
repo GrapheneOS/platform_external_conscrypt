@@ -24,6 +24,7 @@ import javax.net.ssl.X509ExtendedKeyManager;
 /**
  * {@link X509ExtendedKeyManager} which delegates all calls to the provided
  * {@code X509ExtendedKeyManager} instance.
+ * @hide This class is not part of the Android public SDK API
  */
 public class ForwardingX509ExtendedKeyManager extends X509ExtendedKeyManager {
     private final X509ExtendedKeyManager delegate;

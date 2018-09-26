@@ -36,6 +36,7 @@ import javax.security.auth.x500.X500Principal;
  * time instead of O(N).
  *
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public final class TrustedCertificateIndex {

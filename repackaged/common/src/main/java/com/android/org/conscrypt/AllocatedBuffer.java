@@ -38,6 +38,7 @@ import java.nio.ByteBuffer;
 
 /**
  * A buffer that was allocated by a {@link BufferAllocator}.
+ * @hide This class is not part of the Android public SDK API
  */
 @ExperimentalApi
 public abstract class AllocatedBuffer {

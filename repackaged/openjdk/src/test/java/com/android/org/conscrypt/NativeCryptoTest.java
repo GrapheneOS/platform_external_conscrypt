@@ -91,6 +91,9 @@ import org.junit.runners.JUnit4;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 @RunWith(JUnit4.class)
 public class NativeCryptoTest {
     private static final long NULL = 0;

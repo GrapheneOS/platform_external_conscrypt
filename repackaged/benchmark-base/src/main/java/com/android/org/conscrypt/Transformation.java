@@ -26,6 +26,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 /**
  * Supported cipher transformations.
+ * @hide This class is not part of the Android public SDK API
  */
 @SuppressWarnings({"ImmutableEnumChecker", "unused"})
 public enum Transformation {

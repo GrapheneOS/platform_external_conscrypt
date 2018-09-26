@@ -32,6 +32,7 @@ import java.security.interfaces.RSAPublicKey;
  * generation and verification using BoringSSL.
  *
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public final class OpenSSLSignatureRawRSA extends SignatureSpi {

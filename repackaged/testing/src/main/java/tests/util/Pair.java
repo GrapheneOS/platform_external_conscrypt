@@ -22,6 +22,7 @@ package tests.util;
  *
  * @param <F> type of the first value.
  * @param <S> type of the second value.
+ * @hide This class is not part of the Android public SDK API
  */
 public class Pair<F, S> {
     private final F mFirst;

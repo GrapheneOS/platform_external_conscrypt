@@ -23,6 +23,7 @@ import javax.net.SocketFactory;
 /**
  * {@link SocketFactory} which delegates all invocations to the provided delegate
  * {@code SocketFactory}.
+ * @hide This class is not part of the Android public SDK API
  */
 public class DelegatingSocketFactory extends SocketFactory {
     private final SocketFactory mDelegate;

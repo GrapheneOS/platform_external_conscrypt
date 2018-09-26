@@ -60,6 +60,7 @@ import sun.security.jca.Providers;
 
 /**
  * Tests for all registered Elliptic Curve Diffie-Hellman {@link KeyAgreement} providers.
+ * @hide This class is not part of the Android public SDK API
  */
 @RunWith(JUnit4.class)
 public class ECDHKeyAgreementTest {

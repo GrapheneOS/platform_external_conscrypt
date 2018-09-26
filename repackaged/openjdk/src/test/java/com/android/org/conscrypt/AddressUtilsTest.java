@@ -21,6 +21,7 @@ import junit.framework.TestCase;
 
 /**
  * Test for AddressUtils
+ * @hide This class is not part of the Android public SDK API
  */
 public class AddressUtilsTest extends TestCase {
     public void test_isValidSniHostname_Success() throws Exception {

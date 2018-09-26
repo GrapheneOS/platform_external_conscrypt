@@ -38,6 +38,7 @@ import java.util.List;
  * An implementation of {@link java.security.cert.CertificateFactory} based on BoringSSL.
  *
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public class OpenSSLX509CertificateFactory extends CertificateFactorySpi {

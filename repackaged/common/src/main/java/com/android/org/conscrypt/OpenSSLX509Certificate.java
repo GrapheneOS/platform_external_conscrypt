@@ -56,6 +56,7 @@ import com.android.org.conscrypt.OpenSSLX509CertificateFactory.ParsingException;
  * An implementation of {@link X509Certificate} based on BoringSSL.
  *
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public final class OpenSSLX509Certificate extends X509Certificate {

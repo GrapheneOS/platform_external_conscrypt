@@ -32,6 +32,7 @@ import libcore.java.security.StandardNames;
  * TestKeyManager is a simple proxy class that wraps an existing
  * X509ExtendedKeyManager to provide debug logging and recording of
  * values.
+ * @hide This class is not part of the Android public SDK API
  */
 public final class TestKeyManager extends X509ExtendedKeyManager {
     private static final boolean LOG = false;

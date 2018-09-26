@@ -35,6 +35,7 @@ import javax.net.ssl.TrustManagerFactory;
  * Support class for this package.
  *
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public final class DefaultSSLContextImpl extends OpenSSLContextImpl {

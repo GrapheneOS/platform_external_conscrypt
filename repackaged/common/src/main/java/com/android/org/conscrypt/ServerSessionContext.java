@@ -24,6 +24,7 @@ import javax.net.ssl.SSLContext;
  * sessions using the ID provided by an SSL client.
  *
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public final class ServerSessionContext extends AbstractSessionContext {

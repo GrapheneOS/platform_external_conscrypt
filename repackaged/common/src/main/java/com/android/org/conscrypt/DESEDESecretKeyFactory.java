@@ -30,6 +30,7 @@ import javax.crypto.spec.SecretKeySpec;
  * class supports {@link SecretKeySpec} and {@link DESedeKeySpec} for key specs.
  *
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public class DESEDESecretKeyFactory extends SecretKeyFactorySpi {

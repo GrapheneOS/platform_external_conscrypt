@@ -55,6 +55,7 @@ import org.junit.runners.Parameterized;
 /**
  * Tests for SSLSocket classes that ensure the TLS 1.2 and TLS 1.3 implementations
  * are compatible.
+ * @hide This class is not part of the Android public SDK API
  */
 @RunWith(Parameterized.class)
 public class SSLEngineVersionCompatibilityTest {

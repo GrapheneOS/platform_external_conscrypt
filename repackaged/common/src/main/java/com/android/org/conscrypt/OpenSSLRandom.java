@@ -24,6 +24,7 @@ import java.security.SecureRandomSpi;
  * Implements {@link java.security.SecureRandom} using BoringSSL's RAND interface.
  *
  * @hide
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public final class OpenSSLRandom extends SecureRandomSpi implements Serializable {
