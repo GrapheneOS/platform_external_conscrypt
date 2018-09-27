@@ -199,7 +199,11 @@ java_library {
 
     srcs: [":conscrypt_java_files"],
 
-    no_framework_libs: true,
+    // Conscrypt can be updated independently from the other core libraries so it must only depend
+    // on public SDK and intra-core APIs.
+    no_standard_libs: true,
+    libs: ["core.intra.stubs"],
+    system_modules: "core-intra-stubs-system-modules",
 
     required: ["libjavacrypto"],
 }
