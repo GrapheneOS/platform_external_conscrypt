@@ -35,6 +35,7 @@ import javax.net.ssl.X509TrustManager;
  * Core API for creating and configuring all Conscrypt types.
  * @hide This class is not part of the Android public SDK API
  */
+@libcore.api.CorePlatformApi
 @SuppressWarnings("unused")
 public final class Conscrypt {
     private Conscrypt() {}
@@ -144,6 +145,7 @@ public final class Conscrypt {
     /**
      * Constructs a new instance of the preferred {@link SSLContextSpi}.
      */
+    @libcore.api.CorePlatformApi
     public static SSLContextSpi newPreferredSSLContextSpi() {
         checkAvailability();
         return OpenSSLContextImpl.getPreferred();

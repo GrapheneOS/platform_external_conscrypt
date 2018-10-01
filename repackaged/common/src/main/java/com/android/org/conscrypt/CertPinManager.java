@@ -27,6 +27,7 @@ import java.util.List;
  * @hide
  * @hide This class is not part of the Android public SDK API
  */
+@libcore.api.CorePlatformApi
 @Internal
 public interface CertPinManager {
     /**
