@@ -30,6 +30,7 @@ import javax.net.ssl.SSLContext;
  * @hide
  * @hide This class is not part of the Android public SDK API
  */
+@libcore.api.CorePlatformApi
 @Internal
 public final class ClientSessionContext extends AbstractSessionContext {
     /**
@@ -53,6 +54,7 @@ public final class ClientSessionContext extends AbstractSessionContext {
      * Applications should not use this method. Instead use {@link
      * Conscrypt#setClientSessionCache(SSLContext, SSLClientSessionCache)}.
      */
+    @libcore.api.CorePlatformApi
     public void setPersistentCache(SSLClientSessionCache persistentCache) {
         this.persistentCache = persistentCache;
     }
