@@ -203,6 +203,7 @@ java_library {
     // on public SDK and intra-core APIs.
     no_standard_libs: true,
     libs: ["core.intra.stubs"],
+    patch_module: "java.base",
     system_modules: "core-intra-stubs-system-modules",
 
     required: ["libjavacrypto"],
