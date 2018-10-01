@@ -33,6 +33,7 @@ import javax.net.ssl.SSLSession;
  * @hide
  * @hide This class is not part of the Android public SDK API
  */
+@libcore.api.CorePlatformApi
 @Internal
 public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
     OpenSSLSocketImpl() throws IOException {
@@ -67,6 +68,7 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
         return super.getHostname();
     }
 
+    @libcore.api.CorePlatformApi
     @Override
     public void setHostname(String hostname) {
         super.setHostname(hostname);
@@ -82,6 +84,7 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
         return super.getFileDescriptor$();
     }
 
+    @libcore.api.CorePlatformApi
     @Override
     public void setSoWriteTimeout(int writeTimeoutMilliseconds) throws SocketException {
         super.setSoWriteTimeout(writeTimeoutMilliseconds);
@@ -92,6 +95,7 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
         return super.getSoWriteTimeout();
     }
 
+    @libcore.api.CorePlatformApi
     @Override
     public void setHandshakeTimeout(int handshakeTimeoutMilliseconds) throws SocketException {
         super.setHandshakeTimeout(handshakeTimeoutMilliseconds);
@@ -100,6 +104,7 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
     @Override
     public abstract SSLSession getHandshakeSession();
 
+    @libcore.api.CorePlatformApi
     @Override
     public abstract void setUseSessionTickets(boolean useSessionTickets);
 
@@ -109,15 +114,18 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
     @Override
     public abstract byte[] getChannelId() throws SSLException;
 
+    @libcore.api.CorePlatformApi
     @Override
     public abstract void setChannelIdPrivateKey(PrivateKey privateKey);
 
+    @libcore.api.CorePlatformApi
     @Override
     @Deprecated
     public final byte[] getNpnSelectedProtocol() {
         return super.getNpnSelectedProtocol();
     }
 
+    @libcore.api.CorePlatformApi
     @Override
     @Deprecated
     public final void setNpnProtocols(byte[] npnProtocols) {
@@ -130,6 +138,7 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
         setApplicationProtocols(alpnProtocols == null ? EmptyArray.STRING : alpnProtocols);
     }
 
+    @libcore.api.CorePlatformApi
     @Deprecated
     @Override
     public final byte[] getAlpnSelectedProtocol() {
@@ -139,6 +148,7 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
     /**
      * @deprecated Use {@link #setAlpnProtocols(String[])} instead.
      */
+    @libcore.api.CorePlatformApi
     @Override
     @Deprecated
     public final void setAlpnProtocols(byte[] protocols) {

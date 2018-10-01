@@ -15,18 +15,19 @@
  */
 package com.android.conscrypt.srcgen;
 
+import static com.google.currysrc.api.process.Rules.createMandatoryRule;
+import static com.google.currysrc.api.process.Rules.createOptionalRule;
+
 import com.google.currysrc.Main;
-import com.google.currysrc.api.Rules;
-import com.google.currysrc.api.input.CompoundDirectoryInputFileGenerator;
+import com.google.currysrc.api.RuleSet;
 import com.google.currysrc.api.input.DirectoryInputFileGenerator;
 import com.google.currysrc.api.input.InputFileGenerator;
-import com.google.currysrc.api.match.SourceMatchers;
 import com.google.currysrc.api.output.BasicOutputSourceFileGenerator;
 import com.google.currysrc.api.output.OutputSourceFileGenerator;
-import com.google.currysrc.api.process.DefaultRule;
-import com.google.currysrc.api.process.Processor;
 import com.google.currysrc.api.process.Rule;
+import com.google.currysrc.api.process.ast.BodyDeclarationLocators;
 import com.google.currysrc.api.process.ast.TypeLocator;
+import com.google.currysrc.processors.AddAnnotation;
 import com.google.currysrc.processors.HidePublicClasses;
 import com.google.currysrc.processors.InsertHeader;
 import com.google.currysrc.processors.ModifyQualifiedNames;
@@ -34,10 +35,14 @@ import com.google.currysrc.processors.ModifyStringLiterals;
 import com.google.currysrc.processors.RenamePackage;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants;
 
 /**
  * Generates conscrypt sources in the com.android.org.conscrypt package.
@@ -51,18 +56,36 @@ public class ConscryptTransform {
      * java ConscryptTransform {source dir} {target dir}
      */
     public static void main(String[] args) throws Exception {
+        if (args.length != 3) {
+          throw new IllegalArgumentException(
+              "Usage: " + ConscryptTransform.class.getCanonicalName()
+                  + " <source-dir> <target-dir> <core-platform-api-file>");
+        }
         String sourceDir = args[0];
         String targetDir = args[1];
-        new Main(false /* debug */).execute(new ConscryptRules(sourceDir, targetDir));
+        Path corePlatformApiFile = Paths.get(args[2]);
+
+        Map<String, String> options = JavaCore.getOptions();
+        options.put(JavaCore.COMPILER_COMPLIANCE, JavaCore.VERSION_1_8);
+        options.put(JavaCore.COMPILER_SOURCE, JavaCore.VERSION_1_8);
+        options.put(JavaCore.COMPILER_DOC_COMMENT_SUPPORT, JavaCore.ENABLED);
+        options.put(DefaultCodeFormatterConstants.FORMATTER_TAB_CHAR, JavaCore.SPACE);
+        options.put(DefaultCodeFormatterConstants.FORMATTER_TAB_SIZE, "4");
+
+        new Main(false /* debug */)
+            .setJdtOptions(options)
+            .execute(new TransformRules(sourceDir, targetDir, corePlatformApiFile));
     }
 
-    static class ConscryptRules implements Rules {
+    static class TransformRules implements RuleSet {
         private final String sourceDir;
         private final String targetDir;
+        private final Path corePlatformApiFile;
 
-        ConscryptRules(String sourceDir, String targetDir) {
+        TransformRules(String sourceDir, String targetDir, Path corePlatformApiFile) {
             this.sourceDir = sourceDir;
             this.targetDir = targetDir;
+            this.corePlatformApiFile = corePlatformApiFile;
         }
 
         @Override
@@ -83,7 +106,11 @@ public class ConscryptTransform {
                     // AST change: Change all string literals containing package names in code.
                     createOptionalRule(new ModifyStringLiterals(ORIGINAL_PACKAGE, ANDROID_PACKAGE)),
                     // Doc change: Insert @hide on all public classes.
-                    createHidePublicClassesRule());
+                    createHidePublicClassesRule(),
+                    // AST change: Add CorePlatformApi to specified classes and members
+                    createOptionalRule(new AddAnnotation("libcore.api.CorePlatformApi",
+                        BodyDeclarationLocators.readBodyDeclarationLocators(corePlatformApiFile)))
+                    );
         }
 
         private static Rule createHidePublicClassesRule() {
@@ -97,14 +124,6 @@ public class ConscryptTransform {
             File outputDir = new File(targetDir);
             return new BasicOutputSourceFileGenerator(outputDir);
         }
-    }
-
-    public static DefaultRule createMandatoryRule(Processor processor) {
-        return new DefaultRule(processor, SourceMatchers.all(), true /* mustModify */);
-    }
-
-    public static DefaultRule createOptionalRule(Processor processor) {
-        return new DefaultRule(processor, SourceMatchers.all(), false /* mustModify */);
     }
 
     private ConscryptTransform() {

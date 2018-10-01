@@ -86,6 +86,7 @@ import com.android.org.conscrypt.ct.CTVerifier;
  * @hide
  * @hide This class is not part of the Android public SDK API
  */
+@libcore.api.CorePlatformApi
 @Internal
 public final class TrustManagerImpl extends X509ExtendedTrustManager {
 
@@ -155,6 +156,7 @@ public final class TrustManagerImpl extends X509ExtendedTrustManager {
         this(keyStore, manager, null);
     }
 
+    @libcore.api.CorePlatformApi
     public TrustManagerImpl(KeyStore keyStore, CertPinManager manager,
             ConscryptCertStore certStore) {
         this(keyStore, manager, certStore, null);
@@ -261,6 +263,7 @@ public final class TrustManagerImpl extends X509ExtendedTrustManager {
         return trustAnchors;
     }
 
+    @libcore.api.CorePlatformApi
     @Override
     public void checkClientTrusted(X509Certificate[] chain, String authType)
             throws CertificateException {
@@ -285,6 +288,7 @@ public final class TrustManagerImpl extends X509ExtendedTrustManager {
         return session;
     }
 
+    @libcore.api.CorePlatformApi
     @Override
     public void checkClientTrusted(X509Certificate[] chain, String authType, Socket socket)
             throws CertificateException {
@@ -298,6 +302,7 @@ public final class TrustManagerImpl extends X509ExtendedTrustManager {
         checkTrusted(chain, authType, session, parameters, true /* client auth */);
     }
 
+    @libcore.api.CorePlatformApi
     @Override
     public void checkClientTrusted(X509Certificate[] chain, String authType, SSLEngine engine)
             throws CertificateException {
@@ -317,6 +322,7 @@ public final class TrustManagerImpl extends X509ExtendedTrustManager {
     /**
      * For backward compatibility with older Android API that used String for the hostname only.
      */
+    @libcore.api.CorePlatformApi
     public List<X509Certificate> checkServerTrusted(X509Certificate[] chain, String authType,
             String hostname) throws CertificateException {
         return checkTrusted(chain, null /* ocspData */, null /* tlsSctData */, authType, hostname,
@@ -328,6 +334,7 @@ public final class TrustManagerImpl extends X509ExtendedTrustManager {
      *
      * Throws {@link CertificateException} when no trusted chain can be found from {@code certs}.
      */
+    @libcore.api.CorePlatformApi
     public List<X509Certificate> getTrustedChainForServer(X509Certificate[] certs,
             String authType, Socket socket) throws CertificateException {
         SSLSession session = null;
@@ -345,6 +352,7 @@ public final class TrustManagerImpl extends X509ExtendedTrustManager {
      *
      * Throws {@link CertificateException} when no trusted chain can be found from {@code certs}.
      */
+    @libcore.api.CorePlatformApi
     public List<X509Certificate> getTrustedChainForServer(X509Certificate[] certs,
             String authType, SSLEngine engine) throws CertificateException {
         SSLSession session = engine.getHandshakeSession();
@@ -378,6 +386,7 @@ public final class TrustManagerImpl extends X509ExtendedTrustManager {
         return checkTrusted(chain, authType, session, null, false /* client auth */);
     }
 
+    @libcore.api.CorePlatformApi
     public void handleTrustStorageUpdate() {
         if (acceptedIssuers == null) {
             trustedCertificateIndex.reset();

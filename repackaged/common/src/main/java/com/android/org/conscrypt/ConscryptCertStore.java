@@ -10,6 +10,7 @@ import java.util.Set;
  * Android platform.
  * @hide This class is not part of the Android public SDK API
  */
+@libcore.api.CorePlatformApi
 @Internal
 public interface ConscryptCertStore {
 
