@@ -33,6 +33,7 @@ import javax.net.ssl.SSLSession;
  * @hide
  * @hide This class is not part of the Android public SDK API
  */
+@libcore.api.CorePlatformApi
 @Internal
 public interface SSLClientSessionCache {
     /**
