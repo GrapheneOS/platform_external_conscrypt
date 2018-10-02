@@ -148,6 +148,7 @@ public final class TrustManagerImpl extends X509ExtendedTrustManager {
      *
      * @param keyStore
      */
+    @libcore.api.CorePlatformApi
     public TrustManagerImpl(KeyStore keyStore) {
         this(keyStore, null);
     }
