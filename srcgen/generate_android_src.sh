@@ -11,9 +11,11 @@ CONSCRYPT_DIR=${ANDROID_BUILD_TOP}/external/conscrypt
 cd ${ANDROID_BUILD_TOP}
 make -j15 currysrc android_conscrypt_srcgen
 
+CORE_PLATFORM_API_FILE=${CONSCRYPT_DIR}/srcgen/core-platform-api.txt
+
 function do_transform() {
-  SRC_IN_DIR=$1
-  SRC_OUT_DIR=$2
+  local SRC_IN_DIR=$1
+  local SRC_OUT_DIR=$2
 
   if [ ! -d $SRC_OUT_DIR ]; then
     echo ${SRC_OUT_DIR} does not exist >&2
@@ -22,7 +24,7 @@ function do_transform() {
   rm -rf ${SRC_OUT_DIR}
   mkdir -p ${SRC_OUT_DIR}
 
-  java -cp ${CLASSPATH} com.android.conscrypt.srcgen.ConscryptTransform ${SRC_IN_DIR} ${SRC_OUT_DIR}
+  java -cp ${CLASSPATH} com.android.conscrypt.srcgen.ConscryptTransform ${SRC_IN_DIR} ${SRC_OUT_DIR} ${CORE_PLATFORM_API_FILE}
 }
 
 REPACKAGED_DIR=${CONSCRYPT_DIR}/repackaged

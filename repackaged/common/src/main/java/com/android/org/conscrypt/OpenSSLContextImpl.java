@@ -38,6 +38,7 @@ import javax.net.ssl.TrustManager;
  * @hide
  * @hide This class is not part of the Android public SDK API
  */
+@libcore.api.CorePlatformApi
 @Internal
 public abstract class OpenSSLContextImpl extends SSLContextSpi {
     /**
@@ -99,6 +100,7 @@ public abstract class OpenSSLContextImpl extends SSLContextSpi {
      * @param sr the randomness source or {@code null}
      * @throws KeyManagementException if initializing this instance fails
      */
+    @libcore.api.CorePlatformApi
     @Override
     public void engineInit(KeyManager[] kms, TrustManager[] tms, SecureRandom sr)
             throws KeyManagementException {
@@ -106,6 +108,7 @@ public abstract class OpenSSLContextImpl extends SSLContextSpi {
                 kms, tms, sr, clientSessionContext, serverSessionContext, algorithms);
     }
 
+    @libcore.api.CorePlatformApi
     @Override
     public SSLSocketFactory engineGetSocketFactory() {
         if (sslParameters == null) {
@@ -147,6 +150,7 @@ public abstract class OpenSSLContextImpl extends SSLContextSpi {
         return serverSessionContext;
     }
 
+    @libcore.api.CorePlatformApi
     @Override
     public ClientSessionContext engineGetClientSessionContext() {
         return clientSessionContext;
