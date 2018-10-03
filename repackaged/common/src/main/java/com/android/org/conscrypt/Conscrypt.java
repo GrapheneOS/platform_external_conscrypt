@@ -129,6 +129,7 @@ public final class Conscrypt {
     /**
      * Gets the default X.509 trust manager.
      */
+    @libcore.api.CorePlatformApi
     @ExperimentalApi
     public static X509TrustManager getDefaultX509TrustManager() throws KeyManagementException {
         checkAvailability();

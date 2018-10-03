@@ -94,6 +94,7 @@ public class TrustedCertificateStore implements ConscryptCertStore {
     public static final boolean isSystem(String alias) {
         return alias.startsWith(PREFIX_SYSTEM);
     }
+    @libcore.api.CorePlatformApi
     public static final boolean isUser(String alias) {
         return alias.startsWith(PREFIX_USER);
     }
@@ -591,6 +592,7 @@ public class TrustedCertificateStore implements ConscryptCertStore {
      * silently ignores the certificate if it already exists in the
      * store.
      */
+    @libcore.api.CorePlatformApi
     public void installCertificate(X509Certificate cert) throws IOException, CertificateException {
         if (cert == null) {
             throw new NullPointerException("cert == null");
@@ -626,6 +628,7 @@ public class TrustedCertificateStore implements ConscryptCertStore {
      * only. Instead, this is used by the {@code KeyChainService} to
      * delete CA certificates.
      */
+    @libcore.api.CorePlatformApi
     public void deleteCertificateEntry(String alias) throws IOException, CertificateException {
         if (alias == null) {
             return;
