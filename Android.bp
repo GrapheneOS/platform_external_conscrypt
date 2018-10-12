@@ -158,17 +158,18 @@ java_library {
         ":conscrypt-nojarjar_generated_constants",
     ],
 
+    no_standard_libs: true,
+    system_modules: "core-all-system-modules",
     target: {
         android: {
             srcs: ["platform/src/main/java/**/*.java"],
+            libs: ["core-all"],
         },
         host: {
             srcs: ["openjdk/src/main/java/**/*.java"],
             javacflags: ["-XDignore.symbol.file"],
         },
     },
-
-    no_framework_libs: true,
 
     required: ["libjavacrypto"],
     java_version: "1.7",
@@ -361,14 +362,17 @@ java_test {
         "repackaged/benchmark-base/src/main/java/**/*.java",
         "repackaged/benchmark-android/src/main/java/**/*.java",
     ],
-    no_framework_libs: true,
+    no_standard_libs: true,
     libs: [
+        "core-all",
         "junit",
         "bouncycastle-unbundled",
         "bouncycastle-bcpkix-unbundled",
         "bouncycastle-ocsp-unbundled",
         "caliper-api-target",
     ],
+    system_modules: "core-all-system-modules",
+
     static_libs: [
         "core-tests-support",
         "conscrypt",
