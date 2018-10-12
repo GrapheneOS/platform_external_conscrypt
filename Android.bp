@@ -327,11 +327,15 @@ java_test {
         "openjdk/src/test/resources",
         "openjdk-integ-tests/src/test/resources",
     ],
-    no_framework_libs: true,
+
+    no_standard_libs: true,
     libs: [
+        "core-all",
         "junit",
         "mockito-target-minus-junit4",
     ],
+    system_modules: "core-all-system-modules",
+
     static_libs: [
         "core-tests-support",
         "conscrypt",
