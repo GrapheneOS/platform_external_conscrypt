@@ -5,6 +5,7 @@ method:com.android.org.conscrypt.FileClientSessionCache#usingDirectory(File)
 method:com.android.org.conscrypt.OpenSSLContextImpl#engineGetClientSessionContext()
 method:com.android.org.conscrypt.OpenSSLContextImpl#engineGetSocketFactory()
 method:com.android.org.conscrypt.OpenSSLContextImpl#engineInit(KeyManager[],TrustManager[],SecureRandom)
+method:com.android.org.conscrypt.OpenSSLProvider#OpenSSLProvider()
 method:com.android.org.conscrypt.OpenSSLSocketImpl#getAlpnSelectedProtocol()
 method:com.android.org.conscrypt.OpenSSLSocketImpl#getNpnSelectedProtocol()
 method:com.android.org.conscrypt.OpenSSLSocketImpl#setAlpnProtocols(byte[])
@@ -43,6 +44,7 @@ type:com.android.org.conscrypt.Conscrypt
 type:com.android.org.conscrypt.ConscryptCertStore
 type:com.android.org.conscrypt.FileClientSessionCache
 type:com.android.org.conscrypt.OpenSSLContextImpl
+type:com.android.org.conscrypt.OpenSSLProvider
 type:com.android.org.conscrypt.OpenSSLSocketImpl
 type:com.android.org.conscrypt.SSLClientSessionCache
 type:com.android.org.conscrypt.TrustedCertificateIndex

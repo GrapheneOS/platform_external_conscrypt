@@ -34,6 +34,7 @@ import java.security.Provider;
  * @hide
  * @hide This class is not part of the Android public SDK API
  */
+@libcore.api.CorePlatformApi
 @Internal
 public final class OpenSSLProvider extends Provider {
     private static final long serialVersionUID = 2996752495318905136L;
@@ -47,6 +48,7 @@ public final class OpenSSLProvider extends Provider {
     private static final String STANDARD_RSA_PUBLIC_KEY_INTERFACE_CLASS_NAME =
             "java.security.interfaces.RSAPublicKey";
 
+    @libcore.api.CorePlatformApi
     public OpenSSLProvider() {
         this(Platform.getDefaultProviderName());
     }
