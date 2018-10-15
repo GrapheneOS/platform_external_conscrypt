@@ -35,6 +35,7 @@ import javax.crypto.spec.SecretKeySpec;
  * @hide
  * @hide This class is not part of the Android public SDK API
  */
+@libcore.api.IntraCoreApi
 @Internal
 public final class OpenSSLECDHKeyAgreement extends KeyAgreementSpi {
 

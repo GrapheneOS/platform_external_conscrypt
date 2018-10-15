@@ -417,6 +417,9 @@ public class SSLContextTest {
         });
     }
 
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
     public static class ThrowExceptionKeyAndTrustManagerFactoryProvider extends Provider {
         public ThrowExceptionKeyAndTrustManagerFactoryProvider() {
             super("ThrowExceptionKeyAndTrustManagerProvider", 1.0,
@@ -432,6 +435,9 @@ public class SSLContextTest {
         }
     }
 
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
     public static class ThrowExceptionTrustManagagerFactorySpi extends TrustManagerFactorySpi {
         @Override
         protected void engineInit(KeyStore ks) throws KeyStoreException {
@@ -450,6 +456,9 @@ public class SSLContextTest {
         }
     }
 
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
     public static class ThrowExceptionKeyManagagerFactorySpi extends KeyManagerFactorySpi {
         @Override
         protected void engineInit(KeyStore ks, char[] password)

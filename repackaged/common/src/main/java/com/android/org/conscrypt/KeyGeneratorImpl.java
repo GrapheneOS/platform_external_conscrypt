@@ -32,6 +32,7 @@ import javax.crypto.spec.SecretKeySpec;
  * @hide
  * @hide This class is not part of the Android public SDK API
  */
+@libcore.api.IntraCoreApi
 @Internal
 public abstract class KeyGeneratorImpl extends KeyGeneratorSpi {
     private final String algorithm;
@@ -88,43 +89,78 @@ public abstract class KeyGeneratorImpl extends KeyGeneratorSpi {
     }
 
     // For HMAC, RFC 2104 recommends using the hash's output length as the key length
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
+    @libcore.api.IntraCoreApi
     public static final class HmacMD5 extends KeyGeneratorImpl {
+        @libcore.api.IntraCoreApi
         public HmacMD5() {
             super("HmacMD5", 128);
         }
     }
 
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
+    @libcore.api.IntraCoreApi
     public static final class HmacSHA1 extends KeyGeneratorImpl {
+        @libcore.api.IntraCoreApi
         public HmacSHA1() {
             super("HmacSHA1", 160);
         }
     }
 
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
+    @libcore.api.IntraCoreApi
     public static final class HmacSHA224 extends KeyGeneratorImpl {
+        @libcore.api.IntraCoreApi
         public HmacSHA224() {
             super("HmacSHA224", 224);
         }
     }
 
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
+    @libcore.api.IntraCoreApi
     public static final class HmacSHA256 extends KeyGeneratorImpl {
+        @libcore.api.IntraCoreApi
         public HmacSHA256() {
             super("HmacSHA256", 256);
         }
     }
 
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
+    @libcore.api.IntraCoreApi
     public static final class HmacSHA384 extends KeyGeneratorImpl {
+        @libcore.api.IntraCoreApi
         public HmacSHA384() {
             super("HmacSHA384", 384);
         }
     }
 
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
+    @libcore.api.IntraCoreApi
     public static final class HmacSHA512 extends KeyGeneratorImpl {
+        @libcore.api.IntraCoreApi
         public HmacSHA512() {
             super("HmacSHA512", 512);
         }
     }
 
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
+    @libcore.api.IntraCoreApi
     public static final class DESEDE extends KeyGeneratorImpl {
+        @libcore.api.IntraCoreApi
         public DESEDE() {
             super("DESEDE", 192);
         }
@@ -154,7 +190,12 @@ public abstract class KeyGeneratorImpl extends KeyGeneratorSpi {
         }
     }
 
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
+    @libcore.api.IntraCoreApi
     public static final class AES extends KeyGeneratorImpl {
+        @libcore.api.IntraCoreApi
         public AES() {
             super("AES", 128);
         }
@@ -168,7 +209,12 @@ public abstract class KeyGeneratorImpl extends KeyGeneratorSpi {
         }
     }
 
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
+    @libcore.api.IntraCoreApi
     public static final class ChaCha20 extends KeyGeneratorImpl {
+        @libcore.api.IntraCoreApi
         public ChaCha20() {
             super("ChaCha20", 256);
         }
@@ -181,7 +227,12 @@ public abstract class KeyGeneratorImpl extends KeyGeneratorSpi {
         }
     }
 
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
+    @libcore.api.IntraCoreApi
     public static final class ARC4 extends KeyGeneratorImpl {
+        @libcore.api.IntraCoreApi
         public ARC4() {
             super("ARC4", 128);
         }

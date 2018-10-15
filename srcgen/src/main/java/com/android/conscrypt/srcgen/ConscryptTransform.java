@@ -56,14 +56,15 @@ public class ConscryptTransform {
      * java ConscryptTransform {source dir} {target dir}
      */
     public static void main(String[] args) throws Exception {
-        if (args.length != 3) {
+        if (args.length != 4) {
           throw new IllegalArgumentException(
               "Usage: " + ConscryptTransform.class.getCanonicalName()
-                  + " <source-dir> <target-dir> <core-platform-api-file>");
+                  + " <source-dir> <target-dir> <core-platform-api-file> <intra-core-api-file>");
         }
         String sourceDir = args[0];
         String targetDir = args[1];
         Path corePlatformApiFile = Paths.get(args[2]);
+        Path intraCoreApiFile = Paths.get(args[3]);
 
         Map<String, String> options = JavaCore.getOptions();
         options.put(JavaCore.COMPILER_COMPLIANCE, JavaCore.VERSION_1_8);
@@ -74,18 +75,22 @@ public class ConscryptTransform {
 
         new Main(false /* debug */)
             .setJdtOptions(options)
-            .execute(new TransformRules(sourceDir, targetDir, corePlatformApiFile));
+            .execute(new TransformRules(
+                    sourceDir, targetDir, corePlatformApiFile, intraCoreApiFile));
     }
 
     static class TransformRules implements RuleSet {
         private final String sourceDir;
         private final String targetDir;
         private final Path corePlatformApiFile;
+        private final Path intraCoreApiFile;
 
-        TransformRules(String sourceDir, String targetDir, Path corePlatformApiFile) {
+        TransformRules(String sourceDir, String targetDir, Path corePlatformApiFile,
+                Path intraCoreApiFile) {
             this.sourceDir = sourceDir;
             this.targetDir = targetDir;
             this.corePlatformApiFile = corePlatformApiFile;
+            this.intraCoreApiFile = intraCoreApiFile;
         }
 
         @Override
@@ -109,7 +114,10 @@ public class ConscryptTransform {
                     createHidePublicClassesRule(),
                     // AST change: Add CorePlatformApi to specified classes and members
                     createOptionalRule(new AddAnnotation("libcore.api.CorePlatformApi",
-                        BodyDeclarationLocators.readBodyDeclarationLocators(corePlatformApiFile)))
+                        BodyDeclarationLocators.readBodyDeclarationLocators(corePlatformApiFile))),
+                    // AST change: Add IntraCoreApi to specified classes and members
+                    createOptionalRule(new AddAnnotation("libcore.api.IntraCoreApi",
+                        BodyDeclarationLocators.readBodyDeclarationLocators(intraCoreApiFile)))
                     );
         }
 
