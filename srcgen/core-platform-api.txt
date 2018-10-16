@@ -20,11 +20,22 @@ method:com.android.org.conscrypt.TrustedCertificateIndex#findByIssuerAndSignatur
 method:com.android.org.conscrypt.TrustedCertificateIndex#findBySubjectAndPublicKey(X509Certificate)
 method:com.android.org.conscrypt.TrustedCertificateIndex#index(X509Certificate)
 method:com.android.org.conscrypt.TrustedCertificateIndex#TrustedCertificateIndex()
+method:com.android.org.conscrypt.TrustedCertificateStore#aliases()
+method:com.android.org.conscrypt.TrustedCertificateStore#allSystemAliases()
+method:com.android.org.conscrypt.TrustedCertificateStore#containsAlias(String)
 method:com.android.org.conscrypt.TrustedCertificateStore#deleteCertificateEntry(String)
+method:com.android.org.conscrypt.TrustedCertificateStore#findAllIssuers(X509Certificate)
+method:com.android.org.conscrypt.TrustedCertificateStore#findIssuer(X509Certificate)
 method:com.android.org.conscrypt.TrustedCertificateStore#getCertificateAlias(Certificate)
+method:com.android.org.conscrypt.TrustedCertificateStore#getCertificateAlias(Certificate,boolean)
 method:com.android.org.conscrypt.TrustedCertificateStore#getCertificateChain(X509Certificate)
+method:com.android.org.conscrypt.TrustedCertificateStore#getCertificateFile(File,X509Certificate)
 method:com.android.org.conscrypt.TrustedCertificateStore#getCertificate(String)
+method:com.android.org.conscrypt.TrustedCertificateStore#getCertificate(String,boolean)
+method:com.android.org.conscrypt.TrustedCertificateStore#getCreationDate(String)
+method:com.android.org.conscrypt.TrustedCertificateStore#getTrustAnchor(X509Certificate)
 method:com.android.org.conscrypt.TrustedCertificateStore#installCertificate(X509Certificate)
+method:com.android.org.conscrypt.TrustedCertificateStore#isUserAddedCertificate(X509Certificate)
 method:com.android.org.conscrypt.TrustedCertificateStore#isUser(String)
 method:com.android.org.conscrypt.TrustedCertificateStore#setDefaultUserDirectory(File)
 method:com.android.org.conscrypt.TrustedCertificateStore#TrustedCertificateStore()
@@ -46,25 +57,8 @@ type:com.android.org.conscrypt.FileClientSessionCache
 type:com.android.org.conscrypt.OpenSSLContextImpl
 type:com.android.org.conscrypt.OpenSSLProvider
 type:com.android.org.conscrypt.OpenSSLSocketImpl
+type:com.android.org.conscrypt.ServerSessionContext
 type:com.android.org.conscrypt.SSLClientSessionCache
 type:com.android.org.conscrypt.TrustedCertificateIndex
 type:com.android.org.conscrypt.TrustedCertificateStore
 type:com.android.org.conscrypt.TrustManagerImpl
-
-# BEGIN: Not added by tool for some reason.
-type:com.android.org.conscrypt.ServerSessionContext
-# END
-
-# BEGIN: Overridden methods not added by tool
-method:com.android.org.conscrypt.TrustedCertificateStore#findIssuer(X509Certificate)
-method:com.android.org.conscrypt.TrustedCertificateStore#findAllIssuers(X509Certificate)
-method:com.android.org.conscrypt.TrustedCertificateStore#getTrustAnchor(X509Certificate)
-method:com.android.org.conscrypt.TrustedCertificateStore#isUserAddedCertificate(X509Certificate)
-method:com.android.org.conscrypt.TrustedCertificateStore#getCertificateFile(File,X509Certificate)
-method:com.android.org.conscrypt.TrustedCertificateStore#getCertificate(String,boolean)
-method:com.android.org.conscrypt.TrustedCertificateStore#getCreationDate(String)
-method:com.android.org.conscrypt.TrustedCertificateStore#aliases()
-method:com.android.org.conscrypt.TrustedCertificateStore#allSystemAliases()
-method:com.android.org.conscrypt.TrustedCertificateStore#containsAlias(String)
-method:com.android.org.conscrypt.TrustedCertificateStore#getCertificateAlias(Certificate,boolean)
-# END
