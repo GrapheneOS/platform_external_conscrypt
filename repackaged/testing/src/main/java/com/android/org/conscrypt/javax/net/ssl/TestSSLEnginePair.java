@@ -138,6 +138,9 @@ public final class TestSSLEnginePair implements Closeable {
         return new SSLEngine[] { server, client };
     }
 
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
     public static class Hooks {
         void beforeBeginHandshake(SSLEngine client, SSLEngine server) {}
     }

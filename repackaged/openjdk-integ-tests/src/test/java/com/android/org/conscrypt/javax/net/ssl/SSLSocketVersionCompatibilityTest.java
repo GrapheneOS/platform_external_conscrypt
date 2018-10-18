@@ -795,6 +795,9 @@ public class SSLSocketVersionCompatibilityTest {
             Security.removeProvider(OpaqueProvider.NAME);
         }
     }
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
     @SuppressWarnings("serial")
     public static class OpaqueProvider extends Provider {
         static final String NAME = "OpaqueProvider";
@@ -811,6 +814,9 @@ public class SSLSocketVersionCompatibilityTest {
         OpaqueSignatureSpi(String algorithm) {
             this.algorithm = algorithm;
         }
+        /**
+         * @hide This class is not part of the Android public SDK API
+         */
         public final static class ECDSA extends OpaqueSignatureSpi {
             public ECDSA() {
                 super("NONEwithECDSA");
@@ -858,17 +864,26 @@ public class SSLSocketVersionCompatibilityTest {
             return delegate.getParameter(param);
         }
     }
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
     public static class OpaqueCipherSpi extends CipherSpi {
         private Cipher delegate;
         private final String algorithm;
         public OpaqueCipherSpi(String algorithm) {
             this.algorithm = algorithm;
         }
+        /**
+         * @hide This class is not part of the Android public SDK API
+         */
         public final static class NoPadding extends OpaqueCipherSpi {
             public NoPadding() {
                 super("RSA/ECB/NoPadding");
             }
         }
+        /**
+         * @hide This class is not part of the Android public SDK API
+         */
         public final static class PKCS1Padding extends OpaqueCipherSpi {
             public PKCS1Padding() {
                 super("RSA/ECB/PKCS1Padding");

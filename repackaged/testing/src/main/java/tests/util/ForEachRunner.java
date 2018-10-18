@@ -23,6 +23,7 @@ package tests.util;
 public final class ForEachRunner {
     /**
      * Callback parameterized with a value.
+     * @hide This class is not part of the Android public SDK API
      */
     public interface Callback<T> {
         /**

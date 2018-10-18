@@ -66,6 +66,9 @@ public class RenegotiationTest {
             ByteBuffer.wrap(MESSAGE_BYTES).asReadOnlyBuffer();
     private static final int MESSAGE_LENGTH = MESSAGE_BYTES.length;
 
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
     public enum SocketType {
         FILE_DESCRIPTOR {
             @Override

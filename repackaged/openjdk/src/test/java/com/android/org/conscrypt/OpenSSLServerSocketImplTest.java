@@ -51,6 +51,7 @@ public class OpenSSLServerSocketImplTest {
 
     /**
      * Various factories for SSL server sockets.
+     * @hide This class is not part of the Android public SDK API
      */
     public enum SocketType {
         DEFAULT(getConscryptServerSocketFactory(false)),

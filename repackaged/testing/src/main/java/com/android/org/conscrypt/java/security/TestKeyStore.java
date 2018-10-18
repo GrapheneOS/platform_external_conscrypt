@@ -356,6 +356,7 @@ public final class TestKeyStore {
      * Creates KeyStores containing the requested key types. Since key
      * generation can be expensive, most tests should reuse the RSA-only
      * singleton instance returned by TestKeyStore.get.
+     * @hide This class is not part of the Android public SDK API
      */
     public static class Builder {
         private String[] keyAlgorithms = {"RSA"};

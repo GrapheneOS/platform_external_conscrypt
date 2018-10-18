@@ -544,6 +544,9 @@ public class CertificateFactoryTest {
         assertEquals(providerName, actualPath, (CertPath) output);
     }
 
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
     public static class KeyHolder {
         public X509Certificate certificate;
 
