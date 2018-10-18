@@ -31,6 +31,7 @@ import java.security.spec.PSSParameterSpec;
  * @hide
  * @hide This class is not part of the Android public SDK API
  */
+@libcore.api.IntraCoreApi
 @Internal
 public class PSSParameters extends AlgorithmParametersSpi {
 

@@ -30,6 +30,7 @@ import javax.crypto.spec.IvParameterSpec;
  * @hide
  * @hide This class is not part of the Android public SDK API
  */
+@libcore.api.IntraCoreApi
 @Internal
 public class IvParameters extends AlgorithmParametersSpi {
     private byte[] iv;
@@ -111,7 +112,19 @@ public class IvParameters extends AlgorithmParametersSpi {
         return "Conscrypt IV AlgorithmParameters";
     }
 
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
+    @libcore.api.IntraCoreApi
     public static class AES extends IvParameters {}
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
+    @libcore.api.IntraCoreApi
     public static class DESEDE extends IvParameters {}
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
+    @libcore.api.IntraCoreApi
     public static class ChaCha20 extends IvParameters {}
 }

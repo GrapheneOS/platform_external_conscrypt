@@ -34,6 +34,7 @@ import java.security.interfaces.RSAPublicKey;
  * @hide
  * @hide This class is not part of the Android public SDK API
  */
+@libcore.api.IntraCoreApi
 @Internal
 public final class OpenSSLSignatureRawRSA extends SignatureSpi {
     /**

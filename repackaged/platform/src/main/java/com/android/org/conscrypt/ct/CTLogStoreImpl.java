@@ -46,6 +46,7 @@ public class CTLogStoreImpl implements CTLogStore {
 
     /**
      * Thrown when parsing of a log file fails.
+     * @hide This class is not part of the Android public SDK API
      */
     public static class InvalidLogFileException extends Exception {
         public InvalidLogFileException() {

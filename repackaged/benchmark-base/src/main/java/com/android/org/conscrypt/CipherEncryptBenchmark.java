@@ -26,6 +26,9 @@ import javax.crypto.Cipher;
  * @hide This class is not part of the Android public SDK API
  */
 public final class CipherEncryptBenchmark {
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
     public enum BufferType {
         ARRAY,
         HEAP_HEAP,

@@ -201,6 +201,9 @@ public final class TestSSLContext {
         return new Builder();
     }
 
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
     public static final class Builder {
         private TestKeyStore client;
         private char[] clientStorePassword;

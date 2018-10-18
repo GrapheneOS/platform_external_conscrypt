@@ -45,6 +45,9 @@ import com.android.org.conscrypt.OpenSSLX509Certificate;
  */
 @Internal
 public class CertificateEntry {
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
     public enum LogEntryType {
         X509_ENTRY,
         PRECERT_ENTRY

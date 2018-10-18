@@ -33,6 +33,7 @@ import java.security.spec.InvalidParameterSpecException;
  * @hide
  * @hide This class is not part of the Android public SDK API
  */
+@libcore.api.IntraCoreApi
 @Internal
 public final class GCMParameters extends AlgorithmParametersSpi {
 
@@ -45,6 +46,7 @@ public final class GCMParameters extends AlgorithmParametersSpi {
     /** Actually the nonce value for the GCM operation. */
     private byte[] iv;
 
+    @libcore.api.IntraCoreApi
     public GCMParameters() { }
 
     GCMParameters(int tLen, byte[] iv) {
