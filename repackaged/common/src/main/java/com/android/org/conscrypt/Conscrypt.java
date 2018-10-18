@@ -87,6 +87,9 @@ public final class Conscrypt {
         return new OpenSSLProvider(providerName, false);
     }
 
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
     public static class ProviderBuilder {
         private String name = Platform.getDefaultProviderName();
         private boolean provideTrustManager;

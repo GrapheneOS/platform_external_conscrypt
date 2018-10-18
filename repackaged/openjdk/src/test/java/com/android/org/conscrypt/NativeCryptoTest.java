@@ -678,6 +678,9 @@ public class NativeCryptoTest {
 
     private static final boolean DEBUG = false;
 
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
     public static class Hooks {
         String negotiatedCipherSuite;
         private OpenSSLKey channelIdPrivateKey;

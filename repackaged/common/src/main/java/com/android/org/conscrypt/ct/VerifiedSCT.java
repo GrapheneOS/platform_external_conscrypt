@@ -27,6 +27,9 @@ import com.android.org.conscrypt.Internal;
  */
 @Internal
 public final class VerifiedSCT {
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
     public enum Status {
         VALID,
         INVALID_SIGNATURE,

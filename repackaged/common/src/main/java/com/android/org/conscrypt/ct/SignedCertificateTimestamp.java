@@ -31,15 +31,24 @@ import com.android.org.conscrypt.Internal;
  */
 @Internal
 public class SignedCertificateTimestamp {
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
     public enum Version {
         V1
     };
 
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
     public enum SignatureType {
         CERTIFICATE_TIMESTAMP,
         TREE_HASH
     };
 
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
     public enum Origin {
         EMBEDDED,
         TLS_EXTENSION,

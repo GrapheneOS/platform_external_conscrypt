@@ -29,6 +29,9 @@ import com.android.org.conscrypt.Internal;
  */
 @Internal
 public class DigitallySigned {
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
     public enum HashAlgorithm {
         NONE,
         MD5,
@@ -48,6 +51,9 @@ public class DigitallySigned {
         }
     }
 
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
     public enum SignatureAlgorithm {
         ANONYMOUS,
         RSA,

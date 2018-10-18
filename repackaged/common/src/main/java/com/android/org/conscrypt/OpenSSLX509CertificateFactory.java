@@ -40,6 +40,7 @@ import java.util.List;
  * @hide
  * @hide This class is not part of the Android public SDK API
  */
+@libcore.api.IntraCoreApi
 @Internal
 public class OpenSSLX509CertificateFactory extends CertificateFactorySpi {
     private static final byte[] PKCS7_MARKER = new byte[] {

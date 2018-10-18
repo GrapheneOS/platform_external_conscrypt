@@ -65,6 +65,9 @@ public class ConscryptEngineTest {
     private static final String[] CIPHERS = TestUtils.getCommonCipherSuites();
     private static final String RENEGOTIATION_CIPHER = CIPHERS[CIPHERS.length - 1];
 
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
     @SuppressWarnings("ImmutableEnumChecker")
     public enum BufferType {
         HEAP_ALLOCATOR(BufferAllocator.unpooled()) {
