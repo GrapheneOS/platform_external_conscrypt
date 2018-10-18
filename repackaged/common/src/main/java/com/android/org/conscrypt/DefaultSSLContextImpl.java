@@ -37,6 +37,7 @@ import javax.net.ssl.TrustManagerFactory;
  * @hide
  * @hide This class is not part of the Android public SDK API
  */
+@libcore.api.IntraCoreApi
 @Internal
 public final class DefaultSSLContextImpl extends OpenSSLContextImpl {
 
@@ -58,6 +59,7 @@ public final class DefaultSSLContextImpl extends OpenSSLContextImpl {
      * rest of this constructor to guarantee that we don't have races in
      * creating the state shared between all default SSLContexts.
      */
+    @libcore.api.IntraCoreApi
     public DefaultSSLContextImpl() throws GeneralSecurityException, IOException {
         super();
     }

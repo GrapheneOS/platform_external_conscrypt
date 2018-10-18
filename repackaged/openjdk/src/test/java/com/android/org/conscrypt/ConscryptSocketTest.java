@@ -74,6 +74,7 @@ public class ConscryptSocketTest {
 
     /**
      * Factories for underlying sockets.
+     * @hide This class is not part of the Android public SDK API
      */
     public enum UnderlyingSocketType {
         NONE {
@@ -130,6 +131,7 @@ public class ConscryptSocketTest {
 
     /**
      * Various factories for SSL server sockets.
+     * @hide This class is not part of the Android public SDK API
      */
     public enum SocketType {
         FILE_DESCRIPTOR(false) {

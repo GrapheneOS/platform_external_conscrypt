@@ -41,6 +41,7 @@ import javax.net.ssl.SSLSocketFactory;
 final class ServerEndpoint {
     /**
      * A processor for receipt of a single message.
+     * @hide This class is not part of the Android public SDK API
      */
     public interface MessageProcessor {
         void processMessage(byte[] message, int numBytes, OutputStream os);
@@ -48,6 +49,7 @@ final class ServerEndpoint {
 
     /**
      * A {@link MessageProcessor} that simply echos back the received message to the client.
+     * @hide This class is not part of the Android public SDK API
      */
     public static final class EchoProcessor implements MessageProcessor {
         @Override

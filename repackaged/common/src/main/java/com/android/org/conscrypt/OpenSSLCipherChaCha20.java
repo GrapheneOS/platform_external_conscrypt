@@ -34,6 +34,7 @@ import javax.crypto.spec.IvParameterSpec;
  * @hide
  * @hide This class is not part of the Android public SDK API
  */
+@libcore.api.IntraCoreApi
 @Internal
 public class OpenSSLCipherChaCha20 extends OpenSSLCipher {
 
@@ -46,6 +47,7 @@ public class OpenSSLCipherChaCha20 extends OpenSSLCipher {
     private int currentBlockConsumedBytes = 0;
     private int blockCounter = 0;
 
+    @libcore.api.IntraCoreApi
     public OpenSSLCipherChaCha20() {}
 
     @Override

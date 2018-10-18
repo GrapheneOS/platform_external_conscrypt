@@ -51,6 +51,7 @@ import com.android.org.conscrypt.NativeRef.EVP_CIPHER_CTX;
  * @hide
  * @hide This class is not part of the Android public SDK API
  */
+@libcore.api.IntraCoreApi
 @Internal
 public abstract class OpenSSLCipher extends CipherSpi {
 
@@ -477,6 +478,10 @@ public abstract class OpenSSLCipher extends CipherSpi {
         return encrypting;
     }
 
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
+    @libcore.api.IntraCoreApi
     public static abstract class EVP_CIPHER extends OpenSSLCipher {
         /**
          * Native pointer for the OpenSSL EVP_CIPHER context.
@@ -703,47 +708,84 @@ public abstract class OpenSSLCipher extends CipherSpi {
             }
         }
 
+        /**
+         * @hide This class is not part of the Android public SDK API
+         */
+        @libcore.api.IntraCoreApi
         public static class AES extends AES_BASE {
             AES(Mode mode, Padding padding) {
                 super(mode, padding);
             }
 
+            /**
+             * @hide This class is not part of the Android public SDK API
+             */
+            @libcore.api.IntraCoreApi
             public static class CBC extends AES {
                 public CBC(Padding padding) {
                     super(Mode.CBC, padding);
                 }
 
+                /**
+                 * @hide This class is not part of the Android public SDK API
+                 */
+                @libcore.api.IntraCoreApi
                 public static class NoPadding extends CBC {
+                    @libcore.api.IntraCoreApi
                     public NoPadding() {
                         super(Padding.NOPADDING);
                     }
                 }
 
+                /**
+                 * @hide This class is not part of the Android public SDK API
+                 */
+                @libcore.api.IntraCoreApi
                 public static class PKCS5Padding extends CBC {
+                    @libcore.api.IntraCoreApi
                     public PKCS5Padding() {
                         super(Padding.PKCS5PADDING);
                     }
                 }
             }
 
+            /**
+             * @hide This class is not part of the Android public SDK API
+             */
+            @libcore.api.IntraCoreApi
             public static class CTR extends AES {
+                @libcore.api.IntraCoreApi
                 public CTR() {
                     super(Mode.CTR, Padding.NOPADDING);
                 }
             }
 
+            /**
+             * @hide This class is not part of the Android public SDK API
+             */
+            @libcore.api.IntraCoreApi
             public static class ECB extends AES {
                 public ECB(Padding padding) {
                     super(Mode.ECB, padding);
                 }
 
+                /**
+                 * @hide This class is not part of the Android public SDK API
+                 */
+                @libcore.api.IntraCoreApi
                 public static class NoPadding extends ECB {
+                    @libcore.api.IntraCoreApi
                     public NoPadding() {
                         super(Padding.NOPADDING);
                     }
                 }
 
+                /**
+                 * @hide This class is not part of the Android public SDK API
+                 */
+                @libcore.api.IntraCoreApi
                 public static class PKCS5Padding extends ECB {
+                    @libcore.api.IntraCoreApi
                     public PKCS5Padding() {
                         super(Padding.PKCS5PADDING);
                     }
@@ -764,47 +806,82 @@ public abstract class OpenSSLCipher extends CipherSpi {
             }
         }
 
+        /**
+         * @hide This class is not part of the Android public SDK API
+         */
+        @libcore.api.IntraCoreApi
         public static class AES_128 extends AES_BASE {
             AES_128(Mode mode, Padding padding) {
                 super(mode, padding);
             }
 
+            /**
+             * @hide This class is not part of the Android public SDK API
+             */
+            @libcore.api.IntraCoreApi
             public static class CBC extends AES_128 {
                 public CBC(Padding padding) {
                     super(Mode.CBC, padding);
                 }
 
+                /**
+                 * @hide This class is not part of the Android public SDK API
+                 */
+                @libcore.api.IntraCoreApi
                 public static class NoPadding extends CBC {
+                    @libcore.api.IntraCoreApi
                     public NoPadding() {
                         super(Padding.NOPADDING);
                     }
                 }
 
+                /**
+                 * @hide This class is not part of the Android public SDK API
+                 */
+                @libcore.api.IntraCoreApi
                 public static class PKCS5Padding extends CBC {
+                    @libcore.api.IntraCoreApi
                     public PKCS5Padding() {
                         super(Padding.PKCS5PADDING);
                     }
                 }
             }
 
+            /**
+             * @hide This class is not part of the Android public SDK API
+             */
             public static class CTR extends AES_128 {
                 public CTR() {
                     super(Mode.CTR, Padding.NOPADDING);
                 }
             }
 
+            /**
+             * @hide This class is not part of the Android public SDK API
+             */
+            @libcore.api.IntraCoreApi
             public static class ECB extends AES_128 {
                 public ECB(Padding padding) {
                     super(Mode.ECB, padding);
                 }
 
+                /**
+                 * @hide This class is not part of the Android public SDK API
+                 */
+                @libcore.api.IntraCoreApi
                 public static class NoPadding extends ECB {
+                    @libcore.api.IntraCoreApi
                     public NoPadding() {
                         super(Padding.NOPADDING);
                     }
                 }
 
+                /**
+                 * @hide This class is not part of the Android public SDK API
+                 */
+                @libcore.api.IntraCoreApi
                 public static class PKCS5Padding extends ECB {
+                    @libcore.api.IntraCoreApi
                     public PKCS5Padding() {
                         super(Padding.PKCS5PADDING);
                     }
@@ -819,47 +896,82 @@ public abstract class OpenSSLCipher extends CipherSpi {
             }
         }
 
+        /**
+         * @hide This class is not part of the Android public SDK API
+         */
+        @libcore.api.IntraCoreApi
         public static class AES_256 extends AES_BASE {
             AES_256(Mode mode, Padding padding) {
                 super(mode, padding);
             }
 
+            /**
+             * @hide This class is not part of the Android public SDK API
+             */
+            @libcore.api.IntraCoreApi
             public static class CBC extends AES_256 {
                 public CBC(Padding padding) {
                     super(Mode.CBC, padding);
                 }
 
+                /**
+                 * @hide This class is not part of the Android public SDK API
+                 */
+                @libcore.api.IntraCoreApi
                 public static class NoPadding extends CBC {
+                    @libcore.api.IntraCoreApi
                     public NoPadding() {
                         super(Padding.NOPADDING);
                     }
                 }
 
+                /**
+                 * @hide This class is not part of the Android public SDK API
+                 */
+                @libcore.api.IntraCoreApi
                 public static class PKCS5Padding extends CBC {
+                    @libcore.api.IntraCoreApi
                     public PKCS5Padding() {
                         super(Padding.PKCS5PADDING);
                     }
                 }
             }
 
+            /**
+             * @hide This class is not part of the Android public SDK API
+             */
             public static class CTR extends AES_256 {
                 public CTR() {
                     super(Mode.CTR, Padding.NOPADDING);
                 }
             }
 
+            /**
+             * @hide This class is not part of the Android public SDK API
+             */
+            @libcore.api.IntraCoreApi
             public static class ECB extends AES_256 {
                 public ECB(Padding padding) {
                     super(Mode.ECB, padding);
                 }
 
+                /**
+                 * @hide This class is not part of the Android public SDK API
+                 */
+                @libcore.api.IntraCoreApi
                 public static class NoPadding extends ECB {
+                    @libcore.api.IntraCoreApi
                     public NoPadding() {
                         super(Padding.NOPADDING);
                     }
                 }
 
+                /**
+                 * @hide This class is not part of the Android public SDK API
+                 */
+                @libcore.api.IntraCoreApi
                 public static class PKCS5Padding extends ECB {
+                    @libcore.api.IntraCoreApi
                     public PKCS5Padding() {
                         super(Padding.PKCS5PADDING);
                     }
@@ -874,6 +986,10 @@ public abstract class OpenSSLCipher extends CipherSpi {
             }
         }
 
+        /**
+         * @hide This class is not part of the Android public SDK API
+         */
+        @libcore.api.IntraCoreApi
         public static class DESEDE extends EVP_CIPHER {
             private static final int DES_BLOCK_SIZE = 8;
 
@@ -881,18 +997,32 @@ public abstract class OpenSSLCipher extends CipherSpi {
                 super(mode, padding);
             }
 
+            /**
+             * @hide This class is not part of the Android public SDK API
+             */
+            @libcore.api.IntraCoreApi
             public static class CBC extends DESEDE {
                 public CBC(Padding padding) {
                     super(Mode.CBC, padding);
                 }
 
+                /**
+                 * @hide This class is not part of the Android public SDK API
+                 */
+                @libcore.api.IntraCoreApi
                 public static class NoPadding extends CBC {
+                    @libcore.api.IntraCoreApi
                     public NoPadding() {
                         super(Padding.NOPADDING);
                     }
                 }
 
+                /**
+                 * @hide This class is not part of the Android public SDK API
+                 */
+                @libcore.api.IntraCoreApi
                 public static class PKCS5Padding extends CBC {
+                    @libcore.api.IntraCoreApi
                     public PKCS5Padding() {
                         super(Padding.PKCS5PADDING);
                     }
@@ -948,7 +1078,12 @@ public abstract class OpenSSLCipher extends CipherSpi {
             }
         }
 
+        /**
+         * @hide This class is not part of the Android public SDK API
+         */
+        @libcore.api.IntraCoreApi
         public static class ARC4 extends EVP_CIPHER {
+            @libcore.api.IntraCoreApi
             public ARC4() {
                 // Modes and padding don't make sense for ARC4.
                 super(Mode.ECB, Padding.NOPADDING);
@@ -994,6 +1129,10 @@ public abstract class OpenSSLCipher extends CipherSpi {
         }
     }
 
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
+    @libcore.api.IntraCoreApi
     public static abstract class EVP_AEAD extends OpenSSLCipher {
         /**
          * The default tag size when one is not specified. Default to
@@ -1292,6 +1431,10 @@ public abstract class OpenSSLCipher extends CipherSpi {
 
         abstract long getEVP_AEAD(int keyLength) throws InvalidKeyException;
 
+        /**
+         * @hide This class is not part of the Android public SDK API
+         */
+        @libcore.api.IntraCoreApi
         public abstract static class AES extends EVP_AEAD {
             private static final int AES_BLOCK_SIZE = 16;
 
@@ -1321,8 +1464,13 @@ public abstract class OpenSSLCipher extends CipherSpi {
                 return AES_BLOCK_SIZE;
             }
 
+            /**
+             * @hide This class is not part of the Android public SDK API
+             */
+            @libcore.api.IntraCoreApi
             public static class GCM extends AES {
 
+                @libcore.api.IntraCoreApi
                 public GCM() {
                     super(Mode.GCM);
                 }
@@ -1399,6 +1547,10 @@ public abstract class OpenSSLCipher extends CipherSpi {
                     }
                 }
 
+                /**
+                 * @hide This class is not part of the Android public SDK API
+                 */
+                @libcore.api.IntraCoreApi
                 public static class AES_128 extends GCM {
                     @Override
                     void checkSupportedKeySize(int keyLength) throws InvalidKeyException {
@@ -1409,6 +1561,10 @@ public abstract class OpenSSLCipher extends CipherSpi {
                     }
                 }
 
+                /**
+                 * @hide This class is not part of the Android public SDK API
+                 */
+                @libcore.api.IntraCoreApi
                 public static class AES_256 extends GCM {
                     @Override
                     void checkSupportedKeySize(int keyLength) throws InvalidKeyException {
@@ -1421,7 +1577,12 @@ public abstract class OpenSSLCipher extends CipherSpi {
             }
         }
 
+        /**
+         * @hide This class is not part of the Android public SDK API
+         */
+        @libcore.api.IntraCoreApi
         public static class ChaCha20 extends EVP_AEAD {
+            @libcore.api.IntraCoreApi
             public ChaCha20() {
                 super(Mode.POLY1305);
             }
