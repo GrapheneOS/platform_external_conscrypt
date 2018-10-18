@@ -191,6 +191,11 @@ filegroup {
     ],
 }
 
+filegroup {
+    name: "conscrypt_public_api_files",
+    srcs: ["publicapi/src/main/java/**/*.java"]
+}
+
 // Create the conscrypt library from the source produced by the srcgen/generate_android_src.sh
 // script.
 java_library {
@@ -198,7 +203,10 @@ java_library {
     installable: true,
     hostdex: true,
 
-    srcs: [":conscrypt_java_files"],
+    srcs: [
+        ":conscrypt_java_files",
+        ":conscrypt_public_api_files",
+    ],
 
     // Conscrypt can be updated independently from the other core libraries so it must only depend
     // on public SDK and intra-core APIs.
@@ -322,6 +330,7 @@ java_test {
         "repackaged/common/src/test/java/**/*.java",
         "repackaged/openjdk-integ-tests/src/test/java/**/*.java",
         "repackaged/testing/src/main/java/**/*.java",
+        "publicapi/src/test/java/**/*.java",
     ],
     java_resource_dirs: [
         // Resource directories do not need repackaging.
