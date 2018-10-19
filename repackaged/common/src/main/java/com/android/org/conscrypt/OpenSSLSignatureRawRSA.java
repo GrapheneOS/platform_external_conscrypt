@@ -57,6 +57,9 @@ public final class OpenSSLSignatureRawRSA extends SignatureSpi {
      */
     private boolean inputIsTooLong;
 
+    @libcore.api.IntraCoreApi
+    public OpenSSLSignatureRawRSA() {}
+
     @Override
     protected void engineUpdate(byte input) {
         final int oldOffset = inputOffset++;

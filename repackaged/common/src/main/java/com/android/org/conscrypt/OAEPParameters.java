@@ -55,6 +55,9 @@ public class OAEPParameters extends AlgorithmParametersSpi {
 
     private OAEPParameterSpec spec = OAEPParameterSpec.DEFAULT;
 
+    @libcore.api.IntraCoreApi
+    public OAEPParameters() {}
+
     @Override
     protected void engineInit(AlgorithmParameterSpec algorithmParameterSpec)
             throws InvalidParameterSpecException {
