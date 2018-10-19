@@ -332,6 +332,7 @@ java_test {
     no_standard_libs: true,
     libs: [
         "core-all",
+        "conscrypt",
         "junit",
         "mockito-target-minus-junit4",
     ],
@@ -339,7 +340,6 @@ java_test {
 
     static_libs: [
         "core-tests-support",
-        "conscrypt",
         "bouncycastle-unbundled",
         "bouncycastle-bcpkix-unbundled",
         "bouncycastle-ocsp-unbundled",
@@ -365,6 +365,7 @@ java_test {
     no_standard_libs: true,
     libs: [
         "core-all",
+        "conscrypt",
         "junit",
         "bouncycastle-unbundled",
         "bouncycastle-bcpkix-unbundled",
@@ -375,7 +376,6 @@ java_test {
 
     static_libs: [
         "core-tests-support",
-        "conscrypt",
     ],
     javacflags: [
         "-Xmaxwarns 9999999",
