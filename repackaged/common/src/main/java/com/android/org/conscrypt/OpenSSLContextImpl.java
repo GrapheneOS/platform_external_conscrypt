@@ -38,6 +38,7 @@ import javax.net.ssl.TrustManager;
  * @hide
  * @hide This class is not part of the Android public SDK API
  */
+@libcore.api.IntraCoreApi
 @libcore.api.CorePlatformApi
 @Internal
 public abstract class OpenSSLContextImpl extends SSLContextSpi {
@@ -158,8 +159,11 @@ public abstract class OpenSSLContextImpl extends SSLContextSpi {
 
     /**
      * Public to allow construction via the provider framework.
+     * @hide This class is not part of the Android public SDK API
      */
+    @libcore.api.IntraCoreApi
     public static final class TLSv13 extends OpenSSLContextImpl {
+        @libcore.api.IntraCoreApi
         public TLSv13() {
             super(NativeCrypto.TLSV13_PROTOCOLS);
         }
@@ -167,8 +171,11 @@ public abstract class OpenSSLContextImpl extends SSLContextSpi {
 
     /**
      * Public to allow construction via the provider framework.
+     * @hide This class is not part of the Android public SDK API
      */
+    @libcore.api.IntraCoreApi
     public static final class TLSv12 extends OpenSSLContextImpl {
+        @libcore.api.IntraCoreApi
         public TLSv12() {
             super(NativeCrypto.TLSV12_PROTOCOLS);
         }
@@ -176,8 +183,11 @@ public abstract class OpenSSLContextImpl extends SSLContextSpi {
 
     /**
      * Public to allow construction via the provider framework.
+     * @hide This class is not part of the Android public SDK API
      */
+    @libcore.api.IntraCoreApi
     public static final class TLSv11 extends OpenSSLContextImpl {
+        @libcore.api.IntraCoreApi
         public TLSv11() {
             super(NativeCrypto.TLSV11_PROTOCOLS);
         }
@@ -185,8 +195,11 @@ public abstract class OpenSSLContextImpl extends SSLContextSpi {
 
     /**
      * Public to allow construction via the provider framework.
+     * @hide This class is not part of the Android public SDK API
      */
+    @libcore.api.IntraCoreApi
     public static final class TLSv1 extends OpenSSLContextImpl {
+        @libcore.api.IntraCoreApi
         public TLSv1() {
             super(NativeCrypto.TLSV1_PROTOCOLS);
         }
