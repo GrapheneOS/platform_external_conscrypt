@@ -1552,6 +1552,9 @@ public abstract class OpenSSLCipher extends CipherSpi {
                  */
                 @libcore.api.IntraCoreApi
                 public static class AES_128 extends GCM {
+                    @libcore.api.IntraCoreApi
+                    public AES_128() {}
+
                     @Override
                     void checkSupportedKeySize(int keyLength) throws InvalidKeyException {
                         if (keyLength != 16) { // 128 bits
@@ -1566,6 +1569,9 @@ public abstract class OpenSSLCipher extends CipherSpi {
                  */
                 @libcore.api.IntraCoreApi
                 public static class AES_256 extends GCM {
+                    @libcore.api.IntraCoreApi
+                    public AES_256() {}
+
                     @Override
                     void checkSupportedKeySize(int keyLength) throws InvalidKeyException {
                         if (keyLength != 32) { // 256 bits

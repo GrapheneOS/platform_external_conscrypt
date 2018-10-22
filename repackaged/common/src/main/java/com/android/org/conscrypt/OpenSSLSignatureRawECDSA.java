@@ -44,6 +44,9 @@ public class OpenSSLSignatureRawECDSA extends SignatureSpi {
      */
     private ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
+    @libcore.api.IntraCoreApi
+    public OpenSSLSignatureRawECDSA() {}
+
     @Override
     protected void engineUpdate(byte input) {
         buffer.write(input);

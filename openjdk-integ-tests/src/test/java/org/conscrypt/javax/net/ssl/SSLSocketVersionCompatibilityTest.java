@@ -2192,143 +2192,6 @@ public class SSLSocketVersionCompatibilityTest {
     }
 
     @Test
-    public void test_SSLSocket_TokenBinding_Success() throws Exception {
-        TestSSLContext context = new TestSSLContext.Builder()
-                .clientProtocol(clientVersion)
-                .serverProtocol(serverVersion)
-                .build();
-        TestSSLSocketPair pair = TestSSLSocketPair.create(context);
-        try {
-            Conscrypt.setTokenBindingParams(pair.client, 1, 2);
-            Conscrypt.setTokenBindingParams(pair.server, 2, 3);
-            assertEquals(-1, Conscrypt.getTokenBindingParams(pair.client));
-            assertEquals(-1, Conscrypt.getTokenBindingParams(pair.server));
-
-            pair.connect();
-
-            assertEquals(2, Conscrypt.getTokenBindingParams(pair.client));
-            assertEquals(2, Conscrypt.getTokenBindingParams(pair.server));
-        } finally {
-            pair.close();
-        }
-    }
-
-    @Test
-    public void test_SSLSocket_TokenBinding_NoClientSupport() throws Exception {
-        TestSSLContext context = new TestSSLContext.Builder()
-                .clientProtocol(clientVersion)
-                .serverProtocol(serverVersion)
-                .build();
-        TestSSLSocketPair pair = TestSSLSocketPair.create(context);
-        try {
-            // Do not enable on client
-            Conscrypt.setTokenBindingParams(pair.server, 2, 3);
-            assertEquals(-1, Conscrypt.getTokenBindingParams(pair.client));
-            assertEquals(-1, Conscrypt.getTokenBindingParams(pair.server));
-
-            pair.connect();
-
-            assertEquals(-1, Conscrypt.getTokenBindingParams(pair.client));
-            assertEquals(-1, Conscrypt.getTokenBindingParams(pair.server));
-        } finally {
-            pair.close();
-        }
-    }
-
-    @Test
-    public void test_SSLSocket_TokenBinding_NoServerSupport() throws Exception {
-        TestSSLContext context = new TestSSLContext.Builder()
-                .clientProtocol(clientVersion)
-                .serverProtocol(serverVersion)
-                .build();
-        TestSSLSocketPair pair = TestSSLSocketPair.create(context);
-        try {
-            // Do not enable on server
-            Conscrypt.setTokenBindingParams(pair.client, 2, 3);
-            assertEquals(-1, Conscrypt.getTokenBindingParams(pair.client));
-            assertEquals(-1, Conscrypt.getTokenBindingParams(pair.server));
-
-            pair.connect();
-
-            assertEquals(-1, Conscrypt.getTokenBindingParams(pair.client));
-            assertEquals(-1, Conscrypt.getTokenBindingParams(pair.server));
-        } finally {
-            pair.close();
-        }
-    }
-
-    @Test
-    public void test_SSLSocket_TokenBinding_MismatchedSupport() throws Exception {
-        TestSSLContext context = new TestSSLContext.Builder()
-                .clientProtocol(clientVersion)
-                .serverProtocol(serverVersion)
-                .build();
-        TestSSLSocketPair pair = TestSSLSocketPair.create(context);
-        try {
-            Conscrypt.setTokenBindingParams(pair.client, 2);
-            Conscrypt.setTokenBindingParams(pair.server, 1, 3);
-            assertEquals(-1, Conscrypt.getTokenBindingParams(pair.client));
-            assertEquals(-1, Conscrypt.getTokenBindingParams(pair.server));
-
-            pair.connect();
-
-            assertEquals(-1, Conscrypt.getTokenBindingParams(pair.client));
-            assertEquals(-1, Conscrypt.getTokenBindingParams(pair.server));
-        } finally {
-            pair.close();
-        }
-    }
-
-    @Test
-    public void test_SSLSocket_TokenBinding_MismatchedOrdering() throws Exception {
-        // When the server and client disagree on the preference order, the server should
-        // select the server's most highly preferred value.
-        TestSSLContext context = new TestSSLContext.Builder()
-                .clientProtocol(clientVersion)
-                .serverProtocol(serverVersion)
-                .build();
-        TestSSLSocketPair pair = TestSSLSocketPair.create(context);
-        try {
-            Conscrypt.setTokenBindingParams(pair.client, 1, 2, 3, 4);
-            Conscrypt.setTokenBindingParams(pair.server, 3, 2);
-            assertEquals(-1, Conscrypt.getTokenBindingParams(pair.client));
-            assertEquals(-1, Conscrypt.getTokenBindingParams(pair.server));
-
-            pair.connect();
-
-            assertEquals(3, Conscrypt.getTokenBindingParams(pair.client));
-            assertEquals(3, Conscrypt.getTokenBindingParams(pair.server));
-        } finally {
-            pair.close();
-        }
-    }
-
-    @Test
-    public void test_SSLSocket_TokenBinding_ExceptionAfterConnect() throws Exception {
-        TestSSLContext context = new TestSSLContext.Builder()
-                .clientProtocol(clientVersion)
-                .serverProtocol(serverVersion)
-                .build();
-        TestSSLSocketPair pair = TestSSLSocketPair.create(context);
-        try {
-            pair.connect();
-
-            try {
-                Conscrypt.setTokenBindingParams(pair.client, 1);
-                fail("setTokenBindingParams after handshake should throw");
-            } catch (IllegalStateException expected) {
-            }
-            try {
-                Conscrypt.setTokenBindingParams(pair.server, 1);
-                fail("setTokenBindingParams after handshake should throw");
-            } catch (IllegalStateException expected) {
-            }
-        } finally {
-            pair.close();
-        }
-    }
-
-    @Test
     public void test_SSLSocket_EKM() throws Exception {
         TestSSLContext context = new TestSSLContext.Builder()
                 .clientProtocol(clientVersion)
@@ -2360,8 +2223,8 @@ public class SSLSocketVersionCompatibilityTest {
             assertEquals(20, serverContextEkm.length);
             assertArrayEquals(clientContextEkm, serverContextEkm);
 
-            // In TLS 1.2, an empty context and a null context are different (RFC 7505, section 4),
-            // but in TLS 1.3 they are the same (draft-ietf-tls-tls13-28, section 7.5).
+            // In TLS 1.2, an empty context and a null context are different (RFC 5705, section 4),
+            // but in TLS 1.3 they are the same (RFC 8446, section 7.5).
             if ("TLSv1.2".equals(negotiatedVersion())) {
                 assertFalse(Arrays.equals(clientEkm, clientContextEkm));
             } else {
