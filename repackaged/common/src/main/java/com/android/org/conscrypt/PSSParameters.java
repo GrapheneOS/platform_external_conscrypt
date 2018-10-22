@@ -37,6 +37,9 @@ public class PSSParameters extends AlgorithmParametersSpi {
 
     private PSSParameterSpec spec = PSSParameterSpec.DEFAULT;
 
+    @libcore.api.IntraCoreApi
+    public PSSParameters() {}
+
     @Override
     protected void engineInit(AlgorithmParameterSpec algorithmParameterSpec)
             throws InvalidParameterSpecException {
