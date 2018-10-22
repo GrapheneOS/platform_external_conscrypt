@@ -51,6 +51,9 @@ public final class OpenSSLECDHKeyAgreement extends KeyAgreementSpi {
     /** Agreed key. Only available after {@link #engineDoPhase(Key, boolean)} completes. */
     private byte[] mResult;
 
+    @libcore.api.IntraCoreApi
+    public OpenSSLECDHKeyAgreement() {}
+
     @Override
     public Key engineDoPhase(Key key, boolean lastPhase) throws InvalidKeyException {
         if (mOpenSslPrivateKey == null) {

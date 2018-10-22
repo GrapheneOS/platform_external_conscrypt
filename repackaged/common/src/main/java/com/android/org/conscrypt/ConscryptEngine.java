@@ -214,10 +214,18 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
 
     /**
      * Configures the default {@link BufferAllocator} to be used by all future
-     * {@link SSLEngine} instances from this provider.
+     * {@link SSLEngine} and {@link ConscryptEngineSocket} instances from this provider.
      */
     static void setDefaultBufferAllocator(BufferAllocator bufferAllocator) {
         defaultBufferAllocator = bufferAllocator;
+    }
+
+    /**
+     * Returns the default {@link BufferAllocator}, which may be {@code null} if no default
+     * has been explicitly set.
+     */
+    static BufferAllocator getDefaultBufferAllocator() {
+        return defaultBufferAllocator;
     }
 
     @Override
@@ -1754,22 +1762,6 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
     @Override
     byte[] getTlsUnique() {
         return ssl.getTlsUnique();
-    }
-
-    @Override
-    void setTokenBindingParams(int... params) throws SSLException {
-        synchronized (ssl) {
-            if (isHandshakeStarted()) {
-                throw new IllegalStateException(
-                        "Cannot set token binding params after handshake has started.");
-            }
-        }
-        ssl.setTokenBindingParams(params);
-    };
-
-    @Override
-    int getTokenBindingParams() {
-        return ssl.getTokenBindingParams();
     }
 
     @Override
