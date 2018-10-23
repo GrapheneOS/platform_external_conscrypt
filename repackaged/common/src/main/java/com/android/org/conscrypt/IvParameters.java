@@ -116,15 +116,24 @@ public class IvParameters extends AlgorithmParametersSpi {
      * @hide This class is not part of the Android public SDK API
      */
     @libcore.api.IntraCoreApi
-    public static class AES extends IvParameters {}
+    public static class AES extends IvParameters {
+        @libcore.api.IntraCoreApi
+        public AES() {}
+    }
     /**
      * @hide This class is not part of the Android public SDK API
      */
     @libcore.api.IntraCoreApi
-    public static class DESEDE extends IvParameters {}
+    public static class DESEDE extends IvParameters {
+        @libcore.api.IntraCoreApi
+        public DESEDE() {}
+    }
     /**
      * @hide This class is not part of the Android public SDK API
      */
     @libcore.api.IntraCoreApi
-    public static class ChaCha20 extends IvParameters {}
+    public static class ChaCha20 extends IvParameters {
+        @libcore.api.IntraCoreApi
+        public ChaCha20() {}
+    }
 }

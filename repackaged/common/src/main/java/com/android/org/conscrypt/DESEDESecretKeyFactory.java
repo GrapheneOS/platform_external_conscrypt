@@ -35,6 +35,10 @@ import javax.crypto.spec.SecretKeySpec;
 @libcore.api.IntraCoreApi
 @Internal
 public class DESEDESecretKeyFactory extends SecretKeyFactorySpi {
+
+    @libcore.api.IntraCoreApi
+    public DESEDESecretKeyFactory() {}
+
     @Override
     protected SecretKey engineGenerateSecret(KeySpec keySpec) throws InvalidKeySpecException {
         if (keySpec == null) {

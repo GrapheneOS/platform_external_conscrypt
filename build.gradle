@@ -48,7 +48,7 @@ subprojects {
 
     group = "org.conscrypt"
     description = 'Conscrypt is an alternate Java Security Provider that uses BoringSSL'
-    version = "1.4.0-SNAPSHOT"
+    version = "1.5.0-SNAPSHOT"
 
     ext {
         os = org.gradle.internal.os.OperatingSystem.current();
@@ -152,6 +152,17 @@ subprojects {
                 signJar(it.file.absolutePath)
             }
         }
+    }
+
+    task generateProperties(type: WriteProperties) {
+        ext {
+            parsedVersion = VersionNumber.parse(version)
+        }
+        property("org.conscrypt.version.major", parsedVersion.getMajor())
+        property("org.conscrypt.version.minor", parsedVersion.getMinor())
+        property("org.conscrypt.version.patch", parsedVersion.getMicro())
+        property("org.conscrypt.boringssl.version", boringSslVersion)
+        outputFile "build/generated/resources/org/conscrypt/conscrypt.properties"
     }
 
     if (!androidProject) {
