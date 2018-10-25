@@ -1,3 +1,4 @@
+/* GENERATED SOURCE. DO NOT MODIFY. */
 /*
  * Copyright (C) 2016 The Android Open Source Project
  *
@@ -13,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package libcore.tlswire.handshake;
+package com.android.org.conscrypt.tlswire.handshake;
 /**
  * {@code EllipticCurve} enum from RFC 4492 section 5.1.1. Curves are assigned
  * via the
  * <a href="https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-8">IANA registry</a>.
+ * @hide This class is not part of the Android public SDK API
  */
 public enum EllipticCurve {
     SECT163K1(1, "sect163k1"),

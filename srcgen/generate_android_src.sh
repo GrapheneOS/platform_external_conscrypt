@@ -43,6 +43,3 @@ done
 # Remove some unused test files:
 rm -fr ${REPACKAGED_DIR}/openjdk-integ-tests/src/test/java/com/android/org/conscrypt/ConscryptSuite.java
 rm -fr ${REPACKAGED_DIR}/openjdk-integ-tests/src/test/java/com/android/org/conscrypt/ConscryptJava6Suite.java
-
-# Remove the libcore package as that is provided by libcore.
-rm -fr ${REPACKAGED_DIR}/testing/src/main/java/libcore

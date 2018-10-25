@@ -1,3 +1,4 @@
+/* GENERATED SOURCE. DO NOT MODIFY. */
 /*
  * Copyright (C) 2014 The Android Open Source Project
  *
@@ -13,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package libcore.tlswire.util;
+package com.android.org.conscrypt.tlswire.util;
 import java.io.DataInput;
 import java.io.IOException;
 /**
  * {@code ProtovolVersion} struct from TLS 1.2 RFC 5246.
+ * @hide This class is not part of the Android public SDK API
  */
 public class TlsProtocolVersion {
     public static final TlsProtocolVersion SSLV3 = new TlsProtocolVersion(3, 0, "SSLv3");
