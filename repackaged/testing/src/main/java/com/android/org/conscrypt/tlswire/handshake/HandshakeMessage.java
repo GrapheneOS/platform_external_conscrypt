@@ -1,3 +1,4 @@
+/* GENERATED SOURCE. DO NOT MODIFY. */
 /*
  * Copyright (C) 2014 The Android Open Source Project
  *
@@ -13,16 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package libcore.tlswire.handshake;
+package com.android.org.conscrypt.tlswire.handshake;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
-import libcore.tlswire.util.IoUtils;
+import com.android.org.conscrypt.tlswire.util.IoUtils;
 
 /**
  * Handshake Protocol message from TLS 1.2 RFC 5246.
+ * @hide This class is not part of the Android public SDK API
  */
 public class HandshakeMessage {
     public static final int TYPE_CLIENT_HELLO = 1;
