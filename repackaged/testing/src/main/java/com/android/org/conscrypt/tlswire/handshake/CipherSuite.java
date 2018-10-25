@@ -1,3 +1,4 @@
+/* GENERATED SOURCE. DO NOT MODIFY. */
 /*
  * Copyright (C) 2014 The Android Open Source Project
  *
@@ -13,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package libcore.tlswire.handshake;
+package com.android.org.conscrypt.tlswire.handshake;
 import java.util.HashMap;
 import java.util.Map;
 /**
  * {@code CipherSuite} enum from TLS 1.2 RFC 5246.
+ * @hide This class is not part of the Android public SDK API
  */
 public class CipherSuite {
     // The list of cipher suites below is based on IANA registry
