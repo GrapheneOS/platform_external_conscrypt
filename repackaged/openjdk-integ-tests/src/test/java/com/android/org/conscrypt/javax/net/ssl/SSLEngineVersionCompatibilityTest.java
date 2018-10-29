@@ -27,6 +27,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
@@ -48,6 +50,14 @@ import javax.net.ssl.SSLSession;
 import com.android.org.conscrypt.Conscrypt;
 import com.android.org.conscrypt.TestUtils;
 import com.android.org.conscrypt.java.security.TestKeyStore;
+import com.android.org.conscrypt.tlswire.TlsTester;
+import com.android.org.conscrypt.tlswire.handshake.AlpnHelloExtension;
+import com.android.org.conscrypt.tlswire.handshake.ClientHello;
+import com.android.org.conscrypt.tlswire.handshake.HandshakeMessage;
+import com.android.org.conscrypt.tlswire.handshake.HelloExtension;
+import com.android.org.conscrypt.tlswire.handshake.ServerNameHelloExtension;
+import com.android.org.conscrypt.tlswire.record.TlsProtocols;
+import com.android.org.conscrypt.tlswire.record.TlsRecord;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -470,6 +480,89 @@ public class SSLEngineVersionCompatibilityTest {
         res = pair.client.unwrap(ByteBuffer.wrap(new byte[] { 0x01} ), out);
         assertEquals(Status.CLOSED, res.getStatus());
         assertEquals(0, res.bytesConsumed());
+    }
+
+    @Test
+    public void test_SSLSocket_ClientHello_record_size() throws Exception {
+        // This test checks the size of ClientHello of the default SSLEngine. TLS/SSL handshakes
+        // with older/unpatched F5/BIG-IP appliances are known to stall and time out when
+        // the fragment containing ClientHello is between 256 and 511 (inclusive) bytes long.
+        SSLContext context = SSLContext.getInstance(clientVersion);
+        context.init(null, null, null);
+        SSLEngine e = context.createSSLEngine();
+        e.setUseClientMode(true);
+
+        // Enable SNI extension on the engine (this is typically enabled by default)
+        // to increase the size of ClientHello.
+        Conscrypt.setHostname(e, "sslenginetest.androidcts.google.com");
+
+        // Enable Session Tickets extension on the engine (this is typically enabled
+        // by default) to increase the size of ClientHello.
+        Conscrypt.setUseSessionTickets(e, true);
+
+        TlsRecord firstReceivedTlsRecord = TlsTester.parseRecord(getFirstChunk(e));
+
+        assertEquals("TLS record type", TlsProtocols.HANDSHAKE, firstReceivedTlsRecord.type);
+        HandshakeMessage handshakeMessage = HandshakeMessage.read(
+                new DataInputStream(new ByteArrayInputStream(firstReceivedTlsRecord.fragment)));
+        assertEquals(
+                "HandshakeMessage type", HandshakeMessage.TYPE_CLIENT_HELLO, handshakeMessage.type);
+
+        int fragmentLength = firstReceivedTlsRecord.fragment.length;
+        if ((fragmentLength >= 256) && (fragmentLength <= 511)) {
+            fail("Fragment containing ClientHello is of dangerous length: " + fragmentLength
+                    + " bytes");
+        }
+    }
+
+    @Test
+    public void test_SSLSocket_ClientHello_SNI() throws Exception {
+        SSLContext context = SSLContext.getInstance(clientVersion);
+        context.init(null, null, null);
+        SSLEngine e = context.createSSLEngine();
+        e.setUseClientMode(true);
+
+        Conscrypt.setHostname(e, "sslenginetest.androidcts.google.com");
+
+        ClientHello clientHello = TlsTester.parseClientHello(getFirstChunk(e));
+        ServerNameHelloExtension sniExtension =
+                (ServerNameHelloExtension) clientHello.findExtensionByType(
+                        HelloExtension.TYPE_SERVER_NAME);
+
+        assertNotNull(sniExtension);
+        assertEquals(Arrays.asList("sslenginetest.androidcts.google.com"), sniExtension.hostnames);
+    }
+
+    @Test
+    public void test_SSLSocket_ClientHello_ALPN() throws Exception {
+        String[] protocolList = new String[] { "h2", "http/1.1" };
+
+        SSLContext context = SSLContext.getInstance(clientVersion);
+        context.init(null, null, null);
+        SSLEngine e = context.createSSLEngine();
+        e.setUseClientMode(true);
+
+        Conscrypt.setApplicationProtocols(e, protocolList);
+
+        ClientHello clientHello = TlsTester.parseClientHello(getFirstChunk(e));
+        AlpnHelloExtension alpnExtension =
+                (AlpnHelloExtension) clientHello.findExtensionByType(
+                        HelloExtension.TYPE_APPLICATION_LAYER_PROTOCOL_NEGOTIATION);
+        assertNotNull(alpnExtension);
+        assertEquals(Arrays.asList(protocolList), alpnExtension.protocols);
+    }
+
+    private static final ByteBuffer EMPTY_BUFFER = ByteBuffer.allocate(0);
+
+    private static byte[] getFirstChunk(SSLEngine e) throws SSLException {
+        ByteBuffer out = ByteBuffer.allocate(64 * 1024);
+
+        e.wrap(EMPTY_BUFFER, out);
+        out.flip();
+        byte[] data = new byte[out.limit()];
+        out.get(data);
+
+        return data;
     }
 
     @Test
