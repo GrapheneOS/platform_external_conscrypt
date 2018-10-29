@@ -119,6 +119,7 @@ import com.android.org.conscrypt.Conscrypt;
 import com.android.org.conscrypt.TestUtils;
 import com.android.org.conscrypt.java.security.TestKeyStore;
 import com.android.org.conscrypt.tlswire.TlsTester;
+import com.android.org.conscrypt.tlswire.handshake.AlpnHelloExtension;
 import com.android.org.conscrypt.tlswire.handshake.ClientHello;
 import com.android.org.conscrypt.tlswire.handshake.HandshakeMessage;
 import com.android.org.conscrypt.tlswire.handshake.HelloExtension;
@@ -1750,6 +1751,30 @@ public class SSLSocketVersionCompatibilityTest {
             }
         }, getSSLSocketFactoriesToTest());
     }
+
+    @Test
+    public void test_SSLSocket_ClientHello_ALPN() throws Exception {
+        final String[] protocolList = new String[] { "h2", "http/1.1" };
+        
+        ForEachRunner.runNamed(new Callback<SSLSocketFactory>() {
+            @Override
+            public void run(SSLSocketFactory sslSocketFactory) throws Exception {
+                ClientHello clientHello = TlsTester.captureTlsHandshakeClientHello(executor,
+                        new DelegatingSSLSocketFactory(sslSocketFactory) {
+                            @Override public SSLSocket configureSocket(SSLSocket socket) {
+                                Conscrypt.setApplicationProtocols(socket, protocolList);
+                                return socket;
+                            }
+                        });
+                AlpnHelloExtension alpnExtension =
+                        (AlpnHelloExtension) clientHello.findExtensionByType(
+                                HelloExtension.TYPE_APPLICATION_LAYER_PROTOCOL_NEGOTIATION);
+                assertNotNull(alpnExtension);
+                assertEquals(Arrays.asList(protocolList), alpnExtension.protocols);
+            }
+        }, getSSLSocketFactoriesToTest());
+    }
+
     private List<Pair<String, SSLSocketFactory>> getSSLSocketFactoriesToTest()
             throws NoSuchAlgorithmException, KeyManagementException {
         List<Pair<String, SSLSocketFactory>> result =
