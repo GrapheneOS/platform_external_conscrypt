@@ -151,6 +151,7 @@ public final class TrustManagerImpl extends X509ExtendedTrustManager {
      *
      * @param keyStore
      */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     @libcore.api.CorePlatformApi
     public TrustManagerImpl(KeyStore keyStore) {
         this(keyStore, null);
@@ -326,6 +327,7 @@ public final class TrustManagerImpl extends X509ExtendedTrustManager {
     /**
      * For backward compatibility with older Android API that used String for the hostname only.
      */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     @libcore.api.CorePlatformApi
     public List<X509Certificate> checkServerTrusted(X509Certificate[] chain, String authType,
             String hostname) throws CertificateException {

@@ -66,6 +66,7 @@ final class SSLParametersImpl implements Cloneable {
     @SuppressWarnings("deprecation") // PSKKeyManager is deprecated, but in our own package
     private final PSKKeyManager pskKeyManager;
     // source of X.509 certificate based authentication trust decisions or null if not provided
+    @dalvik.annotation.compat.UnsupportedAppUsage
     private final X509TrustManager x509TrustManager;
 
     // protocols enabled for SSL connection
@@ -151,6 +152,7 @@ final class SSLParametersImpl implements Cloneable {
         // directly accesses /dev/urandom, which makes it irrelevant.
     }
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static SSLParametersImpl getDefault() throws KeyManagementException {
         SSLParametersImpl result = defaultParameters;
         if (result == null) {
@@ -197,6 +199,7 @@ final class SSLParametersImpl implements Cloneable {
     /**
      * @return X.509 trust manager or {@code null} for none.
      */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     X509TrustManager getX509TrustManager() {
         return x509TrustManager;
     }
@@ -235,6 +238,7 @@ final class SSLParametersImpl implements Cloneable {
      * Sets the list of available protocols for use in SSL connection.
      * @throws IllegalArgumentException if {@code protocols == null}
      */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     void setEnabledProtocols(String[] protocols) {
         if (protocols == null) {
             throw new IllegalArgumentException("protocols == null");
@@ -532,6 +536,7 @@ final class SSLParametersImpl implements Cloneable {
     /**
      * Gets the default X.509 trust manager.
      */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static X509TrustManager getDefaultX509TrustManager()
             throws KeyManagementException {
         X509TrustManager result = defaultX509TrustManager;

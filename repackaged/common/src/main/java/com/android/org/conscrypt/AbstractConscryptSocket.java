@@ -517,6 +517,7 @@ abstract class AbstractConscryptSocket extends SSLSocket {
      * Returns the hostname that was supplied during socket creation. No DNS resolution is
      * attempted before returning the hostname.
      */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     String getHostname() {
         return peerHostname;
     }
@@ -526,6 +527,7 @@ abstract class AbstractConscryptSocket extends SSLSocket {
      *
      * @param hostname the desired SNI hostname, or null to disable
      */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     void setHostname(String hostname) {
         peerHostname = hostname;
     }
@@ -535,6 +537,7 @@ abstract class AbstractConscryptSocket extends SSLSocket {
      * or the IP address in a textual representation. We do not want to perform reverse DNS
      * lookups on this address.
      */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     String getHostnameOrIP() {
         if (peerHostname != null) {
             return peerHostname;
@@ -551,6 +554,7 @@ abstract class AbstractConscryptSocket extends SSLSocket {
     /**
      * Note write timeouts are not part of the javax.net.ssl.SSLSocket API
      */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     void setSoWriteTimeout(int writeTimeoutMilliseconds) throws SocketException {
         throw new SocketException("Method setSoWriteTimeout() is not supported.");
     }
@@ -558,6 +562,7 @@ abstract class AbstractConscryptSocket extends SSLSocket {
     /**
      * Note write timeouts are not part of the javax.net.ssl.SSLSocket API
      */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     int getSoWriteTimeout() throws SocketException {
         return 0;
     }
@@ -566,6 +571,7 @@ abstract class AbstractConscryptSocket extends SSLSocket {
      * Set the handshake timeout on this socket.  This timeout is specified in
      * milliseconds and will be used only during the handshake process.
      */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     void setHandshakeTimeout(int handshakeTimeoutMilliseconds) throws SocketException {
         throw new SocketException("Method setHandshakeTimeout() is not supported.");
     }
@@ -622,6 +628,7 @@ abstract class AbstractConscryptSocket extends SSLSocket {
      *
      * @param useSessionTickets True to enable session tickets
      */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     abstract void setUseSessionTickets(boolean useSessionTickets);
 
     /**
@@ -632,6 +639,7 @@ abstract class AbstractConscryptSocket extends SSLSocket {
      * @throws IllegalStateException if this is a client socket or if the handshake has already
      *         started.
      */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     abstract void setChannelIdEnabled(boolean enabled);
 
     /**
@@ -644,6 +652,7 @@ abstract class AbstractConscryptSocket extends SSLSocket {
      *         completed.
      * @throws SSLException if channel ID is available but could not be obtained.
      */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     abstract byte[] getChannelId() throws SSLException;
 
     /**
@@ -658,12 +667,14 @@ abstract class AbstractConscryptSocket extends SSLSocket {
      * @throws IllegalStateException if this is a server socket or if the handshake has already
      *         started.
      */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     abstract void setChannelIdPrivateKey(PrivateKey privateKey);
 
     /**
      * Returns null always for backward compatibility.
      * @deprecated NPN is not supported
      */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     @Deprecated
     byte[] getNpnSelectedProtocol() {
         return null;
@@ -673,6 +684,7 @@ abstract class AbstractConscryptSocket extends SSLSocket {
      * This method does nothing and is kept for backward compatibility.
      * @deprecated NPN is not supported
      */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     @Deprecated
     void setNpnProtocols(byte[] npnProtocols) {}
 
@@ -682,6 +694,7 @@ abstract class AbstractConscryptSocket extends SSLSocket {
      *
      * @deprecated use {@link #getApplicationProtocol()} instead.
      */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     @Deprecated
     abstract byte[] getAlpnSelectedProtocol();
 
@@ -692,6 +705,7 @@ abstract class AbstractConscryptSocket extends SSLSocket {
      * @param alpnProtocols the list of ALPN protocols
      * @deprecated use {@link #setApplicationProtocols(String[])} instead.
      */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     @Deprecated
     abstract void setAlpnProtocols(String[] alpnProtocols);
 
@@ -703,6 +717,7 @@ abstract class AbstractConscryptSocket extends SSLSocket {
      * @param alpnProtocols the encoded form of the ALPN protocol list
      * @deprecated Use {@link #setApplicationProtocols(String[])} instead.
      */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     @Deprecated
     abstract void setAlpnProtocols(byte[] alpnProtocols);
 
@@ -711,12 +726,14 @@ abstract class AbstractConscryptSocket extends SSLSocket {
      *
      * @param protocols the list of ALPN protocols
      */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     @SuppressWarnings("MissingOverride") // For compiling pre Java 9.
     abstract void setApplicationProtocols(String[] protocols);
 
     /**
      * Returns the list of supported ALPN protocols.
      */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     @SuppressWarnings("MissingOverride") // For compiling pre Java 9.
     abstract String[] getApplicationProtocols();
 
