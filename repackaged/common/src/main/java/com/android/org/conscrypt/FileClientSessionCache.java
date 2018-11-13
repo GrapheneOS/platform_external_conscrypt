@@ -132,6 +132,7 @@ public final class FileClientSessionCache {
             return host + "." + port;
         }
 
+        @dalvik.annotation.compat.UnsupportedAppUsage
         @Override
         public synchronized byte[] getSessionData(String host, int port) {
             /*
@@ -336,6 +337,7 @@ public final class FileClientSessionCache {
      * @throws IOException if the file exists and is not a directory or if
      *  creating the directories fails
      */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     @libcore.api.CorePlatformApi
     public static synchronized SSLClientSessionCache usingDirectory(File directory)
             throws IOException {

@@ -62,6 +62,7 @@ import com.android.org.conscrypt.OpenSSLX509CertificateFactory.ParsingException;
 public final class OpenSSLX509Certificate extends X509Certificate {
     private static final long serialVersionUID = 1992239142393372128L;
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     private transient final long mContext;
     private transient Integer mHashCode;
 
@@ -146,6 +147,7 @@ public final class OpenSSLX509Certificate extends X509Certificate {
         return certs;
     }
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     public static OpenSSLX509Certificate fromX509PemInputStream(InputStream is)
             throws ParsingException {
         @SuppressWarnings("resource")
