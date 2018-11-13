@@ -38,6 +38,7 @@ final class OpenSSLKey {
 
     private final boolean wrapped;
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     OpenSSLKey(long ctx) {
         this(ctx, false);
     }
@@ -50,6 +51,7 @@ final class OpenSSLKey {
     /**
      * Returns the EVP_PKEY context for use in JNI calls.
      */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     NativeRef.EVP_PKEY getNativeRef() {
         return ctx;
     }
@@ -58,6 +60,7 @@ final class OpenSSLKey {
         return wrapped;
     }
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static OpenSSLKey fromPrivateKey(PrivateKey key) throws InvalidKeyException {
         if (key instanceof OpenSSLKeyHolder) {
             return ((OpenSSLKeyHolder) key).getOpenSSLKey();
@@ -260,6 +263,7 @@ final class OpenSSLKey {
         }
     }
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     PublicKey getPublicKey() throws NoSuchAlgorithmException {
         switch (NativeCrypto.EVP_PKEY_type(ctx)) {
             case NativeConstants.EVP_PKEY_RSA:
