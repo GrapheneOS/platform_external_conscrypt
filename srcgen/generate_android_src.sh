@@ -5,11 +5,11 @@ if [ -z "$ANDROID_BUILD_TOP" ]; then
     exit 1
 fi
 
-CLASSPATH=${ANDROID_HOST_OUT}/framework/currysrc.jar:${ANDROID_HOST_OUT}/framework/android_conscrypt_srcgen.jar
+CLASSPATH=${ANDROID_HOST_OUT}/framework/currysrc.jar
 CONSCRYPT_DIR=${ANDROID_BUILD_TOP}/external/conscrypt
 
 cd ${ANDROID_BUILD_TOP}
-make -j15 currysrc android_conscrypt_srcgen
+make -j15 currysrc
 
 CORE_PLATFORM_API_FILE=${CONSCRYPT_DIR}/srcgen/core-platform-api.txt
 INTRA_CORE_API_FILE=${CONSCRYPT_DIR}/srcgen/intra-core-api.txt
@@ -26,12 +26,13 @@ function do_transform() {
   rm -rf ${SRC_OUT_DIR}
   mkdir -p ${SRC_OUT_DIR}
 
-  java -cp ${CLASSPATH} com.android.conscrypt.srcgen.ConscryptTransform \
-       ${SRC_IN_DIR} \
-       ${SRC_OUT_DIR} \
-       ${CORE_PLATFORM_API_FILE} \
-       ${INTRA_CORE_API_FILE} \
-       ${UNSUPPORTED_APP_USAGE_FILE}
+  java -cp ${CLASSPATH} com.google.currysrc.aosp.RepackagingTransform \
+       --source-dir ${SRC_IN_DIR} \
+       --target-dir ${SRC_OUT_DIR} \
+       --package-transformation "org.conscrypt:com.android.org.conscrypt" \
+       --core-platform-api-file ${CORE_PLATFORM_API_FILE} \
+       --intra-core-api-file ${INTRA_CORE_API_FILE} \
+       --unsupported-app-usage-file ${UNSUPPORTED_APP_USAGE_FILE}
 }
 
 REPACKAGED_DIR=${CONSCRYPT_DIR}/repackaged
