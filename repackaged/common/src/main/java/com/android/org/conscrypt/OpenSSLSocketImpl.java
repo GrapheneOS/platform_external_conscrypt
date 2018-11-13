@@ -63,17 +63,20 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
         super(socket, hostname, port, autoClose);
     }
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     @Override
     public String getHostname() {
         return super.getHostname();
     }
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     @libcore.api.CorePlatformApi
     @Override
     public void setHostname(String hostname) {
         super.setHostname(hostname);
     }
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     @Override
     public String getHostnameOrIP() {
         return super.getHostnameOrIP();
@@ -84,17 +87,20 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
         return super.getFileDescriptor$();
     }
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     @libcore.api.CorePlatformApi
     @Override
     public void setSoWriteTimeout(int writeTimeoutMilliseconds) throws SocketException {
         super.setSoWriteTimeout(writeTimeoutMilliseconds);
     }
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     @Override
     public int getSoWriteTimeout() throws SocketException {
         return super.getSoWriteTimeout();
     }
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     @libcore.api.CorePlatformApi
     @Override
     public void setHandshakeTimeout(int handshakeTimeoutMilliseconds) throws SocketException {
@@ -104,20 +110,25 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
     @Override
     public abstract SSLSession getHandshakeSession();
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     @libcore.api.CorePlatformApi
     @Override
     public abstract void setUseSessionTickets(boolean useSessionTickets);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     @Override
     public abstract void setChannelIdEnabled(boolean enabled);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     @Override
     public abstract byte[] getChannelId() throws SSLException;
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     @libcore.api.CorePlatformApi
     @Override
     public abstract void setChannelIdPrivateKey(PrivateKey privateKey);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     @libcore.api.CorePlatformApi
     @Override
     @Deprecated
@@ -125,6 +136,7 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
         return super.getNpnSelectedProtocol();
     }
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     @libcore.api.CorePlatformApi
     @Override
     @Deprecated
@@ -132,12 +144,14 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
         super.setNpnProtocols(npnProtocols);
     }
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     @Override
     @Deprecated
     public final void setAlpnProtocols(String[] alpnProtocols) {
         setApplicationProtocols(alpnProtocols == null ? EmptyArray.STRING : alpnProtocols);
     }
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     @libcore.api.CorePlatformApi
     @Deprecated
     @Override
@@ -148,6 +162,7 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
     /**
      * @deprecated Use {@link #setAlpnProtocols(String[])} instead.
      */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     @libcore.api.CorePlatformApi
     @Override
     @Deprecated

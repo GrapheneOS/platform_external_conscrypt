@@ -13,6 +13,7 @@ make -j15 currysrc android_conscrypt_srcgen
 
 CORE_PLATFORM_API_FILE=${CONSCRYPT_DIR}/srcgen/core-platform-api.txt
 INTRA_CORE_API_FILE=${CONSCRYPT_DIR}/srcgen/intra-core-api.txt
+UNSUPPORTED_APP_USAGE_FILE=${CONSCRYPT_DIR}/srcgen/unsupported-app-usage.json
 
 function do_transform() {
   local SRC_IN_DIR=$1
@@ -25,7 +26,12 @@ function do_transform() {
   rm -rf ${SRC_OUT_DIR}
   mkdir -p ${SRC_OUT_DIR}
 
-  java -cp ${CLASSPATH} com.android.conscrypt.srcgen.ConscryptTransform ${SRC_IN_DIR} ${SRC_OUT_DIR} ${CORE_PLATFORM_API_FILE} ${INTRA_CORE_API_FILE}
+  java -cp ${CLASSPATH} com.android.conscrypt.srcgen.ConscryptTransform \
+       ${SRC_IN_DIR} \
+       ${SRC_OUT_DIR} \
+       ${CORE_PLATFORM_API_FILE} \
+       ${INTRA_CORE_API_FILE} \
+       ${UNSUPPORTED_APP_USAGE_FILE}
 }
 
 REPACKAGED_DIR=${CONSCRYPT_DIR}/repackaged

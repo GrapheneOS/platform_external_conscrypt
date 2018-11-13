@@ -88,6 +88,7 @@ public final class NativeCrypto {
 
     // --- DSA/RSA public/private key handling functions -----------------------
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native long EVP_PKEY_new_RSA(byte[] n, byte[] e, byte[] d, byte[] p, byte[] q,
             byte[] dmp1, byte[] dmq1, byte[] iqmp);
 
@@ -97,6 +98,7 @@ public final class NativeCrypto {
 
     static native String EVP_PKEY_print_params(NativeRef.EVP_PKEY pkeyRef);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native void EVP_PKEY_free(long pkey);
 
     static native int EVP_PKEY_cmp(NativeRef.EVP_PKEY pkey1, NativeRef.EVP_PKEY pkey2);
@@ -117,6 +119,7 @@ public final class NativeCrypto {
 
     static native long getECPrivateKeyWrapper(PrivateKey key, NativeRef.EC_GROUP ecGroupRef);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native long RSA_generate_key_ex(int modulusBits, byte[] publicExponent);
 
     static native int RSA_size(NativeRef.EVP_PKEY pkey);
@@ -156,6 +159,7 @@ public final class NativeCrypto {
     static native long EVP_PKEY_new_EC_KEY(
             NativeRef.EC_GROUP groupRef, NativeRef.EC_POINT pubkeyRef, byte[] privkey);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native long EC_GROUP_new_by_curve_name(String curveName);
 
     static native long EC_GROUP_new_arbitrary(
@@ -165,6 +169,7 @@ public final class NativeCrypto {
 
     static native byte[][] EC_GROUP_get_curve(NativeRef.EC_GROUP groupRef);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native void EC_GROUP_clear_free(long groupRef);
 
     static native long EC_GROUP_get_generator(NativeRef.EC_GROUP groupRef);
@@ -177,6 +182,7 @@ public final class NativeCrypto {
 
     static native long EC_POINT_new(NativeRef.EC_GROUP groupRef);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native void EC_POINT_clear_free(long pointRef);
 
     static native byte[][] EC_POINT_get_affine_coordinates(
@@ -209,16 +215,20 @@ public final class NativeCrypto {
     // --- Message digest functions --------------
 
     // These return const references
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native long EVP_get_digestbyname(String name);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native int EVP_MD_size(long evp_md_const);
 
     // --- Message digest context functions --------------
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native long EVP_MD_CTX_create();
 
     static native void EVP_MD_CTX_cleanup(NativeRef.EVP_MD_CTX ctx);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native void EVP_MD_CTX_destroy(long ctx);
 
     static native int EVP_MD_CTX_copy_ex(
@@ -290,6 +300,7 @@ public final class NativeCrypto {
     // --- Block ciphers -------------------------------------------------------
 
     // These return const references
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native long EVP_get_cipherbyname(String string);
 
     static native void EVP_CipherInit_ex(NativeRef.EVP_CIPHER_CTX ctx, long evpCipher, byte[] key,
@@ -301,8 +312,10 @@ public final class NativeCrypto {
     static native int EVP_CipherFinal_ex(NativeRef.EVP_CIPHER_CTX ctx, byte[] out, int outOffset)
             throws BadPaddingException, IllegalBlockSizeException;
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native int EVP_CIPHER_iv_length(long evpCipher);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native long EVP_CIPHER_CTX_new();
 
     static native int EVP_CIPHER_CTX_block_size(NativeRef.EVP_CIPHER_CTX ctx);
@@ -353,6 +366,7 @@ public final class NativeCrypto {
 
     // --- RAND ----------------------------------------------------------------
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native void RAND_bytes(byte[] output);
 
     // --- X509_NAME -----------------------------------------------------------
@@ -396,10 +410,13 @@ public final class NativeCrypto {
      */
     static final int EXTENSION_TYPE_CRITICAL = 1;
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native long d2i_X509_bio(long bioCtx);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native long d2i_X509(byte[] encoded) throws ParsingException;
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native long PEM_read_bio_X509(long bioCtx);
 
     static native byte[] i2d_X509(long x509ctx, OpenSSLX509Certificate holder);
@@ -407,8 +424,10 @@ public final class NativeCrypto {
     /** Takes an X509 context not an X509_PUBKEY context. */
     static native byte[] i2d_X509_PUBKEY(long x509ctx, OpenSSLX509Certificate holder);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native byte[] ASN1_seq_pack_X509(long[] x509CertRefs);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native long[] ASN1_seq_unpack_X509_bio(long bioRef) throws ParsingException;
 
     static native void X509_free(long x509ctx, OpenSSLX509Certificate holder);
@@ -479,18 +498,23 @@ public final class NativeCrypto {
     static final int PKCS7_CRLS = 2;
 
     /** Returns an array of X509 or X509_CRL pointers. */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native long[] d2i_PKCS7_bio(long bioCtx, int which) throws ParsingException;
 
     /** Returns an array of X509 or X509_CRL pointers. */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native byte[] i2d_PKCS7(long[] certs);
 
     /** Returns an array of X509 or X509_CRL pointers. */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native long[] PEM_read_bio_PKCS7(long bioCtx, int which);
 
     // --- X509_CRL ------------------------------------------------------------
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native long d2i_X509_CRL_bio(long bioCtx);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native long PEM_read_bio_X509_CRL(long bioCtx);
 
     static native byte[] i2d_X509_CRL(long x509CrlCtx, OpenSSLX509CRL holder);
@@ -536,29 +560,39 @@ public final class NativeCrypto {
 
     // --- X509_REVOKED --------------------------------------------------------
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native long X509_REVOKED_dup(long x509RevokedCtx);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native byte[] i2d_X509_REVOKED(long x509RevokedCtx);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native String[] get_X509_REVOKED_ext_oids(long x509ctx, int critical);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native byte[] X509_REVOKED_get_ext_oid(long x509RevokedCtx, String oid);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native byte[] X509_REVOKED_get_serialNumber(long x509RevokedCtx);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native long X509_REVOKED_get_ext(long x509RevokedCtx, String oid);
 
     /** Returns ASN1_TIME reference. */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native long get_X509_REVOKED_revocationDate(long x509RevokedCtx);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native void X509_REVOKED_print(long bioRef, long x509RevokedCtx);
 
     // --- X509_EXTENSION ------------------------------------------------------
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native int X509_supported_extension(long x509ExtensionRef);
 
     // --- ASN1_TIME -----------------------------------------------------------
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native void ASN1_TIME_to_Calendar(long asn1TimeCtx, Calendar cal) throws ParsingException;
 
     // --- ASN1 Encoding -------------------------------------------------------
@@ -699,10 +733,13 @@ public final class NativeCrypto {
 
     // --- BIO stream creation -------------------------------------------------
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native long create_BIO_InputStream(OpenSSLBIOInputStream is, boolean isFinite);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native long create_BIO_OutputStream(OutputStream os);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native void BIO_free_all(long bioRef);
 
     // --- SSL handling --------------------------------------------------------
@@ -813,6 +850,7 @@ public final class NativeCrypto {
      */
     static native int EVP_has_aes_hardware();
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native long SSL_CTX_new();
 
     // IMPLEMENTATION NOTE: The default list of cipher suites is a trade-off between what we'd like
@@ -1152,24 +1190,31 @@ public final class NativeCrypto {
 
     static native byte[] SSL_session_id(long ssl, NativeSsl ssl_holder);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native byte[] SSL_SESSION_session_id(long sslSessionNativePointer);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native long SSL_SESSION_get_time(long sslSessionNativePointer);
 
     static native long SSL_SESSION_get_timeout(long sslSessionNativePointer);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native String SSL_SESSION_get_version(long sslSessionNativePointer);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native String SSL_SESSION_cipher(long sslSessionNativePointer);
 
     static native boolean SSL_SESSION_should_be_single_use(long sslSessionNativePointer);
 
     static native void SSL_SESSION_up_ref(long sslSessionNativePointer);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native void SSL_SESSION_free(long sslSessionNativePointer);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native byte[] i2d_SSL_SESSION(long sslSessionNativePointer);
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static native long d2i_SSL_SESSION(byte[] data) throws IOException;
 
     /**

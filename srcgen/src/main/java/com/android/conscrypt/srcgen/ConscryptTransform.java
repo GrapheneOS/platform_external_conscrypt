@@ -19,6 +19,7 @@ import static com.google.currysrc.api.process.Rules.createMandatoryRule;
 import static com.google.currysrc.api.process.Rules.createOptionalRule;
 
 import com.google.currysrc.Main;
+import com.google.currysrc.aosp.Annotations;
 import com.google.currysrc.api.RuleSet;
 import com.google.currysrc.api.input.DirectoryInputFileGenerator;
 import com.google.currysrc.api.input.InputFileGenerator;
@@ -56,15 +57,19 @@ public class ConscryptTransform {
      * java ConscryptTransform {source dir} {target dir}
      */
     public static void main(String[] args) throws Exception {
-        if (args.length != 4) {
-          throw new IllegalArgumentException(
-              "Usage: " + ConscryptTransform.class.getCanonicalName()
-                  + " <source-dir> <target-dir> <core-platform-api-file> <intra-core-api-file>");
+        if (args.length != 5) {
+            throw new IllegalArgumentException(
+                    "Usage: " + ConscryptTransform.class.getCanonicalName() + " <source-dir>"
+                    + " <target-dir>"
+                    + " <core-platform-api-file>"
+                    + " <intra-core-api-file>"
+                    + " <unsupported-app-usage-file>");
         }
         String sourceDir = args[0];
         String targetDir = args[1];
         Path corePlatformApiFile = Paths.get(args[2]);
         Path intraCoreApiFile = Paths.get(args[3]);
+        Path unsupportedAppUsageFile = Paths.get(args[4]);
 
         Map<String, String> options = JavaCore.getOptions();
         options.put(JavaCore.COMPILER_COMPLIANCE, JavaCore.VERSION_1_8);
@@ -74,9 +79,9 @@ public class ConscryptTransform {
         options.put(DefaultCodeFormatterConstants.FORMATTER_TAB_SIZE, "4");
 
         new Main(false /* debug */)
-            .setJdtOptions(options)
-            .execute(new TransformRules(
-                    sourceDir, targetDir, corePlatformApiFile, intraCoreApiFile));
+                .setJdtOptions(options)
+                .execute(new TransformRules(sourceDir, targetDir, corePlatformApiFile,
+                        intraCoreApiFile, unsupportedAppUsageFile));
     }
 
     static class TransformRules implements RuleSet {
@@ -84,13 +89,15 @@ public class ConscryptTransform {
         private final String targetDir;
         private final Path corePlatformApiFile;
         private final Path intraCoreApiFile;
+        private final Path unsupportedAppUsageFile;
 
         TransformRules(String sourceDir, String targetDir, Path corePlatformApiFile,
-                Path intraCoreApiFile) {
+                Path intraCoreApiFile, Path unsupportedAppUsageFile) {
             this.sourceDir = sourceDir;
             this.targetDir = targetDir;
             this.corePlatformApiFile = corePlatformApiFile;
             this.intraCoreApiFile = intraCoreApiFile;
+            this.unsupportedAppUsageFile = unsupportedAppUsageFile;
         }
 
         @Override
@@ -118,8 +125,10 @@ public class ConscryptTransform {
                                     corePlatformApiFile))),
                     // AST change: Add IntraCoreApi to specified classes and members
                     createOptionalRule(new AddMarkerAnnotation("libcore.api.IntraCoreApi",
-                            BodyDeclarationLocators.readBodyDeclarationLocators(
-                                    intraCoreApiFile))));
+                            BodyDeclarationLocators.readBodyDeclarationLocators(intraCoreApiFile))),
+                    // AST Change: Add UnsupportedAppUsage to specified class members.
+                    createOptionalRule(
+                            Annotations.addUnsupportedAppUsage(unsupportedAppUsageFile)));
         }
 
         private static Rule createHidePublicClassesRule() {

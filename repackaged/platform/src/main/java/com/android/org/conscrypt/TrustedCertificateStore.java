@@ -131,6 +131,7 @@ public class TrustedCertificateStore implements ConscryptCertStore {
     private final File addedDir;
     private final File deletedDir;
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     @libcore.api.CorePlatformApi
     public TrustedCertificateStore() {
         this(PreloadHolder.defaultCaCertsSystemDir, PreloadHolder.defaultCaCertsAddedDir,
@@ -500,6 +501,7 @@ public class TrustedCertificateStore implements ConscryptCertStore {
      * @throws CertificateException if there was a problem parsing the
      *             certificates
      */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     @libcore.api.CorePlatformApi
     public List<X509Certificate> getCertificateChain(X509Certificate leaf)
             throws CertificateException {
