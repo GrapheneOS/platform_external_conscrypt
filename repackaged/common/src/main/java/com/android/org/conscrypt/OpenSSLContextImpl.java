@@ -61,6 +61,7 @@ public abstract class OpenSSLContextImpl extends SSLContextSpi {
     SSLParametersImpl sslParameters;
 
     /** Allows outside callers to get the preferred SSLContext. */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     static OpenSSLContextImpl getPreferred() {
         return new TLSv12();
     }
@@ -74,6 +75,7 @@ public abstract class OpenSSLContextImpl extends SSLContextSpi {
     /**
      * Constuctor for the DefaultSSLContextImpl.
      */
+    @dalvik.annotation.compat.UnsupportedAppUsage
     OpenSSLContextImpl() throws GeneralSecurityException, IOException {
         synchronized (DefaultSSLContextImpl.class) {
             this.algorithms = null;
@@ -151,6 +153,7 @@ public abstract class OpenSSLContextImpl extends SSLContextSpi {
         return serverSessionContext;
     }
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     @libcore.api.CorePlatformApi
     @Override
     public ClientSessionContext engineGetClientSessionContext() {
@@ -175,6 +178,7 @@ public abstract class OpenSSLContextImpl extends SSLContextSpi {
      */
     @libcore.api.IntraCoreApi
     public static final class TLSv12 extends OpenSSLContextImpl {
+        @dalvik.annotation.compat.UnsupportedAppUsage
         @libcore.api.IntraCoreApi
         public TLSv12() {
             super(NativeCrypto.TLSV12_PROTOCOLS);

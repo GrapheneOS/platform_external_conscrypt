@@ -31,6 +31,7 @@ final class X509PublicKey implements PublicKey {
 
     private final byte[] encoded;
 
+    @dalvik.annotation.compat.UnsupportedAppUsage
     X509PublicKey(String algorithm, byte[] encoded) {
         this.algorithm = algorithm;
         this.encoded = encoded;
