@@ -44,6 +44,8 @@ import java.security.spec.X509EncodedKeySpec;
 @libcore.api.IntraCoreApi
 @Internal
 public final class OpenSSLRSAKeyFactory extends KeyFactorySpi {
+    @libcore.api.IntraCoreApi
+    public OpenSSLRSAKeyFactory() {}
 
     @Override
     protected PublicKey engineGeneratePublic(KeySpec keySpec) throws InvalidKeySpecException {
