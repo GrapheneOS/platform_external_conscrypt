@@ -1,7 +1,5 @@
-/*
-See com.google.currysrc.aosp.Annotations.addUnsupportedAppUsage(Path) method for details on the
-syntax.
-*/
+// See com.google.currysrc.aosp.Annotations.addUnsupportedAppUsage(Path) method for details on the
+// syntax.
 [
   {
     "@location": "method:com.android.org.conscrypt.AbstractConscryptSocket#getAlpnSelectedProtocol()"
