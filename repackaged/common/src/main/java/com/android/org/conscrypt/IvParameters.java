@@ -35,6 +35,9 @@ import javax.crypto.spec.IvParameterSpec;
 public class IvParameters extends AlgorithmParametersSpi {
     private byte[] iv;
 
+    @libcore.api.IntraCoreApi
+    public IvParameters() {}
+
     @Override
     protected void engineInit(AlgorithmParameterSpec algorithmParameterSpec)
             throws InvalidParameterSpecException {
