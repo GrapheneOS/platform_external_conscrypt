@@ -49,6 +49,9 @@ public final class OpenSSLRSAKeyPairGenerator extends KeyPairGeneratorSpi {
      */
     private int modulusBits = 2048;
 
+    @libcore.api.IntraCoreApi
+    public OpenSSLRSAKeyPairGenerator() {}
+
     @Override
     public KeyPair generateKeyPair() {
         final OpenSSLKey key = new OpenSSLKey(NativeCrypto.RSA_generate_key_ex(modulusBits,
