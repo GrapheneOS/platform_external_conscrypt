@@ -226,6 +226,9 @@ java_library {
     installable: true,
 
     static_libs: ["conscrypt"],
+    dex_preopt: {
+        enabled: false,
+    },
 
     no_framework_libs: true,
 
