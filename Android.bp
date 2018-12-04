@@ -260,7 +260,6 @@ cc_library_shared {
     cflags: ["-DJNI_JARJAR_PREFIX=com/android/"],
     shared_libs: [
         "libcrypto",
-        "libjavacore",
         "liblog",
         "libnativehelper",
         "libssl",
