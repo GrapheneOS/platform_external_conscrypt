@@ -18,6 +18,7 @@ package android.net.ssl;
 
 import com.android.org.conscrypt.Conscrypt;
 import javax.net.ssl.SSLEngine;
+import libcore.util.NonNull;
 
 /**
  * Static utility methods for accessing additional functionality of supported instances of
@@ -31,11 +32,11 @@ public class SSLEngines {
      * Returns whether the given engine can be used with the methods in this class.  In general,
      * only engines from the platform TLS provider are supported.
      */
-    public static boolean isSupportedEngine(SSLEngine engine) {
+    public static boolean isSupportedEngine(@NonNull SSLEngine engine) {
         return Conscrypt.isConscrypt(engine);
     }
 
-    private static void checkSupported(SSLEngine e) {
+    private static void checkSupported(@NonNull SSLEngine e) {
         if (!isSupportedEngine(e)) {
             throw new IllegalArgumentException("Engine is not a supported engine.");
         }
@@ -50,7 +51,7 @@ public class SSLEngines {
      * @param useSessionTickets whether to enable or disable the use of session tickets
      * @throws IllegalArgumentException if the given engine is not a platform engine
      */
-    public static void setUseSessionTickets(SSLEngine engine, boolean useSessionTickets) {
+    public static void setUseSessionTickets(@NonNull SSLEngine engine, boolean useSessionTickets) {
         checkSupported(engine);
         Conscrypt.setUseSessionTickets(engine, useSessionTickets);
     }
