@@ -18,6 +18,7 @@ package android.net.ssl;
 
 import com.android.org.conscrypt.Conscrypt;
 import javax.net.ssl.SSLSocket;
+import libcore.util.NonNull;
 
 /**
  * Static utility methods for accessing additional functionality of supported instances of
@@ -31,11 +32,11 @@ public class SSLSockets {
      * Returns whether the given socket can be used with the methods in this class.  In general,
      * only sockets from the platform TLS provider are supported.
      */
-    public static boolean isSupportedSocket(SSLSocket socket) {
+    public static boolean isSupportedSocket(@NonNull SSLSocket socket) {
         return Conscrypt.isConscrypt(socket);
     }
 
-    private static void checkSupported(SSLSocket s) {
+    private static void checkSupported(@NonNull SSLSocket s) {
         if (!isSupportedSocket(s)) {
             throw new IllegalArgumentException("Socket is not a supported socket.");
         }
@@ -50,7 +51,7 @@ public class SSLSockets {
      * @param useSessionTickets whether to enable or disable the use of session tickets
      * @throws IllegalArgumentException if the given socket is not a platform socket
      */
-    public static void setUseSessionTickets(SSLSocket socket, boolean useSessionTickets) {
+    public static void setUseSessionTickets(@NonNull SSLSocket socket, boolean useSessionTickets) {
         checkSupported(socket);
         Conscrypt.setUseSessionTickets(socket, useSessionTickets);
     }
