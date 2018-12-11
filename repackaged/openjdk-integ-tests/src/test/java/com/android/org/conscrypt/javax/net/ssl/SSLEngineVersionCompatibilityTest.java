@@ -666,9 +666,9 @@ public class SSLEngineVersionCompatibilityTest {
                 && !b.isInboundDone() && !a.isOutboundDone() && !b.isOutboundDone());
     }
 
-    // Assumes that the negotiated connection will be
+    // Assumes that the negotiated connection will be TLS 1.2
     private void assumeTlsV1_2Connection() {
-        assumeTrue("TLSv1.2.".equals(negotiatedVersion()));
+        assumeTrue("TLSv1.2".equals(negotiatedVersion()));
     }
 
     /**

@@ -146,7 +146,7 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
     /**
      * Set during startHandshake.
      */
-    private final ActiveSession activeSession;
+    private ActiveSession activeSession;
 
     /**
      * A snapshot of the active session when the engine was closed.
@@ -185,7 +185,6 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
         peerInfoProvider = PeerInfoProvider.nullProvider();
         this.ssl = newSsl(sslParameters, this);
         this.networkBio = ssl.newBio();
-        activeSession = new ActiveSession(ssl, sslParameters.getSessionContext());
     }
 
     ConscryptEngine(String host, int port, SSLParametersImpl sslParameters) {
@@ -193,7 +192,6 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
         this.peerInfoProvider = PeerInfoProvider.forHostAndPort(host, port);
         this.ssl = newSsl(sslParameters, this);
         this.networkBio = ssl.newBio();
-        activeSession = new ActiveSession(ssl, sslParameters.getSessionContext());
     }
 
     ConscryptEngine(SSLParametersImpl sslParameters, PeerInfoProvider peerInfoProvider) {
@@ -201,7 +199,6 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
         this.peerInfoProvider = checkNotNull(peerInfoProvider, "peerInfoProvider");
         this.ssl = newSsl(sslParameters, this);
         this.networkBio = ssl.newBio();
-        activeSession = new ActiveSession(ssl, sslParameters.getSessionContext());
     }
 
     private static NativeSsl newSsl(SSLParametersImpl sslParameters, ConscryptEngine engine) {
@@ -465,10 +462,15 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
             if (state == STATE_CLOSED || state == STATE_CLOSED_INBOUND) {
                 return;
             }
-            if (isOutboundDone()) {
-                closeAndFreeResources();
+            if (isHandshakeStarted()) {
+                if (isOutboundDone()) {
+                    closeAndFreeResources();
+                } else {
+                    transitionTo(STATE_CLOSED_INBOUND);
+                }
             } else {
-                transitionTo(STATE_CLOSED_INBOUND);
+                // Never started the handshake. Just close now.
+                closeAndFreeResources();
             }
         }
     }
@@ -1820,10 +1822,11 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
         switch (newState) {
             case STATE_HANDSHAKE_STARTED: {
                 handshakeFinished = false;
+                activeSession = new ActiveSession(ssl, sslParameters.getSessionContext());
                 break;
             }
             case STATE_CLOSED: {
-                if (!ssl.isClosed() && state >= STATE_HANDSHAKE_STARTED && state < STATE_CLOSED ) {
+                if (!ssl.isClosed() && state >= STATE_HANDSHAKE_STARTED && state < STATE_CLOSED) {
                     closedSession = new SessionSnapshot(activeSession);
                 }
                 break;
