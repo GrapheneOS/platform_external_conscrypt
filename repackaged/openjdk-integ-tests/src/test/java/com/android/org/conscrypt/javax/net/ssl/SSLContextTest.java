@@ -177,11 +177,10 @@ public class SSLContextTest {
             SSLContext context = SSLContext.getInstance(tlsVersion);
             context.init(null, null, null);
 
-            StandardNames.assertSSLContextEnabledProtocols(
-                    tlsVersion, ((SSLSocket) (context.getSocketFactory().createSocket()))
-                                        .getEnabledProtocols());
             StandardNames.assertSSLContextEnabledProtocols(tlsVersion,
-                    ((SSLServerSocket) (context.getServerSocketFactory().createServerSocket()))
+                    ((SSLSocket) context.getSocketFactory().createSocket()).getEnabledProtocols());
+            StandardNames.assertSSLContextEnabledProtocols(tlsVersion,
+                    ((SSLServerSocket) context.getServerSocketFactory().createServerSocket())
                             .getEnabledProtocols());
             StandardNames.assertSSLContextEnabledProtocols(
                     tlsVersion, context.getDefaultSSLParameters().getProtocols());
