@@ -125,6 +125,15 @@ cc_library_host_shared {
     },
 
     stl: "libc++_static",
+
+    // The post-build signing tools need signapk.jar and its shared libs
+    multilib: {
+        lib64: {
+            dist: {
+                targets: ["droidcore"],
+            },
+        },
+    },
 }
 
 cc_binary_host {
