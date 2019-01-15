@@ -90,7 +90,7 @@ final class Java8PlatformUtil {
         return Java8EngineWrapper.getDelegate(engine);
     }
 
-    static SSLSession wrapSSLSession(ConscryptSession sslSession) {
+    static SSLSession wrapSSLSession(ExternalSession sslSession) {
         return new Java8ExtendedSSLSession(sslSession);
     }
 

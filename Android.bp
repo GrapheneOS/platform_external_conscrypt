@@ -342,10 +342,6 @@ java_test {
         "repackaged/openjdk-integ-tests/src/test/java/**/*.java",
         "repackaged/testing/src/main/java/**/*.java",
         "publicapi/src/test/java/**/*.java",
-        // Copies of classes from core-tests-support.
-        "libcore-stub/src/main/java/libcore/java/io/NullPrintStream.java",
-        "libcore-stub/src/main/java/libcore/java/security/CpuFeatures.java",
-        "libcore-stub/src/main/java/libcore/java/security/StandardNames.java",
     ],
     java_resource_dirs: [
         // Resource directories do not need repackaging.
@@ -384,10 +380,6 @@ java_test {
         "repackaged/testing/src/main/java/**/*.java",
         "repackaged/benchmark-base/src/main/java/**/*.java",
         "repackaged/benchmark-android/src/main/java/**/*.java",
-        // Copies of classes from core-tests-support.
-        "libcore-stub/src/main/java/libcore/java/io/NullPrintStream.java",
-        "libcore-stub/src/main/java/libcore/java/security/CpuFeatures.java",
-        "libcore-stub/src/main/java/libcore/java/security/StandardNames.java",
     ],
     no_standard_libs: true,
     libs: [

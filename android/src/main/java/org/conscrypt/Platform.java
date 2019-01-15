@@ -85,6 +85,10 @@ final class Platform {
         return "Conscrypt";
     }
 
+    static boolean provideTrustManagerByDefault() {
+        return false;
+    }
+
     public static FileDescriptor getFileDescriptor(Socket s) {
         try {
             Field f_impl = Socket.class.getDeclaredField("impl");
@@ -849,7 +853,7 @@ final class Platform {
     /**
      * Provides extended capabilities for the session if supported by the platform.
      */
-    public static SSLSession wrapSSLSession(ConscryptSession sslSession) {
+    public static SSLSession wrapSSLSession(ExternalSession sslSession) {
         if (Build.VERSION.SDK_INT >= 24) {
             return new Java8ExtendedSSLSession(sslSession);
         }
