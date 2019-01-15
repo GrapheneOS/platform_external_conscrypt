@@ -1,3 +1,4 @@
+/* GENERATED SOURCE. DO NOT MODIFY. */
 /*
  * Copyright (C) 2010 The Android Open Source Project
  *
@@ -14,13 +15,16 @@
  * limitations under the License.
  */
 
-package libcore.io;
+package com.android.org.conscrypt.testing;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 public final class Streams {
     private Streams() {}
 

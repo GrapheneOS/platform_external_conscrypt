@@ -22,10 +22,13 @@ import static com.android.org.conscrypt.TestUtils.readTestFile;
 import static org.junit.Assert.assertEquals;
 
 import java.security.PublicKey;
+import java.security.Security;
 import java.util.Arrays;
 import com.android.org.conscrypt.OpenSSLX509Certificate;
 import com.android.org.conscrypt.TestUtils;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -39,6 +42,16 @@ public class CTVerifierTest {
     private OpenSSLX509Certificate cert;
     private OpenSSLX509Certificate certEmbedded;
     private CTVerifier ctVerifier;
+
+    @BeforeClass
+    public static void installConscrypt() {
+        TestUtils.installConscryptAsDefaultProvider();
+    }
+
+    @AfterClass
+    public static void removeConscrypt() {
+        Security.removeProvider(TestUtils.getConscryptProvider().getName());
+    }
 
     @Before
     public void setUp() throws Exception {

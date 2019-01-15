@@ -46,166 +46,169 @@ import javax.security.cert.X509Certificate;
  * socket/engine.  This class will never call the value API methods on the
  * underlying sessions, so they need not be implemented.
  */
-final class ExternalSession implements SessionDecorator {
+final class ExternalSession implements ConscryptSession {
+    // Use an initialcapacity of 2 to keep it small in the average case.
+    private final HashMap<String, Object> values = new HashMap<String, Object>(2);
+    private final Provider provider;
 
-  // Use an initialcapacity of 2 to keep it small in the average case.
-  private final HashMap<String, Object> values = new HashMap<String, Object>(2);
-  private final Provider provider;
-
-  public ExternalSession(Provider provider) {
-    this.provider = provider;
-  }
-
-  @Override
-  public ConscryptSession getDelegate() {
-    return provider.provideSession();
-  }
-
-  @Override
-  public String getRequestedServerName() {
-    return getDelegate().getRequestedServerName();
-  }
-
-  @Override
-  public List<byte[]> getStatusResponses() {
-    return getDelegate().getStatusResponses();
-  }
-
-  @Override
-  public byte[] getPeerSignedCertificateTimestamp() {
-    return getDelegate().getPeerSignedCertificateTimestamp();
-  }
-
-  @Override
-  public byte[] getId() {
-    return getDelegate().getId();
-  }
-
-  @Override
-  public SSLSessionContext getSessionContext() {
-    return getDelegate().getSessionContext();
-  }
-
-  @Override
-  public long getCreationTime() {
-    return getDelegate().getCreationTime();
-  }
-
-  @Override
-  public long getLastAccessedTime() {
-    return getDelegate().getLastAccessedTime();
-  }
-
-  @Override
-  public void invalidate() {
-    getDelegate().invalidate();
-  }
-
-  @Override
-  public boolean isValid() {
-    return getDelegate().isValid();
-  }
-
-  @Override
-  public java.security.cert.X509Certificate[] getPeerCertificates()
-      throws SSLPeerUnverifiedException {
-    return getDelegate().getPeerCertificates();
-  }
-
-  @Override
-  public Certificate[] getLocalCertificates() {
-    return getDelegate().getLocalCertificates();
-  }
-
-  @Override
-  public X509Certificate[] getPeerCertificateChain() throws SSLPeerUnverifiedException {
-    return getDelegate().getPeerCertificateChain();
-  }
-
-  @Override
-  public Principal getPeerPrincipal() throws SSLPeerUnverifiedException {
-    return getDelegate().getPeerPrincipal();
-  }
-
-  @Override
-  public Principal getLocalPrincipal() {
-    return getDelegate().getLocalPrincipal();
-  }
-
-  @Override
-  public String getCipherSuite() {
-    return getDelegate().getCipherSuite();
-  }
-
-  @Override
-  public String getProtocol() {
-    return getDelegate().getProtocol();
-  }
-
-  @Override
-  public String getPeerHost() {
-    return getDelegate().getPeerHost();
-  }
-
-  @Override
-  public int getPeerPort() {
-    return getDelegate().getPeerPort();
-  }
-
-  @Override
-  public int getPacketBufferSize() {
-    return getDelegate().getPacketBufferSize();
-  }
-
-  @Override
-  public int getApplicationBufferSize() {
-    return getDelegate().getApplicationBufferSize();
-  }
-
-  @Override
-  public Object getValue(String name) {
-    if (name == null) {
-      throw new IllegalArgumentException("name == null");
-    }
-    return values.get(name);
-  }
-
-  @Override
-  public String[] getValueNames() {
-    return values.keySet().toArray(new String[values.size()]);
-  }
-
-  @Override
-  public void putValue(String name, Object value) {
-    if (name == null || value == null) {
-      throw new IllegalArgumentException("name == null || value == null");
-    }
-    Object old = values.put(name, value);
-    if (value instanceof SSLSessionBindingListener) {
-      ((SSLSessionBindingListener) value).valueBound(new SSLSessionBindingEvent(this, name));
-    }
-    if (old instanceof SSLSessionBindingListener) {
-      ((SSLSessionBindingListener) old).valueUnbound(new SSLSessionBindingEvent(this, name));
+    public ExternalSession(Provider provider) {
+        this.provider = provider;
     }
 
-  }
-
-  @Override
-  public void removeValue(String name) {
-    if (name == null) {
-      throw new IllegalArgumentException("name == null");
+    @Override
+    public String getRequestedServerName() {
+        return provider.provideSession().getRequestedServerName();
     }
-    Object old = values.remove(name);
-    if (old instanceof SSLSessionBindingListener) {
-      SSLSessionBindingListener listener = (SSLSessionBindingListener) old;
-      listener.valueUnbound(new SSLSessionBindingEvent(this, name));
-    }
-  }
 
-  /**
-   * The provider of the current delegate session.
-   */
-  interface Provider {
-    ConscryptSession provideSession();
-  }
+    @Override
+    public List<byte[]> getStatusResponses() {
+        return provider.provideSession().getStatusResponses();
+    }
+
+    @Override
+    public byte[] getPeerSignedCertificateTimestamp() {
+        return provider.provideSession().getPeerSignedCertificateTimestamp();
+    }
+
+    @Override
+    public byte[] getId() {
+        return provider.provideSession().getId();
+    }
+
+    @Override
+    public SSLSessionContext getSessionContext() {
+        return provider.provideSession().getSessionContext();
+    }
+
+    @Override
+    public long getCreationTime() {
+        return provider.provideSession().getCreationTime();
+    }
+
+    @Override
+    public long getLastAccessedTime() {
+        return provider.provideSession().getLastAccessedTime();
+    }
+
+    @Override
+    public void invalidate() {
+        provider.provideSession().invalidate();
+    }
+
+    @Override
+    public boolean isValid() {
+        return provider.provideSession().isValid();
+    }
+
+    @Override
+    public java.security.cert.X509Certificate[] getPeerCertificates()
+            throws SSLPeerUnverifiedException {
+        return provider.provideSession().getPeerCertificates();
+    }
+
+    @Override
+    public Certificate[] getLocalCertificates() {
+        return provider.provideSession().getLocalCertificates();
+    }
+
+    @Override
+    public X509Certificate[] getPeerCertificateChain() throws SSLPeerUnverifiedException {
+        return provider.provideSession().getPeerCertificateChain();
+    }
+
+    @Override
+    public Principal getPeerPrincipal() throws SSLPeerUnverifiedException {
+        return provider.provideSession().getPeerPrincipal();
+    }
+
+    @Override
+    public Principal getLocalPrincipal() {
+        return provider.provideSession().getLocalPrincipal();
+    }
+
+    @Override
+    public String getCipherSuite() {
+        return provider.provideSession().getCipherSuite();
+    }
+
+    @Override
+    public String getProtocol() {
+        return provider.provideSession().getProtocol();
+    }
+
+    @Override
+    public String getPeerHost() {
+        return provider.provideSession().getPeerHost();
+    }
+
+    @Override
+    public int getPeerPort() {
+        return provider.provideSession().getPeerPort();
+    }
+
+    @Override
+    public int getPacketBufferSize() {
+        return provider.provideSession().getPacketBufferSize();
+    }
+
+    @Override
+    public int getApplicationBufferSize() {
+        return provider.provideSession().getApplicationBufferSize();
+    }
+
+    @Override
+    public Object getValue(String name) {
+        if (name == null) {
+            throw new IllegalArgumentException("name == null");
+        }
+        return values.get(name);
+    }
+
+    @Override
+    public String[] getValueNames() {
+        return values.keySet().toArray(new String[values.size()]);
+    }
+
+    @Override
+    public void putValue(String name, Object value) {
+        putValue(this, name, value);
+    }
+
+    void putValue(SSLSession session, String name, Object value) {
+        if (name == null || value == null) {
+            throw new IllegalArgumentException("name == null || value == null");
+        }
+        Object old = values.put(name, value);
+        if (value instanceof SSLSessionBindingListener) {
+            ((SSLSessionBindingListener) value)
+                    .valueBound(new SSLSessionBindingEvent(session, name));
+        }
+        if (old instanceof SSLSessionBindingListener) {
+            ((SSLSessionBindingListener) old)
+                    .valueUnbound(new SSLSessionBindingEvent(session, name));
+        }
+    }
+
+    @Override
+    public void removeValue(String name) {
+        removeValue(this, name);
+    }
+
+    void removeValue(SSLSession session, String name) {
+        if (name == null) {
+            throw new IllegalArgumentException("name == null");
+        }
+        Object old = values.remove(name);
+        if (old instanceof SSLSessionBindingListener) {
+            SSLSessionBindingListener listener = (SSLSessionBindingListener) old;
+            listener.valueUnbound(new SSLSessionBindingEvent(session, name));
+        }
+    }
+
+    /**
+     * The provider of the current delegate session.
+     */
+    interface Provider {
+        ConscryptSession provideSession();
+    }
 }
