@@ -51,10 +51,6 @@ final class SSLNullSession implements ConscryptSession, Cloneable {
         return DefaultHolder.NULL_SESSION;
     }
 
-    static boolean isNullSession(SSLSession session) {
-        return SSLUtils.unwrapSession(session) == DefaultHolder.NULL_SESSION;
-    }
-
     private SSLNullSession() {
         creationTime = System.currentTimeMillis();
         lastAccessedTime = creationTime;

@@ -40,7 +40,7 @@ import javax.net.ssl.KeyStoreBuilderParameters;
 import javax.net.ssl.ManagerFactoryParameters;
 import javax.net.ssl.X509ExtendedKeyManager;
 import javax.net.ssl.X509KeyManager;
-import libcore.java.security.StandardNames;
+import com.android.org.conscrypt.java.security.StandardNames;
 import com.android.org.conscrypt.java.security.TestKeyStore;
 import org.junit.Before;
 import org.junit.Test;
@@ -295,7 +295,8 @@ public class KeyManagerFactoryTest {
             // "EC_RSA", etc. since we don't know what the expected
             // algorithm was.
             if (!keyType.equals("DH") && !keyType.equals("EC")) {
-                assertTrue(sigAlgName.contains(TestKeyStore.signatureAlgorithm(keyType)));
+                assertTrue("SigAlg: " + sigAlgName + ", KeyType: " + keyType,
+                        sigAlgName.contains(TestKeyStore.signatureAlgorithm(keyType)));
             }
         }
     }
