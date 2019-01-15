@@ -128,6 +128,9 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
     @Override
     public abstract void setChannelIdPrivateKey(PrivateKey privateKey);
 
+    /**
+     * @deprecated NPN is not supported
+     */
     @dalvik.annotation.compat.UnsupportedAppUsage
     @libcore.api.CorePlatformApi
     @Override
@@ -136,6 +139,9 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
         return super.getNpnSelectedProtocol();
     }
 
+    /**
+     * @deprecated NPN is not supported
+     */
     @dalvik.annotation.compat.UnsupportedAppUsage
     @libcore.api.CorePlatformApi
     @Override
@@ -144,6 +150,9 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
         super.setNpnProtocols(npnProtocols);
     }
 
+    /**
+     * @deprecated use {@link #setApplicationProtocols(String[])} instead.
+     */
     @dalvik.annotation.compat.UnsupportedAppUsage
     @Override
     @Deprecated
@@ -151,10 +160,14 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
         setApplicationProtocols(alpnProtocols == null ? EmptyArray.STRING : alpnProtocols);
     }
 
-    @dalvik.annotation.compat.UnsupportedAppUsage
+    /**
+     * @deprecated use {@link #getApplicationProtocol()} instead.
+     */
+    @dalvik.annotation.
+    compat.UnsupportedAppUsage
     @libcore.api.CorePlatformApi
-    @Deprecated
     @Override
+    @Deprecated
     public final byte[] getAlpnSelectedProtocol() {
         return SSLUtils.toProtocolBytes(getApplicationProtocol());
     }
