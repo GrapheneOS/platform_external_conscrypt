@@ -1,3 +1,4 @@
+/* GENERATED SOURCE. DO NOT MODIFY. */
 /*
  * Copyright (C) 2010 The Android Open Source Project
  *
@@ -14,12 +15,15 @@
  * limitations under the License.
  */
 
-package libcore.io;
+package com.android.org.conscrypt.io;
 
 import java.io.Closeable;
 import java.io.InterruptedIOException;
 import java.net.Socket;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 public final class IoUtils {
     private IoUtils() {}
 
