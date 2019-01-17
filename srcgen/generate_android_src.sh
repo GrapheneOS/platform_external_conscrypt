@@ -65,7 +65,7 @@ done
 
 # Remove some unused test files:
 rm -fr ${REPACKAGED_DIR}/openjdk-integ-tests/src/test/java/com/android/org/conscrypt/ConscryptSuite.java
-rm -fr ${REPACKAGED_DIR}/openjdk-integ-tests/src/test/java/com/android/org/conscrypt/ConscryptJava6Suite.java
+rm -fr ${REPACKAGED_DIR}/openjdk-integ-tests/src/test/java/com/android/org/conscrypt/ConscryptJava7Suite.java
 
 echo "Reformatting generated code to adhere to format required by the preupload check"
 cd ${CONSCRYPT_DIR}
