@@ -15,6 +15,7 @@
 apex {
     name: "com.android.conscrypt",
     manifest: "apex_manifest.json",
+    compile_multilib: "both",
     java_libs: ["conscrypt"],
     native_shared_libs: ["libjavacrypto"],
     key: "apex.conscrypt.key",
