@@ -270,10 +270,10 @@ cc_library_shared {
     defaults: ["libjavacrypto-defaults"],
 
     cflags: ["-DJNI_JARJAR_PREFIX=com/android/"],
+    header_libs: ["libnativehelper_header_only"],
     shared_libs: [
         "libcrypto",
         "liblog",
-        "libnativehelper",
         "libssl",
     ],
 
