@@ -16,8 +16,6 @@
 
 #include <conscrypt/compatibility_close_monitor.h>
 
-#if defined(CONSCRYPT_UNBUNDLED) && !defined(CONSCRYPT_OPENJDK)
-
 #include <dlfcn.h>
 
 namespace conscrypt {
@@ -38,5 +36,3 @@ void CompatibilityCloseMonitor::init() {
 }
 
 }  // namespace conscrypt
-
-#endif  // CONSCRYPT_UNBUNDLED && !CONSCRYPT_OPENJDK
