@@ -85,10 +85,6 @@ final class Platform {
         return "Conscrypt";
     }
 
-    static boolean provideTrustManagerByDefault() {
-        return false;
-    }
-
     public static FileDescriptor getFileDescriptor(Socket s) {
         try {
             Field f_impl = Socket.class.getDeclaredField("impl");

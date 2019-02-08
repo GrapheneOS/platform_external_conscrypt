@@ -16,8 +16,6 @@
  */
 package com.android.org.conscrypt.javax.net.ssl;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.IOException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -25,7 +23,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLSocket;
-import com.android.org.conscrypt.TestUtils;
 
 /**
  * TestSSLSocketPair is a convenience class for other tests that want
@@ -77,7 +74,6 @@ public final class TestSSLSocketPair {
                     if (serverCipherSuites != null) {
                         server.setEnabledCipherSuites(serverCipherSuites);
                     }
-                    TestUtils.setUseSessionTickets(server, true);
                     server.startHandshake();
                     return null;
                 }
@@ -88,7 +84,6 @@ public final class TestSSLSocketPair {
                     if (clientCipherSuites != null) {
                         client.setEnabledCipherSuites(clientCipherSuites);
                     }
-                    TestUtils.setUseSessionTickets(client, true);
                     client.startHandshake();
                     return null;
                 }
@@ -118,25 +113,10 @@ public final class TestSSLSocketPair {
             if (clientException != null) {
                 throw clientException;
             }
-            // Ensure that messages can actually be passed and that any NewSessionTicket messages
-            // that come after the handshake have been processed.
-            exchangeMessages();
             return this;
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private TestSSLSocketPair exchangeMessages() {
-        try {
-            client.getOutputStream().write('A');
-            assertEquals((int) 'A', server.getInputStream().read());
-            server.getOutputStream().write('B');
-            assertEquals((int) 'B', client.getInputStream().read());
-            return this;
-        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
