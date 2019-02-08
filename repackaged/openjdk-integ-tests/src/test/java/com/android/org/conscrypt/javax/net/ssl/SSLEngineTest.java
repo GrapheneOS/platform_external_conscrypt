@@ -141,8 +141,6 @@ public class SSLEngineTest {
         TestSSLContext c = TestSSLContext.newBuilder()
                                    .client(testKeyStore)
                                    .server(testKeyStore)
-                                   .clientProtocol("TLSv1.2")
-                                   .serverProtocol("TLSv1.2")
                                    .additionalClientKeyManagers(new KeyManager[] {pskKeyManager})
                                    .additionalServerKeyManagers(new KeyManager[] {pskKeyManager})
                                    .build();
@@ -389,10 +387,9 @@ public class SSLEngineTest {
     }
 
     @Test
-    public void test_SSLEngine_setEnabledCipherSuites_TLS12() throws Exception {
-        SSLContext context = SSLContext.getInstance("TLSv1.2");
-        context.init(null, null, null);
-        SSLEngine e = context.createSSLEngine();
+    public void test_SSLEngine_setEnabledCipherSuites() throws Exception {
+        TestSSLContext c = TestSSLContext.create();
+        SSLEngine e = c.clientContext.createSSLEngine();
 
         try {
             e.setEnabledCipherSuites(null);
@@ -423,6 +420,8 @@ public class SSLEngineTest {
         };
         e.setEnabledCipherSuites(cipherSuites);
         assertEquals(Arrays.asList(cipherSuites), Arrays.asList(e.getEnabledCipherSuites()));
+
+        c.close();
     }
 
     @Test
