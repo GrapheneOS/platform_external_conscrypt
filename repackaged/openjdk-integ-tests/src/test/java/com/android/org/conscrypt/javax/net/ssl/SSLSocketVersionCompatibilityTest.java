@@ -647,7 +647,7 @@ public class SSLSocketVersionCompatibilityTest {
                 .clientProtocol(clientVersion)
                 .serverProtocol(serverVersion)
                 .build();
-        SSLContext clientContext = SSLContext.getInstance(clientVersion);
+        SSLContext clientContext = SSLContext.getInstance("TLS");
         X509KeyManager keyManager = new X509KeyManager() {
             @Override
             public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket) {
@@ -696,11 +696,8 @@ public class SSLSocketVersionCompatibilityTest {
         });
         try {
             client.startHandshake();
-            // In TLS 1.3, the alert will only show up once we try to use the connection, since
-            // the client finishes the handshake without feedback from the server
-            client.getInputStream().read();
             fail();
-        } catch (SSLException expected) {
+        } catch (SSLHandshakeException expected) {
             // before we would get a NullPointerException from passing
             // due to the null PrivateKey return by the X509KeyManager.
         }
