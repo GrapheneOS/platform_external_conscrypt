@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 package com.android.org.conscrypt.javax.net.ssl;
-
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
@@ -62,15 +61,11 @@ public final class TestSSLSessions {
     }
 
     public static TestSSLSessions create() {
-        return create(TestSSLContext.create());
-    }
-
-    public static TestSSLSessions create(TestSSLContext context) {
         try {
             SSLSocketFactory sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
             SSLSocket ssl = (SSLSocket) sf.createSocket();
             SSLSession invalid = ssl.getSession();
-            TestSSLSocketPair s = TestSSLSocketPair.create(context).connect();
+            TestSSLSocketPair s = TestSSLSocketPair.create().connect();
             return new TestSSLSessions(invalid, s.server.getSession(), s.client.getSession(), s);
         } catch (Exception e) {
             throw new RuntimeException(e);
