@@ -19,12 +19,18 @@ apex_defaults {
     java_libs: ["conscrypt"],
     native_shared_libs: ["libjavacrypto"],
     key: "apex.conscrypt.key",
+    certificate: ":com.android.conscrypt.certificate",
 }
 
 apex_key {
     name: "apex.conscrypt.key",
     public_key: "com.android.conscrypt.avbpubkey",
     private_key: "com.android.conscrypt.pem",
+}
+
+android_app_certificate {
+    name: "com.android.conscrypt.certificate",
+    certificate: "com.android.conscrypt",
 }
 
 // Production APEX
