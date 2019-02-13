@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-apex {
-    name: "com.android.conscrypt",
-    manifest: "apex_manifest.json",
+// Defaults shared between real and test versions of the APEX.
+apex_defaults {
+    name: "com.android.conscrypt-defaults",
     compile_multilib: "both",
     java_libs: ["conscrypt"],
     native_shared_libs: ["libjavacrypto"],
@@ -25,4 +25,11 @@ apex_key {
     name: "apex.conscrypt.key",
     public_key: "com.android.conscrypt.avbpubkey",
     private_key: "com.android.conscrypt.pem",
+}
+
+// Production APEX
+apex {
+    name: "com.android.conscrypt",
+    defaults: ["com.android.conscrypt-defaults"],
+    manifest: "apex_manifest.json",
 }
