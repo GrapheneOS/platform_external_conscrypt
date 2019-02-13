@@ -14,12 +14,9 @@
 
 apex {
     name: "test_com.android.conscrypt",
+    defaults: ["com.android.conscrypt-defaults"],
     manifest: "test_apex_manifest.json",
     file_contexts: "com.android.conscrypt",
-    compile_multilib: "both",
-    java_libs: ["conscrypt"],
-    native_shared_libs: ["libjavacrypto"],
-    key: "apex.conscrypt.key",
     // Test APEX, should never be installed
     installable: false
 }
