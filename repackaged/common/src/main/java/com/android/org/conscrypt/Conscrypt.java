@@ -138,7 +138,7 @@ public final class Conscrypt {
     @Deprecated
     public static Provider newProvider(String providerName) {
         checkAvailability();
-        return new OpenSSLProvider(providerName, false);
+        return new OpenSSLProvider(providerName, Platform.provideTrustManagerByDefault());
     }
 
     /**
@@ -146,7 +146,7 @@ public final class Conscrypt {
      */
     public static class ProviderBuilder {
         private String name = Platform.getDefaultProviderName();
-        private boolean provideTrustManager;
+        private boolean provideTrustManager = Platform.provideTrustManagerByDefault();
 
         private ProviderBuilder() {}
 
@@ -161,9 +161,19 @@ public final class Conscrypt {
         /**
          * Causes the returned provider to provide an implementation of
          * {@link javax.net.ssl.TrustManagerFactory}.
+         * @deprecated Use provideTrustManager(true)
          */
+        @Deprecated
         public ProviderBuilder provideTrustManager() {
-            this.provideTrustManager = true;
+            return provideTrustManager(true);
+        }
+
+        /**
+         * Specifies whether the returned provider will provide an implementation of
+         * {@link javax.net.ssl.TrustManagerFactory}.
+         */
+        public ProviderBuilder provideTrustManager(boolean provide) {
+            this.provideTrustManager = provide;
             return this;
         }
 
