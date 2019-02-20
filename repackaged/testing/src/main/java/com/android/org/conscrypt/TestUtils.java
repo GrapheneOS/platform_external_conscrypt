@@ -52,6 +52,7 @@ import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import com.android.org.conscrypt.java.security.StandardNames;
@@ -304,6 +305,16 @@ public final class TestUtils {
                     "setUseEngineSocket", SSLServerSocketFactory.class, boolean.class);
             method.invoke(null, conscryptFactory, useEngineSocket);
             return conscryptFactory;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void setUseSessionTickets(SSLSocket socket, boolean useTickets) {
+        try {
+            Class<?> clazz = conscryptClass("Conscrypt");
+            Method method = clazz.getMethod("setUseSessionTickets", SSLSocket.class, boolean.class);
+            method.invoke(null, socket, useTickets);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
