@@ -1,10 +1,6 @@
 method:com.android.org.conscrypt.ClientSessionContext#setPersistentCache(SSLClientSessionCache)
 method:com.android.org.conscrypt.Conscrypt#getDefaultX509TrustManager()
-method:com.android.org.conscrypt.Conscrypt#newPreferredSSLContextSpi()
 method:com.android.org.conscrypt.FileClientSessionCache#usingDirectory(File)
-method:com.android.org.conscrypt.OpenSSLContextImpl#engineGetClientSessionContext()
-method:com.android.org.conscrypt.OpenSSLContextImpl#engineGetSocketFactory()
-method:com.android.org.conscrypt.OpenSSLContextImpl#engineInit(KeyManager[],TrustManager[],SecureRandom)
 method:com.android.org.conscrypt.OpenSSLProvider#OpenSSLProvider()
 method:com.android.org.conscrypt.OpenSSLSocketImpl#getAlpnSelectedProtocol()
 method:com.android.org.conscrypt.OpenSSLSocketImpl#getNpnSelectedProtocol()
@@ -54,7 +50,6 @@ type:com.android.org.conscrypt.ClientSessionContext
 type:com.android.org.conscrypt.Conscrypt
 type:com.android.org.conscrypt.ConscryptCertStore
 type:com.android.org.conscrypt.FileClientSessionCache
-type:com.android.org.conscrypt.OpenSSLContextImpl
 type:com.android.org.conscrypt.OpenSSLProvider
 type:com.android.org.conscrypt.OpenSSLSocketImpl
 type:com.android.org.conscrypt.ServerSessionContext

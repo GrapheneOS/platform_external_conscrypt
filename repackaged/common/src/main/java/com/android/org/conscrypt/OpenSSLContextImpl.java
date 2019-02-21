@@ -27,6 +27,7 @@ import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContextSpi;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 
@@ -39,7 +40,6 @@ import javax.net.ssl.TrustManager;
  * @hide This class is not part of the Android public SDK API
  */
 @libcore.api.IntraCoreApi
-@libcore.api.CorePlatformApi
 @Internal
 public abstract class OpenSSLContextImpl extends SSLContextSpi {
     /**
@@ -84,8 +84,12 @@ public abstract class OpenSSLContextImpl extends SSLContextSpi {
                 serverSessionContext = new ServerSessionContext();
                 defaultSslContextImpl = (DefaultSSLContextImpl) this;
             } else {
-                clientSessionContext = defaultSslContextImpl.engineGetClientSessionContext();
-                serverSessionContext = defaultSslContextImpl.engineGetServerSessionContext();
+                clientSessionContext =
+                        (ClientSessionContext)
+                                defaultSslContextImpl.engineGetClientSessionContext();
+                serverSessionContext =
+                        (ServerSessionContext)
+                                defaultSslContextImpl.engineGetServerSessionContext();
             }
             sslParameters = new SSLParametersImpl(defaultSslContextImpl.getKeyManagers(),
                     defaultSslContextImpl.getTrustManagers(), null, clientSessionContext,
@@ -103,7 +107,6 @@ public abstract class OpenSSLContextImpl extends SSLContextSpi {
      * @param sr the randomness source or {@code null}
      * @throws KeyManagementException if initializing this instance fails
      */
-    @libcore.api.CorePlatformApi
     @Override
     public void engineInit(KeyManager[] kms, TrustManager[] tms, SecureRandom sr)
             throws KeyManagementException {
@@ -111,7 +114,6 @@ public abstract class OpenSSLContextImpl extends SSLContextSpi {
                 kms, tms, sr, clientSessionContext, serverSessionContext, algorithms);
     }
 
-    @libcore.api.CorePlatformApi
     @Override
     public SSLSocketFactory engineGetSocketFactory() {
         if (sslParameters == null) {
@@ -149,14 +151,12 @@ public abstract class OpenSSLContextImpl extends SSLContextSpi {
     }
 
     @Override
-    public ServerSessionContext engineGetServerSessionContext() {
+    public SSLSessionContext engineGetServerSessionContext() {
         return serverSessionContext;
     }
 
-    @dalvik.annotation.compat.UnsupportedAppUsage
-    @libcore.api.CorePlatformApi
     @Override
-    public ClientSessionContext engineGetClientSessionContext() {
+    public SSLSessionContext engineGetClientSessionContext() {
         return clientSessionContext;
     }
 

@@ -37,8 +37,7 @@ public class CaliperAlpnBenchmark {
     @Param
     public BufferType b_buffer;
 
-    @Param
-    public AndroidEngineFactory c_engine;
+    @Param({"CONSCRYPT_UNPOOLED"}) public AndroidEngineFactory c_engine;
 
     private EngineHandshakeBenchmark benchmark;
 
