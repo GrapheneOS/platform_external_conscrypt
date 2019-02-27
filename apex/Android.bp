@@ -15,11 +15,17 @@
 // Defaults shared between real and test versions of the APEX.
 apex_defaults {
     name: "com.android.conscrypt-defaults",
+    androidManifest: ":com.android.conscrypt-androidManifest",
     compile_multilib: "both",
     java_libs: ["conscrypt"],
     native_shared_libs: ["libjavacrypto"],
     key: "apex.conscrypt.key",
     certificate: ":com.android.conscrypt.certificate",
+}
+
+filegroup {
+    name: "com.android.conscrypt-androidManifest",
+    srcs: ["AndroidManifest.xml"],
 }
 
 apex_key {
