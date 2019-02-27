@@ -87,7 +87,6 @@ method:com.android.org.conscrypt.OpenSSLSignatureRawECDSA#OpenSSLSignatureRawECD
 method:com.android.org.conscrypt.OpenSSLSignatureRawRSA#OpenSSLSignatureRawRSA()
 method:com.android.org.conscrypt.OpenSSLX509CertificateFactory#OpenSSLX509CertificateFactory()
 method:com.android.org.conscrypt.PSSParameters#PSSParameters()
-type:com.android.org.conscrypt.ClientSessionContext
 type:com.android.org.conscrypt.DESEDESecretKeyFactory
 type:com.android.org.conscrypt.DefaultSSLContextImpl
 type:com.android.org.conscrypt.ECParameters
@@ -199,4 +198,3 @@ type:com.android.org.conscrypt.OpenSSLSignatureRawECDSA
 type:com.android.org.conscrypt.OpenSSLSignatureRawRSA
 type:com.android.org.conscrypt.OpenSSLX509CertificateFactory
 type:com.android.org.conscrypt.PSSParameters
-type:com.android.org.conscrypt.ServerSessionContext

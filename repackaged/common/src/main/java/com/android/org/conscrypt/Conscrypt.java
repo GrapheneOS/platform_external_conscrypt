@@ -213,7 +213,6 @@ public final class Conscrypt {
     /**
      * Constructs a new instance of the preferred {@link SSLContextSpi}.
      */
-    @libcore.api.CorePlatformApi
     public static SSLContextSpi newPreferredSSLContextSpi() {
         checkAvailability();
         return OpenSSLContextImpl.getPreferred();
