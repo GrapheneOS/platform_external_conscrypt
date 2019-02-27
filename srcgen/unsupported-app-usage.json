@@ -221,9 +221,6 @@
     "@location": "method:com.android.org.conscrypt.OpenSSLContextImpl#OpenSSLContextImpl()"
   },
   {
-    "@location": "method:com.android.org.conscrypt.OpenSSLContextImpl#engineGetClientSessionContext()"
-  },
-  {
     "@location": "method:com.android.org.conscrypt.OpenSSLContextImpl#getPreferred()"
   },
   {
