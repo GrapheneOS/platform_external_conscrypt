@@ -52,7 +52,6 @@ type:com.android.org.conscrypt.ConscryptCertStore
 type:com.android.org.conscrypt.FileClientSessionCache
 type:com.android.org.conscrypt.OpenSSLProvider
 type:com.android.org.conscrypt.OpenSSLSocketImpl
-type:com.android.org.conscrypt.ServerSessionContext
 type:com.android.org.conscrypt.SSLClientSessionCache
 type:com.android.org.conscrypt.TrustedCertificateIndex
 type:com.android.org.conscrypt.TrustedCertificateStore

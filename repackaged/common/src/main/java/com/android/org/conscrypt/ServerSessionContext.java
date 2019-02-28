@@ -26,7 +26,6 @@ import javax.net.ssl.SSLContext;
  * @hide
  * @hide This class is not part of the Android public SDK API
  */
-@libcore.api.CorePlatformApi
 @Internal
 public final class ServerSessionContext extends AbstractSessionContext {
     private SSLServerSessionCache persistentCache;
