@@ -21,5 +21,9 @@
   <!--
     *  API levels the Conscrypt APEX is known to work with.
     -->
-  <uses-sdk android:minSdkVersion="28" android:maxSdkVersion="28" />
+  <uses-sdk
+      android:minSdkVersion="28"
+      android:maxSdkVersion="28"
+      android:targetSdkVersion="28"
+  />
 </manifest>
