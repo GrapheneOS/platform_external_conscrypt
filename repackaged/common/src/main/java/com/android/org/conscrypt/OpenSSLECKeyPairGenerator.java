@@ -33,8 +33,6 @@ import java.util.Map;
 /**
  * An implementation of {@link KeyPairGenerator} for EC keys which uses BoringSSL to perform all the
  * operations.
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @libcore.api.IntraCoreApi

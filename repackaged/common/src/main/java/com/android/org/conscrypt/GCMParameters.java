@@ -29,8 +29,6 @@ import java.security.spec.InvalidParameterSpecException;
  * implementation of the GCM AlgorithmParameters implementation.
  * <p>
  * The only supported encoding format is ASN.1, as specified in RFC 5084 section 3.2.
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @libcore.api.IntraCoreApi

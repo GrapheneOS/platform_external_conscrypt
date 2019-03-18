@@ -36,8 +36,6 @@ import java.security.Provider;
  * Trust manager implementation requires:
  *     CertPathValidator    PKIX
  *     CertificateFactory    X509
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @Internal

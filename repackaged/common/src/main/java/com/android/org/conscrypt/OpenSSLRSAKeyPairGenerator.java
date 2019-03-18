@@ -30,8 +30,6 @@ import java.security.spec.RSAKeyGenParameterSpec;
 /**
  * An implementation of {@link java.security.KeyPairGenerator} which uses BoringSSL to perform all
  * the operations.
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @libcore.api.IntraCoreApi

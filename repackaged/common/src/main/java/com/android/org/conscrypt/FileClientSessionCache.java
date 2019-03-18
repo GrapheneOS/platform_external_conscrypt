@@ -37,8 +37,6 @@ import javax.net.ssl.SSLSession;
 /**
  * File-based cache implementation. Only one process should access the
  * underlying directory at a time.
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @libcore.api.CorePlatformApi

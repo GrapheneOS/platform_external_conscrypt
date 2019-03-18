@@ -20,10 +20,12 @@ package com.android.org.conscrypt.io;
 import java.io.Closeable;
 import java.io.InterruptedIOException;
 import java.net.Socket;
+import com.android.org.conscrypt.Internal;
 
 /**
  * @hide This class is not part of the Android public SDK API
  */
+@Internal
 public final class IoUtils {
     private IoUtils() {}
 

@@ -26,8 +26,6 @@ import com.android.org.conscrypt.OpenSSLX509CertificateFactory.ParsingException;
 /**
  * Helper to initialize the JNI libraries. This version runs when compiled
  * as part of the platform.
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @Internal

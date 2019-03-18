@@ -34,8 +34,6 @@ import javax.security.auth.x500.X500Principal;
 /**
  * Indexes {@code TrustAnchor} instances so they can be found in O(1)
  * time instead of O(N).
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @libcore.api.CorePlatformApi
