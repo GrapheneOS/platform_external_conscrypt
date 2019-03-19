@@ -27,8 +27,6 @@ import java.security.SignatureSpi;
 /**
  * Implements the JDK Signature interface needed for RAW ECDSA signature
  * generation and verification using BoringSSL.
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @libcore.api.IntraCoreApi

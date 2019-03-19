@@ -37,7 +37,6 @@ import com.android.org.conscrypt.Internal;
 import com.android.org.conscrypt.InternalUtil;
 
 /**
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @Internal

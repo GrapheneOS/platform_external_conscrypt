@@ -36,7 +36,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @Internal

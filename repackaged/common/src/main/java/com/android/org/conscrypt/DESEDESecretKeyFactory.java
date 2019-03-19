@@ -28,8 +28,6 @@ import javax.crypto.spec.SecretKeySpec;
 /**
  * An implementation of {@link javax.crypto.SecretKeyFactory} for use with DESEDE keys.  This
  * class supports {@link SecretKeySpec} and {@link DESedeKeySpec} for key specs.
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @libcore.api.IntraCoreApi

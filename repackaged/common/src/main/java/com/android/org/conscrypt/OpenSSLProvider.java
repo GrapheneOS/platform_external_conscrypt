@@ -30,8 +30,6 @@ import java.security.Provider;
  * href="http://csrc.nist.gov/groups/ST/crypto_apps_infra/csor/algorithms.html">NIST cryptographic
  * algorithms</a></li>
  * </ul>
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @libcore.api.CorePlatformApi

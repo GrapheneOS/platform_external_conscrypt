@@ -40,9 +40,9 @@ import java.util.logging.Logger;
 
 /**
  * Utilities for interacting with properties of the host being run on.
- * @hide This class is not part of the Android public SDK API
  */
-public class HostProperties {
+@Internal
+class HostProperties {
     private static final Logger logger = Logger.getLogger(HostProperties.class.getName());
 
     private static final String TEMP_DIR_PROPERTY_NAME = "com.android.org.conscrypt.tmpdir";

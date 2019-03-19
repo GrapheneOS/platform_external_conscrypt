@@ -29,8 +29,6 @@ import java.security.spec.RSAPublicKeySpec;
 /**
  * An implementation of {@link java.security.PublicKey} for RSA keys which uses BoringSSL to
  * perform all the operations.
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @Internal
