@@ -30,8 +30,6 @@ import javax.crypto.spec.IvParameterSpec;
 
 /**
  * Implementation of the ChaCha20 stream cipher.
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @libcore.api.IntraCoreApi

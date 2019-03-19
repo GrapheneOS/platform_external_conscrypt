@@ -18,10 +18,7 @@
 package com.android.org.conscrypt;
 
 /**
- *
  * Helper class for dealing with hexadecimal strings.
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @Internal

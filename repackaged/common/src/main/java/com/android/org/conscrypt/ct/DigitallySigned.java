@@ -23,8 +23,6 @@ import com.android.org.conscrypt.Internal;
 
 /**
  * DigitallySigned structure, as defined by RFC5246 Section 4.7.
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @Internal

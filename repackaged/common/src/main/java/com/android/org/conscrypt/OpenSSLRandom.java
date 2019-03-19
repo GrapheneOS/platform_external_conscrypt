@@ -22,8 +22,6 @@ import java.security.SecureRandomSpi;
 
 /**
  * Implements {@link java.security.SecureRandom} using BoringSSL's RAND interface.
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @libcore.api.IntraCoreApi

@@ -83,7 +83,6 @@ import com.android.org.conscrypt.ct.CTVerifier;
  * be provided by some certification provider.
  *
  * @see javax.net.ssl.X509ExtendedTrustManager
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @libcore.api.CorePlatformApi
