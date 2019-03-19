@@ -30,8 +30,6 @@ import java.security.interfaces.RSAPublicKey;
 /**
  * Implements the JDK Signature interface needed for RAW RSA signature
  * generation and verification using BoringSSL.
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @libcore.api.IntraCoreApi

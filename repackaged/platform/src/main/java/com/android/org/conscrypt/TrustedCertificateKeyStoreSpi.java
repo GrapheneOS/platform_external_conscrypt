@@ -28,8 +28,6 @@ import java.util.Enumeration;
 
 /**
  * A KeyStoreSpi wrapper for the TrustedCertificateStore.
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @Internal

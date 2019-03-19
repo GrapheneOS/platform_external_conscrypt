@@ -25,8 +25,6 @@ import com.android.org.conscrypt.Internal;
 
 /**
  * SignedCertificateTimestamp structure, as defined by RFC6962 Section 3.2.
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @Internal

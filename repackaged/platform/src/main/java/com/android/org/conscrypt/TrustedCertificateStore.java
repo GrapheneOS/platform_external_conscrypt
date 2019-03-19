@@ -80,8 +80,6 @@ import com.android.org.conscrypt.io.IoUtils;
  * ensures that its owner and group are the system uid and system
  * gid and that it is world readable but only writable by the system
  * user.
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @libcore.api.CorePlatformApi

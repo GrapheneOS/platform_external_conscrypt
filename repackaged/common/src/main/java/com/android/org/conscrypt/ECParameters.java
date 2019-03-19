@@ -28,8 +28,6 @@ import java.security.spec.InvalidParameterSpecException;
 /**
  * AlgorithmParameters implementation for elliptic curves.  The only supported encoding format is
  * ASN.1, as specified in RFC 3279, section 2.3.5.  However, only named curves are supported.
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @libcore.api.IntraCoreApi

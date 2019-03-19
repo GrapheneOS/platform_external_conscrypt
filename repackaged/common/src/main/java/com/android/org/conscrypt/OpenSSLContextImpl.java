@@ -35,8 +35,6 @@ import javax.net.ssl.TrustManager;
  * OpenSSL-backed SSLContext service provider interface.
  *
  * <p>Public to allow contruction via the provider framework.
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @libcore.api.IntraCoreApi
