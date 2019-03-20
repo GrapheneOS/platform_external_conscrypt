@@ -30,8 +30,6 @@ import com.android.org.conscrypt.Internal;
  * Properties about a Certificate Transparency Log.
  * This object stores information about a CT log, its public key, description and URL.
  * It allows verification of SCTs against the log's public key.
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @Internal

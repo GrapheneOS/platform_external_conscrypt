@@ -29,8 +29,6 @@ import javax.net.ssl.SSLSession;
 /**
  * Public shim allowing us to stay backward-compatible with legacy applications which were using
  * Conscrypt's extended socket API before the introduction of the {@link Conscrypt} class.
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @libcore.api.CorePlatformApi

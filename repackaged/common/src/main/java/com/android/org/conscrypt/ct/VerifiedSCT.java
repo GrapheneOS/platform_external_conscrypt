@@ -21,8 +21,6 @@ import com.android.org.conscrypt.Internal;
 
 /**
  * Verification result for a single SCT.
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @Internal

@@ -36,8 +36,6 @@ import java.security.spec.PSSParameterSpec;
 /**
  * Implements the subset of the JDK Signature interface needed for
  * signature verification using OpenSSL.
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @libcore.api.IntraCoreApi

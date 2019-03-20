@@ -47,7 +47,6 @@ import javax.net.ssl.TrustManagerFactorySpi;
  * TrustManagerFactory service provider interface implementation.
  *
  * @see javax.net.ssl.TrustManagerFactorySpi
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @Internal

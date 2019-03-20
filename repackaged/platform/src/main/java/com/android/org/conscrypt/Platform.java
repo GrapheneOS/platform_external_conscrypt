@@ -141,6 +141,7 @@ final class Platform {
                 }
             }
         }
+        impl.setApplicationProtocols(params.getApplicationProtocols());
     }
 
     static void getSSLParameters(
@@ -151,6 +152,7 @@ final class Platform {
             params.setServerNames(Collections.<SNIServerName>singletonList(
                     new SNIHostName(socket.getHostname())));
         }
+        params.setApplicationProtocols(impl.getApplicationProtocols());
     }
 
     static void setSSLParameters(
@@ -166,6 +168,7 @@ final class Platform {
                 }
             }
         }
+        impl.setApplicationProtocols(params.getApplicationProtocols());
     }
 
     static void getSSLParameters(
@@ -176,6 +179,7 @@ final class Platform {
             params.setServerNames(Collections.<SNIServerName>singletonList(
                     new SNIHostName(engine.getHostname())));
         }
+        params.setApplicationProtocols(impl.getApplicationProtocols());
     }
 
     /**

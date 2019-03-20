@@ -31,8 +31,6 @@ import javax.crypto.spec.SecretKeySpec;
 
 /**
  * Elliptic Curve Diffie-Hellman key agreement backed by the OpenSSL engine.
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @libcore.api.IntraCoreApi

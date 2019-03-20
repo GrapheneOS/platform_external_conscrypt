@@ -39,8 +39,6 @@ import com.android.org.conscrypt.OpenSSLX509Certificate;
  *         case precert_entry: PreCert;
  *     } signed_entry;
  * } CertificateEntry;
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @Internal

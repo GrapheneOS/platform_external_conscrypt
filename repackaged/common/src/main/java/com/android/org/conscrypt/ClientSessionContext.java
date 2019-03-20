@@ -26,8 +26,6 @@ import javax.net.ssl.SSLContext;
 /**
  * Caches client sessions. Indexes by host and port. Users are typically
  * looking to reuse any session for a given host and port.
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @libcore.api.CorePlatformApi

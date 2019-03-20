@@ -19,8 +19,6 @@ package com.android.org.conscrypt;
 
 /**
  * Marker interface for classes that hold an {@link OpenSSLKey}.
- *
- * @hide
  * @hide This class is not part of the Android public SDK API
  */
 @Internal
