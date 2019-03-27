@@ -33,6 +33,10 @@
 
 package com.android.org.conscrypt;
 
+import static java.nio.file.attribute.PosixFilePermission.GROUP_EXECUTE;
+import static java.nio.file.attribute.PosixFilePermission.OTHERS_EXECUTE;
+import static java.nio.file.attribute.PosixFilePermission.OWNER_EXECUTE;
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -45,6 +49,8 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketImpl;
 import java.nio.channels.SocketChannel;
+import java.nio.file.Files;
+import java.nio.file.attribute.PosixFilePermission;
 import java.security.AccessController;
 import java.security.AlgorithmParameters;
 import java.security.KeyStore;
@@ -61,8 +67,10 @@ import java.security.spec.ECParameterSpec;
 import java.security.spec.InvalidParameterSpecException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
@@ -70,6 +78,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509ExtendedTrustManager;
 import javax.net.ssl.X509TrustManager;
 import com.android.org.conscrypt.ct.CTLogStore;
 import com.android.org.conscrypt.ct.CTPolicy;
@@ -147,16 +156,29 @@ final class Platform {
     }
 
     static boolean canExecuteExecutable(File file) throws IOException {
-        if (JAVA_VERSION >= 7) {
-            return Java7PlatformUtil.canExecuteExecutable(file);
+        // If we can already execute, there is nothing to do.
+        if (file.canExecute()) {
+            return true;
         }
-        return true;
-    }
 
-    static void addSuppressed(Throwable t, Throwable suppressed) {
-        if (JAVA_VERSION >= 7) {
-            Java7PlatformUtil.addSuppressed(t, suppressed);
+        // On volumes, with noexec set, even files with the executable POSIX permissions will
+        // fail to execute. The File#canExecute() method honors this behavior, probably via
+        // parsing the noexec flag when initializing the UnixFileStore, though the flag is not
+        // exposed via a public API.  To find out if library is being loaded off a volume with
+        // noexec, confirm or add executable permissions, then check File#canExecute().
+
+        Set<PosixFilePermission> existingFilePermissions =
+                Files.getPosixFilePermissions(file.toPath());
+        Set<PosixFilePermission> executePermissions =
+                EnumSet.of(OWNER_EXECUTE, GROUP_EXECUTE, OTHERS_EXECUTE);
+        if (existingFilePermissions.containsAll(executePermissions)) {
+            return false;
         }
+
+        Set<PosixFilePermission> newPermissions = EnumSet.copyOf(existingFilePermissions);
+        newPermissions.addAll(executePermissions);
+        Files.setPosixFilePermissions(file.toPath(), newPermissions);
+        return file.canExecute();
     }
 
     static FileDescriptor getFileDescriptor(Socket s) {
@@ -218,8 +240,8 @@ final class Platform {
             Java9PlatformUtil.setSSLParameters(params, impl, socket);
         } else if (JAVA_VERSION >= 8) {
             Java8PlatformUtil.setSSLParameters(params, impl, socket);
-        } else if (JAVA_VERSION >= 7) {
-            Java7PlatformUtil.setSSLParameters(params, impl);
+        } else {
+            impl.setEndpointIdentificationAlgorithm(params.getEndpointIdentificationAlgorithm());
         }
     }
 
@@ -229,8 +251,8 @@ final class Platform {
             Java9PlatformUtil.getSSLParameters(params, impl, socket);
         } else if (JAVA_VERSION >= 8) {
             Java8PlatformUtil.getSSLParameters(params, impl, socket);
-        } else if (JAVA_VERSION >= 7) {
-            Java7PlatformUtil.getSSLParameters(params, impl);
+        } else {
+            params.setEndpointIdentificationAlgorithm(impl.getEndpointIdentificationAlgorithm());
         }
     }
 
@@ -240,8 +262,8 @@ final class Platform {
             Java9PlatformUtil.setSSLParameters(params, impl, engine);
         } else if (JAVA_VERSION >= 8) {
             Java8PlatformUtil.setSSLParameters(params, impl, engine);
-        } else if (JAVA_VERSION >= 7) {
-            Java7PlatformUtil.setSSLParameters(params, impl);
+        } else {
+            impl.setEndpointIdentificationAlgorithm(params.getEndpointIdentificationAlgorithm());
         }
     }
 
@@ -251,8 +273,8 @@ final class Platform {
             Java9PlatformUtil.getSSLParameters(params, impl, engine);
         } else if (JAVA_VERSION >= 8) {
             Java8PlatformUtil.getSSLParameters(params, impl, engine);
-        } else if (JAVA_VERSION >= 7) {
-            Java7PlatformUtil.getSSLParameters(params, impl);
+        } else {
+            params.setEndpointIdentificationAlgorithm(impl.getEndpointIdentificationAlgorithm());
         }
     }
 
@@ -270,8 +292,9 @@ final class Platform {
     @SuppressWarnings("unused")
     static void checkClientTrusted(X509TrustManager tm, X509Certificate[] chain, String authType,
             AbstractConscryptSocket socket) throws CertificateException {
-        if (JAVA_VERSION >= 7) {
-            Java7PlatformUtil.checkClientTrusted(tm, chain, authType, socket);
+        if (tm instanceof X509ExtendedTrustManager) {
+            X509ExtendedTrustManager x509etm = (X509ExtendedTrustManager) tm;
+            x509etm.checkClientTrusted(chain, authType, socket);
         } else {
             tm.checkClientTrusted(chain, authType);
         }
@@ -280,8 +303,9 @@ final class Platform {
     @SuppressWarnings("unused")
     static void checkServerTrusted(X509TrustManager tm, X509Certificate[] chain, String authType,
             AbstractConscryptSocket socket) throws CertificateException {
-        if (JAVA_VERSION >= 7) {
-            Java7PlatformUtil.checkServerTrusted(tm, chain, authType, socket);
+        if (tm instanceof X509ExtendedTrustManager) {
+            X509ExtendedTrustManager x509etm = (X509ExtendedTrustManager) tm;
+            x509etm.checkServerTrusted(chain, authType, socket);
         } else {
             tm.checkServerTrusted(chain, authType);
         }
@@ -290,8 +314,9 @@ final class Platform {
     @SuppressWarnings("unused")
     static void checkClientTrusted(X509TrustManager tm, X509Certificate[] chain, String authType,
             ConscryptEngine engine) throws CertificateException {
-        if (JAVA_VERSION >= 7) {
-            Java7PlatformUtil.checkClientTrusted(tm, chain, authType, engine);
+        if (tm instanceof X509ExtendedTrustManager) {
+            X509ExtendedTrustManager x509etm = (X509ExtendedTrustManager) tm;
+            x509etm.checkClientTrusted(chain, authType, engine);
         } else {
             tm.checkClientTrusted(chain, authType);
         }
@@ -300,8 +325,9 @@ final class Platform {
     @SuppressWarnings("unused")
     static void checkServerTrusted(X509TrustManager tm, X509Certificate[] chain, String authType,
             ConscryptEngine engine) throws CertificateException {
-        if (JAVA_VERSION >= 7) {
-            Java7PlatformUtil.checkServerTrusted(tm, chain, authType, engine);
+        if (tm instanceof X509ExtendedTrustManager) {
+            X509ExtendedTrustManager x509etm = (X509ExtendedTrustManager) tm;
+            x509etm.checkServerTrusted(chain, authType, engine);
         } else {
             tm.checkServerTrusted(chain, authType);
         }
@@ -533,10 +559,7 @@ final class Platform {
         if (JAVA_VERSION >= 8) {
             return Java8PlatformUtil.wrapSSLSession(sslSession);
         }
-        if (JAVA_VERSION >= 7) {
-            return Java7PlatformUtil.wrapSSLSession(sslSession);
-        }
-        return sslSession;
+        return new Java7ExtendedSSLSession(sslSession);
     }
 
     public static String getOriginalHostNameFromInetAddress(InetAddress addr) {
@@ -564,16 +587,14 @@ final class Platform {
         return addr.getHostAddress();
     }
 
-    /*
-     * Pre-Java-7 backward compatibility.
-     */
-
     @SuppressWarnings("unused")
     static String getHostStringFromInetSocketAddress(InetSocketAddress addr) {
-        if (JAVA_VERSION >= 7) {
-            return Java7PlatformUtil.getHostStringFromInetSocketAddress(addr);
-        }
-        return null;
+        return addr.getHostString();
+    }
+
+    // OpenJDK always has X509ExtendedTrustManager
+    static boolean supportsX509ExtendedTrustManager() {
+        return true;
     }
 
     /**
