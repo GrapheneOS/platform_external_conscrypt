@@ -23,6 +23,7 @@ import java.security.KeyManagementException;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.util.Properties;
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLContextSpi;
 import javax.net.ssl.SSLEngine;
@@ -32,6 +33,7 @@ import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 /**
@@ -714,5 +716,67 @@ public final class Conscrypt {
     public static byte[] exportKeyingMaterial(SSLEngine engine, String label, byte[] context,
             int length) throws SSLException {
         return toConscrypt(engine).exportKeyingMaterial(label, context, length);
+    }
+
+    /**
+     * Indicates whether the given {@link TrustManager} was created by this distribution of
+     * Conscrypt.
+     */
+    public static boolean isConscrypt(TrustManager trustManager) {
+        return trustManager instanceof TrustManagerImpl;
+    }
+
+    private static TrustManagerImpl toConscrypt(TrustManager trustManager) {
+        if (!isConscrypt(trustManager)) {
+            throw new IllegalArgumentException(
+                    "Not a Conscrypt trust manager: " + trustManager.getClass().getName());
+        }
+        return (TrustManagerImpl) trustManager;
+    }
+
+    /**
+     * Set the default hostname verifier that will be used for HTTPS endpoint identification by
+     * Conscrypt trust managers.  If {@code null} (the default), endpoint identification will use
+     * the default hostname verifier set in
+     * {@link HttpsURLConnection#setDefaultHostnameVerifier(javax.net.ssl.HostnameVerifier)}.
+     */
+    public synchronized static void setDefaultHostnameVerifier(ConscryptHostnameVerifier verifier) {
+        TrustManagerImpl.setDefaultHostnameVerifier(verifier);
+    }
+
+    /**
+     * Returns the currently-set default hostname verifier for Conscrypt trust managers.
+     *
+     * @see #setDefaultHostnameVerifier(ConscryptHostnameVerifier)
+     */
+    public synchronized static ConscryptHostnameVerifier getDefaultHostnameVerifier(
+            TrustManager trustManager) {
+        return TrustManagerImpl.getDefaultHostnameVerifier();
+    }
+
+    /**
+     * Set the hostname verifier that will be used for HTTPS endpoint identification by the
+     * given trust manager.  If {@code null} (the default), endpoint identification will use the
+     * default hostname verifier set in {@link
+     * #setDefaultHostnameVerifier(ConscryptHostnameVerifier)}.
+     *
+     * @throws IllegalArgumentException if the provided trust manager is not a Conscrypt trust
+     * manager per {@link #isConscrypt(TrustManager)}
+     */
+    public static void setHostnameVerifier(
+            TrustManager trustManager, ConscryptHostnameVerifier verifier) {
+        toConscrypt(trustManager).setHostnameVerifier(verifier);
+    }
+
+    /**
+     * Returns the currently-set hostname verifier for the given trust manager.
+     *
+     * @throws IllegalArgumentException if the provided trust manager is not a Conscrypt trust
+     * manager per {@link #isConscrypt(TrustManager)}
+     *
+     * @see #setHostnameVerifier(TrustManager, ConscryptHostnameVerifier)
+     */
+    public static ConscryptHostnameVerifier getHostnameVerifier(TrustManager trustManager) {
+        return toConscrypt(trustManager).getHostnameVerifier();
     }
 }
