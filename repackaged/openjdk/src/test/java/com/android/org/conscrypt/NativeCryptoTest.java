@@ -703,8 +703,10 @@ public class NativeCryptoTest {
             } else {
                 cipherSuites.addAll(enabledCipherSuites);
             }
-            NativeCrypto.setEnabledCipherSuites(
-                    s, null, cipherSuites.toArray(new String[cipherSuites.size()]));
+            // Protocol list is included for determining whether to send TLS_FALLBACK_SCSV
+            NativeCrypto.setEnabledCipherSuites(s, null,
+                    cipherSuites.toArray(new String[cipherSuites.size()]),
+                    new String[] {"TLSv1.2"});
 
             if (channelIdPrivateKey != null) {
                 NativeCrypto.SSL_set1_tls_channel_id(s, null, channelIdPrivateKey.getNativeRef());
