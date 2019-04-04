@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 The Android Open Source Project
+ * Copyright 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,19 @@
 
 package org.conscrypt;
 
-import java.math.BigInteger;
-import java.security.PublicKey;
+import javax.net.ssl.SSLSession;
 
 /**
- * A set of certificates that are blacklisted from trust.
+ * This interface is used to implement hostname verification in Conscrypt.  Unlike with
+ * {@link javax.net.ssl.HostnameVerifier}, the hostname verifier is called whenever hostname
+ * verification is needed, without any use of default rules.
  */
-public interface CertBlacklist {
+public interface ConscryptHostnameVerifier {
 
-    /**
-     * Returns whether the given public key is in the blacklist.
-     */
-    boolean isPublicKeyBlackListed(PublicKey publicKey);
+  /**
+   * Returns whether the given hostname is allowable given the peer's authentication information
+   * from the given session.
+   */
+  boolean verify(String hostname, SSLSession session);
 
-    /**
-     * Returns whether the given serial number is in the blacklist.
-     */
-    boolean isSerialNumberBlackListed(BigInteger serial);
 }
