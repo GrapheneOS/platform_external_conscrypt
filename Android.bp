@@ -224,6 +224,11 @@ java_library {
     patch_module: "java.base",
     system_modules: "core-intra-stubs-system-modules",
 
+    permitted_packages: [
+        "android.net.ssl",
+        "com.android.org.conscrypt",
+    ],
+
     required: ["libjavacrypto"],
 }
 
