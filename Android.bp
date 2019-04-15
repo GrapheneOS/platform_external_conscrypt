@@ -224,12 +224,20 @@ java_library {
     patch_module: "java.base",
     system_modules: "core-intra-stubs-system-modules",
 
+    // Workaround for b/124476339: libjavacrypto is required for both APEX and
+    // hostdex builds, but adding a top-level required property results in
+    // it being installed to /system on Android.
+    // TODO(b/124476339): move required back to a top level property
+    target: {
+        hostdex: {
+            required: ["libjavacrypto"],
+        }
+    },
+
     permitted_packages: [
         "android.net.ssl",
         "com.android.org.conscrypt",
     ],
-
-    required: ["libjavacrypto"],
 }
 
 // A guaranteed unstripped version of conscrypt.
