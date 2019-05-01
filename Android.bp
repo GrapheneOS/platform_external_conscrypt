@@ -202,13 +202,21 @@ filegroup {
 
 filegroup {
     name: "conscrypt_public_api_files",
-    srcs: ["publicapi/src/main/java/**/*.java"]
+    srcs: ["publicapi/src/main/java/**/*.java"],
 }
 
 // Create the conscrypt library from the source produced by the srcgen/generate_android_src.sh
 // script.
 java_library {
     name: "conscrypt",
+    visibility: [
+        "//external/okhttp",
+        "//external/robolectric-shadows",
+        "//external/wycheproof",
+        "//libcore",
+        "//system/apex/tests",
+        ":__subpackages__",
+    ],
     installable: true,
     hostdex: true,
 
@@ -343,7 +351,6 @@ cc_library_static {
     sdk_version: "9",
     stl: "c++_shared",
 }
-
 
 // Make the conscrypt-tests library.
 java_test {
