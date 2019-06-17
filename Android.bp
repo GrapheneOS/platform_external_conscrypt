@@ -167,7 +167,7 @@ java_library {
         ":conscrypt-nojarjar_generated_constants",
     ],
 
-    no_standard_libs: true,
+    sdk_version: "none",
     system_modules: "core-all-system-modules",
     target: {
         android: {
@@ -227,7 +227,7 @@ java_library {
 
     // Conscrypt can be updated independently from the other core libraries so it must only depend
     // on public SDK and intra-core APIs.
-    no_standard_libs: true,
+    sdk_version: "none",
     libs: ["core.intra.stubs"],
     patch_module: "java.base",
     system_modules: "core-intra-stubs-system-modules",
@@ -369,7 +369,7 @@ java_test {
         "openjdk-integ-tests/src/test/resources",
     ],
 
-    no_standard_libs: true,
+    sdk_version: "none",
     libs: [
         "core-all",
         "conscrypt",
@@ -401,7 +401,7 @@ java_test {
         "repackaged/benchmark-base/src/main/java/**/*.java",
         "repackaged/benchmark-android/src/main/java/**/*.java",
     ],
-    no_standard_libs: true,
+    sdk_version: "none",
     libs: [
         "core-all",
         "conscrypt",
