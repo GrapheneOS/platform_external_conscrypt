@@ -260,7 +260,7 @@ java_library {
         enabled: false,
     },
 
-    no_framework_libs: true,
+    sdk_version: "core_platform",
 
     required: ["libjavacrypto"],
 }
