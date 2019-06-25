@@ -25,6 +25,9 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import com.android.org.conscrypt.TestUtils;
+import com.android.org.conscrypt.java.security.StandardNames;
+import com.android.org.conscrypt.java.security.TestKeyStore;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.ByteBuffer;
@@ -32,6 +35,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.KeyManager;
@@ -46,9 +50,6 @@ import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.X509ExtendedKeyManager;
 import javax.net.ssl.X509ExtendedTrustManager;
-import com.android.org.conscrypt.TestUtils;
-import com.android.org.conscrypt.java.security.StandardNames;
-import com.android.org.conscrypt.java.security.TestKeyStore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -589,8 +590,14 @@ public class SSLEngineTest {
                                     // should be agreed
                                     assertEquals(referenceContext.host.getHostName(),
                                             session.getPeerHost());
-                                    assertEquals(referenceEngine.getEnabledCipherSuites()[0],
-                                            session.getCipherSuite());
+                                    String sessionSuite = session.getCipherSuite();
+                                    List<String> enabledSuites =
+                                            Arrays.asList(referenceEngine.getEnabledCipherSuites());
+                                    String message = "Handshake session has invalid cipher suite: "
+                                            + (sessionSuite == null ? "(null)" : sessionSuite);
+                                    assertTrue("Expected enabled suites to contain " + sessionSuite
+                                                    + ", got: " + enabledSuites,
+                                            enabledSuites.contains(sessionSuite));
                                 } catch (Exception e) {
                                     throw new CertificateException("Something broke", e);
                                 }
