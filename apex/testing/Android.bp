@@ -18,5 +18,5 @@ apex {
     manifest: "test_apex_manifest.json",
     file_contexts: "com.android.conscrypt",
     // Test APEX, should never be installed
-    installable: false
+    installable: false,
 }
