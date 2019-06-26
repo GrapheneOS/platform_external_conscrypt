@@ -239,7 +239,7 @@ java_library {
     target: {
         hostdex: {
             required: ["libjavacrypto"],
-        }
+        },
     },
 
     permitted_packages: [
