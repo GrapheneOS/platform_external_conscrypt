@@ -14,6 +14,9 @@
 
 apex {
     name: "test_com.android.conscrypt",
+    visibility: [
+        "//system/apex/tests",
+    ],
     defaults: ["com.android.conscrypt-defaults"],
     manifest: "test_apex_manifest.json",
     file_contexts: "com.android.conscrypt",

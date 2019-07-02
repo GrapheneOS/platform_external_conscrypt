@@ -42,6 +42,9 @@ android_app_certificate {
 // Production APEX
 apex {
     name: "com.android.conscrypt",
+    visibility: [
+        "//vendor:__subpackages__",
+    ],
     defaults: ["com.android.conscrypt-defaults"],
     manifest: "apex_manifest.json",
 }
