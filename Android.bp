@@ -238,6 +238,8 @@ java_library {
         "android.net.ssl",
         "com.android.org.conscrypt",
     ],
+
+    plugins: ["java_api_finder"],
 }
 
 // A guaranteed unstripped version of conscrypt.
