@@ -14,6 +14,12 @@
 // limitations under the License.
 //
 
+package {
+    default_visibility: [
+        ":__subpackages__",
+    ],
+}
+
 //
 // Definitions for building the Conscrypt Java library, native code,
 // and associated tests.
@@ -159,6 +165,9 @@ genrule {
 // Create the conscrypt library without jarjar for tests
 java_library {
     name: "conscrypt-nojarjar",
+    visibility: [
+        "//build/make/tools/signapk",
+    ],
     host_supported: true,
     hostdex: true,
 
@@ -193,6 +202,9 @@ genrule {
 
 filegroup {
     name: "conscrypt_java_files",
+    visibility: [
+        "//libcore",
+    ],
     srcs: [
         "repackaged/common/src/main/java/**/*.java",
         "repackaged/platform/src/main/java/**/*.java",
@@ -202,6 +214,9 @@ filegroup {
 
 filegroup {
     name: "conscrypt_public_api_files",
+    visibility: [
+        "//libcore",
+    ],
     srcs: ["publicapi/src/main/java/**/*.java"],
 }
 
@@ -210,6 +225,8 @@ filegroup {
 java_library {
     name: "conscrypt",
     visibility: [
+        "//art/build",
+        "//device:__subpackages__",
         "//external/okhttp",
         "//external/robolectric-shadows",
         "//external/wycheproof",
@@ -355,6 +372,9 @@ cc_library_static {
 // Make the conscrypt-tests library.
 java_test {
     name: "conscrypt-tests",
+    visibility: [
+        "//cts/tests/libcore/luni",
+    ],
     hostdex: true,
     srcs: [
         "repackaged/platform/src/test/java/**/*.java",
