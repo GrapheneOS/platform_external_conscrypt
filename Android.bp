@@ -295,9 +295,6 @@ cc_defaults {
     ],
 
     srcs: ["common/src/jni/main/cpp/**/*.cc"],
-    include_dirs: [
-        "libcore/luni/src/main/native",
-    ],
     local_include_dirs: ["common/src/jni/main/include"],
 }
 
