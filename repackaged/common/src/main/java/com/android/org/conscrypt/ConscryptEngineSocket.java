@@ -259,6 +259,7 @@ class ConscryptEngineSocket extends OpenSSLSocketImpl {
                 }
             }
         } catch (SSLException e) {
+            drainOutgoingQueue();
             close();
             throw e;
         } catch (IOException e) {
@@ -543,6 +544,18 @@ class ConscryptEngineSocket extends OpenSSLSocketImpl {
             if (state == STATE_CLOSED) {
                 throw new SocketException("Socket is closed");
             }
+        }
+    }
+
+    private void drainOutgoingQueue() {
+        try {
+            while (engine.pendingOutboundEncryptedBytes() > 0) {
+                out.writeInternal(EMPTY_BUFFER);
+                // Always flush handshake frames immediately.
+                out.flushInternal();
+            }
+        } catch (IOException e) {
+            // Ignore
         }
     }
 

@@ -72,6 +72,7 @@ public final class CipherBasicsTest {
     private static final Map<String, String> AEAD_CIPHER_TO_TEST_DATA = new HashMap<String, String>();
     static {
         AEAD_CIPHER_TO_TEST_DATA.put("AES/GCM/NoPadding", "/crypto/aes-gcm.csv");
+        AEAD_CIPHER_TO_TEST_DATA.put("AES/GCM-SIV/NoPadding", "/crypto/aes-gcm-siv.csv");
         AEAD_CIPHER_TO_TEST_DATA.put("ChaCha20/Poly1305/NoPadding", "/crypto/chacha20-poly1305.csv");
     }
 
@@ -99,6 +100,12 @@ public final class CipherBasicsTest {
                 // We don't strongly care about checking this implementation, so just skip it.
                 if (p.getName().equals("SunPKCS11-NSS")
                         && transformation.equals("AES/ECB/NoPadding")) {
+                    continue;
+                }
+
+                // The SunJCE implementation of ChaCha20 only supports initializing with
+                // ChaCha20ParameterSpec, introduced in Java 11.  For now, just skip testing it.
+                if (transformation.equals("ChaCha20") && p.getName().equals("SunJCE")) {
                     continue;
                 }
 
