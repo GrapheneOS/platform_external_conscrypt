@@ -23,29 +23,41 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import com.android.org.conscrypt.KeyManagerFactoryImpl;
+import com.android.org.conscrypt.TestUtils;
+import com.android.org.conscrypt.java.security.StandardNames;
+import com.android.org.conscrypt.java.security.TestKeyStore;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.InvalidAlgorithmParameterException;
+import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStore.PasswordProtection;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.KeyStoreException;
+import java.security.KeyStoreSpi;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Provider;
-import java.security.Security;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
-import java.util.Set;
+import java.util.Date;
+import java.util.Enumeration;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.KeyStoreBuilderParameters;
 import javax.net.ssl.ManagerFactoryParameters;
 import javax.net.ssl.X509ExtendedKeyManager;
 import javax.net.ssl.X509KeyManager;
-import com.android.org.conscrypt.java.security.StandardNames;
-import com.android.org.conscrypt.java.security.TestKeyStore;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import tests.util.ServiceTester;
 
 /**
  * @hide This class is not part of the Android public SDK API
@@ -303,40 +315,207 @@ public class KeyManagerFactoryTest {
 
     @Test
     public void test_KeyManagerFactory_getInstance() throws Exception {
-        Provider[] providers = Security.getProviders();
-        for (Provider provider : providers) {
-            Set<Provider.Service> services = provider.getServices();
-            for (Provider.Service service : services) {
-                String type = service.getType();
-                if (!type.equals("KeyManagerFactory")) {
-                    continue;
-                }
-                String algorithm = service.getAlgorithm();
-                try {
-                    {
-                        KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm);
-                        assertEquals(algorithm, kmf.getAlgorithm());
-                        test_KeyManagerFactory(kmf);
-                    }
+        ServiceTester.test("KeyManagerFactory").run(new ServiceTester.Test() {
+            @Override
+            public void test(Provider provider, String algorithm) throws Exception {
+                KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm);
+                assertEquals(algorithm, kmf.getAlgorithm());
+                test_KeyManagerFactory(kmf);
 
-                    {
-                        KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm, provider);
-                        assertEquals(algorithm, kmf.getAlgorithm());
-                        assertEquals(provider, kmf.getProvider());
-                        test_KeyManagerFactory(kmf);
-                    }
+                kmf = KeyManagerFactory.getInstance(algorithm, provider);
+                assertEquals(algorithm, kmf.getAlgorithm());
+                assertEquals(provider, kmf.getProvider());
+                test_KeyManagerFactory(kmf);
 
-                    {
-                        KeyManagerFactory kmf =
-                                KeyManagerFactory.getInstance(algorithm, provider.getName());
-                        assertEquals(algorithm, kmf.getAlgorithm());
-                        assertEquals(provider, kmf.getProvider());
-                        test_KeyManagerFactory(kmf);
-                    }
-                } catch (Exception e) {
-                    throw new Exception("Problem with algorithm " + algorithm, e);
-                }
+                kmf = KeyManagerFactory.getInstance(algorithm, provider.getName());
+                assertEquals(algorithm, kmf.getAlgorithm());
+                assertEquals(provider, kmf.getProvider());
+                test_KeyManagerFactory(kmf);
             }
+        });
+    }
+
+    // The Conscrypt provider on OpenJDK doesn't provide the KeyManagerFactory, but we want
+    // to test it on OpenJDK anyway
+    @Test
+    public void test_KeyManagerFactory_Conscrypt() throws Exception {
+        KeyManagerFactory kmf = new KeyManagerFactory(new KeyManagerFactoryImpl(),
+                TestUtils.getConscryptProvider(), KeyManagerFactory.getDefaultAlgorithm()) {};
+        test_KeyManagerFactory(kmf);
+
+        // Test that using a KeyStore that doesn't implement getEntry(), like Android Keystore
+        // doesn't, still produces a functional KeyManager.
+        kmf.init(new NoGetEntryKeyStore(getTestKeyStore().keyStore),
+                getTestKeyStore().storePassword);
+        test_KeyManagerFactory_getKeyManagers(kmf, false);
+    }
+
+    private static class NoGetEntryKeyStore extends KeyStore {
+        public NoGetEntryKeyStore(KeyStore keyStore) throws Exception {
+            super(new NoGetEntryKeyStoreSpi(keyStore), keyStore.getProvider(), keyStore.getType());
+            load(null, null);
+        }
+    }
+
+    // Android Keystore's KeyStore doesn't support getEntry(), so we replicate that here
+    // for testing by throwing UnsupportedOperationException and passing everything else through
+    // to a working implementation.
+    private static class NoGetEntryKeyStoreSpi extends KeyStoreSpi {
+        private final KeyStore keyStore;
+
+        public NoGetEntryKeyStoreSpi(KeyStore keyStore) {
+            this.keyStore = keyStore;
+        }
+
+        @Override
+        public KeyStore.Entry engineGetEntry(String alias, KeyStore.ProtectionParameter protParam) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Key engineGetKey(String s, char[] chars)
+                throws NoSuchAlgorithmException, UnrecoverableKeyException {
+            try {
+                return keyStore.getKey(s, chars);
+            } catch (KeyStoreException e) {
+                throw new AssertionError(e);
+            }
+        }
+
+        @Override
+        public Certificate[] engineGetCertificateChain(String s) {
+            try {
+                return keyStore.getCertificateChain(s);
+            } catch (KeyStoreException e) {
+                throw new AssertionError(e);
+            }
+        }
+
+        @Override
+        public Certificate engineGetCertificate(String s) {
+            try {
+                return keyStore.getCertificate(s);
+            } catch (KeyStoreException e) {
+                throw new AssertionError(e);
+            }
+        }
+
+        @Override
+        public Date engineGetCreationDate(String s) {
+            try {
+                return keyStore.getCreationDate(s);
+            } catch (KeyStoreException e) {
+                throw new AssertionError(e);
+            }
+        }
+
+        @Override
+        public void engineSetKeyEntry(String s, Key key, char[] chars, Certificate[] certificates)
+                throws KeyStoreException {
+            try {
+                keyStore.setKeyEntry(s, key, chars, certificates);
+            } catch (KeyStoreException e) {
+                throw new AssertionError(e);
+            }
+        }
+
+        @Override
+        public void engineSetKeyEntry(String s, byte[] bytes, Certificate[] certificates)
+                throws KeyStoreException {
+            try {
+                keyStore.setKeyEntry(s, bytes, certificates);
+            } catch (KeyStoreException e) {
+                throw new AssertionError(e);
+            }
+        }
+
+        @Override
+        public void engineSetCertificateEntry(String s, Certificate certificate)
+                throws KeyStoreException {
+            try {
+                keyStore.setCertificateEntry(s, certificate);
+            } catch (KeyStoreException e) {
+                throw new AssertionError(e);
+            }
+        }
+
+        @Override
+        public void engineDeleteEntry(String s) throws KeyStoreException {
+            try {
+                keyStore.deleteEntry(s);
+            } catch (KeyStoreException e) {
+                throw new AssertionError(e);
+            }
+        }
+
+        @Override
+        public Enumeration<String> engineAliases() {
+            try {
+                return keyStore.aliases();
+            } catch (KeyStoreException e) {
+                throw new AssertionError(e);
+            }
+        }
+
+        @Override
+        public boolean engineContainsAlias(String s) {
+            try {
+                return keyStore.containsAlias(s);
+            } catch (KeyStoreException e) {
+                throw new AssertionError(e);
+            }
+        }
+
+        @Override
+        public int engineSize() {
+            try {
+                return keyStore.size();
+            } catch (KeyStoreException e) {
+                throw new AssertionError(e);
+            }
+        }
+
+        @Override
+        public boolean engineIsKeyEntry(String s) {
+            try {
+                return keyStore.isKeyEntry(s);
+            } catch (KeyStoreException e) {
+                throw new AssertionError(e);
+            }
+        }
+
+        @Override
+        public boolean engineIsCertificateEntry(String s) {
+            try {
+                return keyStore.isCertificateEntry(s);
+            } catch (KeyStoreException e) {
+                throw new AssertionError(e);
+            }
+        }
+
+        @Override
+        public String engineGetCertificateAlias(Certificate certificate) {
+            try {
+                return keyStore.getCertificateAlias(certificate);
+            } catch (KeyStoreException e) {
+                throw new AssertionError(e);
+            }
+        }
+
+        @Override
+        public void engineStore(OutputStream outputStream, char[] chars)
+                throws IOException, NoSuchAlgorithmException, CertificateException {
+            try {
+                keyStore.store(outputStream, chars);
+            } catch (KeyStoreException e) {
+                throw new AssertionError(e);
+            }
+        }
+
+        @Override
+        public void engineLoad(InputStream inputStream, char[] chars)
+                throws IOException, NoSuchAlgorithmException, CertificateException {
+            // Do nothing, the keystore is already loaded
         }
     }
 }
