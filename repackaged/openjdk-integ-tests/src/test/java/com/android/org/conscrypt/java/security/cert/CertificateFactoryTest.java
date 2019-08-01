@@ -24,6 +24,10 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import com.android.org.conscrypt.Conscrypt;
+import com.android.org.conscrypt.TestUtils;
+import com.android.org.conscrypt.java.security.StandardNames;
+import dalvik.system.VMRuntime;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FilterInputStream;
@@ -61,16 +65,13 @@ import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
-import com.android.org.conscrypt.Conscrypt;
-import com.android.org.conscrypt.TestUtils;
-import com.android.org.conscrypt.java.security.StandardNames;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import dalvik.system.VMRuntime;
 import sun.security.jca.Providers;
+import tests.util.ServiceTester;
 
 /**
  * @hide This class is not part of the Android public SDK API
@@ -219,20 +220,20 @@ public class CertificateFactoryTest {
 
     @Test
     public void test_generateCertificate() throws Exception {
-        Provider[] providers = Security.getProviders("CertificateFactory.X509");
-        for (Provider p : providers) {
-            CertificateFactory cf = CertificateFactory.getInstance("X509", p);
-            try {
-                test_generateCertificate(cf);
-                test_generateCertificate_InputStream_Offset_Correct(cf);
-                test_generateCertificate_InputStream_Empty(cf);
-                test_generateCertificate_InputStream_InvalidStart_Failure(cf);
-                test_generateCertificate_AnyLineLength_Success(cf);
-                test_generateCertificate_PartialInput(cf);
-            } catch (Throwable e) {
-                throw new Exception("Problem testing " + p.getName(), e);
-            }
-        }
+        ServiceTester.test("CertificateFactory")
+                .withAlgorithm("X509")
+                .run(new ServiceTester.Test() {
+                    @Override
+                    public void test(Provider p, String algorithm) throws Exception {
+                        CertificateFactory cf = CertificateFactory.getInstance("X509", p);
+                        test_generateCertificate(cf);
+                        test_generateCertificate_InputStream_Offset_Correct(cf);
+                        test_generateCertificate_InputStream_Empty(cf);
+                        test_generateCertificate_InputStream_InvalidStart_Failure(cf);
+                        test_generateCertificate_AnyLineLength_Success(cf);
+                        test_generateCertificate_PartialInput(cf);
+                    }
+                });
     }
 
     private void test_generateCertificate(CertificateFactory cf) throws Exception {

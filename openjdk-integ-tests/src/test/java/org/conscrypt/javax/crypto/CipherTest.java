@@ -109,6 +109,7 @@ public final class CipherTest {
 
     /** GCM tag size used for tests. */
     private static final int GCM_TAG_SIZE_BITS = 96;
+    private static final int GCM_SIV_TAG_SIZE_BITS = 128;
 
     private static final String[] RSA_PROVIDERS = StandardNames.IS_RI
         ? new String[] { "SunJCE", StandardNames.JSSE_PROVIDER_NAME }
@@ -283,6 +284,7 @@ public final class CipherTest {
 
     private static boolean isAEAD(String algorithm) {
         return "GCM".equals(algorithm) || algorithm.contains("/GCM/")
+                || algorithm.contains("/GCM-SIV/")
                 || algorithm.equals("CHACHA20/POLY1305/NOPADDING");
     }
 
@@ -379,6 +381,7 @@ public final class CipherTest {
         setExpectedBlockSize("AES/ECB/PKCS7PADDING", 16);
         setExpectedBlockSize("AES/ECB/NOPADDING", 16);
         setExpectedBlockSize("AES/GCM/NOPADDING", 16);
+        setExpectedBlockSize("AES/GCM-SIV/NOPADDING", 16);
         setExpectedBlockSize("AES/OFB/PKCS5PADDING", 16);
         setExpectedBlockSize("AES/OFB/PKCS7PADDING", 16);
         setExpectedBlockSize("AES/OFB/NOPADDING", 16);
@@ -389,6 +392,7 @@ public final class CipherTest {
         setExpectedBlockSize("AES_128/ECB/PKCS7PADDING", 16);
         setExpectedBlockSize("AES_128/ECB/NOPADDING", 16);
         setExpectedBlockSize("AES_128/GCM/NOPADDING", 16);
+        setExpectedBlockSize("AES_128/GCM-SIV/NOPADDING", 16);
         setExpectedBlockSize("AES_256/CBC/PKCS5PADDING", 16);
         setExpectedBlockSize("AES_256/CBC/PKCS7PADDING", 16);
         setExpectedBlockSize("AES_256/CBC/NOPADDING", 16);
@@ -396,6 +400,7 @@ public final class CipherTest {
         setExpectedBlockSize("AES_256/ECB/PKCS7PADDING", 16);
         setExpectedBlockSize("AES_256/ECB/NOPADDING", 16);
         setExpectedBlockSize("AES_256/GCM/NOPADDING", 16);
+        setExpectedBlockSize("AES_256/GCM-SIV/NOPADDING", 16);
         setExpectedBlockSize("PBEWITHMD5AND128BITAES-CBC-OPENSSL", 16);
         setExpectedBlockSize("PBEWITHMD5AND192BITAES-CBC-OPENSSL", 16);
         setExpectedBlockSize("PBEWITHMD5AND256BITAES-CBC-OPENSSL", 16);
@@ -593,6 +598,7 @@ public final class CipherTest {
         setExpectedOutputSize("AES/ECB/PKCS5PADDING", Cipher.ENCRYPT_MODE, 16);
         setExpectedOutputSize("AES/ECB/PKCS7PADDING", Cipher.ENCRYPT_MODE, 16);
         setExpectedOutputSize("AES/GCM/NOPADDING", Cipher.ENCRYPT_MODE, GCM_TAG_SIZE_BITS / 8);
+        setExpectedOutputSize("AES/GCM-SIV/NOPADDING", Cipher.ENCRYPT_MODE, GCM_SIV_TAG_SIZE_BITS / 8);
         setExpectedOutputSize("AES/OFB/PKCS5PADDING", Cipher.ENCRYPT_MODE, 16);
         setExpectedOutputSize("AES/OFB/PKCS7PADDING", Cipher.ENCRYPT_MODE, 16);
         setExpectedOutputSize("AES_128/CBC/PKCS5PADDING", Cipher.ENCRYPT_MODE, 16);
@@ -600,11 +606,13 @@ public final class CipherTest {
         setExpectedOutputSize("AES_128/ECB/PKCS5PADDING", Cipher.ENCRYPT_MODE, 16);
         setExpectedOutputSize("AES_128/ECB/PKCS7PADDING", Cipher.ENCRYPT_MODE, 16);
         setExpectedOutputSize("AES_128/GCM/NOPADDING", Cipher.ENCRYPT_MODE, GCM_TAG_SIZE_BITS / 8);
+        setExpectedOutputSize("AES_128/GCM-SIV/NOPADDING", Cipher.ENCRYPT_MODE, GCM_SIV_TAG_SIZE_BITS / 8);
         setExpectedOutputSize("AES_256/CBC/PKCS5PADDING", Cipher.ENCRYPT_MODE, 16);
         setExpectedOutputSize("AES_256/CBC/PKCS7PADDING", Cipher.ENCRYPT_MODE, 16);
         setExpectedOutputSize("AES_256/ECB/PKCS5PADDING", Cipher.ENCRYPT_MODE, 16);
         setExpectedOutputSize("AES_256/ECB/PKCS7PADDING", Cipher.ENCRYPT_MODE, 16);
         setExpectedOutputSize("AES_256/GCM/NOPADDING", Cipher.ENCRYPT_MODE, GCM_TAG_SIZE_BITS / 8);
+        setExpectedOutputSize("AES_256/GCM-SIV/NOPADDING", Cipher.ENCRYPT_MODE, GCM_SIV_TAG_SIZE_BITS / 8);
         setExpectedOutputSize("PBEWITHMD5AND128BITAES-CBC-OPENSSL", 16);
         setExpectedOutputSize("PBEWITHMD5AND192BITAES-CBC-OPENSSL", 16);
         setExpectedOutputSize("PBEWITHMD5AND256BITAES-CBC-OPENSSL", 16);
@@ -636,6 +644,7 @@ public final class CipherTest {
         setExpectedOutputSize("AES/ECB/PKCS5PADDING", Cipher.DECRYPT_MODE, 0);
         setExpectedOutputSize("AES/ECB/PKCS7PADDING", Cipher.DECRYPT_MODE, 0);
         setExpectedOutputSize("AES/GCM/NOPADDING", Cipher.DECRYPT_MODE, 0);
+        setExpectedOutputSize("AES/GCM-SIV/NOPADDING", Cipher.DECRYPT_MODE, 0);
         setExpectedOutputSize("AES/OFB/PKCS5PADDING", Cipher.DECRYPT_MODE, 0);
         setExpectedOutputSize("AES/OFB/PKCS7PADDING", Cipher.DECRYPT_MODE, 0);
         setExpectedOutputSize("AES_128/CBC/PKCS5PADDING", Cipher.DECRYPT_MODE, 0);
@@ -643,11 +652,13 @@ public final class CipherTest {
         setExpectedOutputSize("AES_128/ECB/PKCS5PADDING", Cipher.DECRYPT_MODE, 0);
         setExpectedOutputSize("AES_128/ECB/PKCS7PADDING", Cipher.DECRYPT_MODE, 0);
         setExpectedOutputSize("AES_128/GCM/NOPADDING", Cipher.DECRYPT_MODE, 0);
+        setExpectedOutputSize("AES_128/GCM-SIV/NOPADDING", Cipher.DECRYPT_MODE, 0);
         setExpectedOutputSize("AES_256/CBC/PKCS5PADDING", Cipher.DECRYPT_MODE, 0);
         setExpectedOutputSize("AES_256/CBC/PKCS7PADDING", Cipher.DECRYPT_MODE, 0);
         setExpectedOutputSize("AES_256/ECB/PKCS5PADDING", Cipher.DECRYPT_MODE, 0);
         setExpectedOutputSize("AES_256/ECB/PKCS7PADDING", Cipher.DECRYPT_MODE, 0);
         setExpectedOutputSize("AES_256/GCM/NOPADDING", Cipher.DECRYPT_MODE, 0);
+        setExpectedOutputSize("AES_256/GCM-SIV/NOPADDING", Cipher.DECRYPT_MODE, 0);
         setExpectedOutputSize("PBEWITHMD5AND128BITAES-CBC-OPENSSL", Cipher.DECRYPT_MODE, 0);
         setExpectedOutputSize("PBEWITHMD5AND192BITAES-CBC-OPENSSL", Cipher.DECRYPT_MODE, 0);
         setExpectedOutputSize("PBEWITHMD5AND256BITAES-CBC-OPENSSL", Cipher.DECRYPT_MODE, 0);
@@ -935,6 +946,13 @@ public final class CipherTest {
             new SecureRandom().nextBytes(iv);
             return new GCMParameterSpec(GCM_TAG_SIZE_BITS, iv);
         }
+        if (algorithm.equals("AES/GCM-SIV/NOPADDING")
+            || algorithm.equals("AES_128/GCM-SIV/NOPADDING")
+            || algorithm.equals("AES_256/GCM-SIV/NOPADDING")) {
+            final byte[] iv = new byte[12];
+            new SecureRandom().nextBytes(iv);
+            return new GCMParameterSpec(GCM_SIV_TAG_SIZE_BITS, iv);
+        }
         if (algorithm.equals("AES/CBC/NOPADDING")
             || algorithm.equals("AES/CBC/PKCS5PADDING")
             || algorithm.equals("AES/CBC/PKCS7PADDING")
@@ -987,6 +1005,11 @@ public final class CipherTest {
                     || "AES_128/GCM/NOPADDING".equals(algorithm)
                     || "AES_256/GCM/NOPADDING".equals(algorithm)) {
                 return new GCMParameterSpec(GCM_TAG_SIZE_BITS, iv);
+            }
+            if ("AES/GCM-SIV/NOPADDING".equals(algorithm)
+                || "AES_128/GCM-SIV/NOPADDING".equals(algorithm)
+                || "AES_256/GCM-SIV/NOPADDING".equals(algorithm)) {
+                return new GCMParameterSpec(GCM_SIV_TAG_SIZE_BITS, iv);
             }
             return new IvParameterSpec(iv);
         }
@@ -4087,23 +4110,6 @@ public final class CipherTest {
     }
 
     @Test
-    public void testCipher_updateAAD_AfterInit_WithGcm_Success() throws Exception {
-        Cipher c = Cipher.getInstance("AES/GCM/NoPadding");
-        c.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(new byte[128 / 8], "AES"));
-        c.updateAAD(new byte[8]);
-        c.updateAAD(ByteBuffer.wrap(new byte[8]));
-    }
-
-    @Test
-    public void testCipher_updateAAD_AfterUpdate_WithGcm_Sucess() throws Exception {
-        Cipher c = Cipher.getInstance("AES/GCM/NoPadding");
-        c.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(new byte[128 / 8], "AES"));
-        c.updateAAD(new byte[8]);
-        c.update(new byte[8]);
-        c.updateAAD(ByteBuffer.wrap(new byte[8]));
-    }
-
-    @Test
     public void testCipher_ShortBlock_Failure() throws Exception {
         for (String provider : AES_PROVIDERS) {
             testCipher_ShortBlock_Failure(provider);
@@ -4334,6 +4340,7 @@ public final class CipherTest {
             (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0 });
         cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, AES), param);
         byte[] ciphertext = cipher.update(input);
+        assertEquals(16, ciphertext.length);
         byte[] tag = cipher.doFinal();
         assertEquals(12, tag.length);
     }
@@ -4618,189 +4625,6 @@ public final class CipherTest {
         cipher.doFinal(new byte[] {1,2,3,4});
     }
 
-    /*
-     * Check that two AAD updates are equivalent to one.
-     * http://b/27371173
-     */
-    @Test
-    public void test_AESGCMNoPadding_UpdateAADTwice_Success() throws Exception {
-        SecretKeySpec key = new SecretKeySpec(new byte[16], "AES");
-        GCMParameterSpec spec = new GCMParameterSpec(128, new byte[12]);
-        Cipher c1 = Cipher.getInstance("AES/GCM/NoPadding");
-        Cipher c2 = Cipher.getInstance("AES/GCM/NoPadding");
-
-        c1.init(Cipher.ENCRYPT_MODE, key, spec);
-        c1.updateAAD(new byte[] {
-                0x01, 0x02, 0x03, 0x04, 0x05,
-        });
-        c1.updateAAD(new byte[] {
-                0x06, 0x07, 0x08, 0x09, 0x10,
-        });
-
-        c2.init(Cipher.ENCRYPT_MODE, key, spec);
-        c2.updateAAD(new byte[] {
-                0x01, 0x02, 0x03, 0x04, 0x05,
-                0x06, 0x07, 0x08, 0x09, 0x10,
-        });
-
-        assertEquals(Arrays.toString(c1.doFinal()), Arrays.toString(c2.doFinal()));
-    }
-
-    @Test
-    public void test_AESGCMNoPadding_UpdateAADByteBuffer_Simple() throws Exception {
-        SecretKeySpec key = new SecretKeySpec(new byte[16], "AES");
-        GCMParameterSpec spec = new GCMParameterSpec(128, new byte[12]);
-        Cipher c1 = Cipher.getInstance("AES/GCM/NoPadding");
-        Cipher c2 = Cipher.getInstance("AES/GCM/NoPadding");
-        Cipher c3 = Cipher.getInstance("AES/GCM/NoPadding");
-
-        c1.init(Cipher.ENCRYPT_MODE, key, spec);
-        c1.updateAAD(new byte[] {
-            0x01, 0x02, 0x03, 0x04, 0x05,
-            0x06, 0x07, 0x08, 0x09, 0x10,
-        });
-
-        c2.init(Cipher.ENCRYPT_MODE, key, spec);
-        c2.updateAAD(ByteBuffer.wrap(new byte[] {
-            0x01, 0x02, 0x03, 0x04, 0x05,
-            0x06, 0x07, 0x08, 0x09, 0x10,
-        }));
-
-        c3.init(Cipher.ENCRYPT_MODE, key, spec);
-        ByteBuffer buf = ByteBuffer.allocateDirect(10);
-        buf.put(new byte[] {
-            0x01, 0x02, 0x03, 0x04, 0x05,
-            0x06, 0x07, 0x08, 0x09, 0x10,
-        });
-        buf.flip();
-        c3.updateAAD(buf);
-
-        byte[] c1Final = c1.doFinal();
-        byte[] c2Final = c2.doFinal();
-        byte[] c3Final = c3.doFinal();
-        assertEquals(Arrays.toString(c1Final), Arrays.toString(c2Final));
-        assertEquals(Arrays.toString(c1Final), Arrays.toString(c3Final));
-    }
-
-    @Test
-    public void test_AESGCMNoPadding_UpdateAADByteBuffer_MultipleUpdates() throws Exception {
-        SecretKeySpec key = new SecretKeySpec(new byte[16], "AES");
-        GCMParameterSpec spec = new GCMParameterSpec(128, new byte[12]);
-        Cipher c1 = Cipher.getInstance("AES/GCM/NoPadding");
-        Cipher c2 = Cipher.getInstance("AES/GCM/NoPadding");
-        Cipher c3 = Cipher.getInstance("AES/GCM/NoPadding");
-
-        c1.init(Cipher.ENCRYPT_MODE, key, spec);
-        c1.updateAAD(new byte[] {
-            0x01, 0x02, 0x03, 0x04, 0x05,
-        });
-        c1.updateAAD(new byte[] {
-            0x06, 0x07, 0x08, 0x09, 0x10,
-        });
-
-        c2.init(Cipher.ENCRYPT_MODE, key, spec);
-        c2.updateAAD(ByteBuffer.wrap(new byte[] {
-            0x01, 0x02, 0x03, 0x04, 0x05,
-        }));
-        c2.updateAAD(ByteBuffer.wrap(new byte[] {
-            0x06, 0x07, 0x08, 0x09, 0x10,
-        }));
-
-        c3.init(Cipher.ENCRYPT_MODE, key, spec);
-        ByteBuffer buf = ByteBuffer.allocateDirect(10);
-        buf.put(new byte[] {
-            0x01, 0x02, 0x03, 0x04, 0x05,
-            0x06, 0x07, 0x08, 0x09, 0x10,
-        });
-        buf.flip();
-        buf.limit(5);
-        c3.updateAAD(buf);
-        buf.limit(10);
-        c3.updateAAD(buf);
-
-        byte[] c1Final = c1.doFinal();
-        byte[] c2Final = c2.doFinal();
-        byte[] c3Final = c3.doFinal();
-        assertEquals(Arrays.toString(c1Final), Arrays.toString(c2Final));
-        assertEquals(Arrays.toString(c1Final), Arrays.toString(c3Final));
-    }
-
-    @Test
-    public void test_AESGCMNoPadding_UpdateAADByteBuffer_MixedCalls() throws Exception {
-        SecretKeySpec key = new SecretKeySpec(new byte[16], "AES");
-        GCMParameterSpec spec = new GCMParameterSpec(128, new byte[12]);
-        Cipher c1 = Cipher.getInstance("AES/GCM/NoPadding");
-        Cipher c2 = Cipher.getInstance("AES/GCM/NoPadding");
-        Cipher c3 = Cipher.getInstance("AES/GCM/NoPadding");
-
-        c1.init(Cipher.ENCRYPT_MODE, key, spec);
-        c1.updateAAD(new byte[] {
-            0x01, 0x02, 0x03, 0x04, 0x05,
-            0x06, 0x07, 0x08, 0x09, 0x10,
-        });
-
-        c2.init(Cipher.ENCRYPT_MODE, key, spec);
-        c2.updateAAD(new byte[] {
-            0x01, 0x02, 0x03, 0x04, 0x05,
-        });
-        c2.updateAAD(ByteBuffer.wrap(new byte[] {
-            0x06, 0x07, 0x08, 0x09, 0x10,
-        }));
-
-        c3.init(Cipher.ENCRYPT_MODE, key, spec);
-        ByteBuffer buf = ByteBuffer.allocateDirect(10);
-        buf.put(new byte[] {
-            0x01, 0x02, 0x03, 0x04, 0x05,
-            0x06, 0x07, 0x08, 0x09, 0x10,
-        });
-        buf.flip();
-        buf.limit(5);
-        c3.updateAAD(buf);
-        c3.updateAAD(new byte[] {
-            0x06, 0x07, 0x08, 0x09, 0x10,
-        });
-
-        byte[] c1Final = c1.doFinal();
-        byte[] c2Final = c2.doFinal();
-        byte[] c3Final = c3.doFinal();
-        assertEquals(Arrays.toString(c1Final), Arrays.toString(c2Final));
-        assertEquals(Arrays.toString(c1Final), Arrays.toString(c3Final));
-    }
-
-    @Test
-    public void test_AESGCMNoPadding_UpdateAADByteBuffer_Unequal() throws Exception {
-        SecretKeySpec key = new SecretKeySpec(new byte[16], "AES");
-        GCMParameterSpec spec = new GCMParameterSpec(128, new byte[12]);
-        Cipher c1 = Cipher.getInstance("AES/GCM/NoPadding");
-        Cipher c2 = Cipher.getInstance("AES/GCM/NoPadding");
-        Cipher c3 = Cipher.getInstance("AES/GCM/NoPadding");
-
-        c1.init(Cipher.ENCRYPT_MODE, key, spec);
-        c1.updateAAD(ByteBuffer.wrap(new byte[] {
-            0x01, 0x02, 0x03, 0x04, 0x05,
-        }));
-
-        c2.init(Cipher.ENCRYPT_MODE, key, spec);
-        c2.updateAAD(new byte[] {
-            0x06, 0x07, 0x08, 0x09, 0x10,
-        });
-
-        c3.init(Cipher.ENCRYPT_MODE, key, spec);
-        ByteBuffer buf = ByteBuffer.allocateDirect(10);
-        buf.put(new byte[] {
-            0x11, 0x12, 0x13, 0x14, 0x15,
-        });
-        buf.flip();
-        c3.updateAAD(buf);
-
-        byte[] c1Final = c1.doFinal();
-        byte[] c2Final = c2.doFinal();
-        byte[] c3Final = c3.doFinal();
-        assertFalse(Arrays.equals(c1Final, c2Final));
-        assertFalse(Arrays.equals(c2Final, c3Final));
-        assertFalse(Arrays.equals(c1Final, c3Final));
-    }
-
     /**
      * Check that initializing with a GCM AlgorithmParameters produces the same result
      * as initializing with a GCMParameterSpec.
@@ -4827,117 +4651,6 @@ public final class CipherTest {
         });
 
         assertEquals(Arrays.toString(c1.doFinal()), Arrays.toString(c2.doFinal()));
-    }
-
-    /*
-     * Check that GCM encryption with old and new instances update correctly.
-     * http://b/27324690
-     */
-    @Test
-    public void test_AESGCMNoPadding_Reuse_Success() throws Exception {
-        SecretKeySpec key = new SecretKeySpec(new byte[16], "AES");
-        byte[] key2bytes = new byte[16];
-        key2bytes[0] = 0x01;
-        SecretKeySpec key2 = new SecretKeySpec(key2bytes, "AES");
-        GCMParameterSpec spec = new GCMParameterSpec(128, new byte[12]);
-        Cipher c1 = Cipher.getInstance("AES/GCM/NoPadding");
-        Cipher c2 = Cipher.getInstance("AES/GCM/NoPadding");
-
-        // Pollute the c1 cipher with AAD
-        c1.init(Cipher.ENCRYPT_MODE, key, spec);
-        c1.updateAAD(new byte[] {
-                0x01, 0x02, 0x03, 0x04, 0x05,
-        });
-
-        // Now init each again and make sure the outputs are the same.  We have to use a
-        // different key because reiniting an AEAD cipher with the same key and IV should fail.
-        c1.init(Cipher.ENCRYPT_MODE, key2, spec);
-        c2.init(Cipher.ENCRYPT_MODE, key2, spec);
-
-        byte[] aad = new byte[] {
-                0x10, 0x20, 0x30, 0x40, 0x50, 0x60,
-        };
-        c1.updateAAD(aad);
-        c2.updateAAD(aad);
-
-        assertEquals(Arrays.toString(c1.doFinal()), Arrays.toString(c2.doFinal()));
-
-        // .doFinal should also not allow reuse without re-initialization
-        byte[] aad2 = new byte[] {
-                0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11,
-        };
-        try {
-            c1.updateAAD(aad2);
-            fail("Should not allow updateAAD without re-initialization");
-        } catch (IllegalStateException expected) {
-        }
-
-        try {
-            c1.update(new byte[8]);
-            fail("Should not allow update without re-initialization");
-        } catch (IllegalStateException expected) {
-        }
-
-        try {
-            c1.doFinal();
-            fail("Should not allow doFinal without re-initialization");
-        } catch (IllegalStateException expected) {
-        }
-    }
-
-    /*
-     * Check that ChaCha20/Poly1305 encryption with old and new instances update correctly
-     */
-    @Test
-    public void test_ChaCha20_Reuse_Success() throws Exception {
-        SecretKeySpec key = new SecretKeySpec(new byte[32], "ChaCha20");
-        byte[] key2bytes = new byte[32];
-        key2bytes[0] = 0x01;
-        SecretKeySpec key2 = new SecretKeySpec(key2bytes, "ChaCha20");
-        IvParameterSpec spec = new IvParameterSpec(new byte[12]);
-        Cipher c1 = Cipher.getInstance("ChaCha20/Poly1305/NoPadding");
-        Cipher c2 = Cipher.getInstance("ChaCha20/Poly1305/NoPadding");
-
-        // Pollute the c1 cipher with AAD
-        c1.init(Cipher.ENCRYPT_MODE, key, spec);
-        c1.updateAAD(new byte[] {
-                0x01, 0x02, 0x03, 0x04, 0x05,
-        });
-
-        // Now init each again and make sure the outputs are the same.  We have to use a
-        // different key because reiniting an AEAD cipher with the same key and IV should fail.
-        c1.init(Cipher.ENCRYPT_MODE, key2, spec);
-        c2.init(Cipher.ENCRYPT_MODE, key2, spec);
-
-        byte[] aad = new byte[] {
-                0x10, 0x20, 0x30, 0x40, 0x50, 0x60,
-        };
-        c1.updateAAD(aad);
-        c2.updateAAD(aad);
-
-        assertEquals(Arrays.toString(c1.doFinal()), Arrays.toString(c2.doFinal()));
-
-        // .doFinal should also not allow reuse without re-initialization
-        byte[] aad2 = new byte[] {
-                0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11,
-        };
-        try {
-            c1.updateAAD(aad2);
-            fail("Should not allow updateAAD without re-initialization");
-        } catch (IllegalStateException expected) {
-        }
-
-        try {
-            c1.update(new byte[8]);
-            fail("Should not allow update without re-initialization");
-        } catch (IllegalStateException expected) {
-        }
-
-        try {
-            c1.doFinal();
-            fail("Should not allow doFinal without re-initialization");
-        } catch (IllegalStateException expected) {
-        }
     }
 
     /**

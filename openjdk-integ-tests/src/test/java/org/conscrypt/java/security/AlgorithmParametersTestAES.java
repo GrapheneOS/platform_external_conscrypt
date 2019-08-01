@@ -15,22 +15,40 @@
  */
 package org.conscrypt.java.security;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
+import dalvik.system.VMRuntime;
 import java.security.AlgorithmParameters;
-import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
-import java.security.Security;
-import java.util.Arrays;
 import javax.crypto.spec.IvParameterSpec;
 import org.conscrypt.TestUtils;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import sun.security.jca.Providers;
+import tests.util.ServiceTester;
 
 @RunWith(JUnit4.class)
 public class AlgorithmParametersTestAES extends AbstractAlgorithmParametersTest {
+
+    // BEGIN Android-Added: Allow access to deprecated BC algorithms.
+    // Allow access to deprecated BC algorithms in this test, so we can ensure they
+    // continue to work
+    @BeforeClass
+    public static void enableDeprecatedAlgorithms() {
+        Providers.setMaximumAllowableApiLevelForBcDeprecation(
+            VMRuntime.getRuntime().getTargetSdkVersion());
+    }
+
+    @AfterClass
+    public static void restoreDeprecatedAlgorithms() {
+        Providers.setMaximumAllowableApiLevelForBcDeprecation(
+            Providers.DEFAULT_MAXIMUM_ALLOWABLE_TARGET_API_LEVEL_FOR_BC_DEPRECATION);
+    }
+    // END Android-Added: Allow access to deprecated BC algorithms.
 
     private static final byte[] parameterData = new byte[] {
         (byte) 0x04, (byte) 0x08, (byte) 0x68, (byte) 0xC8,
@@ -49,25 +67,22 @@ public class AlgorithmParametersTestAES extends AbstractAlgorithmParametersTest 
 
     @Test
     public void testEncoding() throws Exception {
-        for (Provider p : Security.getProviders()) {
-            AlgorithmParameters params;
-            try {
-                params = AlgorithmParameters.getInstance("AES", p);
-            } catch (NoSuchAlgorithmException e) {
-                // This provider doesn't support AES, ignore
-                continue;
-            }
+        ServiceTester.test("AlgorithmParameters")
+            .withAlgorithm("AES")
+            .run(new ServiceTester.Test() {
+                @Override
+                public void test(Provider p, String algorithm) throws Exception {
+                    AlgorithmParameters params = AlgorithmParameters.getInstance("AES", p);
 
-            params.init(new IvParameterSpec(parameterData));
-            assertEquals("Provider: " + p.getName(),
-                    ENCODED_DATA, TestUtils.encodeBase64(params.getEncoded()));
+                    params.init(new IvParameterSpec(parameterData));
+                    assertEquals(ENCODED_DATA, TestUtils.encodeBase64(params.getEncoded()));
 
-            params = AlgorithmParameters.getInstance("AES", p);
-            params.init(TestUtils.decodeBase64(ENCODED_DATA));
-            assertTrue("Provider: " + p.getName(),
-                    Arrays.equals(parameterData,
-                            params.getParameterSpec(IvParameterSpec.class).getIV()));
-        }
+                    params = AlgorithmParameters.getInstance("AES", p);
+                    params.init(TestUtils.decodeBase64(ENCODED_DATA));
+                    assertArrayEquals(parameterData,
+                        params.getParameterSpec(IvParameterSpec.class).getIV());
+                }
+            });
     }
 
 }
