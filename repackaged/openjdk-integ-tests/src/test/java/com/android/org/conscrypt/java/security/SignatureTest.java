@@ -23,6 +23,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import com.android.org.conscrypt.Conscrypt;
+import com.android.org.conscrypt.TestUtils;
+import com.android.org.conscrypt.testing.BrokenProvider;
+import com.android.org.conscrypt.testing.OpaqueProvider;
+import dalvik.system.VMRuntime;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.security.AlgorithmParameters;
@@ -38,6 +43,7 @@ import java.security.PublicKey;
 import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.DSAPrivateKeySpec;
 import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.ECFieldFp;
@@ -59,7 +65,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -67,15 +72,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import com.android.org.conscrypt.Conscrypt;
-import com.android.org.conscrypt.TestUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import dalvik.system.VMRuntime;
 import sun.security.jca.Providers;
+import tests.util.ServiceTester;
 
 /**
  * @hide This class is not part of the Android public SDK API
@@ -104,62 +107,50 @@ public class SignatureTest {
 
     @Test
     public void test_getInstance() throws Exception {
-        Provider[] providers = Security.getProviders();
-        for (Provider provider : providers) {
-            // Do not test AndroidKeyStore's Signature. It needs an AndroidKeyStore-specific key.
-            // It's OKish not to test AndroidKeyStore's Signature here because it's tested
-            // by cts/tests/test/keystore.
-            if (provider.getName().startsWith("AndroidKeyStore")) {
-                continue;
-            }
-            Set<Provider.Service> services = provider.getServices();
-            for (Provider.Service service : services) {
-                String type = service.getType();
-                if (!type.equals("Signature")) {
-                    continue;
-                }
-                if (service.getProvider().getName().equalsIgnoreCase("SunMSCAPI")
-                    || service.getProvider().getName().equalsIgnoreCase("SunPKCS11-NSS")) {
-                    // The SunMSCAPI is very strange, including only supporting its own keys,
-                    // so don't test it.
-                    // SunPKCS11-NSS has a problem where failed verifications can leave the
-                    // operation open, which results in future init() calls to throw an exception.
-                    // This appears to be a problem in the underlying library (see
-                    // https://bugs.openjdk.java.net/browse/JDK-8044554), but skip verifying it all
-                    // the same.
-                    continue;
-                }
-                String algorithm = service.getAlgorithm();
-                try {
-                    KeyPair kp = keyPair(algorithm, provider.getName());
-                    // Signature.getInstance(String)
-                    Signature sig1 = Signature.getInstance(algorithm);
-                    assertEquals(algorithm, sig1.getAlgorithm());
-                    test_Signature(sig1, kp);
+        ServiceTester
+                .test("Signature")
+                // Do not test AndroidKeyStore's Signature. It needs an AndroidKeyStore-specific
+                // key. It's OKish not to test AndroidKeyStore's Signature here because it's tested
+                // by cts/tests/test/keystore.
+                .skipProvider("AndroidKeyStore")
+                .skipProvider("AndroidKeyStoreBCWorkaround")
+                // The SunMSCAPI is very strange, including only supporting its own keys,
+                // so don't test it.
+                .skipProvider("SunMSCAPI")
+                // SunPKCS11-NSS has a problem where failed verifications can leave the
+                // operation open, which results in future init() calls to throw an exception.
+                // This appears to be a problem in the underlying library (see
+                // https://bugs.openjdk.java.net/browse/JDK-8044554), but skip verifying it all
+                // the same.
+                .skipProvider("SunPKCS11-NSS")
+                .run(new ServiceTester.Test() {
+                    @Override
+                    public void test(Provider provider, String algorithm) throws Exception {
+                        KeyPair kp = keyPair(algorithm);
+                        // Signature.getInstance(String)
+                        Signature sig1 = Signature.getInstance(algorithm);
+                        assertEquals(algorithm, sig1.getAlgorithm());
+                        test_Signature(sig1, kp);
 
-                    // Signature.getInstance(String, Provider)
-                    Signature sig2 = Signature.getInstance(algorithm, provider);
-                    assertEquals(algorithm, sig2.getAlgorithm());
-                    assertEquals(provider, sig2.getProvider());
-                    test_Signature(sig2, kp);
+                        // Signature.getInstance(String, Provider)
+                        Signature sig2 = Signature.getInstance(algorithm, provider);
+                        assertEquals(algorithm, sig2.getAlgorithm());
+                        assertEquals(provider, sig2.getProvider());
+                        test_Signature(sig2, kp);
 
-                    // Signature.getInstance(String, String)
-                    Signature sig3 = Signature.getInstance(algorithm, provider.getName());
-                    assertEquals(algorithm, sig3.getAlgorithm());
-                    assertEquals(provider, sig3.getProvider());
-                    test_Signature(sig3, kp);
-                } catch (Exception e) {
-                    throw new Exception("Problem testing Signature." + algorithm
-                            + " from provider " + provider.getName(), e);
-                }
-            }
-        }
+                        // Signature.getInstance(String, String)
+                        Signature sig3 = Signature.getInstance(algorithm, provider.getName());
+                        assertEquals(algorithm, sig3.getAlgorithm());
+                        assertEquals(provider, sig3.getProvider());
+                        test_Signature(sig3, kp);
+                    }
+                });
     }
 
     private final Map<String, KeyPair> keypairAlgorithmToInstance
             = new HashMap<String, KeyPair>();
 
-    private KeyPair keyPair(String sigAlgorithm, String providerName) throws Exception {
+    private KeyPair keyPair(String sigAlgorithm) throws Exception {
         String sigAlgorithmUpperCase = sigAlgorithm.toUpperCase(Locale.US);
         if (sigAlgorithmUpperCase.endsWith("ENCRYPTION")) {
             sigAlgorithm = sigAlgorithm.substring(0, sigAlgorithm.length()-"ENCRYPTION".length());
@@ -168,12 +159,15 @@ public class SignatureTest {
 
         String kpAlgorithm;
         // note ECDSA must be before DSA
-        if (sigAlgorithmUpperCase.endsWith("ECDSA")) {
+        if (sigAlgorithmUpperCase.endsWith("ECDSA")
+                || sigAlgorithmUpperCase.endsWith("ECDSAINP1363FORMAT")) {
             kpAlgorithm = "EC";
-        } else if (sigAlgorithmUpperCase.endsWith("DSA")) {
+        } else if (sigAlgorithmUpperCase.endsWith("DSA")
+                || sigAlgorithmUpperCase.endsWith("DSAINP1363FORMAT")) {
             kpAlgorithm = "DSA";
         } else if (sigAlgorithmUpperCase.endsWith("RSA")
-                || sigAlgorithmUpperCase.endsWith("RSA/PSS")) {
+                || sigAlgorithmUpperCase.endsWith("RSA/PSS")
+                || sigAlgorithmUpperCase.endsWith("RSASSA-PSS")) {
             kpAlgorithm = "RSA";
         } else {
             throw new Exception("Unknown KeyPair algorithm for Signature algorithm "
@@ -192,14 +186,28 @@ public class SignatureTest {
         return kp;
     }
 
+    private AlgorithmParameterSpec getAlgParamSpec(String algorithm) {
+        if (algorithm.equalsIgnoreCase("RSASSA-PSS")) {
+            return PSSParameterSpec.DEFAULT;
+        }
+        return null;
+    }
+
     private void test_Signature(Signature sig, KeyPair keyPair) throws Exception {
+        AlgorithmParameterSpec params = getAlgParamSpec(sig.getAlgorithm());
         sig.initSign(keyPair.getPrivate());
+        if (params != null) {
+            sig.setParameter(params);
+        }
         sig.update(DATA);
         byte[] signature = sig.sign();
         assertNotNull(sig.getAlgorithm(), signature);
         assertTrue(sig.getAlgorithm(), signature.length > 0);
 
         sig.initVerify(keyPair.getPublic());
+        if (params != null) {
+            sig.setParameter(params);
+        }
         sig.update(DATA);
         assertTrue(sig.getAlgorithm(), sig.verify(signature));
 
@@ -211,16 +219,16 @@ public class SignatureTest {
          * The RI appears to clear out the input data in RawDSA while calling
          * verify a second time.
          */
-        if (StandardNames.IS_RI && (
-                "NONEwithDSA".equalsIgnoreCase(sig.getAlgorithm())
-                || "RawDSA".equalsIgnoreCase(sig.getAlgorithm()))) {
+        if (StandardNames.IS_RI
+                && ("NONEwithDSA".equalsIgnoreCase(sig.getAlgorithm())
+                        || "NONEwithDSAinP1363Format".equalsIgnoreCase(sig.getAlgorithm())
+                        || "RawDSA".equalsIgnoreCase(sig.getAlgorithm()))) {
             try {
                 sig.verify(signature);
                 fail("Expected RI to have a NONEwithDSA bug");
             } catch (SignatureException bug) {
             }
-        } else if (StandardNames.IS_RI
-                && "NONEwithECDSA".equalsIgnoreCase(sig.getAlgorithm())
+        } else if (StandardNames.IS_RI && "NONEwithECDSA".equalsIgnoreCase(sig.getAlgorithm())
                 && "SunPKCS11-NSS".equalsIgnoreCase(sig.getProvider().getName())) {
             // This provider doesn't work properly
             try {
@@ -2745,7 +2753,7 @@ public class SignatureTest {
 
     @Test
     public void testSign_NONEwithECDSA_Key_Success() throws Exception {
-        KeyPair keys = keyPair("NONEwithECDSA", null);
+        KeyPair keys = keyPair("NONEwithECDSA");
         Signature sig = Signature.getInstance("NONEwithECDSA");
 
         sig.initSign(keys.getPrivate());
@@ -2782,10 +2790,10 @@ public class SignatureTest {
         assertFalse(sig.verify(NAMED_CURVE_SIGNATURE));
     }
 
-    @Test
     // Suppress ErrorProne's warning about the try block that doesn't call fail() but
     // expects an exception, it's intentional
     @SuppressWarnings("MissingFail")
+    @Test
     public void testVerify_NONEwithECDSA_Key_SingleByte_Failure() throws Exception {
         PublicKey pub = getNamedCurveEcPublicKey();
         MessageDigest sha1 = MessageDigest.getInstance("SHA1");
@@ -2800,6 +2808,61 @@ public class SignatureTest {
             assertFalse(sig.verify(corrupted));
         } catch (SignatureException expected) {
             // It's valid to either return false or throw an exception, accept either
+        }
+    }
+
+    // Tests that an opaque key will be accepted by the ECDSA signature and will delegate to a
+    // functioning alternative provider
+    @Test
+    public void test_NONEwithECDSA_OpaqueKey() throws Exception {
+        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC");
+        keyGen.initialize(256);
+        KeyPair kp = keyGen.generateKeyPair();
+
+        // Insert this at #2 so that Conscrypt is still the first provider and CryptoUpcalls
+        // has to drop to manual provider selection rather than relying on Signature's internals
+        Security.insertProviderAt(new OpaqueProvider(), 2);
+        try {
+            Signature sig =
+                    Signature.getInstance("NONEwithECDSA", TestUtils.getConscryptProvider());
+            sig.initSign(OpaqueProvider.wrapKeyMarked(kp.getPrivate()));
+            sig.update(new byte[] {1, 2, 3, 4, 5, 6, 7, 8});
+            byte[] data = sig.sign();
+
+            sig.initVerify(kp.getPublic());
+            sig.update(new byte[] {1, 2, 3, 4, 5, 6, 7, 8});
+            assertTrue(sig.verify(data));
+        } finally {
+            Security.removeProvider(OpaqueProvider.NAME);
+        }
+    }
+
+    // Tests that an opaque key will be accepted by the ECDSA signature and that a broken
+    // alternative provider that throws UnsupportedOperationException will be skipped and
+    // a functioning provider that follows will work.
+    @Test
+    public void test_NONEwithECDSA_OpaqueKey_BrokenProvider() throws Exception {
+        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC");
+        keyGen.initialize(256);
+        KeyPair kp = keyGen.generateKeyPair();
+
+        // Insert these at #2 so that Conscrypt is still the first provider and CryptoUpcalls
+        // has to drop to manual provider selection rather than relying on Signature's internals
+        Security.insertProviderAt(new OpaqueProvider(), 2);
+        Security.insertProviderAt(new BrokenProvider(), 2);
+        try {
+            Signature sig =
+                    Signature.getInstance("NONEwithECDSA", TestUtils.getConscryptProvider());
+            sig.initSign(OpaqueProvider.wrapKeyMarked(kp.getPrivate()));
+            sig.update(new byte[] {1, 2, 3, 4, 5, 6, 7, 8});
+            byte[] data = sig.sign();
+
+            sig.initVerify(kp.getPublic());
+            sig.update(new byte[] {1, 2, 3, 4, 5, 6, 7, 8});
+            assertTrue(sig.verify(data));
+        } finally {
+            Security.removeProvider(OpaqueProvider.NAME);
+            Security.removeProvider(BrokenProvider.NAME);
         }
     }
 
