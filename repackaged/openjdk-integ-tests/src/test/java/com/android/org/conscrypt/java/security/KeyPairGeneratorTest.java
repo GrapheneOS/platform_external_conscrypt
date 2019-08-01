@@ -19,9 +19,10 @@ package com.android.org.conscrypt.java.security;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import com.android.org.conscrypt.TestUtils;
+import dalvik.system.VMRuntime;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
@@ -33,7 +34,6 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.Provider;
-import java.security.Provider.Service;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
@@ -56,7 +56,6 @@ import java.util.Set;
 import javax.crypto.interfaces.DHPrivateKey;
 import javax.crypto.interfaces.DHPublicKey;
 import javax.crypto.spec.DHParameterSpec;
-import com.android.org.conscrypt.TestUtils;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -64,8 +63,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import dalvik.system.VMRuntime;
 import sun.security.jca.Providers;
+import tests.util.ServiceTester;
 
 /**
  * @hide This class is not part of the Android public SDK API
@@ -89,178 +88,60 @@ public class KeyPairGeneratorTest {
     }
     // END Android-Added: Allow access to deprecated BC algorithms.
 
-    private List<Provider> providers = new ArrayList<Provider>();
-
-    @Before
-    public void setUp() throws Exception {
-        Provider[] providers = Security.getProviders();
-        for (Provider p : providers) {
-            // Do not test AndroidKeyStore Provider. It does not accept vanilla public keys for
-            // signature verification. It's OKish not to test here because it's tested by
-            // cts/tests/tests/keystore.
-            if (!p.getName().startsWith("AndroidKeyStore")) {
-                this.providers.add(p);
-            }
-        }
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        providers.clear();
-    }
-
     @Test
-    public void test_providerCount() {
-        // We expect there to be at least one provider.
-        assertTrue(providers.size() > 0);
-        // If this fails remember to add _provider methods below. This test is sharded because it
-        // takes a long time to execute.
-        assertTrue("Saw " + providers.size() + " providers", providers.size() <= 15);
-    }
+    public void test_getInstance() throws Exception {
+        ServiceTester
+                .test("KeyPairGenerator")
+                // Do not test AndroidKeyStore Provider. It does not accept vanilla public keys for
+                // signature verification. It's OKish not to test here because it's tested by
+                // cts/tests/tests/keystore.
+                .skipProvider("AndroidKeyStore")
+                // The SunEC provider tries to pass a sun-only AlgorithmParameterSpec to the default
+                // AlgorithmParameters:EC when its KeyPairGenerator is initialized.  Since Conscrypt
+                // is the highest-ranked provider when running our tests, its implementation of
+                // AlgorithmParameters:EC is returned, and it doesn't understand the special
+                // AlgorithmParameterSpec, so the KeyPairGenerator can't be initialized.
+                .skipProvider("SunEC")
+                // The SunPKCS11-NSS provider on OpenJDK 7 attempts to delegate to the SunEC
+                // provider, which doesn't exist on OpenJDK 7, and thus totally fails.  This appears
+                // to be a bug introduced into later revisions of OpenJDK 7.
+                .skipProvider("SunPKCS11-NSS")
+                .run(new ServiceTester.Test() {
+                    @Override
+                    public void test(Provider provider, String algorithm) throws Exception {
+                        AlgorithmParameterSpec params = null;
 
-    @Test
-    public void test_getInstance_provider0() throws Exception {
-        test_getInstance(0);
-    }
+                        if ("DH".equals(algorithm) || "DiffieHellman".equalsIgnoreCase(algorithm)) {
+                            params = getDHParams();
+                        }
+                        // KeyPairGenerator.getInstance(String)
+                        KeyPairGenerator kpg1 = KeyPairGenerator.getInstance(algorithm);
+                        assertEquals(algorithm, kpg1.getAlgorithm());
+                        if (params != null) {
+                            kpg1.initialize(params);
+                        }
+                        test_KeyPairGenerator(kpg1);
 
-    @Test
-    public void test_getInstance_provider1() throws Exception {
-        test_getInstance(1);
-    }
+                        // KeyPairGenerator.getInstance(String, Provider)
+                        KeyPairGenerator kpg2 = KeyPairGenerator.getInstance(algorithm, provider);
+                        assertEquals(algorithm, kpg2.getAlgorithm());
+                        assertEquals(provider, kpg2.getProvider());
+                        if (params != null) {
+                            kpg2.initialize(params);
+                        }
+                        test_KeyPairGenerator(kpg2);
 
-    @Test
-    public void test_getInstance_provider2() throws Exception {
-        test_getInstance(2);
-    }
-
-    @Test
-    public void test_getInstance_provider3() throws Exception {
-        test_getInstance(3);
-    }
-
-    @Test
-    public void test_getInstance_provider4() throws Exception {
-        test_getInstance(4);
-    }
-
-    @Test
-    public void test_getInstance_provider5() throws Exception {
-        test_getInstance(5);
-    }
-
-    @Test
-    public void test_getInstance_provider6() throws Exception {
-        test_getInstance(6);
-    }
-
-    @Test
-    public void test_getInstance_provider7() throws Exception {
-        test_getInstance(7);
-    }
-
-    @Test
-    public void test_getInstance_provider8() throws Exception {
-        test_getInstance(8);
-    }
-
-    @Test
-    public void test_getInstance_provider9() throws Exception {
-        test_getInstance(9);
-    }
-
-    @Test
-    public void test_getInstance_provider10() throws Exception {
-        test_getInstance(10);
-    }
-
-    @Test
-    public void test_getInstance_provider11() throws Exception {
-        test_getInstance(11);
-    }
-
-    @Test
-    public void test_getInstance_provider12() throws Exception {
-        test_getInstance(12);
-    }
-
-    @Test
-    public void test_getInstance_provider13() throws Exception {
-        test_getInstance(13);
-    }
-
-    @Test
-    public void test_getInstance_provider14() throws Exception {
-        test_getInstance(14);
-    }
-
-    private void test_getInstance(int providerIndex) throws Exception {
-        if (providerIndex >= providers.size()) {
-            // Providers can be added by vendors and other tests. We do not
-            // specify a fixed number and silenty pass if the provider at the
-            // specified index does not exist.
-            return;
-        }
-
-        Provider provider = providers.get(providerIndex);
-        if (provider.getName().equals("SunEC")) {
-            // The SunEC provider tries to pass a sun-only AlgorithmParameterSpec to the default
-            // AlgorithmParameters:EC when its KeyPairGenerator is initialized.  Since Conscrypt
-            // is the highest-ranked provider when running our tests, its implementation of
-            // AlgorithmParameters:EC is returned, and it doesn't understand the special
-            // AlgorithmParameterSpec, so the KeyPairGenerator can't be initialized.
-            return;
-        }
-        if (provider.getName().equals("SunPKCS11-NSS")) {
-            // The SunPKCS11-NSS provider on OpenJDK 7 attempts to delegate to the SunEC provider,
-            // which doesn't exist on OpenJDK 7, and thus totally fails.  This appears to be a bug
-            // introduced into later revisions of OpenJDK 7.
-            return;
-        }
-        Set<Provider.Service> services = provider.getServices();
-        for (Provider.Service service : services) {
-            String type = service.getType();
-            if (!type.equals("KeyPairGenerator")) {
-                continue;
-            }
-            String algorithm = service.getAlgorithm();
-            AlgorithmParameterSpec params = null;
-
-            if ("DH".equals(algorithm) || "DiffieHellman".equalsIgnoreCase(algorithm)) {
-                params = getDHParams();
-            }
-
-            try {
-                // KeyPairGenerator.getInstance(String)
-                KeyPairGenerator kpg1 = KeyPairGenerator.getInstance(algorithm);
-                assertEquals(algorithm, kpg1.getAlgorithm());
-                if (params != null) {
-                    kpg1.initialize(params);
-                }
-                test_KeyPairGenerator(kpg1);
-
-                // KeyPairGenerator.getInstance(String, Provider)
-                KeyPairGenerator kpg2 = KeyPairGenerator.getInstance(algorithm, provider);
-                assertEquals(algorithm, kpg2.getAlgorithm());
-                assertEquals(provider, kpg2.getProvider());
-                if (params != null) {
-                    kpg2.initialize(params);
-                }
-                test_KeyPairGenerator(kpg2);
-
-                // KeyPairGenerator.getInstance(String, String)
-                KeyPairGenerator kpg3 = KeyPairGenerator.getInstance(algorithm,
-                                                                    provider.getName());
-                assertEquals(algorithm, kpg3.getAlgorithm());
-                assertEquals(provider, kpg3.getProvider());
-                if (params != null) {
-                    kpg3.initialize(params);
-                }
-                test_KeyPairGenerator(kpg3);
-            } catch (Exception e) {
-                throw new Exception("Problem testing KeyPairGenerator." + algorithm
-                        + " from provider " + provider.getName(), e);
-            }
-        }
+                        // KeyPairGenerator.getInstance(String, String)
+                        KeyPairGenerator kpg3 =
+                                KeyPairGenerator.getInstance(algorithm, provider.getName());
+                        assertEquals(algorithm, kpg3.getAlgorithm());
+                        assertEquals(provider, kpg3.getProvider());
+                        if (params != null) {
+                            kpg3.initialize(params);
+                        }
+                        test_KeyPairGenerator(kpg3);
+                    }
+                });
     }
 
     private static final Map<String, List<Integer>> KEY_SIZES
@@ -287,6 +168,7 @@ public class KeyPairGeneratorTest {
         putKeySize("DSA", 512+64);
         putKeySize("DSA", 1024);
         putKeySize("RSA", 512);
+        putKeySize("RSASSA-PSS", 512);
         putKeySize("DH", 512);
         putKeySize("DH", 512+64);
         putKeySize("DH", 1024);
@@ -428,13 +310,17 @@ public class KeyPairGeneratorTest {
         byte[] encoded = k.getEncoded();
 
         String keyAlgo = k.getAlgorithm();
-        for (Provider p : providers) {
+        for (Provider p : Security.getProviders()) {
             Set<Provider.Service> services = p.getServices();
             for (Provider.Service service : services) {
                 if (!"KeyFactory".equals(service.getType())) {
                     continue;
                 }
                 if (!service.getAlgorithm().equals(keyAlgo)) {
+                    continue;
+                }
+                if (p.getName().equalsIgnoreCase("AndroidKeyStore")) {
+                    // AndroidKeyStore only works with its own keys
                     continue;
                 }
                 if ("EC".equals(k.getAlgorithm())
@@ -554,38 +440,29 @@ public class KeyPairGeneratorTest {
     public void testDSAGeneratorWithParams() throws Exception {
         final DSAParameterSpec dsaSpec = new DSAParameterSpec(DSA_P, DSA_Q, DSA_G);
 
-        final Provider[] providers = Security.getProviders();
-        for (final Provider p : providers) {
-            Service s = p.getService("KeyPairGenerator", "DSA");
-            if (s == null) {
-                continue;
+        ServiceTester.test("KeyPairGenerator").withAlgorithm("DSA").run(new ServiceTester.Test() {
+            @Override
+            public void test(Provider p, String algorithm) throws Exception {
+                final KeyPairGenerator kpg = KeyPairGenerator.getInstance("DSA", p);
+                kpg.initialize(dsaSpec);
+                KeyPair pair = kpg.generateKeyPair();
+                DSAPrivateKey privKey = (DSAPrivateKey) pair.getPrivate();
+                DSAPublicKey pubKey = (DSAPublicKey) pair.getPublic();
+
+                DSAParams actualParams = privKey.getParams();
+                assertNotNull("DSA params should not be null", actualParams);
+
+                assertEquals("DSA P should be the same as supplied", DSA_P, actualParams.getP());
+                assertEquals("DSA Q should be the same as supplied", DSA_Q, actualParams.getQ());
+                assertEquals("DSA G should be the same as supplied", DSA_G, actualParams.getG());
+
+                actualParams = pubKey.getParams();
+                assertNotNull("DSA params should not be null", actualParams);
+
+                assertEquals("DSA P should be the same as supplied", DSA_P, actualParams.getP());
+                assertEquals("DSA Q should be the same as supplied", DSA_Q, actualParams.getQ());
+                assertEquals("DSA G should be the same as supplied", DSA_G, actualParams.getG());
             }
-
-            final KeyPairGenerator kpg = KeyPairGenerator.getInstance("DSA", p);
-            kpg.initialize(dsaSpec);
-            KeyPair pair = kpg.generateKeyPair();
-            DSAPrivateKey privKey = (DSAPrivateKey) pair.getPrivate();
-            DSAPublicKey pubKey = (DSAPublicKey) pair.getPublic();
-
-            DSAParams actualParams = privKey.getParams();
-            assertNotNull("DSA params should not be null", actualParams);
-
-            assertEquals("DSA P should be the same as supplied with provider " + p.getName(),
-                    DSA_P, actualParams.getP());
-            assertEquals("DSA Q should be the same as supplied with provider " + p.getName(),
-                    DSA_Q, actualParams.getQ());
-            assertEquals("DSA G should be the same as supplied with provider " + p.getName(),
-                    DSA_G, actualParams.getG());
-
-            actualParams = pubKey.getParams();
-            assertNotNull("DSA params should not be null", actualParams);
-
-            assertEquals("DSA P should be the same as supplied with provider " + p.getName(),
-                    DSA_P, actualParams.getP());
-            assertEquals("DSA Q should be the same as supplied with provider " + p.getName(),
-                    DSA_Q, actualParams.getQ());
-            assertEquals("DSA G should be the same as supplied with provider " + p.getName(),
-                    DSA_G, actualParams.getG());
-        }
+        });
     }
 }

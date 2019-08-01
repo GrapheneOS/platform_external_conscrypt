@@ -16,19 +16,17 @@
  */
 package com.android.org.conscrypt.java.security;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
-import java.security.AlgorithmParameters;
-import java.security.NoSuchAlgorithmException;
-import java.security.Provider;
-import java.security.Security;
-import java.util.Arrays;
-import javax.crypto.spec.IvParameterSpec;
 import com.android.org.conscrypt.TestUtils;
+import java.security.AlgorithmParameters;
+import java.security.Provider;
+import javax.crypto.spec.IvParameterSpec;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import tests.util.ServiceTester;
 
 /**
  * @hide This class is not part of the Android public SDK API
@@ -51,25 +49,22 @@ public class AlgorithmParametersTestDES extends AbstractAlgorithmParametersTest 
 
     @Test
     public void testEncoding() throws Exception {
-        for (Provider p : Security.getProviders()) {
-            AlgorithmParameters params;
-            try {
-                params = AlgorithmParameters.getInstance("DES", p);
-            } catch (NoSuchAlgorithmException e) {
-                // This provider doesn't support DES, ignore
-                continue;
-            }
+        ServiceTester.test("AlgorithmParameters")
+                .withAlgorithm("DES")
+                .run(new ServiceTester.Test() {
+                    @Override
+                    public void test(Provider p, String algorithm) throws Exception {
+                        AlgorithmParameters params = AlgorithmParameters.getInstance("DES", p);
 
-            params.init(new IvParameterSpec(parameterData));
-            assertEquals("Provider: " + p.getName(),
-                    ENCODED_DATA, TestUtils.encodeBase64(params.getEncoded()));
+                        params.init(new IvParameterSpec(parameterData));
+                        assertEquals(ENCODED_DATA, TestUtils.encodeBase64(params.getEncoded()));
 
-            params = AlgorithmParameters.getInstance("DES", p);
-            params.init(TestUtils.decodeBase64(ENCODED_DATA));
-            assertTrue("Provider: " + p.getName(),
-                    Arrays.equals(parameterData,
-                            params.getParameterSpec(IvParameterSpec.class).getIV()));
-        }
+                        params = AlgorithmParameters.getInstance("DES", p);
+                        params.init(TestUtils.decodeBase64(ENCODED_DATA));
+                        assertArrayEquals(parameterData,
+                                params.getParameterSpec(IvParameterSpec.class).getIV());
+                    }
+                });
     }
 
 }

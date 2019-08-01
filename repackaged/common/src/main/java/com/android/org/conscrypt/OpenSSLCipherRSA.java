@@ -49,9 +49,12 @@ import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
 import javax.crypto.spec.SecretKeySpec;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 @libcore.api.IntraCoreApi
 @Internal
-abstract class OpenSSLCipherRSA extends CipherSpi {
+public abstract class OpenSSLCipherRSA extends CipherSpi {
     /**
      * The current OpenSSL key we're operating on.
      */
@@ -437,8 +440,11 @@ abstract class OpenSSLCipherRSA extends CipherSpi {
         }
     }
 
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
     @libcore.api.IntraCoreApi
-    static class OAEP extends OpenSSLCipherRSA {
+    public static class OAEP extends OpenSSLCipherRSA {
         private long oaepMd;
         private int oaepMdSizeBytes;
 
