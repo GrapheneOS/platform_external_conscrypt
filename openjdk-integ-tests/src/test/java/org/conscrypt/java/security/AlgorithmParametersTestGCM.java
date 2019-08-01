@@ -15,22 +15,41 @@
  */
 package org.conscrypt.java.security;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import dalvik.system.VMRuntime;
 import java.security.AlgorithmParameters;
-import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
-import java.security.Security;
-import java.util.Arrays;
 import javax.crypto.spec.GCMParameterSpec;
 import org.conscrypt.TestUtils;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import sun.security.jca.Providers;
+import tests.util.ServiceTester;
 
 @RunWith(JUnit4.class)
 public class AlgorithmParametersTestGCM extends AbstractAlgorithmParametersTest {
+
+    // BEGIN Android-Added: Allow access to deprecated BC algorithms.
+    // Allow access to deprecated BC algorithms in this test, so we can ensure they
+    // continue to work
+    @BeforeClass
+    public static void enableDeprecatedAlgorithms() {
+        Providers.setMaximumAllowableApiLevelForBcDeprecation(
+            VMRuntime.getRuntime().getTargetSdkVersion());
+    }
+
+    @AfterClass
+    public static void restoreDeprecatedAlgorithms() {
+        Providers.setMaximumAllowableApiLevelForBcDeprecation(
+            Providers.DEFAULT_MAXIMUM_ALLOWABLE_TARGET_API_LEVEL_FOR_BC_DEPRECATION);
+    }
+    // END Android-Added: Allow access to deprecated BC algorithms.
 
     private static final byte[] IV = new byte[] {
         (byte) 0x04, (byte) 0x08, (byte) 0x68, (byte) 0xC8,
@@ -61,38 +80,36 @@ public class AlgorithmParametersTestGCM extends AbstractAlgorithmParametersTest 
 
     @Test
     public void testEncoding() throws Exception {
-        for (Provider p : Security.getProviders()) {
-            AlgorithmParameters params;
-            try {
-                params = AlgorithmParameters.getInstance("GCM", p);
-            } catch (NoSuchAlgorithmException e) {
-                // This provider doesn't support AES/GCM, ignore
-                continue;
-            }
+        ServiceTester.test("AlgorithmParameters")
+            .withAlgorithm("GCM")
+            .run(new ServiceTester.Test() {
+                @Override
+                public void test(Provider p, String algorithm) throws Exception {
+                    AlgorithmParameters params = AlgorithmParameters.getInstance("GCM", p);
 
-            params.init(new GCMParameterSpec(TLEN, IV));
-            String encoded = TestUtils.encodeBase64(params.getEncoded());
-            assertTrue("Provider: " + p.getName() + ", encoded: " + encoded,
-                    encoded.equals(ENCODED_DATA_TLEN) || encoded.equals(ENCODED_DATA_NO_TLEN));
+                    params.init(new GCMParameterSpec(TLEN, IV));
+                    String encoded = TestUtils.encodeBase64(params.getEncoded());
+                    assertTrue("Encoded: " + encoded,
+                        encoded.equals(ENCODED_DATA_TLEN) || encoded.equals(ENCODED_DATA_NO_TLEN));
 
-            params = AlgorithmParameters.getInstance("GCM", p);
-            params.init(TestUtils.decodeBase64(ENCODED_DATA_NO_TLEN));
-            GCMParameterSpec spec = params.getParameterSpec(GCMParameterSpec.class);
-            if (!p.getName().equals("SunJCE")) {
-                assertEquals("Provider: " + p.getName(), TLEN, spec.getTLen());
-            } else {
-                // In some cases the SunJCE provider uses 128 as the default instead of 96
-                assertTrue("Provider: " + p.getName(),
-                        spec.getTLen() == TLEN || spec.getTLen() == SUN_ALT_TLEN);
-            }
-            assertTrue("Provider: " + p.getName(), Arrays.equals(IV, spec.getIV()));
+                    params = AlgorithmParameters.getInstance("GCM", p);
+                    params.init(TestUtils.decodeBase64(ENCODED_DATA_NO_TLEN));
+                    GCMParameterSpec spec = params.getParameterSpec(GCMParameterSpec.class);
+                    if (!p.getName().equals("SunJCE")) {
+                        assertEquals(TLEN, spec.getTLen());
+                    } else {
+                        // In some cases the SunJCE provider uses 128 as the default instead of 96
+                        assertTrue(spec.getTLen() == TLEN || spec.getTLen() == SUN_ALT_TLEN);
+                    }
+                    assertArrayEquals(IV, spec.getIV());
 
-            params = AlgorithmParameters.getInstance("GCM", p);
-            params.init(TestUtils.decodeBase64(ENCODED_DATA_TLEN));
-            spec = params.getParameterSpec(GCMParameterSpec.class);
-            assertEquals("Provider: " + p.getName(), TLEN, spec.getTLen());
-            assertTrue("Provider: " + p.getName(), Arrays.equals(IV, spec.getIV()));
-        }
+                    params = AlgorithmParameters.getInstance("GCM", p);
+                    params.init(TestUtils.decodeBase64(ENCODED_DATA_TLEN));
+                    spec = params.getParameterSpec(GCMParameterSpec.class);
+                    assertEquals(TLEN, spec.getTLen());
+                    assertArrayEquals(IV, spec.getIV());
+                }
+            });
     }
 
 }

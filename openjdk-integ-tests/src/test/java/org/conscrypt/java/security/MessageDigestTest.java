@@ -21,18 +21,19 @@ import static org.junit.Assert.assertEquals;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
-import java.security.Security;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import dalvik.system.VMRuntime;
+import org.conscrypt.TestUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import dalvik.system.VMRuntime;
 import sun.security.jca.Providers;
+import tests.util.ServiceTester;
 
 @RunWith(JUnit4.class)
 public final class MessageDigestTest {
@@ -69,16 +70,10 @@ public final class MessageDigestTest {
 
     @Test
     public void test_getInstance() throws Exception {
-        Provider[] providers = Security.getProviders();
-        for (Provider provider : providers) {
-            Set<Provider.Service> services = provider.getServices();
-            for (Provider.Service service : services) {
-                String type = service.getType();
-                if (!type.equals("MessageDigest")) {
-                    continue;
-                }
-                String algorithm = service.getAlgorithm();
-                try {
+        ServiceTester.test("MessageDigest")
+            .run(new ServiceTester.Test() {
+                @Override
+                public void test(Provider provider, String algorithm) throws Exception {
                     // MessageDigest.getInstance(String)
                     MessageDigest md1 = MessageDigest.getInstance(algorithm);
                     assertEquals(algorithm, md1.getAlgorithm());
@@ -95,12 +90,8 @@ public final class MessageDigestTest {
                     assertEquals(algorithm, md3.getAlgorithm());
                     assertEquals(provider, md3.getProvider());
                     test_MessageDigest(md3);
-                } catch (Exception e) {
-                    throw new Exception("Problem testing MessageDigest." + algorithm
-                            + " from provider " + provider.getName(), e);
                 }
-            }
-        }
+            });
     }
 
     private static final Map<String, Map<String, byte[]>> EXPECTATIONS
@@ -179,6 +170,32 @@ public final class MessageDigestTest {
                                     -1, -125, 24, -46, -121, 126, -20, 47,
                                     99, -71, 49, -67, 71, 65, 122, -127,
                                     -91, 56, 50, 122, -7, 39, -38, 62 });
+        putExpectation("SHA-512/224",
+            INPUT_EMPTY,
+            TestUtils.decodeHex(
+                "6ed0dd02806fa89e25de060c19d3ac86cabb87d6a0ddd05c333b84f4"));
+        putExpectation("SHA-512/256",
+            INPUT_EMPTY,
+            TestUtils.decodeHex(
+                "c672b8d1ef56ed28ab87c3622c5114069bdd3ad7b8f9737498d0c01ecef0967a"));
+        putExpectation("SHA3-224",
+            INPUT_EMPTY,
+            TestUtils.decodeHex(
+                "6b4e03423667dbb73b6e15454f0eb1abd4597f9a1b078e3f5b5a6bc7"));
+        putExpectation("SHA3-256",
+            INPUT_EMPTY,
+            TestUtils.decodeHex(
+                "a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a"));
+        putExpectation("SHA3-384",
+            INPUT_EMPTY,
+            TestUtils.decodeHex(
+                "0c63a75b845e4f7d01107d852e4c2485c51a50aaaa94fc61995e71bbee983a2a"
+                    + "c3713831264adb47fb6bd1e058d5f004"));
+        putExpectation("SHA3-512",
+            INPUT_EMPTY,
+            TestUtils.decodeHex(
+                "a69f73cca23a9ac5c8b567dc185a756e97c982164fe25859e0d1dcc1475c80a6"
+                    + "15b2123af1f5f94c11e3e9402c3ac558f500199d95b6d3e301758586281dcd26"));
 
         // Regression test for a SHA-1 problem with inputs larger than 256 MiB. http://b/4501620
         // In mid-2013 this takes 3 minutes even on the host, so let's not run it on devices.

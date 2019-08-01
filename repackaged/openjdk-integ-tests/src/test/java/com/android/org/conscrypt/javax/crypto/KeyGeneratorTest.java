@@ -20,25 +20,24 @@ package com.android.org.conscrypt.javax.crypto;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import com.android.org.conscrypt.TestUtils;
+import com.android.org.conscrypt.java.security.StandardNames;
+import dalvik.system.VMRuntime;
 import java.security.Provider;
 import java.security.SecureRandom;
-import java.security.Security;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import com.android.org.conscrypt.TestUtils;
-import com.android.org.conscrypt.java.security.StandardNames;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import dalvik.system.VMRuntime;
 import sun.security.jca.Providers;
+import tests.util.ServiceTester;
 
 /**
  * @hide This class is not part of the Android public SDK API
@@ -75,46 +74,34 @@ public class KeyGeneratorTest {
 
     @Test
     public void test_getInstance() throws Exception {
-        Provider[] providers = Security.getProviders();
-        for (Provider provider : providers) {
-            Set<Provider.Service> services = provider.getServices();
-            for (Provider.Service service : services) {
-                String type = service.getType();
-                if (!type.equals("KeyGenerator")) {
-                    continue;
-                }
-
+        ServiceTester
+                .test("KeyGenerator")
                 // Do not test AndroidKeyStore's KeyGenerator. It cannot be initialized without
                 // providing AndroidKeyStore-specific algorithm parameters.
                 // It's OKish not to test AndroidKeyStore's KeyGenerator here because it's tested
                 // by cts/tests/test/keystore.
-                if ("AndroidKeyStore".equals(provider.getName())) {
-                    continue;
-                }
+                .skipProvider("AndroidKeyStore")
+                .run(new ServiceTester.Test() {
+                    @Override
+                    public void test(Provider provider, String algorithm) throws Exception {
+                        // KeyGenerator.getInstance(String)
+                        KeyGenerator kg1 = KeyGenerator.getInstance(algorithm);
+                        assertEquals(algorithm, kg1.getAlgorithm());
+                        test_KeyGenerator(kg1);
 
-                String algorithm = service.getAlgorithm();
-                try {
-                    // KeyGenerator.getInstance(String)
-                    KeyGenerator kg1 = KeyGenerator.getInstance(algorithm);
-                    assertEquals(algorithm, kg1.getAlgorithm());
-                    test_KeyGenerator(kg1);
+                        // KeyGenerator.getInstance(String, Provider)
+                        KeyGenerator kg2 = KeyGenerator.getInstance(algorithm, provider);
+                        assertEquals(algorithm, kg2.getAlgorithm());
+                        assertEquals(provider, kg2.getProvider());
+                        test_KeyGenerator(kg2);
 
-                    // KeyGenerator.getInstance(String, Provider)
-                    KeyGenerator kg2 = KeyGenerator.getInstance(algorithm, provider);
-                    assertEquals(algorithm, kg2.getAlgorithm());
-                    assertEquals(provider, kg2.getProvider());
-                    test_KeyGenerator(kg2);
-
-                    // KeyGenerator.getInstance(String, String)
-                    KeyGenerator kg3 = KeyGenerator.getInstance(algorithm, provider.getName());
-                    assertEquals(algorithm, kg3.getAlgorithm());
-                    assertEquals(provider, kg3.getProvider());
-                    test_KeyGenerator(kg3);
-                } catch (Exception e) {
-                    throw new Exception("Problem testing KeyPairGenerator." + algorithm, e);
-                }
-            }
-        }
+                        // KeyGenerator.getInstance(String, String)
+                        KeyGenerator kg3 = KeyGenerator.getInstance(algorithm, provider.getName());
+                        assertEquals(algorithm, kg3.getAlgorithm());
+                        assertEquals(provider, kg3.getProvider());
+                        test_KeyGenerator(kg3);
+                    }
+                });
     }
 
     private static final Map<String, List<Integer>> KEY_SIZES
