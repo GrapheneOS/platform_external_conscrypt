@@ -1,6 +1,6 @@
 /* GENERATED SOURCE. DO NOT MODIFY. */
 /*
- * Copyright (C) 2009 The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,27 +17,22 @@
 package com.android.org.conscrypt.java.security;
 
 import dalvik.system.VMRuntime;
-import java.security.KeyFactory;
 import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.RSAPrivateKeySpec;
-import java.security.spec.RSAPublicKeySpec;
-import java.security.spec.X509EncodedKeySpec;
+import java.security.spec.ECPrivateKeySpec;
+import java.security.spec.ECPublicKeySpec;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import sun.security.jca.Providers;
+import tests.util.ServiceTester;
 
 /**
  * @hide This class is not part of the Android public SDK API
  */
 @RunWith(JUnit4.class)
-public class KeyFactoryTestRSA extends
-        AbstractKeyFactoryTest<RSAPublicKeySpec, RSAPrivateKeySpec> {
+public class KeyFactoryTestEC extends
+    AbstractKeyFactoryTest<ECPublicKeySpec, ECPrivateKeySpec> {
     // BEGIN Android-Added: Allow access to deprecated BC algorithms.
     // Allow access to deprecated BC algorithms in this test, so we can ensure they
     // continue to work
@@ -54,30 +49,19 @@ public class KeyFactoryTestRSA extends
     }
     // END Android-Added: Allow access to deprecated BC algorithms.
 
-    public KeyFactoryTestRSA() {
-        super("RSA", RSAPublicKeySpec.class, RSAPrivateKeySpec.class);
-    }
+    public KeyFactoryTestEC() {
+        super("EC", ECPublicKeySpec.class, ECPrivateKeySpec.class);
+  }
 
-    @Override
-    protected void check(KeyPair keyPair) throws Exception {
-        new CipherAsymmetricCryptHelper("RSA").test(keyPair);
-    }
+  @Override
+  public ServiceTester customizeTester(ServiceTester tester) {
+    // BC's EC keys always use explicit params, even though it's a bad idea, and we don't support
+    // those, so don't test BC keys
+    return tester.skipProvider("BC");
+  }
 
-    @Test
-    public void testExtraBufferSpace_Private() throws Exception {
-        PrivateKey privateKey = DefaultKeys.getPrivateKey("RSA");
-        byte[] encoded = privateKey.getEncoded();
-        byte[] longBuffer = new byte[encoded.length + 147];
-        System.arraycopy(encoded, 0, longBuffer, 0, encoded.length);
-        KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(longBuffer));
-    }
-
-    @Test
-    public void testExtraBufferSpace_Public() throws Exception {
-        PublicKey publicKey = DefaultKeys.getPublicKey("RSA");
-        byte[] encoded = publicKey.getEncoded();
-        byte[] longBuffer = new byte[encoded.length + 147];
-        System.arraycopy(encoded, 0, longBuffer, 0, encoded.length);
-        KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(longBuffer));
-    }
+  @Override
+  protected void check(KeyPair keyPair) throws Exception {
+    new SignatureHelper("SHA256withECDSA").test(keyPair);
+  }
 }
