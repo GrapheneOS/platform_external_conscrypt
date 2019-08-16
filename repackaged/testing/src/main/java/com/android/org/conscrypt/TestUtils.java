@@ -190,13 +190,14 @@ public final class TestUtils {
             String defaultName = (String) conscryptClass("Platform")
                 .getDeclaredMethod("getDefaultProviderName")
                 .invoke(null);
-            Constructor<?> c = conscryptClass("OpenSSLProvider")
-                .getDeclaredConstructor(String.class, Boolean.TYPE);
+            Constructor<?> c =
+                    conscryptClass("OpenSSLProvider")
+                            .getDeclaredConstructor(String.class, Boolean.TYPE, String.class);
 
             if (!isClassAvailable("javax.net.ssl.X509ExtendedTrustManager")) {
-                return (Provider) c.newInstance(defaultName, false);
+                return (Provider) c.newInstance(defaultName, false, "TLSv1.3");
             } else {
-                return (Provider) c.newInstance(defaultName, true);
+                return (Provider) c.newInstance(defaultName, true, "TLSv1.3");
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
