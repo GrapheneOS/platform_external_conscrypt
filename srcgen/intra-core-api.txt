@@ -1,5 +1,6 @@
 method:com.android.org.conscrypt.DESEDESecretKeyFactory#DESEDESecretKeyFactory()
-method:com.android.org.conscrypt.DefaultSSLContextImpl#DefaultSSLContextImpl()
+method:com.android.org.conscrypt.DefaultSSLContextImpl$TLSv12#TLSv12()
+method:com.android.org.conscrypt.DefaultSSLContextImpl$TLSv13#TLSv13()
 method:com.android.org.conscrypt.ECParameters#ECParameters()
 method:com.android.org.conscrypt.GCMParameters#GCMParameters()
 method:com.android.org.conscrypt.IvParameters$AES#AES()
@@ -92,6 +93,8 @@ method:com.android.org.conscrypt.OpenSSLX509CertificateFactory#OpenSSLX509Certif
 method:com.android.org.conscrypt.PSSParameters#PSSParameters()
 type:com.android.org.conscrypt.DESEDESecretKeyFactory
 type:com.android.org.conscrypt.DefaultSSLContextImpl
+type:com.android.org.conscrypt.DefaultSSLContextImpl$TLSv12
+type:com.android.org.conscrypt.DefaultSSLContextImpl$TLSv13
 type:com.android.org.conscrypt.ECParameters
 type:com.android.org.conscrypt.GCMParameters
 type:com.android.org.conscrypt.IvParameters
