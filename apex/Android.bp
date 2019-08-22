@@ -19,6 +19,11 @@ apex_defaults {
     compile_multilib: "both",
     java_libs: ["conscrypt"],
     native_shared_libs: ["libjavacrypto"],
+    multilib: {
+        both: {
+            binaries: ["boringssl_self_test"],
+        },
+    },
     key: "apex.conscrypt.key",
     certificate: ":com.android.conscrypt.certificate",
 }
