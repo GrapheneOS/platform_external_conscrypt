@@ -254,6 +254,10 @@ java_library {
     // it being installed to /system on Android.
     // TODO(b/124476339): move required back to a top level property
     target: {
+        // boringssl_self_test needed in both /system/bin and /apex/com.android.conscrypt/bin
+        android: {
+            required: ["boringssl_self_test"],
+        },
         hostdex: {
             required: ["libjavacrypto"],
         },
