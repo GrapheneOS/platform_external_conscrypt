@@ -471,6 +471,7 @@ public class SSLSocketTest {
         final SSLSocket referenceClientSocket =
             (SSLSocket) referenceContext.clientContext.getSocketFactory().createSocket();
 
+        final boolean[] wasCalled = new boolean[1];
         TestSSLContext c = TestSSLContext.newBuilder()
             .clientTrustManager(new X509ExtendedTrustManager() {
                 @Override
@@ -489,8 +490,13 @@ public class SSLSocketTest {
                         // By the point of the handshake where we're validating certificates,
                         // the hostname is known and the cipher suite should be agreed
                         assertEquals(referenceContext.host.getHostName(), session.getPeerHost());
-                        assertEquals(referenceClientSocket.getEnabledCipherSuites()[0],
-                            session.getCipherSuite());
+                        String sessionSuite = session.getCipherSuite();
+                        List<String> enabledSuites =
+                                Arrays.asList(referenceClientSocket.getEnabledCipherSuites());
+                        assertTrue("Expected enabled suites to contain " + sessionSuite
+                                        + ", got: " + enabledSuites,
+                                enabledSuites.contains(sessionSuite));
+                        wasCalled[0] = true;
                     } catch (Exception e) {
                         throw new CertificateException("Something broke", e);
                     }
@@ -543,6 +549,7 @@ public class SSLSocketTest {
         client.close();
         server.close();
         c.close();
+        assertTrue(wasCalled[0]);
     }
 
     @Test
