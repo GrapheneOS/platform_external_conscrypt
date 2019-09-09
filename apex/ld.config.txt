@@ -15,6 +15,10 @@ additional.namespaces = platform
 # "conscrypt" namespace in system/core/rootdir/etc/ld.config*.txt and its
 # dependencies "platform" and "runtime".
 
+# TODO(b/139916951): The com.android.runtime paths below are to be able to load
+# libclang_rt.hwasan, which normally resides in the runtime namespace. Depending
+# on where those libraries should live, it should either have a separate
+# "runtime" namespace config, or be part of the platform namespace.
 namespace.default.search.paths       = /apex/com.android.conscrypt/${LIB}
 namespace.default.search.paths      += /apex/com.android.runtime/${LIB}
 namespace.default.asan.search.paths  = /apex/com.android.conscrypt/${LIB}
@@ -36,6 +40,7 @@ namespace.platform.isolated = true
 namespace.platform.search.paths  = /system/${LIB}
 namespace.platform.asan.search.paths  = /data/asan/system/${LIB}
 namespace.platform.links = default
+# TODO(b/139916951): See note for the com.android.runtime paths above.
 namespace.platform.link.default.shared_libs  = libclang_rt.hwasan-aarch64-android.so
 
 # /system/lib/libc.so, etc are symlinks to
