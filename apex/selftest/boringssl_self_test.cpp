@@ -17,8 +17,11 @@
 #include <openssl/crypto.h>
 
 int main(int, char**) {
-    // TODO: This can be removed once boringssl has been updated to perform
-    // a self test in a library constructor.
-    BORINGSSL_self_test();
-    return 0;
+    // If we get here, then libcrypto is either in FIPS mode (in which case
+    // it doesn't run the self test), or the self test has passed. If the
+    // self test ran and failed, then libcrypto will already have abort()ed.
+    if (!FIPS_mode()) {
+        return 1;  // failure
+    }
+    return 0;  // success
 }
