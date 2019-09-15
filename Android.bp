@@ -218,6 +218,7 @@ filegroup {
         "//libcore",
     ],
     srcs: ["publicapi/src/main/java/**/*.java"],
+    path: "publicapi/src/main/java",
 }
 
 // Create the conscrypt library from the source produced by the srcgen/generate_android_src.sh
