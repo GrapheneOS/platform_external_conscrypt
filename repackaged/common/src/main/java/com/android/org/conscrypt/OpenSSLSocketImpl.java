@@ -67,10 +67,13 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
         return super.getHostname();
     }
 
-    @dalvik.annotation.compat.UnsupportedAppUsage
+    @dalvik.annotation.
+    compat.UnsupportedAppUsage(maxTargetSdk = dalvik.system.VersionCodes.Q,
+                  publicAlternatives = "Use {@link javax.net.ssl.SSLParameters#setServerNames}.")
     @libcore.api.CorePlatformApi
     @Override
-    public void setHostname(String hostname) {
+    public void
+    setHostname(String hostname) {
         super.setHostname(hostname);
     }
 
@@ -108,10 +111,14 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
     @Override
     public abstract SSLSession getHandshakeSession();
 
-    @dalvik.annotation.compat.UnsupportedAppUsage
+    @dalvik.annotation.
+    compat.UnsupportedAppUsage(maxTargetSdk = dalvik.system.VersionCodes.Q,
+                  publicAlternatives =
+                          "Use {@link android.net.ssl.SSLSockets#setUseSessionTickets}.")
     @libcore.api.CorePlatformApi
     @Override
-    public abstract void setUseSessionTickets(boolean useSessionTickets);
+    public abstract void
+    setUseSessionTickets(boolean useSessionTickets);
 
     @dalvik.annotation.compat.UnsupportedAppUsage
     @Override
@@ -151,10 +158,13 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
     /**
      * @deprecated use {@link #setApplicationProtocols(String[])} instead.
      */
-    @dalvik.annotation.compat.UnsupportedAppUsage
+    @dalvik.annotation.compat.UnsupportedAppUsage(maxTargetSdk = dalvik.system.VersionCodes.Q,
+            publicAlternatives =
+                    "Use {@link javax.net.ssl.SSLParameters#setApplicationProtocols(java.lang.String[])}.")
     @Override
     @Deprecated
-    public final void setAlpnProtocols(String[] alpnProtocols) {
+    public final void
+    setAlpnProtocols(String[] alpnProtocols) {
         setApplicationProtocols(alpnProtocols == null ? EmptyArray.STRING : alpnProtocols);
     }
 
@@ -162,7 +172,9 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
      * @deprecated use {@link #getApplicationProtocol()} instead.
      */
     @dalvik.annotation.
-    compat.UnsupportedAppUsage
+    compat.UnsupportedAppUsage(maxTargetSdk = dalvik.system.VersionCodes.Q,
+                  publicAlternatives =
+                          "Use {@link javax.net.ssl.SSLSocket#getApplicationProtocol()}.")
     @libcore.api.CorePlatformApi
     @Override
     @Deprecated
@@ -173,11 +185,15 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
     /**
      * @deprecated Use {@link #setAlpnProtocols(String[])} instead.
      */
-    @dalvik.annotation.compat.UnsupportedAppUsage
+    @dalvik.annotation.
+    compat.UnsupportedAppUsage(maxTargetSdk = dalvik.system.VersionCodes.Q,
+                  publicAlternatives =
+                          "Use {@link javax.net.ssl.SSLParameters#setApplicationProtocols(java.lang.String[])}.")
     @libcore.api.CorePlatformApi
     @Override
     @Deprecated
-    public final void setAlpnProtocols(byte[] protocols) {
+    public final void
+    setAlpnProtocols(byte[] protocols) {
         setApplicationProtocols(SSLUtils.decodeProtocols(protocols == null ? EmptyArray.BYTE : protocols));
     }
 }
