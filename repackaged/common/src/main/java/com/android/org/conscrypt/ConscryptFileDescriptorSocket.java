@@ -756,9 +756,11 @@ class ConscryptFileDescriptorSocket extends OpenSSLSocketImpl
      *
      * @param useSessionTickets True to enable session tickets
      */
-    @dalvik.annotation.compat.UnsupportedAppUsage
+    @dalvik.annotation.compat.UnsupportedAppUsage(maxTargetSdk = dalvik.system.VersionCodes.Q,
+            publicAlternatives = "Use {@link android.net.ssl.SSLSockets#setUseSessionTickets}.")
     @Override
-    public final void setUseSessionTickets(boolean useSessionTickets) {
+    public final void
+    setUseSessionTickets(boolean useSessionTickets) {
         sslParameters.setUseSessionTickets(useSessionTickets);
     }
 
@@ -768,9 +770,11 @@ class ConscryptFileDescriptorSocket extends OpenSSLSocketImpl
      *
      * @param hostname the desired SNI hostname, or null to disable
      */
-    @dalvik.annotation.compat.UnsupportedAppUsage
+    @dalvik.annotation.compat.UnsupportedAppUsage(maxTargetSdk = dalvik.system.VersionCodes.Q,
+            publicAlternatives = "Use {@link javax.net.ssl.SSLParameters#setServerNames}.")
     @Override
-    public final void setHostname(String hostname) {
+    public final void
+    setHostname(String hostname) {
         sslParameters.setUseSni(hostname != null);
         super.setHostname(hostname);
     }
