@@ -51,7 +51,7 @@ public class KeyFactoryTestEC extends
 
     public KeyFactoryTestEC() {
         super("EC", ECPublicKeySpec.class, ECPrivateKeySpec.class);
-  }
+    }
 
   @Override
   public ServiceTester customizeTester(ServiceTester tester) {
