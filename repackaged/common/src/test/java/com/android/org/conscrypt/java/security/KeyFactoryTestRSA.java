@@ -16,7 +16,6 @@
  */
 package com.android.org.conscrypt.java.security;
 
-import dalvik.system.VMRuntime;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.PrivateKey;
@@ -25,12 +24,12 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import libcore.junit.util.EnableDeprecatedBouncyCastleAlgorithmsRule;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import sun.security.jca.Providers;
 
 /**
  * @hide This class is not part of the Android public SDK API
@@ -42,17 +41,9 @@ public class KeyFactoryTestRSA extends
     // BEGIN Android-Added: Allow access to deprecated BC algorithms.
     // Allow access to deprecated BC algorithms in this test, so we can ensure they
     // continue to work
-    @BeforeClass
-    public static void enableDeprecatedAlgorithms() {
-        Providers.setMaximumAllowableApiLevelForBcDeprecation(
-            VMRuntime.getRuntime().getTargetSdkVersion());
-    }
-
-    @AfterClass
-    public static void restoreDeprecatedAlgorithms() {
-        Providers.setMaximumAllowableApiLevelForBcDeprecation(
-            Providers.DEFAULT_MAXIMUM_ALLOWABLE_TARGET_API_LEVEL_FOR_BC_DEPRECATION);
-    }
+    @ClassRule
+    public static TestRule enableDeprecatedBCAlgorithmsRule =
+            EnableDeprecatedBouncyCastleAlgorithmsRule.getInstance();
     // END Android-Added: Allow access to deprecated BC algorithms.
 
     public KeyFactoryTestRSA() {

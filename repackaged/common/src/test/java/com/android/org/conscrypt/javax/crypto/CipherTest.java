@@ -24,6 +24,10 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import com.android.org.conscrypt.Conscrypt;
+import com.android.org.conscrypt.TestUtils;
+import com.android.org.conscrypt.java.security.StandardNames;
+import com.android.org.conscrypt.java.security.TestKeyStore;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.math.BigInteger;
@@ -70,19 +74,15 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 import javax.crypto.spec.PSource;
 import javax.crypto.spec.SecretKeySpec;
+import libcore.junit.util.EnableDeprecatedBouncyCastleAlgorithmsRule;
 import org.bouncycastle.asn1.x509.KeyUsage;
-import com.android.org.conscrypt.Conscrypt;
-import com.android.org.conscrypt.TestUtils;
-import com.android.org.conscrypt.java.security.StandardNames;
-import com.android.org.conscrypt.java.security.TestKeyStore;
-import org.junit.AfterClass;
 import org.junit.Assume;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import dalvik.system.VMRuntime;
-import sun.security.jca.Providers;
 
 /**
  * @hide This class is not part of the Android public SDK API
@@ -93,17 +93,9 @@ public final class CipherTest {
     // BEGIN Android-Added: Allow access to deprecated BC algorithms.
     // Allow access to deprecated BC algorithms in this test, so we can ensure they
     // continue to work
-    @BeforeClass
-    public static void enableDeprecatedAlgorithms() {
-        Providers.setMaximumAllowableApiLevelForBcDeprecation(
-                VMRuntime.getRuntime().getTargetSdkVersion());
-    }
-
-    @AfterClass
-    public static void restoreDeprecatedAlgorithms() {
-        Providers.setMaximumAllowableApiLevelForBcDeprecation(
-                Providers.DEFAULT_MAXIMUM_ALLOWABLE_TARGET_API_LEVEL_FOR_BC_DEPRECATION);
-    }
+    @ClassRule
+    public static TestRule enableDeprecatedBCAlgorithmsRule =
+            EnableDeprecatedBouncyCastleAlgorithmsRule.getInstance();
     // END Android-Added: Allow access to deprecated BC algorithms.
 
     @BeforeClass
