@@ -215,9 +215,8 @@ java_library {
     // Conscrypt can be updated independently from the other core libraries so it must only depend
     // on public SDK and intra-core APIs.
     sdk_version: "none",
-    libs: ["core.intra.stubs"],
-    patch_module: "java.base",
     system_modules: "core-intra-stubs-system-modules",
+    patch_module: "java.base",
 
     // Workaround for b/124476339: libjavacrypto is required for both APEX and
     // hostdex builds, but adding a top-level required property results in
@@ -352,13 +351,12 @@ java_test {
     ],
 
     sdk_version: "none",
+    system_modules: "core-all-system-modules",
     libs: [
-        "core-all",
         "conscrypt",
         "junit",
         "mockito-target-minus-junit4",
     ],
-    system_modules: "core-all-system-modules",
 
     static_libs: [
         "bouncycastle-unbundled",
@@ -384,8 +382,8 @@ java_test {
         "repackaged/benchmark-android/src/main/java/**/*.java",
     ],
     sdk_version: "none",
+    system_modules: "core-intra-stubs-system-modules",
     libs: [
-        "core-all",
         "conscrypt",
         "junit",
         "bouncycastle-unbundled",
@@ -393,7 +391,6 @@ java_test {
         "bouncycastle-ocsp-unbundled",
         "caliper-api-target",
     ],
-    system_modules: "core-all-system-modules",
 
     javacflags: [
         "-Xmaxwarns 9999999",
