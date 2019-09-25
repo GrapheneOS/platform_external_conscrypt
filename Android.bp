@@ -156,41 +156,10 @@ cc_binary_host {
 }
 
 genrule {
-    name: "conscrypt-nojarjar_generated_constants",
+    name: "conscrypt-unbundled_generated_constants",
     out: ["org/conscrypt/NativeConstants.java"],
     cmd: "$(location conscrypt_generate_constants) > $(out)",
     tools: ["conscrypt_generate_constants"],
-}
-
-// Create the conscrypt library without jarjar for tests
-java_library {
-    name: "conscrypt-nojarjar",
-    visibility: [
-        "//build/make/tools/signapk",
-    ],
-    host_supported: true,
-    hostdex: true,
-
-    srcs: [
-        "common/src/main/java/**/*.java",
-        ":conscrypt-nojarjar_generated_constants",
-    ],
-
-    sdk_version: "none",
-    system_modules: "core-all-system-modules",
-    target: {
-        android: {
-            srcs: ["platform/src/main/java/**/*.java"],
-            libs: ["core-all"],
-        },
-        host: {
-            srcs: ["openjdk/src/main/java/**/*.java"],
-            javacflags: ["-XDignore.symbol.file"],
-        },
-    },
-
-    required: ["libjavacrypto"],
-    java_version: "1.7",
 }
 
 genrule {
@@ -324,29 +293,20 @@ cc_library_shared {
     },
 }
 
-// Unbundled Conscrypt jar
-java_library {
-    name: "conscrypt_unbundled",
-
+// Unbundled Conscrypt jar for use by signapk tool
+//
+// Builds against standard host libraries.
+java_library_host {
+    name: "conscrypt-unbundled",
+    visibility: [
+        "//build/make/tools/signapk",
+    ],
     srcs: [
         "common/src/main/java/**/*.java",
-        "android/src/main/java/**/*.java",
-        ":conscrypt-nojarjar_generated_constants",
+        "openjdk/src/main/java/**/*.java",
+        ":conscrypt-unbundled_generated_constants",
     ],
-
-    libs: ["conscrypt-stubs"],
-
-    sdk_version: "current",
-    java_version: "1.7",
-}
-
-// Stub library for unbundled builds
-java_library {
-    name: "conscrypt-stubs",
-
-    srcs: ["android-stub/src/main/java/**/*.java"],
-
-    sdk_version: "current",
+    javacflags: ["-XDignore.symbol.file"],
     java_version: "1.7",
 }
 
