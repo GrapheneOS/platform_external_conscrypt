@@ -90,7 +90,7 @@ cc_defaults {
 
     static_libs: [
         "libssl",
-        "libcrypto",
+        "libcrypto_static",
     ],
 
     sdk_version: "9",
@@ -118,7 +118,7 @@ cc_library_host_shared {
 
     static_libs: [
         "libssl",
-        "libcrypto",
+        "libcrypto_static",
     ],
 
     // TODO: b/26097626. ASAN breaks use of this library in JVM.
@@ -324,7 +324,7 @@ cc_library_static {
 
     static_libs: [
         "libssl",
-        "libcrypto",
+        "libcrypto_static",
     ],
     sdk_version: "9",
     stl: "c++_shared",
