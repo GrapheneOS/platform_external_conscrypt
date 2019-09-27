@@ -340,14 +340,13 @@ java_test {
     srcs: [
         "repackaged/platform/src/test/java/**/*.java",
         "repackaged/common/src/test/java/**/*.java",
-        "repackaged/openjdk-integ-tests/src/test/java/**/*.java",
         "repackaged/testing/src/main/java/**/*.java",
         "publicapi/src/test/java/**/*.java",
     ],
     java_resource_dirs: [
         // Resource directories do not need repackaging.
         "openjdk/src/test/resources",
-        "openjdk-integ-tests/src/test/resources",
+        "common/src/test/resources",
     ],
 
     sdk_version: "none",
