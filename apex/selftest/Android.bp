@@ -42,4 +42,5 @@ cc_binary {
     defaults: ["boringssl_self_test_defaults"],
     stem: "boringssl_self_test",
     vendor: true,
+    init_rc: ["boringssl_self_test.rc"],
 }
