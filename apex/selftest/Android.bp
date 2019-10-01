@@ -12,10 +12,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
-cc_binary {
-    name: "boringssl_self_test",
+cc_defaults {
+    name: "boringssl_self_test_defaults",
     compile_multilib: "both",
     multilib: {
         lib32: {
@@ -31,4 +30,16 @@ cc_binary {
     srcs: [
         "boringssl_self_test.cpp",
     ],
+}
+
+cc_binary {
+    name: "boringssl_self_test",
+    defaults: ["boringssl_self_test_defaults"],
+}
+
+cc_binary {
+    name: "boringssl_self_test_vendor",
+    defaults: ["boringssl_self_test_defaults"],
+    stem: "boringssl_self_test",
+    vendor: true,
 }
