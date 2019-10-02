@@ -172,7 +172,7 @@ genrule {
 filegroup {
     name: "conscrypt_java_files",
     visibility: [
-        "//libcore",
+        "//libcore:__subpackages__",
     ],
     srcs: [
         "repackaged/common/src/main/java/**/*.java",
