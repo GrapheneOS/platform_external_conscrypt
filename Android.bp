@@ -350,9 +350,10 @@ java_test {
     ],
 
     sdk_version: "none",
-    system_modules: "core-all-system-modules",
+    system_modules: "core-intra-stubs-system-modules",
     libs: [
         "conscrypt",
+        "core-test-rules",
         "junit",
         "mockito-target-minus-junit4",
     ],

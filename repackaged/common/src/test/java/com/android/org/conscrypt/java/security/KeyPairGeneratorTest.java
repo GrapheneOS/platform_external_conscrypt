@@ -21,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import com.android.org.conscrypt.TestUtils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
@@ -54,17 +55,12 @@ import java.util.Set;
 import javax.crypto.interfaces.DHPrivateKey;
 import javax.crypto.interfaces.DHPublicKey;
 import javax.crypto.spec.DHParameterSpec;
-import com.android.org.conscrypt.TestUtils;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import libcore.junit.util.EnableDeprecatedBouncyCastleAlgorithmsRule;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import dalvik.system.VMRuntime;
-import sun.security.jca.Providers;
-import org.junit.Test;
 import tests.util.ServiceTester;
 
 /**
@@ -76,17 +72,9 @@ public class KeyPairGeneratorTest {
     // BEGIN Android-Added: Allow access to deprecated BC algorithms.
     // Allow access to deprecated BC algorithms in this test, so we can ensure they
     // continue to work
-    @BeforeClass
-    public static void enableDeprecatedAlgorithms() {
-        Providers.setMaximumAllowableApiLevelForBcDeprecation(
-                VMRuntime.getRuntime().getTargetSdkVersion());
-    }
-
-    @AfterClass
-    public static void restoreDeprecatedAlgorithms() {
-        Providers.setMaximumAllowableApiLevelForBcDeprecation(
-                Providers.DEFAULT_MAXIMUM_ALLOWABLE_TARGET_API_LEVEL_FOR_BC_DEPRECATION);
-    }
+    @ClassRule
+    public static TestRule enableDeprecatedBCAlgorithmsRule =
+            EnableDeprecatedBouncyCastleAlgorithmsRule.getInstance();
     // END Android-Added: Allow access to deprecated BC algorithms.
 
     @Test

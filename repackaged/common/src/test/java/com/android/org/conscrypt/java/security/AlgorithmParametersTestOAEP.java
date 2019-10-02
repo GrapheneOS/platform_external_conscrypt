@@ -19,20 +19,19 @@ package com.android.org.conscrypt.java.security;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-import dalvik.system.VMRuntime;
+import com.android.org.conscrypt.TestUtils;
 import java.security.AlgorithmParameters;
 import java.security.Provider;
 import java.security.spec.MGF1ParameterSpec;
 import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
 import javax.crypto.spec.PSource.PSpecified;
-import com.android.org.conscrypt.TestUtils;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import libcore.junit.util.EnableDeprecatedBouncyCastleAlgorithmsRule;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import sun.security.jca.Providers;
 import tests.util.ServiceTester;
 
 /**
@@ -44,17 +43,9 @@ public class AlgorithmParametersTestOAEP extends AbstractAlgorithmParametersTest
     // BEGIN Android-Added: Allow access to deprecated BC algorithms.
     // Allow access to deprecated BC algorithms in this test, so we can ensure they
     // continue to work
-    @BeforeClass
-    public static void enableDeprecatedAlgorithms() {
-        Providers.setMaximumAllowableApiLevelForBcDeprecation(
-            VMRuntime.getRuntime().getTargetSdkVersion());
-    }
-
-    @AfterClass
-    public static void restoreDeprecatedAlgorithms() {
-        Providers.setMaximumAllowableApiLevelForBcDeprecation(
-            Providers.DEFAULT_MAXIMUM_ALLOWABLE_TARGET_API_LEVEL_FOR_BC_DEPRECATION);
-    }
+    @ClassRule
+    public static TestRule enableDeprecatedBCAlgorithmsRule =
+            EnableDeprecatedBouncyCastleAlgorithmsRule.getInstance();
     // END Android-Added: Allow access to deprecated BC algorithms.
 
     // The ASN.1 encoding for OAEP params (specified in RFC 4055 section 4.1) specifies
