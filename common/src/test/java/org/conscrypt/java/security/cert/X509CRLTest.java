@@ -22,7 +22,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import dalvik.system.VMRuntime;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.Provider;
@@ -33,12 +32,12 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import libcore.junit.util.EnableDeprecatedBouncyCastleAlgorithmsRule;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import sun.security.jca.Providers;
 import tests.util.ServiceTester;
 
 @RunWith(JUnit4.class)
@@ -47,17 +46,9 @@ public class X509CRLTest {
     // BEGIN Android-Added: Allow access to deprecated BC algorithms.
     // Allow access to deprecated BC algorithms in this test, so we can ensure they
     // continue to work
-    @BeforeClass
-    public static void enableDeprecatedAlgorithms() {
-        Providers.setMaximumAllowableApiLevelForBcDeprecation(
-            VMRuntime.getRuntime().getTargetSdkVersion());
-    }
-
-    @AfterClass
-    public static void restoreDeprecatedAlgorithms() {
-        Providers.setMaximumAllowableApiLevelForBcDeprecation(
-            Providers.DEFAULT_MAXIMUM_ALLOWABLE_TARGET_API_LEVEL_FOR_BC_DEPRECATION);
-    }
+    @ClassRule
+    public static TestRule enableDeprecatedBCAlgorithmsRule =
+        EnableDeprecatedBouncyCastleAlgorithmsRule.getInstance();
     // END Android-Added: Allow access to deprecated BC algorithms.
 
     private static final String CA_CERT =
