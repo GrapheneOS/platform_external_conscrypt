@@ -215,7 +215,7 @@ java_library {
     // Conscrypt can be updated independently from the other core libraries so it must only depend
     // on public SDK and intra-core APIs.
     sdk_version: "none",
-    system_modules: "core-intra-stubs-system-modules",
+    system_modules: "art-module-intra-core-api-stubs-system-modules",
     patch_module: "java.base",
 
     // Workaround for b/124476339: libjavacrypto is required for both APEX and
@@ -434,7 +434,7 @@ java_test {
     ],
 
     sdk_version: "none",
-    system_modules: "core-intra-stubs-system-modules",
+    system_modules: "art-module-intra-core-api-stubs-system-modules",
     libs: [
         "conscrypt",
         "core-test-rules",
@@ -466,7 +466,7 @@ java_test {
         "repackaged/benchmark-android/src/main/java/**/*.java",
     ],
     sdk_version: "none",
-    system_modules: "core-intra-stubs-system-modules",
+    system_modules: "art-module-intra-core-api-stubs-system-modules",
     libs: [
         "conscrypt",
         "junit",
