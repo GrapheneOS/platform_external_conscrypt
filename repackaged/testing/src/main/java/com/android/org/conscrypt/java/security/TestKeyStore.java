@@ -197,6 +197,10 @@ public final class TestKeyStore {
         }
     }
 
+    public TestKeyStore copy() {
+        return new TestKeyStore(keyStore, storePassword, keyPassword);
+    }
+
     /**
      * Lazily create shared test certificates.
      */
