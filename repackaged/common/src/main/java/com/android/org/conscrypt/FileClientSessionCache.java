@@ -17,6 +17,7 @@
 
 package com.android.org.conscrypt;
 
+import com.android.org.conscrypt.io.IoUtils;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -176,12 +177,7 @@ public final class FileClientSessionCache {
                 logReadError(host, file, e);
                 return null;
             } finally {
-                if (in != null) {
-                    try {
-                        in.close();
-                    } catch (Exception ignored) {
-                    }
-                }
+                IoUtils.closeQuietly(in);
             }
         }
 

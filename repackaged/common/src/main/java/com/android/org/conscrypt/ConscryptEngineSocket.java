@@ -17,13 +17,14 @@
 
 package com.android.org.conscrypt;
 
-import static javax.net.ssl.SSLEngineResult.Status.OK;
 import static com.android.org.conscrypt.SSLUtils.EngineStates.STATE_CLOSED;
 import static com.android.org.conscrypt.SSLUtils.EngineStates.STATE_HANDSHAKE_COMPLETED;
 import static com.android.org.conscrypt.SSLUtils.EngineStates.STATE_HANDSHAKE_STARTED;
 import static com.android.org.conscrypt.SSLUtils.EngineStates.STATE_NEW;
 import static com.android.org.conscrypt.SSLUtils.EngineStates.STATE_READY;
 import static com.android.org.conscrypt.SSLUtils.EngineStates.STATE_READY_HANDSHAKE_CUT_THROUGH;
+import static javax.net.ssl.SSLEngineResult.Status.CLOSED;
+import static javax.net.ssl.SSLEngineResult.Status.OK;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -616,14 +617,13 @@ class ConscryptEngineSocket extends OpenSSLSocketImpl {
             init();
 
             // Need to loop through at least once to enable handshaking where no application
-            // bytes are
-            // processed.
+            // bytes are processed.
             int len = buffer.remaining();
             SSLEngineResult engineResult;
             do {
                 target.clear();
                 engineResult = engine.wrap(buffer, target);
-                if (engineResult.getStatus() != OK) {
+                if (engineResult.getStatus() != OK && engineResult.getStatus() != CLOSED) {
                     throw new SSLException("Unexpected engine result " + engineResult.getStatus());
                 }
                 if (target.position() != engineResult.bytesProduced()) {
