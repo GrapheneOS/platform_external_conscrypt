@@ -8,6 +8,7 @@ buildscript {
         // This must be applied in the root project otherwise each subproject will
         // have it in a different ClassLoader.
         classpath android_tools
+        classpath 'biz.aQute.bnd:biz.aQute.bnd.gradle:4.2.0'
     }
 }
 
@@ -43,11 +44,12 @@ subprojects {
     apply plugin: "maven"
     apply plugin: "signing"
     apply plugin: "idea"
+    apply plugin: "jacoco"
     apply plugin: "net.ltgt.errorprone"
 
     group = "org.conscrypt"
     description = 'Conscrypt is an alternate Java Security Provider that uses BoringSSL'
-    version = "2.3.0-SNAPSHOT"
+    version = "2.4.0-SNAPSHOT"
 
     ext {
         os = org.gradle.internal.os.OperatingSystem.current();
@@ -151,6 +153,10 @@ subprojects {
                 signJar(it.file.absolutePath)
             }
         }
+    }
+
+    jacoco {
+        toolVersion = "0.8.4"
     }
 
     task generateProperties(type: WriteProperties) {
