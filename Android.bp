@@ -171,9 +171,6 @@ genrule {
 
 filegroup {
     name: "conscrypt_java_files",
-    visibility: [
-        "//libcore:__subpackages__",
-    ],
     srcs: [
         "repackaged/common/src/main/java/**/*.java",
         "repackaged/platform/src/main/java/**/*.java",
@@ -183,9 +180,6 @@ filegroup {
 
 filegroup {
     name: "conscrypt_public_api_files",
-    visibility: [
-        "//libcore",
-    ],
     srcs: ["publicapi/src/main/java/**/*.java"],
     path: "publicapi/src/main/java",
 }
@@ -309,9 +303,15 @@ java_library {
 
 // Generates stubs for the parts of the public SDK API provided by the conscrypt module.
 //
-// Only for use by conscrypt.module.public.api.stubs target below.
+// For use by conscrypt.module.public.api.stubs target below and also for
+// generating the Android SDK public API stubs and JavaDoc.
 droidstubs {
-    name: "conscrypt-module-public-api-stubs-gen",
+    name: "conscrypt-module-public-api-stubs-source",
+    visibility: [
+        // Allow libcore access to collate the public stubs source for all the
+        // core libraries.
+        "//libcore:__subpackages__",
+    ],
     srcs: [
         ":conscrypt_public_api_files",
     ],
@@ -319,6 +319,9 @@ droidstubs {
     installable: false,
     sdk_version: "none",
     system_modules: "art-module-public-api-stubs-system-modules",
+
+    // Emit nullability annotations from the source to the stub files.
+    args: "--include-annotations",
 }
 
 // A stubs target containing the parts of the public SDK API provided by the conscrypt module.
@@ -327,7 +330,7 @@ java_library {
     visibility: [
         "//libcore",
     ],
-    srcs: [":conscrypt-module-public-api-stubs-gen"],
+    srcs: [":conscrypt-module-public-api-stubs-source"],
     errorprone: {
         javacflags: [
             "-Xep:MissingOverride:OFF",
