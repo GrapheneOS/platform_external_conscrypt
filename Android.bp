@@ -172,7 +172,7 @@ genrule {
 filegroup {
     name: "conscrypt_java_files",
     visibility: [
-        "//libcore",
+        "//libcore:__subpackages__",
     ],
     srcs: [
         "repackaged/common/src/main/java/**/*.java",
@@ -255,6 +255,38 @@ java_library {
     sdk_version: "core_platform",
 
     required: ["libjavacrypto"],
+}
+
+// Generates stubs for the parts of the public SDK API provided by the conscrypt module.
+//
+// Only for use by conscrypt.module.public.api.stubs target below.
+droidstubs {
+    name: "conscrypt-module-public-api-stubs-gen",
+    srcs: [
+        ":conscrypt_public_api_files",
+    ],
+    java_version: "1.9",
+    installable: false,
+    sdk_version: "none",
+    libs: [
+        "art.module.public.api.stubs",
+    ],
+}
+
+// A stubs target containing the parts of the public SDK API provided by the conscrypt module.
+java_library {
+    name: "conscrypt.module.public.api.stubs",
+    visibility: [
+        "//libcore",
+    ],
+    srcs: [":conscrypt-module-public-api-stubs-gen"],
+    errorprone: {
+        javacflags: [
+            "-Xep:MissingOverride:OFF",
+        ],
+    },
+    sdk_version: "none",
+    system_modules: "art-module-public-api-stubs-system-modules",
 }
 
 // Platform conscrypt crypto JNI library
@@ -342,20 +374,20 @@ java_test {
     srcs: [
         "repackaged/platform/src/test/java/**/*.java",
         "repackaged/common/src/test/java/**/*.java",
-        "repackaged/openjdk-integ-tests/src/test/java/**/*.java",
         "repackaged/testing/src/main/java/**/*.java",
         "publicapi/src/test/java/**/*.java",
     ],
     java_resource_dirs: [
         // Resource directories do not need repackaging.
         "openjdk/src/test/resources",
-        "openjdk-integ-tests/src/test/resources",
+        "common/src/test/resources",
     ],
 
     sdk_version: "none",
-    system_modules: "core-all-system-modules",
+    system_modules: "core-intra-stubs-system-modules",
     libs: [
         "conscrypt",
+        "core-test-rules",
         "junit",
         "mockito-target-minus-junit4",
     ],

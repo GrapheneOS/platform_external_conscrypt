@@ -66,7 +66,6 @@ import static com.android.org.conscrypt.SSLUtils.EngineStates.STATE_READY_HANDSH
 import static com.android.org.conscrypt.SSLUtils.calculateOutNetBufSize;
 import static com.android.org.conscrypt.SSLUtils.toSSLHandshakeException;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
@@ -446,6 +445,7 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
                 String logMessage = String.format("ssl_unexpected_ccs: host=%s", getPeerHost());
                 Platform.logEvent(logMessage);
             }
+            closeAll();
             throw SSLUtils.toSSLHandshakeException(e);
         } finally {
             if (releaseResources) {
@@ -880,8 +880,7 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
                                 case -SSL_ERROR_ZERO_RETURN: {
                                     // We received a close_notify from the peer, so mark the
                                     // inbound direction as closed and shut down the SSL object
-                                    closeInbound();
-                                    sendSSLShutdown();
+                                    closeAll();
                                     return new SSLEngineResult(Status.CLOSED,
                                             pendingOutboundEncryptedBytes() > 0
                                                     ? NEED_WRAP : NOT_HANDSHAKING,
@@ -889,7 +888,7 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
                                 }
                                 default: {
                                     // Should never get here.
-                                    sendSSLShutdown();
+                                    closeAll();
                                     throw newSslExceptionWithMessage("SSL_read");
                                 }
                             }
@@ -901,18 +900,12 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
                     // it in the pendingInboundCleartextBytes() call.
                     ssl.forceRead();
                 }
-            } catch (SSLException e) {
-                // Shut down the SSL and rethrow the exception.  Users will need to drain any alerts
-                // from the SSL before closing.
-                sendSSLShutdown();
-                throw convertException(e);
             } catch (InterruptedIOException e) {
                 return newResult(bytesConsumed, bytesProduced, handshakeStatus);
-            } catch (EOFException e) {
-                closeAll();
-                throw convertException(e);
             } catch (IOException e) {
-                sendSSLShutdown();
+                // Shut down the SSL and rethrow the exception.  Users will need to drain any alerts
+                // from the SSL before closing.
+                closeAll();
                 throw convertException(e);
             }
 
@@ -977,13 +970,10 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
                         // SSL_ERROR_NONE.
                     }
                 }
-            } catch (SSLException e) {
+            } catch (IOException e) {
                 // Shut down the SSL and rethrow the exception.  Users will need to drain any alerts
                 // from the SSL before closing.
-                sendSSLShutdown();
-                throw e;
-            } catch (IOException e) {
-                sendSSLShutdown();
+                closeAll();
                 throw e;
             }
 
@@ -1155,6 +1145,7 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
 
             return bytesWritten;
         } catch (IOException e) {
+            closeAll();
             throw new SSLException(e);
         }
     }
@@ -1530,7 +1521,7 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
                                                                 : NEED_WRAP_CLOSED;
                             default:
                                 // Everything else is considered as error
-                                sendSSLShutdown();
+                                closeAll();
                                 throw newSslExceptionWithMessage("SSL_write");
                         }
                     }
@@ -1585,6 +1576,13 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
                 default:
                     // Ignore
             }
+        }
+    }
+
+    @Override
+    public void serverCertificateRequested() throws IOException {
+        synchronized (ssl) {
+            ssl.configureServerCertificate();
         }
     }
 
