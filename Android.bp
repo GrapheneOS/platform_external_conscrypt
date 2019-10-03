@@ -237,6 +237,62 @@ java_library {
     ],
 }
 
+// Generates stub source files for the core platform API of the Conscrypt module.
+// i.e. every class/member that is either in the public API or annotated with
+// @CorePlatformApi.
+//
+// The API specification .txt files managed by this only contain the additional
+// classes/members that are in the intra-core API but which are not in the public
+// API.
+droidstubs {
+    name: "conscrypt-module-platform-api-stubs-source",
+    srcs: [
+        ":conscrypt_java_files",
+    ],
+    sdk_version: "none",
+    libs: [
+        "art.module.platform.api.stubs",
+    ],
+
+    installable: false,
+    args: "--hide-annotation libcore.api.Hide " +
+        "--show-single-annotation libcore.api.CorePlatformApi " +
+        "--skip-annotation-instance-methods=false ",
+
+    api_filename: "api.txt",
+    removed_api_filename: "removed.txt",
+    previous_api: "previous.txt",
+
+    check_api: {
+        current: {
+            api_file: "api/platform/current-api.txt",
+            removed_api_file: "api/platform/current-removed.txt",
+        },
+        last_released: {
+            api_file: "api/platform/last-api.txt",
+            removed_api_file: "api/platform/last-removed.txt",
+        },
+    },
+}
+
+// A library containing the core platform API stubs of the Conscrypt module.
+//
+// Core platform APIs are only intended for use of other parts of the platform, not the
+// core library modules.
+java_library {
+    name: "conscrypt.module.platform.api.stubs",
+    visibility: [
+        "//libcore:__subpackages__",
+    ],
+    srcs: [
+        ":conscrypt-module-platform-api-stubs-source",
+    ],
+    hostdex: true,
+
+    sdk_version: "none",
+    system_modules: "art-module-platform-api-stubs-system-modules",
+}
+
 // A guaranteed unstripped version of conscrypt.
 // The build system may or may not strip the conscrypt jar, but this one will
 // not be stripped. See b/24535627.
