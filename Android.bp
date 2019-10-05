@@ -197,7 +197,6 @@ java_library {
     visibility: [
         "//art/build",
         "//device:__subpackages__",
-        "//external/okhttp",
         "//external/robolectric-shadows",
         "//external/wycheproof",
         "//libcore",
@@ -297,6 +296,7 @@ droidstubs {
     name: "conscrypt-module-intra-core-api-stubs-source",
     srcs: [
         ":conscrypt_java_files",
+        ":conscrypt_public_api_files",
     ],
     sdk_version: "none",
     libs: [
@@ -329,6 +329,7 @@ droidstubs {
 java_library {
     name: "conscrypt.module.intra.core.api.stubs",
     visibility: [
+        "//external/okhttp",
         "//libcore:__subpackages__",
     ],
     srcs: [
