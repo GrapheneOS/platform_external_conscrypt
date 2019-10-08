@@ -198,8 +198,6 @@ java_library {
         "//art/build",
         "//device:__subpackages__",
         "//external/robolectric-shadows",
-        "//external/wycheproof",
-        "//libcore",
         "//system/apex/tests",
         ":__subpackages__",
     ],
@@ -282,6 +280,7 @@ droidstubs {
 java_library {
     name: "conscrypt.module.platform.api.stubs",
     visibility: [
+        "//external/wycheproof",
         "//libcore:__subpackages__",
     ],
     srcs: [
