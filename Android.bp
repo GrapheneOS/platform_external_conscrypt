@@ -248,9 +248,7 @@ droidstubs {
         ":conscrypt_java_files",
     ],
     sdk_version: "none",
-    libs: [
-        "art.module.platform.api.stubs",
-    ],
+    system_modules: "art-module-platform-api-stubs-system-modules",
 
     installable: false,
     args: "--hide-annotation libcore.api.Hide " +
@@ -320,9 +318,7 @@ droidstubs {
     java_version: "1.9",
     installable: false,
     sdk_version: "none",
-    libs: [
-        "art.module.public.api.stubs",
-    ],
+    system_modules: "art-module-public-api-stubs-system-modules",
 }
 
 // A stubs target containing the parts of the public SDK API provided by the conscrypt module.
@@ -354,9 +350,7 @@ droidstubs {
         ":conscrypt_public_api_files",
     ],
     sdk_version: "none",
-    libs: [
-        "art.module.intra.core.api.stubs",
-    ],
+    system_modules: "art-module-intra-core-api-stubs-system-modules",
 
     installable: false,
     args: "--hide-annotation libcore.api.Hide " +
