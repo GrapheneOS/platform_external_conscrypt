@@ -68,7 +68,7 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
     }
 
     @dalvik.annotation.
-    compat.UnsupportedAppUsage(maxTargetSdk = dalvik.system.VersionCodes.Q,
+    compat.UnsupportedAppUsage(maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
                   publicAlternatives = "Use {@link javax.net.ssl.SSLParameters#setServerNames}.")
     @libcore.api.CorePlatformApi
     @Override
@@ -112,7 +112,7 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
     public abstract SSLSession getHandshakeSession();
 
     @dalvik.annotation.
-    compat.UnsupportedAppUsage(maxTargetSdk = dalvik.system.VersionCodes.Q,
+    compat.UnsupportedAppUsage(maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
                   publicAlternatives =
                           "Use {@link android.net.ssl.SSLSockets#setUseSessionTickets}.")
     @libcore.api.CorePlatformApi
@@ -158,7 +158,8 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
     /**
      * @deprecated use {@link #setApplicationProtocols(String[])} instead.
      */
-    @dalvik.annotation.compat.UnsupportedAppUsage(maxTargetSdk = dalvik.system.VersionCodes.Q,
+    @dalvik.annotation.compat.
+    UnsupportedAppUsage(maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
             publicAlternatives =
                     "Use {@link javax.net.ssl.SSLParameters#setApplicationProtocols(java.lang.String[])}.")
     @Override
@@ -172,7 +173,7 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
      * @deprecated use {@link #getApplicationProtocol()} instead.
      */
     @dalvik.annotation.
-    compat.UnsupportedAppUsage(maxTargetSdk = dalvik.system.VersionCodes.Q,
+    compat.UnsupportedAppUsage(maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
                   publicAlternatives =
                           "Use {@link javax.net.ssl.SSLSocket#getApplicationProtocol()}.")
     @libcore.api.CorePlatformApi
@@ -186,7 +187,7 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
      * @deprecated Use {@link #setAlpnProtocols(String[])} instead.
      */
     @dalvik.annotation.
-    compat.UnsupportedAppUsage(maxTargetSdk = dalvik.system.VersionCodes.Q,
+    compat.UnsupportedAppUsage(maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
                   publicAlternatives =
                           "Use {@link javax.net.ssl.SSLParameters#setApplicationProtocols(java.lang.String[])}.")
     @libcore.api.CorePlatformApi
