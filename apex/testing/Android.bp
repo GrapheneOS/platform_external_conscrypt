@@ -19,7 +19,7 @@ apex {
     ],
     defaults: ["com.android.conscrypt-defaults"],
     manifest: "test_apex_manifest.json",
-    file_contexts: "com.android.conscrypt",
+    file_contexts: ":com.android.conscrypt-file_contexts",
     // Test APEX, should never be installed
     installable: false,
 }
