@@ -20,6 +20,5 @@ javadoc {
     options.docletpath = configurations.publicApiDocs.files as List
 }
 
-// Don't include this artifact in the distribution.
-tasks.install.enabled = false
-tasks.uploadArchives.enabled = false;
+// Disable the javadoc task.
+tasks.withType(Javadoc).all { enabled = false }
