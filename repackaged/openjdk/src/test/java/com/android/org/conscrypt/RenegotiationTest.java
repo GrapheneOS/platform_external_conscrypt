@@ -142,7 +142,6 @@ public class RenegotiationTest {
     private static final class Client {
         private final SSLSocket socket;
         private ExecutorService executor;
-        private volatile boolean stopping;
 
         Client(boolean useEngineSocket, int port) {
             try {
@@ -169,7 +168,6 @@ public class RenegotiationTest {
 
         void stop() {
             try {
-                stopping = true;
                 socket.close();
 
                 if (executor != null) {
