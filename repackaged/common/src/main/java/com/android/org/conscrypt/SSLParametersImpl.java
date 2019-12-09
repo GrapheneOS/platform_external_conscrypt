@@ -158,6 +158,7 @@ final class SSLParametersImpl implements Cloneable {
     }
 
     // Copy constructor for the purposes of changing the final fields
+    @SuppressWarnings("deprecation") // for PSKKeyManager
     private SSLParametersImpl(ClientSessionContext clientSessionContext,
             ServerSessionContext serverSessionContext, X509KeyManager x509KeyManager,
             PSKKeyManager pskKeyManager, X509TrustManager x509TrustManager,
@@ -310,6 +311,13 @@ final class SSLParametersImpl implements Cloneable {
      */
     void setApplicationProtocolSelector(ApplicationProtocolSelectorAdapter applicationProtocolSelector) {
         this.applicationProtocolSelector = applicationProtocolSelector;
+    }
+
+    /**
+     * Returns the application protocol (ALPN) selector for this socket.
+     */
+    ApplicationProtocolSelectorAdapter getApplicationProtocolSelector() {
+        return applicationProtocolSelector;
     }
 
     /**
