@@ -64,28 +64,34 @@ public final class MessageDigestTest {
 
     @Test
     public void test_getInstance() throws Exception {
-        ServiceTester.test("MessageDigest")
-            .run(new ServiceTester.Test() {
-                @Override
-                public void test(Provider provider, String algorithm) throws Exception {
-                    // MessageDigest.getInstance(String)
-                    MessageDigest md1 = MessageDigest.getInstance(algorithm);
-                    assertEquals(algorithm, md1.getAlgorithm());
-                    test_MessageDigest(md1);
+        ServiceTester
+                .test("MessageDigest")
+                // Azul Systems's Zulu release of Java 8 apparently backported parts of the JCE
+                // but did not add the actual implementations.
+                .skipRuntimeProviderAlgorithm("Azul Systems, Inc.", "SUN", "SHA-512/256")
+                .skipRuntimeProviderAlgorithm("Azul Systems, Inc.", "SUN", "SHA-512/224")
+                .run(new ServiceTester.Test() {
+                    @Override
+                    public void test(Provider provider, String algorithm) throws Exception {
+                        // MessageDigest.getInstance(String)
+                        MessageDigest md1 = MessageDigest.getInstance(algorithm);
+                        assertEquals(algorithm, md1.getAlgorithm());
+                        test_MessageDigest(md1);
 
-                    // MessageDigest.getInstance(String, Provider)
-                    MessageDigest md2 = MessageDigest.getInstance(algorithm, provider);
-                    assertEquals(algorithm, md2.getAlgorithm());
-                    assertEquals(provider, md2.getProvider());
-                    test_MessageDigest(md2);
+                        // MessageDigest.getInstance(String, Provider)
+                        MessageDigest md2 = MessageDigest.getInstance(algorithm, provider);
+                        assertEquals(algorithm, md2.getAlgorithm());
+                        assertEquals(provider, md2.getProvider());
+                        test_MessageDigest(md2);
 
-                    // MessageDigest.getInstance(String, String)
-                    MessageDigest md3 = MessageDigest.getInstance(algorithm, provider.getName());
-                    assertEquals(algorithm, md3.getAlgorithm());
-                    assertEquals(provider, md3.getProvider());
-                    test_MessageDigest(md3);
-                }
-            });
+                        // MessageDigest.getInstance(String, String)
+                        MessageDigest md3 =
+                                MessageDigest.getInstance(algorithm, provider.getName());
+                        assertEquals(algorithm, md3.getAlgorithm());
+                        assertEquals(provider, md3.getProvider());
+                        test_MessageDigest(md3);
+                    }
+                });
     }
 
     private static final Map<String, Map<String, byte[]>> EXPECTATIONS
