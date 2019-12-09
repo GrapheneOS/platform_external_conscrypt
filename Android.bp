@@ -554,3 +554,13 @@ sdk {
         "conscrypt-module-public-api-stubs-source",
     ],
 }
+
+// Host tools SDK exposed by the Conscrypt module.
+sdk {
+    name: "conscrypt-module-host-sdk",
+    host_supported: true,
+    device_supported: false,
+    java_libs: [
+        "conscrypt-unbundled",
+    ],
+}
