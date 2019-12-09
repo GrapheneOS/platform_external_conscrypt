@@ -712,7 +712,7 @@ final class Platform {
     /**
      * Convert from an opaque AlgorithmParameters to the platform's GCMParameterSpec.
      */
-    @SuppressWarnings("LiteralClassName")
+    @SuppressWarnings({"LiteralClassName", "unchecked"})
     static AlgorithmParameterSpec fromGCMParameters(AlgorithmParameters params) {
         Class<?> gcmSpecClass;
         try {
@@ -749,9 +749,9 @@ final class Platform {
                 return (AlgorithmParameterSpec) constructor.newInstance(tagLenInBits, iv);
             } catch (NoSuchMethodException | InstantiationException | IllegalAccessException
                     | IllegalArgumentException e) {
-                e.printStackTrace();
+                logStackTraceSnippet("Can't find GCMParameterSpec class", e);
             } catch (InvocationTargetException e) {
-                e.getCause().printStackTrace();
+                logStackTraceSnippet("Can't find GCMParameterSpec class", e.getCause());
             }
         }
         return null;

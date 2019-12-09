@@ -434,7 +434,7 @@ public class TrustedCertificateStore implements ConscryptCertStore {
             }
         };
         X500Principal issuer = c.getIssuerX500Principal();
-        Set<X509Certificate> userAddedCerts = findCert(addedDir, issuer, selector, Set.class);
+        Set<X509Certificate> userAddedCerts = findCertSet(addedDir, issuer, selector);
         if (userAddedCerts != null) {
             issuers = userAddedCerts;
         }
@@ -452,7 +452,7 @@ public class TrustedCertificateStore implements ConscryptCertStore {
                 }
             }
         };
-        Set<X509Certificate> systemCerts = findCert(systemDir, issuer, selector, Set.class);
+        Set<X509Certificate> systemCerts = findCertSet(systemDir, issuer, selector);
         if (systemCerts != null) {
             if (issuers != null) {
                 issuers.addAll(systemCerts);
@@ -527,9 +527,15 @@ public class TrustedCertificateStore implements ConscryptCertStore {
         public boolean match(X509Certificate cert);
     }
 
+    @SuppressWarnings("unchecked")
+    private Set<X509Certificate> findCertSet(
+            File dir, X500Principal subject, CertSelector selector) {
+        return (Set<X509Certificate>) findCert(dir, subject, selector, Set.class);
+    }
+
+    @SuppressWarnings("unchecked")
     private <T> T findCert(
             File dir, X500Principal subject, CertSelector selector, Class<T> desiredReturnType) {
-
         Set<X509Certificate> certs = null;
         String hash = hash(subject);
         for (int index = 0; true; index++) {
