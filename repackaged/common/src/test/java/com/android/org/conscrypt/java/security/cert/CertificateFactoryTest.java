@@ -65,8 +65,6 @@ import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.x509.X509V3CertificateGenerator;
-import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -334,7 +332,8 @@ public class CertificateFactoryTest {
             // Bouncy Castle returns null on empty inputs rather than throwing an exception,
             // which technically doesn't satisfy the method contract, but we'll accept it
             assertTrue((c == null) && cf.getProvider().getName().equals("BC"));
-        } catch (CertificateException expected) {
+        } catch (CertificateException maybeExpected) {
+            assertFalse(cf.getProvider().getName().equals("BC"));
         }
 
         try {
@@ -342,9 +341,9 @@ public class CertificateFactoryTest {
             // Bouncy Castle returns null on short inputs rather than throwing an exception,
             // which technically doesn't satisfy the method contract, but we'll accept it
             assertTrue((c == null) && cf.getProvider().getName().equals("BC"));
-        } catch (CertificateException expected) {
+        } catch (CertificateException maybeExpected) {
+            assertFalse(cf.getProvider().getName().equals("BC"));
         }
-
     }
 
     /*
@@ -736,7 +735,8 @@ public class CertificateFactoryTest {
             basicConstraints = new BasicConstraints(false);
         }
 
-        X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
+        org.bouncycastle.x509.X509V3CertificateGenerator certGen =
+                new org.bouncycastle.x509.X509V3CertificateGenerator();
 
         PublicKey pubKey = keyPair.getPublic();
         certGen.setSerialNumber(serial);
@@ -749,7 +749,8 @@ public class CertificateFactoryTest {
 
         if (issuer != null) {
             certGen.addExtension(Extension.authorityKeyIdentifier, false,
-                    new AuthorityKeyIdentifierStructure(issuer.certificate));
+                    new org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure(
+                            issuer.certificate));
         } else {
             certGen.addExtension(Extension.authorityKeyIdentifier, false,
                     new AuthorityKeyIdentifier(generatePublicKeyDigest(pubKey)));
@@ -807,7 +808,8 @@ public class CertificateFactoryTest {
             // Bouncy Castle returns null on empty inputs rather than throwing an exception,
             // which technically doesn't satisfy the method contract, but we'll accept it
             assertTrue((c == null) && cf.getProvider().getName().equals("BC"));
-        } catch (CRLException expected) {
+        } catch (CRLException maybeExpected) {
+            assertFalse(cf.getProvider().getName().equals("BC"));
         }
 
         try {
@@ -815,8 +817,8 @@ public class CertificateFactoryTest {
             // Bouncy Castle returns null on short inputs rather than throwing an exception,
             // which technically doesn't satisfy the method contract, but we'll accept it
             assertTrue((c == null) && cf.getProvider().getName().equals("BC"));
-        } catch (CRLException expected) {
+        } catch (CRLException maybeExpected) {
+            assertFalse(cf.getProvider().getName().equals("BC"));
         }
-
     }
 }
