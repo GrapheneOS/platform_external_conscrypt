@@ -96,47 +96,58 @@ public class SignatureTest {
     // END Android-Added: Allow access to deprecated BC algorithms.
 
     // 20 bytes for DSA
-    private final byte[] DATA = new byte[20];
+    private final byte[] EMPTY_DATA = new byte[20];
 
     @Test
     public void test_getInstance() throws Exception {
-        ServiceTester.test("Signature")
-            // Do not test AndroidKeyStore's Signature. It needs an AndroidKeyStore-specific key.
-            // It's OKish not to test AndroidKeyStore's Signature here because it's tested
-            // by cts/tests/test/keystore.
-            .skipProvider("AndroidKeyStore")
-            .skipProvider("AndroidKeyStoreBCWorkaround")
-            // The SunMSCAPI is very strange, including only supporting its own keys,
-            // so don't test it.
-            .skipProvider("SunMSCAPI")
-            // SunPKCS11-NSS has a problem where failed verifications can leave the
-            // operation open, which results in future init() calls to throw an exception.
-            // This appears to be a problem in the underlying library (see
-            // https://bugs.openjdk.java.net/browse/JDK-8044554), but skip verifying it all
-            // the same.
-            .skipProvider("SunPKCS11-NSS")
-            .run(new ServiceTester.Test() {
-                @Override
-                public void test(Provider provider, String algorithm) throws Exception {
-                    KeyPair kp = keyPair(algorithm);
-                    // Signature.getInstance(String)
-                    Signature sig1 = Signature.getInstance(algorithm);
-                    assertEquals(algorithm, sig1.getAlgorithm());
-                    test_Signature(sig1, kp);
+        ServiceTester
+                .test("Signature")
+                // Do not test AndroidKeyStore's Signature. It needs an AndroidKeyStore-specific
+                // key. It's OKish not to test AndroidKeyStore's Signature here because it's tested
+                // by cts/tests/test/keystore.
+                .skipProvider("AndroidKeyStore")
+                .skipProvider("AndroidKeyStoreBCWorkaround")
+                // The SunMSCAPI is very strange, including only supporting its own keys,
+                // so don't test it.
+                .skipProvider("SunMSCAPI")
+                // SunPKCS11-NSS has a problem where failed verifications can leave the
+                // operation open, which results in future init() calls to throw an exception.
+                // This appears to be a problem in the underlying library (see
+                // https://bugs.openjdk.java.net/browse/JDK-8044554), but skip verifying it all
+                // the same.
+                .skipProvider("SunPKCS11-NSS")
+                // Azul Systems's Zulu release of Java 8 apparently backported parts of the JCE
+                // but did not add the actual implementations.
+                .skipRuntimeProviderAlgorithm(
+                        "Azul Systems, Inc.", "SUN", "NONEwithDSAinP1363Format")
+                .skipRuntimeProviderAlgorithm(
+                        "Azul Systems, Inc.", "SUN", "SHA1withDSAinP1363Format")
+                .skipRuntimeProviderAlgorithm(
+                        "Azul Systems, Inc.", "SUN", "SHA224withDSAinP1363Format")
+                .skipRuntimeProviderAlgorithm(
+                        "Azul Systems, Inc.", "SUN", "SHA256withDSAinP1363Format")
+                .run(new ServiceTester.Test() {
+                    @Override
+                    public void test(Provider provider, String algorithm) throws Exception {
+                        KeyPair kp = keyPair(algorithm);
+                        // Signature.getInstance(String)
+                        Signature sig1 = Signature.getInstance(algorithm);
+                        assertEquals(algorithm, sig1.getAlgorithm());
+                        test_Signature(sig1, kp);
 
-                    // Signature.getInstance(String, Provider)
-                    Signature sig2 = Signature.getInstance(algorithm, provider);
-                    assertEquals(algorithm, sig2.getAlgorithm());
-                    assertEquals(provider, sig2.getProvider());
-                    test_Signature(sig2, kp);
+                        // Signature.getInstance(String, Provider)
+                        Signature sig2 = Signature.getInstance(algorithm, provider);
+                        assertEquals(algorithm, sig2.getAlgorithm());
+                        assertEquals(provider, sig2.getProvider());
+                        test_Signature(sig2, kp);
 
-                    // Signature.getInstance(String, String)
-                    Signature sig3 = Signature.getInstance(algorithm, provider.getName());
-                    assertEquals(algorithm, sig3.getAlgorithm());
-                    assertEquals(provider, sig3.getProvider());
-                    test_Signature(sig3, kp);
-                }
-            });
+                        // Signature.getInstance(String, String)
+                        Signature sig3 = Signature.getInstance(algorithm, provider.getName());
+                        assertEquals(algorithm, sig3.getAlgorithm());
+                        assertEquals(provider, sig3.getProvider());
+                        test_Signature(sig3, kp);
+                    }
+                });
     }
 
     private final Map<String, KeyPair> keypairAlgorithmToInstance
@@ -191,7 +202,7 @@ public class SignatureTest {
         if (params != null) {
             sig.setParameter(params);
         }
-        sig.update(DATA);
+        sig.update(EMPTY_DATA);
         byte[] signature = sig.sign();
         assertNotNull(sig.getAlgorithm(), signature);
         assertTrue(sig.getAlgorithm(), signature.length > 0);
@@ -200,11 +211,11 @@ public class SignatureTest {
         if (params != null) {
             sig.setParameter(params);
         }
-        sig.update(DATA);
+        sig.update(EMPTY_DATA);
         assertTrue(sig.getAlgorithm(), sig.verify(signature));
 
         // After verify, should be reusable as if we are after initVerify
-        sig.update(DATA);
+        sig.update(EMPTY_DATA);
         assertTrue(sig.getAlgorithm(), sig.verify(signature));
 
         /*

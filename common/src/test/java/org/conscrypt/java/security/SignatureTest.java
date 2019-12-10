@@ -92,7 +92,7 @@ public class SignatureTest {
     // END Android-Added: Allow access to deprecated BC algorithms.
 
     // 20 bytes for DSA
-    private final byte[] DATA = new byte[20];
+    private final byte[] EMPTY_DATA = new byte[20];
 
     @Test
     public void test_getInstance() throws Exception {
@@ -111,6 +111,12 @@ public class SignatureTest {
             // https://bugs.openjdk.java.net/browse/JDK-8044554), but skip verifying it all
             // the same.
             .skipProvider("SunPKCS11-NSS")
+            // Azul Systems's Zulu release of Java 8 apparently backported parts of the JCE
+            // but did not add the actual implementations.
+            .skipRuntimeProviderAlgorithm("Azul Systems, Inc.", "SUN", "NONEwithDSAinP1363Format")
+            .skipRuntimeProviderAlgorithm("Azul Systems, Inc.", "SUN", "SHA1withDSAinP1363Format")
+            .skipRuntimeProviderAlgorithm("Azul Systems, Inc.", "SUN", "SHA224withDSAinP1363Format")
+            .skipRuntimeProviderAlgorithm("Azul Systems, Inc.", "SUN", "SHA256withDSAinP1363Format")
             .run(new ServiceTester.Test() {
                 @Override
                 public void test(Provider provider, String algorithm) throws Exception {
@@ -187,7 +193,7 @@ public class SignatureTest {
         if (params != null) {
             sig.setParameter(params);
         }
-        sig.update(DATA);
+        sig.update(EMPTY_DATA);
         byte[] signature = sig.sign();
         assertNotNull(sig.getAlgorithm(), signature);
         assertTrue(sig.getAlgorithm(), signature.length > 0);
@@ -196,11 +202,11 @@ public class SignatureTest {
         if (params != null) {
             sig.setParameter(params);
         }
-        sig.update(DATA);
+        sig.update(EMPTY_DATA);
         assertTrue(sig.getAlgorithm(), sig.verify(signature));
 
         // After verify, should be reusable as if we are after initVerify
-        sig.update(DATA);
+        sig.update(EMPTY_DATA);
         assertTrue(sig.getAlgorithm(), sig.verify(signature));
 
         /*
