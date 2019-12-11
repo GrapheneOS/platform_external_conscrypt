@@ -452,12 +452,17 @@ class ConscryptEngineSocket extends OpenSSLSocketImpl {
             // Close the engine.
             engine.closeInbound();
             engine.closeOutbound();
-            
+
             // Release any resources we're holding
             if (in != null) {
                 in.release();
             }
         }
+    }
+
+    @Override
+    public void setHandshakeTimeout(int handshakeTimeoutMilliseconds) throws SocketException {
+        // Not supported but ignored rather than throwing for compatibility: b/146041327
     }
 
     @Override
