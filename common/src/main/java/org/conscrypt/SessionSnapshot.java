@@ -39,7 +39,6 @@ final class SessionSnapshot implements ConscryptSession {
     private final String cipherSuite;
     private final String protocol;
     private final String peerHost;
-    private final String applicationProtocol;
     private final int peerPort;
 
     SessionSnapshot(ConscryptSession session) {
@@ -54,7 +53,6 @@ final class SessionSnapshot implements ConscryptSession {
         protocol = session.getProtocol();
         peerHost = session.getPeerHost();
         peerPort = session.getPeerPort();
-        applicationProtocol = session.getApplicationProtocol();
     }
 
     @Override
@@ -109,25 +107,25 @@ final class SessionSnapshot implements ConscryptSession {
     @Override
     public void putValue(String s, Object o) {
         throw new UnsupportedOperationException(
-                "All calls to this method should be intercepted by ExternalSession.");
+                "All calls to this method should be intercepted by ProvidedSessionDecorator.");
     }
 
     @Override
     public Object getValue(String s) {
         throw new UnsupportedOperationException(
-                "All calls to this method should be intercepted by ExternalSession.");
+                "All calls to this method should be intercepted by ProvidedSessionDecorator.");
     }
 
     @Override
     public void removeValue(String s) {
         throw new UnsupportedOperationException(
-                "All calls to this method should be intercepted by ExternalSession.");
+                "All calls to this method should be intercepted by ProvidedSessionDecorator.");
     }
 
     @Override
     public String[] getValueNames() {
         throw new UnsupportedOperationException(
-                "All calls to this method should be intercepted by ExternalSession.");
+                "All calls to this method should be intercepted by ProvidedSessionDecorator.");
     }
 
     @Override
@@ -184,10 +182,5 @@ final class SessionSnapshot implements ConscryptSession {
     @Override
     public int getApplicationBufferSize() {
         return NativeConstants.SSL3_RT_MAX_PLAIN_LENGTH;
-    }
-
-    @Override
-    public String getApplicationProtocol() {
-        return applicationProtocol;
     }
 }

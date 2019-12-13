@@ -1126,7 +1126,7 @@ class ConscryptFileDescriptorSocket extends OpenSSLSocketImpl
 
     @Override
     public final String getApplicationProtocol() {
-        return provideSession().getApplicationProtocol();
+        return SSLUtils.toProtocolString(ssl.getApplicationProtocol());
     }
 
     @Override
