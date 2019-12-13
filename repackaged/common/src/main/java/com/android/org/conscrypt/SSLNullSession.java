@@ -77,11 +77,6 @@ final class SSLNullSession implements ConscryptSession, Cloneable {
     }
 
     @Override
-    public String getApplicationProtocol() {
-        return null;
-    }
-
-    @Override
     public String getCipherSuite() {
         return INVALID_CIPHER;
     }
@@ -155,13 +150,13 @@ final class SSLNullSession implements ConscryptSession, Cloneable {
     @Override
     public Object getValue(String name) {
         throw new UnsupportedOperationException(
-                "All calls to this method should be intercepted by ExternalSession.");
+                "All calls to this method should be intercepted by ProvidedSessionDecorator.");
     }
 
     @Override
     public String[] getValueNames() {
         throw new UnsupportedOperationException(
-                "All calls to this method should be intercepted by ExternalSession.");
+                "All calls to this method should be intercepted by ProvidedSessionDecorator.");
     }
 
     @Override
@@ -176,12 +171,12 @@ final class SSLNullSession implements ConscryptSession, Cloneable {
     @Override
     public void putValue(String name, Object value) {
         throw new UnsupportedOperationException(
-                "All calls to this method should be intercepted by ExternalSession.");
+                "All calls to this method should be intercepted by ProvidedSessionDecorator.");
     }
 
     @Override
     public void removeValue(String name) {
         throw new UnsupportedOperationException(
-                "All calls to this method should be intercepted by ExternalSession.");
+                "All calls to this method should be intercepted by ProvidedSessionDecorator.");
     }
 }

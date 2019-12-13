@@ -417,7 +417,6 @@ public class SSLSocketVersionCompatibilityTest {
                         handshakeCompletedListenerCalled.notify();
                     }
                     handshakeCompletedListenerCalled[0] = true;
-                    socket.removeHandshakeCompletedListener(this);
                 } catch (RuntimeException e) {
                     throw e;
                 } catch (Exception e) {
