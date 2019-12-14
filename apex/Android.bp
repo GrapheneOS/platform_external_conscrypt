@@ -26,6 +26,7 @@ apex_defaults {
     },
     key: "apex.conscrypt.key",
     certificate: ":com.android.conscrypt.certificate",
+    legacy_android10_support: true,
 }
 
 filegroup {
