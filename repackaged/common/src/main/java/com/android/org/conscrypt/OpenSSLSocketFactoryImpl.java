@@ -37,12 +37,11 @@ import javax.net.ssl.SSLSocketFactory;
 final class OpenSSLSocketFactoryImpl extends SSLSocketFactory {
     private static boolean useEngineSocketByDefault = SSLUtils.USE_ENGINE_SOCKET_BY_DEFAULT;
 
-    @dalvik.annotation.compat.UnsupportedAppUsage
-    private final SSLParametersImpl sslParameters;
+    @android.compat.annotation.UnsupportedAppUsage private final SSLParametersImpl sslParameters;
     private final IOException instantiationException;
     private boolean useEngineSocket = useEngineSocketByDefault;
 
-    @dalvik.annotation.compat.UnsupportedAppUsage
+    @android.compat.annotation.UnsupportedAppUsage
     OpenSSLSocketFactoryImpl() {
         SSLParametersImpl sslParametersLocal = null;
         IOException instantiationExceptionLocal = null;

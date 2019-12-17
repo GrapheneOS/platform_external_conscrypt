@@ -69,8 +69,7 @@ final class SSLParametersImpl implements Cloneable {
     @SuppressWarnings("deprecation") // PSKKeyManager is deprecated, but in our own package
     private final PSKKeyManager pskKeyManager;
     // source of X.509 certificate based authentication trust decisions or null if not provided
-    @dalvik.annotation.compat.UnsupportedAppUsage
-    private final X509TrustManager x509TrustManager;
+    @android.compat.annotation.UnsupportedAppUsage private final X509TrustManager x509TrustManager;
 
     // protocols enabled for SSL connection
     String[] enabledProtocols;
@@ -195,7 +194,7 @@ final class SSLParametersImpl implements Cloneable {
         this.channelIdEnabled = sslParams.channelIdEnabled;
     }
 
-    @dalvik.annotation.compat.UnsupportedAppUsage
+    @android.compat.annotation.UnsupportedAppUsage
     static SSLParametersImpl getDefault() throws KeyManagementException {
         SSLParametersImpl result = defaultParameters;
         if (result == null) {
@@ -242,7 +241,7 @@ final class SSLParametersImpl implements Cloneable {
     /**
      * @return X.509 trust manager or {@code null} for none.
      */
-    @dalvik.annotation.compat.UnsupportedAppUsage
+    @android.compat.annotation.UnsupportedAppUsage
     X509TrustManager getX509TrustManager() {
         return x509TrustManager;
     }
@@ -281,7 +280,7 @@ final class SSLParametersImpl implements Cloneable {
      * Sets the list of available protocols for use in SSL connection.
      * @throws IllegalArgumentException if {@code protocols == null}
      */
-    @dalvik.annotation.compat.UnsupportedAppUsage
+    @android.compat.annotation.UnsupportedAppUsage
     void setEnabledProtocols(String[] protocols) {
         if (protocols == null) {
             throw new IllegalArgumentException("protocols == null");
@@ -591,9 +590,8 @@ final class SSLParametersImpl implements Cloneable {
     /**
      * Gets the default X.509 trust manager.
      */
-    @dalvik.annotation.compat.UnsupportedAppUsage
-    static X509TrustManager getDefaultX509TrustManager()
-            throws KeyManagementException {
+    @android.compat.annotation.UnsupportedAppUsage
+    static X509TrustManager getDefaultX509TrustManager() throws KeyManagementException {
         X509TrustManager result = defaultX509TrustManager;
         if (result == null) {
             // single-check idiom
