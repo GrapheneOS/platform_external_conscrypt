@@ -59,7 +59,7 @@ public abstract class OpenSSLContextImpl extends SSLContextSpi {
     SSLParametersImpl sslParameters;
 
     /** Allows outside callers to get the preferred SSLContext. */
-    @dalvik.annotation.compat.UnsupportedAppUsage
+    @android.compat.annotation.UnsupportedAppUsage
     static OpenSSLContextImpl getPreferred() {
         return new TLSv13();
     }
@@ -71,7 +71,7 @@ public abstract class OpenSSLContextImpl extends SSLContextSpi {
     }
 
     // BEGIN Android-added: Restore missing constructor that is used by apps
-    @dalvik.annotation.compat.UnsupportedAppUsage
+    @android.compat.annotation.UnsupportedAppUsage
     private OpenSSLContextImpl() throws GeneralSecurityException, IOException {
         this(NativeCrypto.TLSV13_PROTOCOLS, true);
     }
@@ -184,9 +184,10 @@ public abstract class OpenSSLContextImpl extends SSLContextSpi {
      */
     @libcore.api.IntraCoreApi
     public static final class TLSv12 extends OpenSSLContextImpl {
-        @dalvik.annotation.compat.UnsupportedAppUsage
-        @libcore.api.IntraCoreApi
-        public TLSv12() {
+        @android.compat.annotation
+                .UnsupportedAppUsage
+                @libcore.api.IntraCoreApi
+                public TLSv12() {
             super(NativeCrypto.TLSV12_PROTOCOLS);
         }
     }
