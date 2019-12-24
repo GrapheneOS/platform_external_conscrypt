@@ -235,54 +235,45 @@ java_library {
     ],
 }
 
-// Generates stub source files for the core platform API of the Conscrypt module.
-// i.e. every class/member that is either in the public API or annotated with
-// @CorePlatformApi.
-//
-// The API specification .txt files managed by this only contain the additional
-// classes/members that are in the intra-core API but which are not in the public
-// API.
-droidstubs {
-    name: "conscrypt-module-platform-api-stubs-source",
+// Referenced implicitly from conscrypt.module.platform.api.
+filegroup {
+    name: "conscrypt.module.platform.api.api.public.latest",
     srcs: [
-        ":conscrypt_java_files",
+        "api/platform/last-api.txt",
     ],
-    sdk_version: "none",
-    system_modules: "art-module-platform-api-stubs-system-modules",
+}
 
-    installable: false,
-    args: "--hide-annotation libcore.api.Hide " +
-        "--show-single-annotation libcore.api.CorePlatformApi " +
-        "--skip-annotation-instance-methods=false ",
-
-    api_filename: "api.txt",
-    removed_api_filename: "removed.txt",
-    previous_api: "previous.txt",
-
-    check_api: {
-        current: {
-            api_file: "api/platform/current-api.txt",
-            removed_api_file: "api/platform/current-removed.txt",
-        },
-        last_released: {
-            api_file: "api/platform/last-api.txt",
-            removed_api_file: "api/platform/last-removed.txt",
-        },
-    },
+// Referenced implicitly from conscrypt.module.platform.api.
+filegroup {
+    name: "conscrypt.module.platform.api-removed.api.public.latest",
+    srcs: [
+        "api/platform/last-removed.txt",
+    ],
 }
 
 // A library containing the core platform API stubs of the Conscrypt module.
 //
 // Core platform APIs are only intended for use of other parts of the platform, not the
 // core library modules.
-java_library {
-    name: "conscrypt.module.platform.api.stubs",
+//
+// The API specification .txt files managed by this only contain the additional
+// classes/members that are in the platform API but which are not in the public
+// API.
+java_sdk_library {
+    name: "conscrypt.module.platform.api",
     visibility: [
         "//external/wycheproof",
         "//libcore:__subpackages__",
     ],
     srcs: [
-        ":conscrypt-module-platform-api-stubs-source",
+        ":conscrypt_java_files",
+    ],
+    api_dir: "api/platform",
+    api_only: true,
+    droiddoc_options: [
+        "--hide-annotation libcore.api.Hide",
+        "--show-single-annotation libcore.api.CorePlatformApi",
+        "--skip-annotation-instance-methods=false",
     ],
     hostdex: true,
 
