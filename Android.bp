@@ -574,9 +574,9 @@ sdk {
     ],
 }
 
-// Host tools SDK exposed by the Conscrypt module.
-sdk {
-    name: "conscrypt-module-host-sdk",
+// Host tools exported by the Conscrypt module.
+module_exports {
+    name: "conscrypt-module-host-exports",
     host_supported: true,
     device_supported: false,
     java_libs: [
