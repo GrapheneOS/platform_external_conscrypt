@@ -585,3 +585,18 @@ module_exports {
         "conscrypt-unbundled",
     ],
 }
+
+// Test libraries exposed by the Conscrypt module.
+module_exports {
+    name: "conscrypt-module-test-exports",
+    java_libs: [
+        // For use by robolectric.
+        "conscrypt",
+        // For use by art tests
+        "conscrypt-testdex",
+    ],
+    java_tests: [
+        // For use by CTS
+        "conscrypt-tests",
+    ],
+}
