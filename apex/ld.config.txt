@@ -17,6 +17,8 @@ additional.namespaces = platform
 
 namespace.default.search.paths      = /apex/com.android.conscrypt/${LIB}
 namespace.default.asan.search.paths = /apex/com.android.conscrypt/${LIB}
+namespace.default.permitted.paths = /system/${LIB}
+namespace.default.asan.permitted.paths = /system/${LIB}
 namespace.default.links = platform
 namespace.default.link.platform.shared_libs  = libc.so
 namespace.default.link.platform.shared_libs += libm.so
