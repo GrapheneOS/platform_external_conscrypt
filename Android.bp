@@ -474,6 +474,7 @@ java_test {
     name: "conscrypt-tests",
     visibility: [
         "//cts/tests/libcore/luni",
+        "//external/conscrypt/apex/tests",
     ],
     hostdex: true,
     srcs: [
