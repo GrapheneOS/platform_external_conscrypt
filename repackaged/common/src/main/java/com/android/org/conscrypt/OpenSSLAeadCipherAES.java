@@ -27,7 +27,6 @@ import java.security.spec.InvalidParameterSpecException;
 /**
  * @hide This class is not part of the Android public SDK API
  */
-@libcore.api.IntraCoreApi
 @Internal
 public abstract class OpenSSLAeadCipherAES extends OpenSSLAeadCipher {
     private static final int AES_BLOCK_SIZE = 16;
@@ -115,10 +114,8 @@ public abstract class OpenSSLAeadCipherAES extends OpenSSLAeadCipher {
     /**
      * @hide This class is not part of the Android public SDK API
      */
-    @libcore.api.IntraCoreApi
     public static class GCM extends OpenSSLAeadCipherAES {
 
-        @libcore.api.IntraCoreApi
         public GCM() {
             super(Mode.GCM);
         }
@@ -144,9 +141,7 @@ public abstract class OpenSSLAeadCipherAES extends OpenSSLAeadCipher {
         /**
          * @hide This class is not part of the Android public SDK API
          */
-        @libcore.api.IntraCoreApi
         public static class AES_128 extends GCM {
-            @libcore.api.IntraCoreApi
             public AES_128() {}
 
             @Override
@@ -161,9 +156,7 @@ public abstract class OpenSSLAeadCipherAES extends OpenSSLAeadCipher {
         /**
          * @hide This class is not part of the Android public SDK API
          */
-        @libcore.api.IntraCoreApi
         public static class AES_256 extends GCM {
-            @libcore.api.IntraCoreApi
             public AES_256() {}
 
             @Override
@@ -179,9 +172,7 @@ public abstract class OpenSSLAeadCipherAES extends OpenSSLAeadCipher {
     /**
      * @hide This class is not part of the Android public SDK API
      */
-    @libcore.api.IntraCoreApi
     public static class GCM_SIV extends OpenSSLAeadCipherAES {
-        @libcore.api.IntraCoreApi
         public GCM_SIV() {
             super(Mode.GCM_SIV);
         }
@@ -222,9 +213,7 @@ public abstract class OpenSSLAeadCipherAES extends OpenSSLAeadCipher {
         /**
          * @hide This class is not part of the Android public SDK API
          */
-        @libcore.api.IntraCoreApi
         public static class AES_128 extends GCM_SIV {
-            @libcore.api.IntraCoreApi
             public AES_128() {}
 
             @Override
@@ -239,9 +228,7 @@ public abstract class OpenSSLAeadCipherAES extends OpenSSLAeadCipher {
         /**
          * @hide This class is not part of the Android public SDK API
          */
-        @libcore.api.IntraCoreApi
         public static class AES_256 extends GCM_SIV {
-            @libcore.api.IntraCoreApi
             public AES_256() {}
 
             @Override
