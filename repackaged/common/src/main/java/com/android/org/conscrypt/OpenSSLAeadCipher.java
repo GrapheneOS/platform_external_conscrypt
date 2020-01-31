@@ -34,7 +34,6 @@ import javax.crypto.spec.IvParameterSpec;
 /**
  * @hide This class is not part of the Android public SDK API
  */
-@libcore.api.IntraCoreApi
 @Internal
 public abstract class OpenSSLAeadCipher extends OpenSSLCipher {
     /**

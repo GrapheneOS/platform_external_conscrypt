@@ -52,7 +52,6 @@ import javax.crypto.spec.SecretKeySpec;
 /**
  * @hide This class is not part of the Android public SDK API
  */
-@libcore.api.IntraCoreApi
 @Internal
 public abstract class OpenSSLCipherRSA extends CipherSpi {
     /**
@@ -421,9 +420,7 @@ public abstract class OpenSSLCipherRSA extends CipherSpi {
     /**
      * @hide This class is not part of the Android public SDK API
      */
-    @libcore.api.IntraCoreApi
     public static final class PKCS1 extends DirectRSA {
-        @libcore.api.IntraCoreApi
         public PKCS1() {
             super(NativeConstants.RSA_PKCS1_PADDING);
         }
@@ -432,9 +429,7 @@ public abstract class OpenSSLCipherRSA extends CipherSpi {
     /**
      * @hide This class is not part of the Android public SDK API
      */
-    @libcore.api.IntraCoreApi
     public static final class Raw extends DirectRSA {
-        @libcore.api.IntraCoreApi
         public Raw() {
             super(NativeConstants.RSA_NO_PADDING);
         }
@@ -443,7 +438,6 @@ public abstract class OpenSSLCipherRSA extends CipherSpi {
     /**
      * @hide This class is not part of the Android public SDK API
      */
-    @libcore.api.IntraCoreApi
     public static class OAEP extends OpenSSLCipherRSA {
         private long oaepMd;
         private int oaepMdSizeBytes;
@@ -620,9 +614,7 @@ public abstract class OpenSSLCipherRSA extends CipherSpi {
         /**
          * @hide This class is not part of the Android public SDK API
          */
-        @libcore.api.IntraCoreApi
         public static final class SHA1 extends OAEP {
-            @libcore.api.IntraCoreApi
             public SHA1() {
                 super(EvpMdRef.SHA1.EVP_MD, EvpMdRef.SHA1.SIZE_BYTES);
             }
@@ -631,9 +623,7 @@ public abstract class OpenSSLCipherRSA extends CipherSpi {
         /**
          * @hide This class is not part of the Android public SDK API
          */
-        @libcore.api.IntraCoreApi
         public static final class SHA224 extends OAEP {
-            @libcore.api.IntraCoreApi
             public SHA224() {
                 super(EvpMdRef.SHA224.EVP_MD, EvpMdRef.SHA224.SIZE_BYTES);
             }
@@ -642,9 +632,7 @@ public abstract class OpenSSLCipherRSA extends CipherSpi {
         /**
          * @hide This class is not part of the Android public SDK API
          */
-        @libcore.api.IntraCoreApi
         public static final class SHA256 extends OAEP {
-            @libcore.api.IntraCoreApi
             public SHA256() {
                 super(EvpMdRef.SHA256.EVP_MD, EvpMdRef.SHA256.SIZE_BYTES);
             }
@@ -653,9 +641,7 @@ public abstract class OpenSSLCipherRSA extends CipherSpi {
         /**
          * @hide This class is not part of the Android public SDK API
          */
-        @libcore.api.IntraCoreApi
         public static final class SHA384 extends OAEP {
-            @libcore.api.IntraCoreApi
             public SHA384() {
                 super(EvpMdRef.SHA384.EVP_MD, EvpMdRef.SHA384.SIZE_BYTES);
             }
@@ -664,9 +650,7 @@ public abstract class OpenSSLCipherRSA extends CipherSpi {
         /**
          * @hide This class is not part of the Android public SDK API
          */
-        @libcore.api.IntraCoreApi
         public static final class SHA512 extends OAEP {
-            @libcore.api.IntraCoreApi
             public SHA512() {
                 super(EvpMdRef.SHA512.EVP_MD, EvpMdRef.SHA512.SIZE_BYTES);
             }
