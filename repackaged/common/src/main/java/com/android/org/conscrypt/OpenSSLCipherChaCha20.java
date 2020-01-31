@@ -32,7 +32,6 @@ import javax.crypto.spec.IvParameterSpec;
  * Implementation of the ChaCha20 stream cipher.
  * @hide This class is not part of the Android public SDK API
  */
-@libcore.api.IntraCoreApi
 @Internal
 public class OpenSSLCipherChaCha20 extends OpenSSLCipher {
 
@@ -45,7 +44,6 @@ public class OpenSSLCipherChaCha20 extends OpenSSLCipher {
     private int currentBlockConsumedBytes = 0;
     private int blockCounter = 0;
 
-    @libcore.api.IntraCoreApi
     public OpenSSLCipherChaCha20() {}
 
     @Override

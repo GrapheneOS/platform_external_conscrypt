@@ -23,10 +23,8 @@ import java.security.NoSuchAlgorithmException;
 /**
  * @hide This class is not part of the Android public SDK API
  */
-@libcore.api.IntraCoreApi
 @Internal
 public class OpenSSLAeadCipherChaCha20 extends OpenSSLAeadCipher {
-    @libcore.api.IntraCoreApi
     public OpenSSLAeadCipherChaCha20() {
         super(Mode.POLY1305);
     }

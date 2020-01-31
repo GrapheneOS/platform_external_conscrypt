@@ -25,7 +25,6 @@ import javax.crypto.NoSuchPaddingException;
 /**
  * @hide This class is not part of the Android public SDK API
  */
-@libcore.api.IntraCoreApi
 @Internal
 public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
     private static final int AES_BLOCK_SIZE = 16;
@@ -76,7 +75,6 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
     /**
      * @hide This class is not part of the Android public SDK API
      */
-    @libcore.api.IntraCoreApi
     public static class AES extends OpenSSLEvpCipherAES {
         AES(Mode mode, Padding padding) {
             super(mode, padding);
@@ -85,7 +83,6 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
         /**
          * @hide This class is not part of the Android public SDK API
          */
-        @libcore.api.IntraCoreApi
         public static class CBC extends AES {
             CBC(Padding padding) {
                 super(Mode.CBC, padding);
@@ -94,9 +91,7 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
             /**
              * @hide This class is not part of the Android public SDK API
              */
-            @libcore.api.IntraCoreApi
             public static class NoPadding extends CBC {
-                @libcore.api.IntraCoreApi
                 public NoPadding() {
                     super(Padding.NOPADDING);
                 }
@@ -105,9 +100,7 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
             /**
              * @hide This class is not part of the Android public SDK API
              */
-            @libcore.api.IntraCoreApi
             public static class PKCS5Padding extends CBC {
-                @libcore.api.IntraCoreApi
                 public PKCS5Padding() {
                     super(Padding.PKCS5PADDING);
                 }
@@ -117,9 +110,7 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
         /**
          * @hide This class is not part of the Android public SDK API
          */
-        @libcore.api.IntraCoreApi
         public static class CTR extends AES {
-            @libcore.api.IntraCoreApi
             public CTR() {
                 super(Mode.CTR, Padding.NOPADDING);
             }
@@ -128,7 +119,6 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
         /**
          * @hide This class is not part of the Android public SDK API
          */
-        @libcore.api.IntraCoreApi
         public static class ECB extends AES {
             ECB(Padding padding) {
                 super(Mode.ECB, padding);
@@ -137,9 +127,7 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
             /**
              * @hide This class is not part of the Android public SDK API
              */
-            @libcore.api.IntraCoreApi
             public static class NoPadding extends ECB {
-                @libcore.api.IntraCoreApi
                 public NoPadding() {
                     super(Padding.NOPADDING);
                 }
@@ -148,9 +136,7 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
             /**
              * @hide This class is not part of the Android public SDK API
              */
-            @libcore.api.IntraCoreApi
             public static class PKCS5Padding extends ECB {
-                @libcore.api.IntraCoreApi
                 public PKCS5Padding() {
                     super(Padding.PKCS5PADDING);
                 }
@@ -174,7 +160,6 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
     /**
      * @hide This class is not part of the Android public SDK API
      */
-    @libcore.api.IntraCoreApi
     public static class AES_128 extends OpenSSLEvpCipherAES {
         AES_128(Mode mode, Padding padding) {
             super(mode, padding);
@@ -183,7 +168,6 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
         /**
          * @hide This class is not part of the Android public SDK API
          */
-        @libcore.api.IntraCoreApi
         public static class CBC extends AES_128 {
             CBC(Padding padding) {
                 super(Mode.CBC, padding);
@@ -192,9 +176,7 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
             /**
              * @hide This class is not part of the Android public SDK API
              */
-            @libcore.api.IntraCoreApi
             public static class NoPadding extends CBC {
-                @libcore.api.IntraCoreApi
                 public NoPadding() {
                     super(Padding.NOPADDING);
                 }
@@ -203,9 +185,7 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
             /**
              * @hide This class is not part of the Android public SDK API
              */
-            @libcore.api.IntraCoreApi
             public static class PKCS5Padding extends CBC {
-                @libcore.api.IntraCoreApi
                 public PKCS5Padding() {
                     super(Padding.PKCS5PADDING);
                 }
@@ -224,7 +204,6 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
         /**
          * @hide This class is not part of the Android public SDK API
          */
-        @libcore.api.IntraCoreApi
         public static class ECB extends AES_128 {
             ECB(Padding padding) {
                 super(Mode.ECB, padding);
@@ -233,9 +212,7 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
             /**
              * @hide This class is not part of the Android public SDK API
              */
-            @libcore.api.IntraCoreApi
             public static class NoPadding extends ECB {
-                @libcore.api.IntraCoreApi
                 public NoPadding() {
                     super(Padding.NOPADDING);
                 }
@@ -244,9 +221,7 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
             /**
              * @hide This class is not part of the Android public SDK API
              */
-            @libcore.api.IntraCoreApi
             public static class PKCS5Padding extends ECB {
-                @libcore.api.IntraCoreApi
                 public PKCS5Padding() {
                     super(Padding.PKCS5PADDING);
                 }
@@ -264,7 +239,6 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
     /**
      * @hide This class is not part of the Android public SDK API
      */
-    @libcore.api.IntraCoreApi
     public static class AES_256 extends OpenSSLEvpCipherAES {
         AES_256(Mode mode, Padding padding) {
             super(mode, padding);
@@ -273,7 +247,6 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
         /**
          * @hide This class is not part of the Android public SDK API
          */
-        @libcore.api.IntraCoreApi
         public static class CBC extends AES_256 {
             CBC(Padding padding) {
                 super(Mode.CBC, padding);
@@ -282,9 +255,7 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
             /**
              * @hide This class is not part of the Android public SDK API
              */
-            @libcore.api.IntraCoreApi
             public static class NoPadding extends CBC {
-                @libcore.api.IntraCoreApi
                 public NoPadding() {
                     super(Padding.NOPADDING);
                 }
@@ -293,9 +264,7 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
             /**
              * @hide This class is not part of the Android public SDK API
              */
-            @libcore.api.IntraCoreApi
             public static class PKCS5Padding extends CBC {
-                @libcore.api.IntraCoreApi
                 public PKCS5Padding() {
                     super(Padding.PKCS5PADDING);
                 }
@@ -314,7 +283,6 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
         /**
          * @hide This class is not part of the Android public SDK API
          */
-        @libcore.api.IntraCoreApi
         public static class ECB extends AES_256 {
             ECB(Padding padding) {
                 super(Mode.ECB, padding);
@@ -323,9 +291,7 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
             /**
              * @hide This class is not part of the Android public SDK API
              */
-            @libcore.api.IntraCoreApi
             public static class NoPadding extends ECB {
-                @libcore.api.IntraCoreApi
                 public NoPadding() {
                     super(Padding.NOPADDING);
                 }
@@ -334,9 +300,7 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
             /**
              * @hide This class is not part of the Android public SDK API
              */
-            @libcore.api.IntraCoreApi
             public static class PKCS5Padding extends ECB {
-                @libcore.api.IntraCoreApi
                 public PKCS5Padding() {
                     super(Padding.PKCS5PADDING);
                 }

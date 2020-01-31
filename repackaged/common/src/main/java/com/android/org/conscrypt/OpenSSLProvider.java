@@ -32,6 +32,8 @@ import java.security.Provider;
  * </ul>
  * @hide This class is not part of the Android public SDK API
  */
+@libcore.
+api.IntraCoreApi
 @libcore.api.CorePlatformApi
 @Internal
 public final class OpenSSLProvider extends Provider {
@@ -48,6 +50,8 @@ public final class OpenSSLProvider extends Provider {
 
     @android.compat.annotation
             .UnsupportedAppUsage
+            @libcore.api
+            .IntraCoreApi
             @libcore.api.CorePlatformApi
             public OpenSSLProvider() {
         this(Platform.getDefaultProviderName());
