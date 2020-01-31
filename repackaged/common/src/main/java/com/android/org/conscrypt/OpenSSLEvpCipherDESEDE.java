@@ -25,7 +25,6 @@ import javax.crypto.NoSuchPaddingException;
 /**
  * @hide This class is not part of the Android public SDK API
  */
-@libcore.api.IntraCoreApi
 @Internal
 public abstract class OpenSSLEvpCipherDESEDE extends OpenSSLEvpCipher {
     private static final int DES_BLOCK_SIZE = 8;
@@ -37,7 +36,6 @@ public abstract class OpenSSLEvpCipherDESEDE extends OpenSSLEvpCipher {
     /**
      * @hide This class is not part of the Android public SDK API
      */
-    @libcore.api.IntraCoreApi
     public static class CBC extends OpenSSLEvpCipherDESEDE {
         CBC(Padding padding) {
             super(Mode.CBC, padding);
@@ -46,9 +44,7 @@ public abstract class OpenSSLEvpCipherDESEDE extends OpenSSLEvpCipher {
         /**
          * @hide This class is not part of the Android public SDK API
          */
-        @libcore.api.IntraCoreApi
         public static class NoPadding extends CBC {
-            @libcore.api.IntraCoreApi
             public NoPadding() {
                 super(Padding.NOPADDING);
             }
@@ -57,9 +53,7 @@ public abstract class OpenSSLEvpCipherDESEDE extends OpenSSLEvpCipher {
         /**
          * @hide This class is not part of the Android public SDK API
          */
-        @libcore.api.IntraCoreApi
         public static class PKCS5Padding extends CBC {
-            @libcore.api.IntraCoreApi
             public PKCS5Padding() {
                 super(Padding.PKCS5PADDING);
             }

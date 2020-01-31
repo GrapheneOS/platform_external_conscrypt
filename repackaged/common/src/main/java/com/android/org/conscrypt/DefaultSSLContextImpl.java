@@ -35,7 +35,6 @@ import javax.net.ssl.TrustManagerFactory;
  * Support class for this package.
  * @hide This class is not part of the Android public SDK API
  */
-@libcore.api.IntraCoreApi
 @Internal
 public class DefaultSSLContextImpl extends OpenSSLContextImpl {
     /**
@@ -132,9 +131,7 @@ public class DefaultSSLContextImpl extends OpenSSLContextImpl {
     /**
      * @hide This class is not part of the Android public SDK API
      */
-    @libcore.api.IntraCoreApi
     public final static class TLSv13 extends DefaultSSLContextImpl {
-        @libcore.api.IntraCoreApi
         public TLSv13() throws GeneralSecurityException, IOException {
             super(NativeCrypto.TLSV13_PROTOCOLS);
         }
@@ -143,9 +140,7 @@ public class DefaultSSLContextImpl extends OpenSSLContextImpl {
     /**
      * @hide This class is not part of the Android public SDK API
      */
-    @libcore.api.IntraCoreApi
     public final static class TLSv12 extends DefaultSSLContextImpl {
-        @libcore.api.IntraCoreApi
         public TLSv12() throws GeneralSecurityException, IOException {
             super(NativeCrypto.TLSV12_PROTOCOLS);
         }
