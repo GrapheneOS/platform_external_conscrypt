@@ -24,10 +24,8 @@ import javax.crypto.NoSuchPaddingException;
 /**
  * @hide This class is not part of the Android public SDK API
  */
-@libcore.api.IntraCoreApi
 @Internal
 public class OpenSSLEvpCipherARC4 extends OpenSSLEvpCipher {
-    @libcore.api.IntraCoreApi
     public OpenSSLEvpCipherARC4() {
         // Modes and padding don't make sense for ARC4.
         super(Mode.ECB, Padding.NOPADDING);
