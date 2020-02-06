@@ -25,8 +25,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyListOf;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -62,6 +62,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
 /**
@@ -477,7 +478,8 @@ public class ConscryptSocketTest {
 
         // Configure server selector
         ApplicationProtocolSelector selector = Mockito.mock(ApplicationProtocolSelector.class);
-        when(selector.selectApplicationProtocol(any(SSLSocket.class), anyListOf(String.class)))
+        when(selector.selectApplicationProtocol(
+                     any(SSLSocket.class), ArgumentMatchers.<String>anyList()))
                 .thenReturn("spdy/2");
         c.serverHooks.alpnProtocolSelector = selector;
 
@@ -497,7 +499,8 @@ public class ConscryptSocketTest {
 
         // Configure server selector
         ApplicationProtocolSelector selector = Mockito.mock(ApplicationProtocolSelector.class);
-        when(selector.selectApplicationProtocol(any(SSLSocket.class), anyListOf(String.class)))
+        when(selector.selectApplicationProtocol(
+                     any(SSLSocket.class), ArgumentMatchers.<String>anyList()))
                 .thenReturn("h2");
         c.serverHooks.alpnProtocolSelector = selector;
 
