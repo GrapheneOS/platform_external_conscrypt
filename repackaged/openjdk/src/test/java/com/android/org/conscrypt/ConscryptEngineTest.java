@@ -27,9 +27,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.same;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.when;
 
+import com.android.org.conscrypt.java.security.TestKeyStore;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -46,13 +47,12 @@ import javax.net.ssl.SSLEngineResult.Status;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLSession;
-import com.android.org.conscrypt.java.security.TestKeyStore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
 /**
@@ -326,7 +326,8 @@ public class ConscryptEngineTest {
 
         // Configure server selector
         ApplicationProtocolSelector selector = Mockito.mock(ApplicationProtocolSelector.class);
-        when(selector.selectApplicationProtocol(same(serverEngine), Matchers.anyListOf(String.class)))
+        when(selector.selectApplicationProtocol(
+                     same(serverEngine), ArgumentMatchers.<String>anyList()))
                 .thenReturn("spdy/2");
         Conscrypt.setApplicationProtocolSelector(serverEngine, selector);
 
@@ -345,7 +346,8 @@ public class ConscryptEngineTest {
 
         // Configure server selector
         ApplicationProtocolSelector selector = Mockito.mock(ApplicationProtocolSelector.class);
-        when(selector.selectApplicationProtocol(same(serverEngine), Matchers.anyListOf(String.class)))
+        when(selector.selectApplicationProtocol(
+                     same(serverEngine), ArgumentMatchers.<String>anyList()))
                 .thenReturn("h2");
         Conscrypt.setApplicationProtocolSelector(serverEngine, selector);
 

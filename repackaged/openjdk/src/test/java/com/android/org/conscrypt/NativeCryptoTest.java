@@ -36,9 +36,14 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.same;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.when;
 
+import com.android.org.conscrypt.NativeCrypto.SSLHandshakeCallbacks;
+import com.android.org.conscrypt.OpenSSLX509CertificateFactory.ParsingException;
+import com.android.org.conscrypt.io.IoUtils;
+import com.android.org.conscrypt.java.security.StandardNames;
+import com.android.org.conscrypt.java.security.TestKeyStore;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileDescriptor;
@@ -78,16 +83,11 @@ import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLProtocolException;
 import javax.security.auth.x500.X500Principal;
-import com.android.org.conscrypt.NativeCrypto.SSLHandshakeCallbacks;
-import com.android.org.conscrypt.OpenSSLX509CertificateFactory.ParsingException;
-import com.android.org.conscrypt.io.IoUtils;
-import com.android.org.conscrypt.java.security.StandardNames;
-import com.android.org.conscrypt.java.security.TestKeyStore;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
 /**
@@ -2122,7 +2122,7 @@ public class NativeCryptoTest {
         ApplicationProtocolSelector selector = Mockito.mock(ApplicationProtocolSelector.class);
         SSLEngine engine = Mockito.mock(SSLEngine.class);
         ApplicationProtocolSelectorAdapter adapter = new ApplicationProtocolSelectorAdapter(engine, selector);
-        when(selector.selectApplicationProtocol(same(engine), Matchers.anyListOf(String.class)))
+        when(selector.selectApplicationProtocol(same(engine), ArgumentMatchers.<String>anyList()))
                 .thenReturn("spdy/2");
 
         ServerSocket listener = newServerSocket();
@@ -2161,7 +2161,7 @@ public class NativeCryptoTest {
         ApplicationProtocolSelector selector = Mockito.mock(ApplicationProtocolSelector.class);
         SSLEngine engine = Mockito.mock(SSLEngine.class);
         ApplicationProtocolSelectorAdapter adapter = new ApplicationProtocolSelectorAdapter(engine, selector);
-        when(selector.selectApplicationProtocol(same(engine), Matchers.anyListOf(String.class)))
+        when(selector.selectApplicationProtocol(same(engine), ArgumentMatchers.<String>anyList()))
                 .thenReturn("h2");
 
         ServerSocket listener = newServerSocket();
