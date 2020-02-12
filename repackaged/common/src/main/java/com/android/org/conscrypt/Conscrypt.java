@@ -16,6 +16,7 @@
  */
 package com.android.org.conscrypt;
 
+import com.android.org.conscrypt.io.IoUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -82,8 +83,9 @@ public final class Conscrypt {
         int major = -1;
         int minor = -1;
         int patch = -1;
+        InputStream stream = null;
         try {
-            InputStream stream = Conscrypt.class.getResourceAsStream("conscrypt.properties");
+            stream = Conscrypt.class.getResourceAsStream("conscrypt.properties");
             if (stream != null) {
                 Properties props = new Properties();
                 props.load(stream);
@@ -92,6 +94,8 @@ public final class Conscrypt {
                 patch = Integer.parseInt(props.getProperty("com.android.org.conscrypt.version.patch", "-1"));
             }
         } catch (IOException e) {
+        } finally {
+            IoUtils.closeQuietly(stream);
         }
         if ((major >= 0) && (minor >= 0) && (patch >= 0)) {
             VERSION = new Version(major, minor, patch);
