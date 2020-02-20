@@ -395,15 +395,6 @@ cc_defaults {
 
     srcs: ["common/src/jni/main/cpp/**/*.cc"],
     local_include_dirs: ["common/src/jni/main/include"],
-
-    target: {
-        android: {
-            runtime_libs: ["libandroidio"],
-        },
-        not_windows: {
-            runtime_libs: ["libandroidio"],
-        },
-    },
 }
 
 // Platform conscrypt crypto JNI library
@@ -423,6 +414,12 @@ cc_library_shared {
     target: {
         darwin: {
             enabled: false,
+        },
+        android: {
+            runtime_libs: ["libandroidio"],
+        },
+        not_windows: {
+            runtime_libs: ["libandroidio"],
         },
     },
     apex_available: [
