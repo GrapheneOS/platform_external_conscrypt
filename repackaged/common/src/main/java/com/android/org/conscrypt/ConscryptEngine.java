@@ -33,16 +33,6 @@
 
 package com.android.org.conscrypt;
 
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-import static javax.net.ssl.SSLEngineResult.HandshakeStatus.FINISHED;
-import static javax.net.ssl.SSLEngineResult.HandshakeStatus.NEED_UNWRAP;
-import static javax.net.ssl.SSLEngineResult.HandshakeStatus.NEED_WRAP;
-import static javax.net.ssl.SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING;
-import static javax.net.ssl.SSLEngineResult.Status.BUFFER_OVERFLOW;
-import static javax.net.ssl.SSLEngineResult.Status.BUFFER_UNDERFLOW;
-import static javax.net.ssl.SSLEngineResult.Status.CLOSED;
-import static javax.net.ssl.SSLEngineResult.Status.OK;
 import static com.android.org.conscrypt.NativeConstants.SSL3_RT_HEADER_LENGTH;
 import static com.android.org.conscrypt.NativeConstants.SSL3_RT_MAX_PACKET_SIZE;
 import static com.android.org.conscrypt.NativeConstants.SSL3_RT_MAX_PLAIN_LENGTH;
@@ -65,7 +55,21 @@ import static com.android.org.conscrypt.SSLUtils.EngineStates.STATE_READY;
 import static com.android.org.conscrypt.SSLUtils.EngineStates.STATE_READY_HANDSHAKE_CUT_THROUGH;
 import static com.android.org.conscrypt.SSLUtils.calculateOutNetBufSize;
 import static com.android.org.conscrypt.SSLUtils.toSSLHandshakeException;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static javax.net.ssl.SSLEngineResult.HandshakeStatus.FINISHED;
+import static javax.net.ssl.SSLEngineResult.HandshakeStatus.NEED_UNWRAP;
+import static javax.net.ssl.SSLEngineResult.HandshakeStatus.NEED_WRAP;
+import static javax.net.ssl.SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING;
+import static javax.net.ssl.SSLEngineResult.Status.BUFFER_OVERFLOW;
+import static javax.net.ssl.SSLEngineResult.Status.BUFFER_UNDERFLOW;
+import static javax.net.ssl.SSLEngineResult.Status.CLOSED;
+import static javax.net.ssl.SSLEngineResult.Status.OK;
 
+import com.android.org.conscrypt.ExternalSession.Provider;
+import com.android.org.conscrypt.NativeRef.SSL_SESSION;
+import com.android.org.conscrypt.NativeSsl.BioWrapper;
+import com.android.org.conscrypt.SSLParametersImpl.AliasChooser;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
@@ -90,9 +94,6 @@ import javax.net.ssl.X509ExtendedKeyManager;
 import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
 import javax.security.auth.x500.X500Principal;
-import com.android.org.conscrypt.ExternalSession.Provider;
-import com.android.org.conscrypt.NativeRef.SSL_SESSION;
-import com.android.org.conscrypt.NativeSsl.BioWrapper;
 
 /**
  * Implements the {@link SSLEngine} API using OpenSSL's non-blocking interfaces.
@@ -180,27 +181,29 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
     ConscryptEngine(SSLParametersImpl sslParameters) {
         this.sslParameters = sslParameters;
         peerInfoProvider = PeerInfoProvider.nullProvider();
-        this.ssl = newSsl(sslParameters, this);
+        this.ssl = newSsl(sslParameters, this, this);
         this.networkBio = ssl.newBio();
     }
 
     ConscryptEngine(String host, int port, SSLParametersImpl sslParameters) {
         this.sslParameters = sslParameters;
         this.peerInfoProvider = PeerInfoProvider.forHostAndPort(host, port);
-        this.ssl = newSsl(sslParameters, this);
+        this.ssl = newSsl(sslParameters, this, this);
         this.networkBio = ssl.newBio();
     }
 
-    ConscryptEngine(SSLParametersImpl sslParameters, PeerInfoProvider peerInfoProvider) {
+    ConscryptEngine(SSLParametersImpl sslParameters, PeerInfoProvider peerInfoProvider,
+            AliasChooser aliasChooser) {
         this.sslParameters = sslParameters;
         this.peerInfoProvider = checkNotNull(peerInfoProvider, "peerInfoProvider");
-        this.ssl = newSsl(sslParameters, this);
+        this.ssl = newSsl(sslParameters, this, aliasChooser);
         this.networkBio = ssl.newBio();
     }
 
-    private static NativeSsl newSsl(SSLParametersImpl sslParameters, ConscryptEngine engine) {
+    private static NativeSsl newSsl(
+            SSLParametersImpl sslParameters, ConscryptEngine engine, AliasChooser aliasChooser) {
         try {
-            return NativeSsl.newInstance(sslParameters, engine, engine, engine);
+            return NativeSsl.newInstance(sslParameters, engine, aliasChooser, engine);
         } catch (SSLException e) {
             throw new RuntimeException(e);
         }
