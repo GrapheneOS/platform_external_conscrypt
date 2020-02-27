@@ -15,6 +15,7 @@
 // Defaults shared between real and test versions of the APEX.
 apex_defaults {
     name: "com.android.conscrypt-defaults",
+    updatable: true,
     androidManifest: ":com.android.conscrypt-androidManifest",
     compile_multilib: "both",
     java_libs: ["conscrypt"],
