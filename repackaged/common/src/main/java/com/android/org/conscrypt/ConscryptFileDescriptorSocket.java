@@ -771,8 +771,7 @@ class ConscryptFileDescriptorSocket extends OpenSSLSocketImpl
      *
      * @param useSessionTickets True to enable session tickets
      */
-    @android.compat.annotation.
-    UnsupportedAppUsage(maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
+    @android.compat.annotation.UnsupportedAppUsage(
             publicAlternatives = "Use {@link android.net.ssl.SSLSockets#setUseSessionTickets}.")
     @Override
     public final void
@@ -786,8 +785,7 @@ class ConscryptFileDescriptorSocket extends OpenSSLSocketImpl
      *
      * @param hostname the desired SNI hostname, or null to disable
      */
-    @android.compat.annotation.
-    UnsupportedAppUsage(maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
+    @android.compat.annotation.UnsupportedAppUsage(
             publicAlternatives = "Use {@link javax.net.ssl.SSLParameters#setServerNames}.")
     @Override
     public final void
