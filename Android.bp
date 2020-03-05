@@ -233,6 +233,8 @@ java_library {
         "android.net.ssl",
         "com.android.org.conscrypt",
     ],
+
+    plugins: ["java_api_finder"],
 }
 
 // Referenced implicitly from conscrypt.module.platform.api.
