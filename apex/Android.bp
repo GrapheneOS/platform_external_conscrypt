@@ -27,6 +27,7 @@ apex_defaults {
     },
     key: "apex.conscrypt.key",
     certificate: ":com.android.conscrypt.certificate",
+    min_sdk_version: "29",
     legacy_android10_support: true,
 }
 
