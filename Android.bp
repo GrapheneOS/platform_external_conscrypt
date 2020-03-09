@@ -557,7 +557,6 @@ sdk {
     ],
 }
 
-/*
 // Host tools exported by the Conscrypt module.
 module_exports {
     name: "conscrypt-module-host-exports",
@@ -567,7 +566,6 @@ module_exports {
         "conscrypt-unbundled",
     ],
 }
-*/
 
 // Test libraries exposed by the Conscrypt module.
 module_exports {
