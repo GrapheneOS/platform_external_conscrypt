@@ -527,7 +527,8 @@ abstract class AbstractConscryptSocket extends SSLSocket {
      *
      * @param hostname the desired SNI hostname, or null to disable
      */
-    @android.compat.annotation.UnsupportedAppUsage(
+    @android.compat.annotation.
+    UnsupportedAppUsage(maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
             publicAlternatives = "Use {@link javax.net.ssl.SSLParameters#setServerNames}.")
     void
     setHostname(String hostname) {
@@ -631,7 +632,8 @@ abstract class AbstractConscryptSocket extends SSLSocket {
      *
      * @param useSessionTickets True to enable session tickets
      */
-    @android.compat.annotation.UnsupportedAppUsage(
+    @android.compat.annotation.
+    UnsupportedAppUsage(maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
             publicAlternatives = "Use {@link android.net.ssl.SSLSockets#setUseSessionTickets}.")
     abstract void
     setUseSessionTickets(boolean useSessionTickets);
@@ -699,7 +701,8 @@ abstract class AbstractConscryptSocket extends SSLSocket {
      *
      * @deprecated use {@link #getApplicationProtocol()} instead.
      */
-    @android.compat.annotation.UnsupportedAppUsage(
+    @android.compat.annotation.
+    UnsupportedAppUsage(maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
             publicAlternatives = "Use {@link javax.net.ssl.SSLSocket#getApplicationProtocol()}.")
     @Deprecated
     abstract byte[] getAlpnSelectedProtocol();
@@ -711,7 +714,8 @@ abstract class AbstractConscryptSocket extends SSLSocket {
      * @param alpnProtocols the list of ALPN protocols
      * @deprecated use {@link #setApplicationProtocols(String[])} instead.
      */
-    @android.compat.annotation.UnsupportedAppUsage(
+    @android.compat.annotation.
+    UnsupportedAppUsage(maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
             publicAlternatives =
                     "Use {@link javax.net.ssl.SSLParameters#setApplicationProtocols(java.lang.String[])}.")
     @Deprecated
@@ -725,7 +729,8 @@ abstract class AbstractConscryptSocket extends SSLSocket {
      * @param alpnProtocols the encoded form of the ALPN protocol list
      * @deprecated Use {@link #setApplicationProtocols(String[])} instead.
      */
-    @android.compat.annotation.UnsupportedAppUsage(
+    @android.compat.annotation.
+    UnsupportedAppUsage(maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
             publicAlternatives =
                     "Use {@link javax.net.ssl.SSLParameters#setApplicationProtocols(java.lang.String[])}.")
     @Deprecated
@@ -736,7 +741,8 @@ abstract class AbstractConscryptSocket extends SSLSocket {
      *
      * @param protocols the list of ALPN protocols
      */
-    @android.compat.annotation.UnsupportedAppUsage(
+    @android.compat.annotation.
+    UnsupportedAppUsage(maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
             publicAlternatives =
                     "Use {@link javax.net.ssl.SSLParameters#setApplicationProtocols(java.lang.String[])}.")
     @SuppressWarnings("MissingOverride") // For compiling pre Java 9.
@@ -745,7 +751,8 @@ abstract class AbstractConscryptSocket extends SSLSocket {
     /**
      * Returns the list of supported ALPN protocols.
      */
-    @android.compat.annotation.UnsupportedAppUsage(
+    @android.compat.annotation.
+    UnsupportedAppUsage(maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
             publicAlternatives =
                     "Use {@link javax.net.ssl.SSLParameters#getApplicationProtocols()}.")
     @SuppressWarnings("MissingOverride") // For compiling pre Java 9.
