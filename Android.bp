@@ -283,23 +283,6 @@ java_sdk_library {
     system_modules: "art-module-platform-api-stubs-system-modules",
 }
 
-// A guaranteed unstripped version of conscrypt.
-// The build system may or may not strip the conscrypt jar, but this one will
-// not be stripped. See b/24535627.
-java_library {
-    name: "conscrypt-testdex",
-    installable: true,
-
-    static_libs: ["conscrypt"],
-    dex_preopt: {
-        enabled: false,
-    },
-
-    sdk_version: "core_platform",
-
-    required: ["libjavacrypto"],
-}
-
 // Generates stubs for the parts of the public SDK API provided by the conscrypt module.
 //
 // For use by conscrypt.module.public.api.stubs target below and also for
@@ -573,8 +556,6 @@ module_exports {
     java_libs: [
         // For use by robolectric.
         "conscrypt",
-        // For use by art tests
-        "conscrypt-testdex",
     ],
     java_tests: [
         // For use by CTS
