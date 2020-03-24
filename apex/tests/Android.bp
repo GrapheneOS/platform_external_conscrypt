@@ -17,10 +17,11 @@ android_test {
     platform_apis: true,
     static_libs: [
         "conscrypt-tests",
+        "core-test-rules",
+        "ctstestrunner-axt",
         "junit",
     ],
 
-    sdk_version: "current",
     min_sdk_version: "29",
     libs: [
         "android.test.base.stubs",
