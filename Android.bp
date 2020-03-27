@@ -290,9 +290,7 @@ java_sdk_library {
 droidstubs {
     name: "conscrypt-module-public-api-stubs-source",
     visibility: [
-        // Allow libcore access to collate the public stubs source for all the
-        // core libraries.
-        "//libcore:__subpackages__",
+        "//frameworks/base",
     ],
     srcs: [
         ":conscrypt_public_api_files",
