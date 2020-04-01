@@ -200,7 +200,9 @@ java_library {
         "test_com.android.conscrypt",
     ],
     installable: true,
-    hostdex: true,
+    // Hostdex is only for ART testing on host: ART build file has its
+    // own hostdex support for conscrypt.
+    hostdex: false,
 
     srcs: [
         ":conscrypt_java_files",
@@ -215,17 +217,10 @@ java_library {
     system_modules: "art-module-intra-core-api-stubs-system-modules",
     patch_module: "java.base",
 
-    // Workaround for b/124476339: libjavacrypto is required for both APEX and
-    // hostdex builds, but adding a top-level required property results in
-    // it being installed to /system on Android.
-    // TODO(b/124476339): move required back to a top level property
     target: {
         // boringssl_self_test needed in both /system/bin and /apex/com.android.conscrypt/bin
         android: {
             required: ["boringssl_self_test"],
-        },
-        hostdex: {
-            required: ["libjavacrypto"],
         },
     },
 
