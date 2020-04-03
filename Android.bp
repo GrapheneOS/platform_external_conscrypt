@@ -69,6 +69,8 @@ cc_defaults {
         "common/src/jni/main/cpp/conscrypt/trace.cc",
     ],
 
+    header_libs: ["jni_headers"],
+
     local_include_dirs: [
         "common/src/jni/main/include",
     ],
@@ -83,6 +85,8 @@ cc_defaults {
     local_include_dirs: [
         "common/src/jni/unbundled/include",
     ],
+
+    header_libs: ["jni_headers"],
 
     shared_libs: [
         "liblog",
