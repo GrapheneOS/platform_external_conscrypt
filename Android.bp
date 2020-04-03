@@ -546,12 +546,26 @@ module_exports {
 // Test libraries exposed by the Conscrypt module.
 module_exports {
     name: "conscrypt-module-test-exports",
-    java_libs: [
-        // For use by robolectric.
-        "conscrypt",
-    ],
-    java_tests: [
-        // For use by CTS
-        "conscrypt-tests",
-    ],
+    host_supported: true,
+    target: {
+        android: {
+            java_libs: [
+                // For use by robolectric and ART tests.
+                "conscrypt",
+            ],
+            java_tests: [
+                // For use by CTS
+                "conscrypt-tests",
+            ],
+        },
+        darwin: {
+            enabled: false,
+        },
+        // For use by ART tests on host.
+        not_windows: {
+            native_shared_libs: [
+                "libjavacrypto",
+            ],
+        },
+    },
 }
