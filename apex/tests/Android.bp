@@ -19,6 +19,7 @@ android_test {
         "conscrypt-tests",
         "core-test-rules",
         "ctstestrunner-axt",
+        "libcore-crypto-tests",
         "junit",
     ],
 
