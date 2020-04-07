@@ -26,6 +26,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.security.KeyManagementException;
+import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocketFactory;
 
 /**
@@ -60,10 +61,15 @@ final class OpenSSLSocketFactoryImpl extends SSLSocketFactory {
     }
 
     /**
-     * Configures the default socket to be created for all instances.
+     * Configures the default socket type to be created for the default and all new instances.
      */
     static void setUseEngineSocketByDefault(boolean useEngineSocket) {
         useEngineSocketByDefault = useEngineSocket;
+        // The default SSLSocketFactory may already have been created, so also change its setting.
+        SocketFactory defaultFactory = SSLSocketFactory.getDefault();
+        if (defaultFactory instanceof OpenSSLSocketFactoryImpl) {
+            ((OpenSSLSocketFactoryImpl) defaultFactory).setUseEngineSocket(useEngineSocket);
+        }
     }
 
     /**
