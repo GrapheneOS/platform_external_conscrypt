@@ -561,6 +561,10 @@ module_exports {
                 // For use by CTS
                 "conscrypt-tests",
             ],
+            // TODO: Remove this when we resolve b/151303681.
+            native_shared_libs: [
+                "libjavacrypto",
+            ],
         },
         darwin: {
             enabled: false,
