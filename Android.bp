@@ -526,16 +526,13 @@ java_test {
 // Device SDK exposed by the Conscrypt module.
 sdk {
     name: "conscrypt-module-sdk",
-    java_header_libs: [
-        "conscrypt.module.intra.core.api.stubs",
-        "conscrypt.module.platform.api.stubs",
-        "conscrypt.module.public.api.stubs",
+    java_sdk_libs: [
+        "conscrypt.module.public.api",
+        "conscrypt.module.intra.core.api",
+        "conscrypt.module.platform.api",
     ],
     native_shared_libs: [
         "libconscrypt_jni",
-    ],
-    stubs_sources: [
-        "conscrypt.module.public.api.stubs.source",
     ],
 }
 
