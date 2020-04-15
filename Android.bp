@@ -376,6 +376,7 @@ cc_defaults {
     ],
 
     srcs: ["common/src/jni/main/cpp/**/*.cc"],
+    header_libs: ["jni_headers"],
     local_include_dirs: ["common/src/jni/main/include"],
 }
 
