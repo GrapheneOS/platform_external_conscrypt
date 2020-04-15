@@ -282,39 +282,41 @@ java_sdk_library {
     system_modules: "art-module-platform-api-stubs-system-modules",
 }
 
-// Generates stubs for the parts of the public SDK API provided by the conscrypt module.
-//
-// For use by conscrypt.module.public.api.stubs target below and also for
-// generating the Android SDK public API stubs and JavaDoc.
-droidstubs {
-    name: "conscrypt.module.public.api.stubs.source",
+// Referenced implicitly from conscrypt.module.public.api.
+filegroup {
+    name: "conscrypt.module.public.api.api.public.latest",
+    srcs: [
+        "api/public/last-api.txt",
+    ],
+}
+
+// Referenced implicitly from conscrypt.module.public.api.
+filegroup {
+    name: "conscrypt.module.public.api-removed.api.public.latest",
+    srcs: [
+        "api/public/last-removed.txt",
+    ],
+}
+
+// A library containing the public API stubs of the Conscrypt module.
+java_sdk_library {
+    name: "conscrypt.module.public.api",
     visibility: [
         "//frameworks/base",
+        "//libcore",
     ],
     srcs: [
         ":conscrypt_public_api_files",
     ],
-    java_version: "1.9",
-    installable: false,
-    sdk_version: "none",
-    system_modules: "art-module-public-api-stubs-system-modules",
-
-    // Emit nullability annotations from the source to the stub files.
-    args: "--include-annotations",
-}
-
-// A stubs target containing the parts of the public SDK API provided by the conscrypt module.
-java_library {
-    name: "conscrypt.module.public.api.stubs",
-    visibility: [
-        "//libcore",
+    api_dir: "api/public",
+    api_only: true,
+    droiddoc_options: [
+        // Emit nullability annotations from the source to the stub files.
+        "--include-annotations",
     ],
-    srcs: [":conscrypt.module.public.api.stubs.source"],
-    errorprone: {
-        javacflags: [
-            "-Xep:MissingOverride:OFF",
-        ],
-    },
+
+    java_version: "1.9",
+
     sdk_version: "none",
     system_modules: "art-module-public-api-stubs-system-modules",
 }
