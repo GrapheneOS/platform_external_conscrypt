@@ -221,6 +221,9 @@ java_library {
     system_modules: "art-module-intra-core-api-stubs-system-modules",
     patch_module: "java.base",
 
+    // Conscrypt should support Q
+    min_sdk_version: "29",
+
     target: {
         // boringssl_self_test needed in both /system/bin and /apex/com.android.conscrypt/bin
         android: {
@@ -411,6 +414,7 @@ cc_library_shared {
         "com.android.conscrypt",
         "test_com.android.conscrypt",
     ],
+    min_sdk_version: "29",
 }
 
 // Unbundled Conscrypt jar for use by signapk tool
