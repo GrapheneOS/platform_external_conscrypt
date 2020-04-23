@@ -549,6 +549,9 @@ module_exports {
     java_libs: [
         "conscrypt-unbundled",
     ],
+    native_shared_libs: [
+        "libconscrypt_openjdk_jni",
+    ],
 }
 
 // Test libraries exposed by the Conscrypt module.
