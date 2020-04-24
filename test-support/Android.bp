@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,27 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-android_test {
-    name: "MtsConscryptTestCases",
+// Conscrypt test support classes.
+java_library {
+    name: "conscrypt-support",
+    visibility: [
+        "//cts/tests/libcore/luni",
+        "//external/conscrypt/apex/tests",
+    ],
+    srcs: [
+        "src/java/**/*.java",
+    ],
     platform_apis: true,
+    libs: ["junit"],
     static_libs: [
-        "conscrypt-support",
-        "conscrypt-tests",
-        "core-test-rules",
-        "ctstestrunner-axt",
-        "libcore-crypto-tests",
-        "junit",
+        "androidx.test.runner",
     ],
-
-    min_sdk_version: "29",
-    libs: [
-        "android.test.base.stubs",
-    ],
-
-    // Tag this module as an mts test artifact
-    test_suites: [
-        "general-tests",
-        "mts",
-    ],
-
 }
