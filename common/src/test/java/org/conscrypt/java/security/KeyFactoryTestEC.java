@@ -16,9 +16,15 @@
 package org.conscrypt.java.security;
 
 import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECPrivateKeySpec;
 import java.security.spec.ECPublicKeySpec;
 import libcore.junit.util.EnableDeprecatedBouncyCastleAlgorithmsRule;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.ClassRule;
 import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
@@ -51,5 +57,23 @@ public class KeyFactoryTestEC extends
   @Override
   protected void check(KeyPair keyPair) throws Exception {
     new SignatureHelper("SHA256withECDSA").test(keyPair);
+  }
+
+  @Override
+  protected List<KeyPair> getKeys() throws NoSuchAlgorithmException, InvalidKeySpecException {
+    return Arrays.asList(
+        new KeyPair(
+            DefaultKeys.getPublicKey("EC"),
+            DefaultKeys.getPrivateKey("EC")
+        ),
+        new KeyPair(
+            new TestPublicKey(DefaultKeys.getPublicKey("EC")),
+            new TestPrivateKey(DefaultKeys.getPrivateKey("EC"))
+        ),
+        new KeyPair(
+            new TestECPublicKey((ECPublicKey)DefaultKeys.getPublicKey("EC")),
+            new TestECPrivateKey((ECPrivateKey)DefaultKeys.getPrivateKey("EC"))
+        )
+    );
   }
 }
