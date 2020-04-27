@@ -203,6 +203,9 @@ java_library {
         "com.android.conscrypt",
         "test_com.android.conscrypt",
     ],
+    // Conscrypt should support Q
+    min_sdk_version: "29",
+
     installable: true,
     // Hostdex is only for ART testing on host: ART build file has its
     // own hostdex support for conscrypt.
@@ -220,9 +223,6 @@ java_library {
     sdk_version: "none",
     system_modules: "art-module-intra-core-api-stubs-system-modules",
     patch_module: "java.base",
-
-    // Conscrypt should support Q
-    min_sdk_version: "29",
 
     target: {
         // boringssl_self_test needed in both /system/bin and /apex/com.android.conscrypt/bin
