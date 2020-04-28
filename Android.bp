@@ -199,6 +199,9 @@ java_library {
         "com.android.conscrypt",
         "test_com.android.conscrypt",
     ],
+    // Conscrypt should support Q
+    min_sdk_version: "29",
+
     installable: true,
     hostdex: true,
 
@@ -428,6 +431,7 @@ cc_library_shared {
         "com.android.conscrypt",
         "test_com.android.conscrypt",
     ],
+    min_sdk_version: "29",
 }
 
 // Unbundled Conscrypt jar for use by signapk tool
