@@ -287,7 +287,7 @@ java_sdk_library {
     hostdex: true,
 
     sdk_version: "none",
-    system_modules: "art-module-platform-api-stubs-system-modules",
+    system_modules: "legacy-art-module-platform-api-stubs-system-modules",
 }
 
 // Referenced implicitly from conscrypt.module.public.api.
