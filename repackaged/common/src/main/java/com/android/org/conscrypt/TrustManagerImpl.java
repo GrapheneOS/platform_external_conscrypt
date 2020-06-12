@@ -84,10 +84,9 @@ import javax.net.ssl.X509ExtendedTrustManager;
  * @see javax.net.ssl.X509ExtendedTrustManager
  * @hide This class is not part of the Android public SDK API
  */
-@libcore.api.CorePlatformApi
+@libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
 @Internal
 public final class TrustManagerImpl extends X509ExtendedTrustManager {
-
     private static final Logger logger = Logger.getLogger(TrustManagerImpl.class.getName());
 
     /**
@@ -154,7 +153,7 @@ public final class TrustManagerImpl extends X509ExtendedTrustManager {
      */
     @android.compat.annotation
             .UnsupportedAppUsage
-            @libcore.api.CorePlatformApi
+            @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
             public TrustManagerImpl(KeyStore keyStore) {
         this(keyStore, null);
     }
@@ -163,9 +162,9 @@ public final class TrustManagerImpl extends X509ExtendedTrustManager {
         this(keyStore, manager, null);
     }
 
-    @libcore.api.CorePlatformApi
-    public TrustManagerImpl(KeyStore keyStore, CertPinManager manager,
-            ConscryptCertStore certStore) {
+    @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
+    public TrustManagerImpl(
+            KeyStore keyStore, CertPinManager manager, ConscryptCertStore certStore) {
         this(keyStore, manager, certStore, null);
     }
 
@@ -270,7 +269,7 @@ public final class TrustManagerImpl extends X509ExtendedTrustManager {
         return trustAnchors;
     }
 
-    @libcore.api.CorePlatformApi
+    @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
     @Override
     public void checkClientTrusted(X509Certificate[] chain, String authType)
             throws CertificateException {
@@ -295,7 +294,7 @@ public final class TrustManagerImpl extends X509ExtendedTrustManager {
         return session;
     }
 
-    @libcore.api.CorePlatformApi
+    @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
     @Override
     public void checkClientTrusted(X509Certificate[] chain, String authType, Socket socket)
             throws CertificateException {
@@ -309,7 +308,7 @@ public final class TrustManagerImpl extends X509ExtendedTrustManager {
         checkTrusted(chain, authType, session, parameters, true /* client auth */);
     }
 
-    @libcore.api.CorePlatformApi
+    @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
     @Override
     public void checkClientTrusted(X509Certificate[] chain, String authType, SSLEngine engine)
             throws CertificateException {
@@ -331,7 +330,7 @@ public final class TrustManagerImpl extends X509ExtendedTrustManager {
      */
     @android.compat.annotation
             .UnsupportedAppUsage
-            @libcore.api.CorePlatformApi
+            @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
             public List<X509Certificate> checkServerTrusted(X509Certificate[] chain,
                     String authType, String hostname) throws CertificateException {
         return checkTrusted(chain, null /* ocspData */, null /* tlsSctData */, authType, hostname,
@@ -343,9 +342,9 @@ public final class TrustManagerImpl extends X509ExtendedTrustManager {
      *
      * Throws {@link CertificateException} when no trusted chain can be found from {@code certs}.
      */
-    @libcore.api.CorePlatformApi
-    public List<X509Certificate> getTrustedChainForServer(X509Certificate[] certs,
-            String authType, Socket socket) throws CertificateException {
+    @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
+    public List<X509Certificate> getTrustedChainForServer(
+            X509Certificate[] certs, String authType, Socket socket) throws CertificateException {
         SSLSession session = null;
         SSLParameters parameters = null;
         if (socket instanceof SSLSocket) {
@@ -361,9 +360,9 @@ public final class TrustManagerImpl extends X509ExtendedTrustManager {
      *
      * Throws {@link CertificateException} when no trusted chain can be found from {@code certs}.
      */
-    @libcore.api.CorePlatformApi
-    public List<X509Certificate> getTrustedChainForServer(X509Certificate[] certs,
-            String authType, SSLEngine engine) throws CertificateException {
+    @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
+    public List<X509Certificate> getTrustedChainForServer(X509Certificate[] certs, String authType,
+            SSLEngine engine) throws CertificateException {
         SSLSession session = engine.getHandshakeSession();
         if (session == null) {
             throw new CertificateException("Not in handshake; no session available");
@@ -395,7 +394,7 @@ public final class TrustManagerImpl extends X509ExtendedTrustManager {
         return checkTrusted(chain, authType, session, null, false /* client auth */);
     }
 
-    @libcore.api.CorePlatformApi
+    @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
     public void handleTrustStorageUpdate() {
         if (acceptedIssuers == null) {
             trustedCertificateIndex.reset();

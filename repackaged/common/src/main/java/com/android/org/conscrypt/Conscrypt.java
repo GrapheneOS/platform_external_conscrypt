@@ -41,7 +41,7 @@ import javax.net.ssl.X509TrustManager;
  * Core API for creating and configuring all Conscrypt types.
  * @hide This class is not part of the Android public SDK API
  */
-@libcore.api.CorePlatformApi
+@libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
 @SuppressWarnings("unused")
 public final class Conscrypt {
     private Conscrypt() {}
@@ -212,7 +212,7 @@ public final class Conscrypt {
     /**
      * Gets the default X.509 trust manager.
      */
-    @libcore.api.CorePlatformApi
+    @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
     @ExperimentalApi
     public static X509TrustManager getDefaultX509TrustManager() throws KeyManagementException {
         checkAvailability();
