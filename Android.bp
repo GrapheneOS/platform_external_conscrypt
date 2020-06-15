@@ -263,6 +263,9 @@ filegroup {
 // The API specification .txt files managed by this only contain the additional
 // classes/members that are in the platform API but which are not in the public
 // API.
+//
+// Note that this entire API surface is considered stable in the sense described in
+// libcore/mmodules/core_platform_api/Android.bp.
 java_sdk_library {
     name: "conscrypt.module.platform.api",
     visibility: [
@@ -281,7 +284,7 @@ java_sdk_library {
     api_only: true,
     droiddoc_options: [
         "--hide-annotation libcore.api.Hide",
-        "--show-single-annotation libcore.api.CorePlatformApi",
+        "--show-single-annotation libcore.api.CorePlatformApi\\(status=libcore.api.CorePlatformApi.Status.STABLE\\)",
         "--skip-annotation-instance-methods=false",
     ],
     hostdex: true,
