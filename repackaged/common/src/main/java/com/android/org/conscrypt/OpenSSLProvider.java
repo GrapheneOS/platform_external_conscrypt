@@ -34,7 +34,7 @@ import java.security.Provider;
  */
 @libcore.
 api.IntraCoreApi
-@libcore.api.CorePlatformApi
+@libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
 @Internal
 public final class OpenSSLProvider extends Provider {
     private static final long serialVersionUID = 2996752495318905136L;
@@ -52,7 +52,7 @@ public final class OpenSSLProvider extends Provider {
             .UnsupportedAppUsage
             @libcore.api
             .IntraCoreApi
-            @libcore.api.CorePlatformApi
+            @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
             public OpenSSLProvider() {
         this(Platform.getDefaultProviderName());
     }
