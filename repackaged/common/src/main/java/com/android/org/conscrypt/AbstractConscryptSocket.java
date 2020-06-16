@@ -20,7 +20,6 @@ package com.android.org.conscrypt;
 import static com.android.org.conscrypt.Preconditions.checkArgument;
 import static com.android.org.conscrypt.Preconditions.checkNotNull;
 
-import com.android.org.conscrypt.SSLParametersImpl.AliasChooser;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,13 +38,11 @@ import javax.net.ssl.HandshakeCompletedListener;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
-import javax.net.ssl.X509KeyManager;
-import javax.security.auth.x500.X500Principal;
 
 /**
  * Abstract base class for all Conscrypt {@link SSLSocket} classes.
  */
-abstract class AbstractConscryptSocket extends SSLSocket implements AliasChooser {
+abstract class AbstractConscryptSocket extends SSLSocket {
     final Socket socket;
     private final boolean autoClose;
 
@@ -514,19 +511,6 @@ abstract class AbstractConscryptSocket extends SSLSocket implements AliasChooser
             builder.append(super.toString());
         }
         return builder.toString();
-    }
-
-    /** @hide */
-    @Override
-    public final String chooseServerAlias(X509KeyManager keyManager, String keyType) {
-        return keyManager.chooseServerAlias(keyType, null, this);
-    }
-
-    /** @hide */
-    @Override
-    public final String chooseClientAlias(
-            X509KeyManager keyManager, X500Principal[] issuers, String[] keyTypes) {
-        return keyManager.chooseClientAlias(keyTypes, issuers, this);
     }
 
     /**
