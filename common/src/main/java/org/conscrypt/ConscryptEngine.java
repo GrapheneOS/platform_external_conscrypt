@@ -413,7 +413,7 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
             case STATE_CLOSED_INBOUND:
             case STATE_CLOSED_OUTBOUND:
             case STATE_CLOSED:
-                throw new IllegalStateException("Engine has already been closed");
+                throw new SSLHandshakeException("Engine has already been closed");
             default:
                 // We've already started the handshake, just return
                 return;
@@ -620,6 +620,14 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
             return state == STATE_HANDSHAKE_STARTED ? activeSession
                 : SSLNullSession.getNullSession();
         }
+    }
+
+    // After handshake has started, provide active session otherwise a null session,
+    // for code which needs to read session attributes without triggering the handshake.
+    private ConscryptSession provideAfterHandshakeSession() {
+        return (state < STATE_HANDSHAKE_STARTED)
+                ? SSLNullSession.getNullSession()
+                : provideSession();
     }
 
     @Override
@@ -1775,13 +1783,13 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
 
     @Override
     public String getApplicationProtocol() {
-        return SSLUtils.toProtocolString(ssl.getApplicationProtocol());
+        return provideAfterHandshakeSession().getApplicationProtocol();
     }
 
     @Override
     public String getHandshakeApplicationProtocol() {
         synchronized (ssl) {
-            return state == STATE_HANDSHAKE_STARTED ? getApplicationProtocol() : null;
+            return state >= STATE_HANDSHAKE_STARTED ? getApplicationProtocol() : null;
         }
     }
 
