@@ -333,8 +333,8 @@ public abstract class OpenSSLCipherRSA extends CipherSpi {
 
         final int lastOffset = outputOffset + b.length;
         if (lastOffset > output.length) {
-            throw new ShortBufferException("output buffer is too small " + output.length + " < "
-                    + lastOffset);
+            throw new ShortBufferWithoutStackTraceException(
+                    "output buffer is too small " + output.length + " < " + lastOffset);
         }
 
         System.arraycopy(b, 0, output, outputOffset, b.length);
