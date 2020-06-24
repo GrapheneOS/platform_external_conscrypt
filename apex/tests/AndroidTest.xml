@@ -28,8 +28,8 @@
     <!-- module-libs APIs are not accessible to app code by default intentionally. -->
     <option name="hidden-api-checks" value="false" />
     <option name="runtime-hint" value="1m" />
-    <!-- test-timeout unit is ms, value = 10 min -->
-    <option name="test-timeout" value="600000" />
+    <!-- test-timeout unit is ms, value = 20 min -->
+    <option name="test-timeout" value="1200000" />
     <option name="device-listeners" value="org.conscrypt.ConscryptInstrumentationListener" />
     <option name="instrumentation-arg" key="conscrypt_sslsocket_implementation" value="engine" />
   </test>
@@ -47,8 +47,8 @@
     <!-- module-libs APIs are not accessible to app code by default intentionally. -->
     <option name="hidden-api-checks" value="false" />
     <option name="runtime-hint" value="1m" />
-    <!-- test-timeout unit is ms, value = 10 min -->
-    <option name="test-timeout" value="600000" />
+    <!-- test-timeout unit is ms, value = 20 min -->
+    <option name="test-timeout" value="1200000" />
     <option name="device-listeners" value="org.conscrypt.ConscryptInstrumentationListener" />
     <option name="instrumentation-arg" key="conscrypt_sslsocket_implementation" value="fd" />
   </test>
