@@ -1479,6 +1479,8 @@ public class SSLSocketVersionCompatibilityTest {
             underlying, c.host.getHostName(), c.port, true);
         final byte[] data = new byte[1024 * 64];
 
+        // TODO(b/161347005): Re-enable once engine-based socket interruption works correctly.
+        assumeFalse(isConscryptEngineSocket(wrapping));
         Future<Void> clientFuture = runAsync(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
