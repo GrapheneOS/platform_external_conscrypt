@@ -73,6 +73,16 @@
     "@location": "method:com.android.org.conscrypt.ClientSessionContext#setPersistentCache(SSLClientSessionCache)"
   },
   {
+    "@location": "method:com.android.org.conscrypt.ConscryptEngineSocket#setHostname(String)",
+    "maxTargetSdk": "dalvik.annotation.compat.VersionCodes.Q",
+    "publicAlternatives": "Use {@link javax.net.ssl.SSLParameters#setServerNames}."
+  },
+  {
+    "@location": "method:com.android.org.conscrypt.ConscryptEngineSocket#setUseSessionTickets(boolean)",
+    "maxTargetSdk": "dalvik.annotation.compat.VersionCodes.Q",
+    "publicAlternatives": "Use {@link android.net.ssl.SSLSockets#setUseSessionTickets}."
+  },
+  {
     "@location": "method:com.android.org.conscrypt.ConscryptFileDescriptorSocket#setHostname(String)",
     "maxTargetSdk": "dalvik.annotation.compat.VersionCodes.Q",
     "publicAlternatives": "Use {@link javax.net.ssl.SSLParameters#setServerNames}."
