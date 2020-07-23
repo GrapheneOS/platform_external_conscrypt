@@ -368,14 +368,22 @@ class ConscryptEngineSocket extends OpenSSLSocketImpl implements SSLParametersIm
      *
      * @param hostname the desired SNI hostname, or null to disable
      */
+    @android.compat.annotation.
+    UnsupportedAppUsage(maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
+            publicAlternatives = "Use {@link javax.net.ssl.SSLParameters#setServerNames}.")
     @Override
-    public final void setHostname(String hostname) {
+    public final void
+    setHostname(String hostname) {
         engine.setHostname(hostname);
         super.setHostname(hostname);
     }
 
+    @android.compat.annotation.
+    UnsupportedAppUsage(maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
+            publicAlternatives = "Use {@link android.net.ssl.SSLSockets#setUseSessionTickets}.")
     @Override
-    public final void setUseSessionTickets(boolean useSessionTickets) {
+    public final void
+    setUseSessionTickets(boolean useSessionTickets) {
         engine.setUseSessionTickets(useSessionTickets);
     }
 
