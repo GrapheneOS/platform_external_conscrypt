@@ -442,6 +442,7 @@ java_library_host {
     name: "conscrypt-unbundled",
     visibility: [
         "//build/make/tools/signapk",
+        "//tools/apksig",
     ],
     srcs: [
         "common/src/main/java/**/*.java",
