@@ -514,15 +514,7 @@ java_test {
         //"-Xlint:-serial,-deprecation,-unchecked",
     ],
 
-    target: {
-        host: {
-            required: ["libjavacrypto"],
-        },
-        darwin: {
-            // required module "libjavacrypto" is disabled on darwin
-            enabled: false,
-        },
-    },
+    required: ["libjavacrypto"],
     java_version: "1.7",
 }
 
@@ -551,15 +543,7 @@ java_test {
         //"-Xlint:-serial,-deprecation,-unchecked",
     ],
 
-    target: {
-        host: {
-            required: ["libjavacrypto"],
-        },
-        darwin: {
-            // required module "libjavacrypto" is disabled on darwin
-            enabled: false,
-        },
-    },
+    required: ["libjavacrypto"],
     java_version: "1.7",
 }
 
