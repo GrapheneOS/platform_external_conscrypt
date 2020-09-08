@@ -435,7 +435,7 @@ cc_library_shared {
     min_sdk_version: "29",
 }
 
-// Unbundled Conscrypt jar for use by signapk tool
+// Unbundled Conscrypt jar for use by signapk and apksigner tool
 //
 // Builds against standard host libraries.
 java_library_host {
