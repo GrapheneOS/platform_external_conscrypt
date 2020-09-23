@@ -314,6 +314,7 @@ java_sdk_library {
     name: "conscrypt.module.public.api",
     visibility: [
         "//frameworks/base",
+        "//frameworks/base/api",
         "//libcore",
         // Visibility for prebuilt art-module-host-exports from the prebuilt of
         // this module.
