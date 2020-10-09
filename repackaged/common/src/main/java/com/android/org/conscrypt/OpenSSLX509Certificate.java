@@ -132,7 +132,7 @@ public final class OpenSSLX509Certificate extends X509Certificate {
         if (certRefs == null) {
             // To avoid returning a immutable list in only one path, we create an
             // empty list here instead of using Collections.emptyList()
-            return new ArrayList<OpenSSLX509Certificate>();
+            return new ArrayList<>();
         }
 
         final List<OpenSSLX509Certificate> certs = new ArrayList<OpenSSLX509Certificate>(
@@ -471,8 +471,8 @@ public final class OpenSSLX509Certificate extends X509Certificate {
         try {
             OpenSSLKey pkey = new OpenSSLKey(NativeCrypto.X509_get_pubkey(mContext, this));
             return pkey.getPublicKey();
-        } catch (NoSuchAlgorithmException ignored) {
-        } catch (InvalidKeyException ignored) {
+        } catch (NoSuchAlgorithmException | InvalidKeyException ignored) {
+            // Ignored
         }
 
         /* Try generating the key using other Java providers. */
@@ -481,8 +481,8 @@ public final class OpenSSLX509Certificate extends X509Certificate {
         try {
             KeyFactory kf = KeyFactory.getInstance(oid);
             return kf.generatePublic(new X509EncodedKeySpec(encoded));
-        } catch (NoSuchAlgorithmException ignored) {
-        } catch (InvalidKeySpecException ignored) {
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException ignored) {
+            // Ignored
         }
 
         /*
