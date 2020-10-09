@@ -105,6 +105,7 @@ import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -1468,9 +1469,15 @@ public class SSLSocketVersionCompatibilityTest {
      * thread will interrupt another thread blocked writing on the same
      * socket.
      *
+     * Currently disabled: If the victim thread is not actually blocked in a write
+     * call then ConscryptEngineSocket can corrupt the output due to unsynchronized
+     * concurrent access to the socket's output stream and cause flakes: b/161347005
+     * TODO(prb): Re-enable after underlying bug resolved
+     *
      * See also b/147323301 where close() triggered an infinite loop instead.
      */
     @Test
+    @Ignore
     public void test_SSLSocket_interrupt_write_withAutoclose() throws Exception {
         final TestSSLContext c = new TestSSLContext.Builder()
                                          .clientProtocol(clientVersion)
