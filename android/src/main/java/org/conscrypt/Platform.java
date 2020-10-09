@@ -984,7 +984,7 @@ final class Platform {
         return null;
     }
 
-    static CertBlacklist newDefaultBlacklist() {
+    static CertBlocklist newDefaultBlocklist() {
         return null;
     }
 
@@ -1018,5 +1018,9 @@ final class Platform {
             }
         }
         return false;
+    }
+
+    public static ConscryptHostnameVerifier getDefaultHostnameVerifier() {
+        return OkHostnameVerifier.strictInstance();
     }
 }

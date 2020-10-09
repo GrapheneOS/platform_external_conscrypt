@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.SocketTimeoutException;
 import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
@@ -331,11 +332,19 @@ public final class NativeCrypto {
 
     static native int EVP_AEAD_CTX_seal(long evpAead, byte[] key, int tagLengthInBytes, byte[] out,
             int outOffset, byte[] nonce, byte[] in, int inOffset, int inLength, byte[] ad)
-            throws ShortBufferException, BadPaddingException, IndexOutOfBoundsException;
+            throws ShortBufferException, BadPaddingException;
+
+    static native int EVP_AEAD_CTX_seal_buf(long evpAead, byte[] key, int tagLengthInBytes, ByteBuffer out,
+                                            byte[] nonce, ByteBuffer input, byte[] ad)
+            throws ShortBufferException, BadPaddingException;
 
     static native int EVP_AEAD_CTX_open(long evpAead, byte[] key, int tagLengthInBytes, byte[] out,
             int outOffset, byte[] nonce, byte[] in, int inOffset, int inLength, byte[] ad)
-            throws ShortBufferException, BadPaddingException, IndexOutOfBoundsException;
+            throws ShortBufferException, BadPaddingException;
+
+    static native int EVP_AEAD_CTX_open_buf(long evpAead, byte[] key, int tagLengthInBytes, ByteBuffer out,
+                                            byte[] nonce, ByteBuffer input, byte[] ad)
+            throws ShortBufferException, BadPaddingException;
 
     // --- HMAC functions ------------------------------------------------------
 
@@ -1398,24 +1407,10 @@ public final class NativeCrypto {
             SSLHandshakeCallbacks shc) throws IOException;
 
     /**
-     * Writes data from the given array to the BIO.
-     */
-    static native int ENGINE_SSL_write_BIO_heap(long ssl, NativeSsl ssl_holder, long bioRef, byte[] sourceJava,
-            int sourceOffset, int sourceLength, SSLHandshakeCallbacks shc)
-            throws IOException, IndexOutOfBoundsException;
-
-    /**
      * Reads data from the given BIO into a direct {@link java.nio.ByteBuffer}.
      */
     static native int ENGINE_SSL_read_BIO_direct(long ssl, NativeSsl ssl_holder, long bioRef, long address, int len,
             SSLHandshakeCallbacks shc) throws IOException;
-
-    /**
-     * Reads data from the given BIO into an array.
-     */
-    static native int ENGINE_SSL_read_BIO_heap(long ssl, NativeSsl ssl_holder, long bioRef, byte[] destJava,
-            int destOffset, int destLength, SSLHandshakeCallbacks shc)
-            throws IOException, IndexOutOfBoundsException;
 
     /**
      * Forces the SSL object to process any data pending in the BIO.
