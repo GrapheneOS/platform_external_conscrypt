@@ -116,6 +116,7 @@ public class OpenSSLX509CertificateFactory extends CertificateFactorySpi {
                     try {
                         inStream.reset();
                     } catch (IOException ignored) {
+                        // If resetting the stream fails, there's not much we can do
                     }
                 }
                 throw new ParsingException(e);
@@ -167,6 +168,7 @@ public class OpenSSLX509CertificateFactory extends CertificateFactorySpi {
                     try {
                         inStream.reset();
                     } catch (IOException ignored) {
+                        // If resetting the stream fails, there's not much we can do
                     }
                 }
                 throw new ParsingException(e);
@@ -199,6 +201,7 @@ public class OpenSSLX509CertificateFactory extends CertificateFactorySpi {
                         try {
                             inStream.reset();
                         } catch (IOException ignored) {
+                            // If resetting the stream fails, there's not much we can do
                         }
                     }
 
