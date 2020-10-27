@@ -25,6 +25,9 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import com.android.org.conscrypt.TestUtils;
+import com.android.org.conscrypt.java.security.StandardNames;
+import com.android.org.conscrypt.java.security.TestKeyStore;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.ByteBuffer;
@@ -33,6 +36,7 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.KeyManager;
@@ -47,9 +51,6 @@ import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.X509ExtendedKeyManager;
 import javax.net.ssl.X509ExtendedTrustManager;
-import com.android.org.conscrypt.TestUtils;
-import com.android.org.conscrypt.java.security.StandardNames;
-import com.android.org.conscrypt.java.security.TestKeyStore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -558,7 +559,7 @@ public class SSLEngineTest {
         final TestSSLContext referenceContext = TestSSLContext.create();
         final SSLEngine referenceEngine = referenceContext.clientContext.createSSLEngine();
 
-        final boolean[] wasCalled = new boolean[1];
+        final AtomicInteger checkServerTrustedWasCalled = new AtomicInteger(0);
         TestSSLContext c = TestSSLContext.newBuilder()
             .clientTrustManager(new X509ExtendedTrustManager() {
                 @Override
@@ -593,10 +594,9 @@ public class SSLEngineTest {
                                 Arrays.asList(referenceEngine.getEnabledCipherSuites());
                         String message = "Handshake session has invalid cipher suite: "
                                 + (sessionSuite == null ? "(null)" : sessionSuite);
-                        assertTrue("Expected enabled suites to contain " + sessionSuite
-                                        + ", got: " + enabledSuites,
-                                enabledSuites.contains(sessionSuite));
-                        wasCalled[0] = true;
+                        assertTrue(message, enabledSuites.contains(sessionSuite));
+
+                        checkServerTrustedWasCalled.incrementAndGet();
                     } catch (Exception e) {
                         throw new CertificateException("Something broke", e);
                     }
@@ -621,7 +621,7 @@ public class SSLEngineTest {
             }).build();
         TestSSLEnginePair pair = TestSSLEnginePair.create(c);
         pair.close();
-        assertTrue(wasCalled[0]);
+        assertEquals(1, checkServerTrustedWasCalled.get());
     }
 
     @Test
@@ -632,7 +632,7 @@ public class SSLEngineTest {
         final TestSSLContext referenceContext = TestSSLContext.create();
         final SSLEngine referenceEngine = referenceContext.clientContext.createSSLEngine();
 
-        final boolean[] wasCalled = new boolean[1];
+        final AtomicInteger checkClientTrustedWasCalled = new AtomicInteger(0);
         TestSSLContext c = TestSSLContext.newBuilder()
             .client(TestKeyStore.getClientCertificate())
             .serverTrustManager(new X509ExtendedTrustManager() {
@@ -657,8 +657,17 @@ public class SSLEngineTest {
                         // By the point of the handshake where we're validating client certificates,
                         // the cipher suite should be agreed and the server's own certificates
                         // should have been delivered
-                        assertEquals(referenceEngine.getEnabledCipherSuites()[0],
-                            session.getCipherSuite());
+
+                        // The negotiated cipher suite should be one of the enabled ones, but
+                        // BoringSSL may have reordered them based on things like hardware support,
+                        // so we don't know which one may have been negotiated.
+                        String sessionSuite = session.getCipherSuite();
+                        List<String> enabledSuites =
+                                Arrays.asList(referenceEngine.getEnabledCipherSuites());
+                        String message = "Handshake session has invalid cipher suite: "
+                                + (sessionSuite == null ? "(null)" : sessionSuite);
+                        assertTrue(message, enabledSuites.contains(sessionSuite));
+
                         assertNotNull(session.getLocalCertificates());
                         assertEquals("CN=localhost",
                             ((X509Certificate) session.getLocalCertificates()[0])
@@ -666,7 +675,7 @@ public class SSLEngineTest {
                         assertEquals("CN=Test Intermediate Certificate Authority",
                             ((X509Certificate) session.getLocalCertificates()[0])
                                 .getIssuerDN().getName());
-                        wasCalled[0] = true;
+                        checkClientTrustedWasCalled.incrementAndGet();
                     } catch (Exception e) {
                         throw new CertificateException("Something broke", e);
                     }
@@ -702,7 +711,7 @@ public class SSLEngineTest {
             }
         });
         pair.close();
-        assertTrue(wasCalled[0]);
+        assertEquals(1, checkClientTrustedWasCalled.get());
     }
 
     @Test
