@@ -27,10 +27,13 @@ import com.android.org.conscrypt.ct.CTLogStore;
 import com.android.org.conscrypt.ct.CTLogStoreImpl;
 import com.android.org.conscrypt.ct.CTPolicy;
 import com.android.org.conscrypt.ct.CTPolicyImpl;
+import com.android.org.conscrypt.metrics.CipherSuite;
+import com.android.org.conscrypt.metrics.Protocol;
 import dalvik.system.BlockGuard;
 import dalvik.system.CloseGuard;
 import java.io.FileDescriptor;
 import java.io.IOException;
+import java.lang.System;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -535,5 +538,23 @@ final class Platform {
 
     public static ConscryptHostnameVerifier getDefaultHostnameVerifier() {
         return Conscrypt.wrapHostnameVerifier(HttpsURLConnection.getDefaultHostnameVerifier());
+    }
+
+    /**
+     * Returns milliseconds elapsed since boot, including time spent in sleep.
+     * @return long number of milliseconds elapsed since boot
+     */
+    static long getMillisSinceBoot() {
+        return System.currentTimeMillis();
+    }
+
+    static void countTlsHandshake(
+            boolean success, String protocol, String cipherSuite, long duration) {
+        Protocol proto = Protocol.forName(protocol);
+        CipherSuite suite = CipherSuite.forName(cipherSuite);
+        int dur = (int) duration;
+
+        ConscryptStatsLog.write(ConscryptStatsLog.TLS_HANDSHAKE_REPORTED, success, proto.getId(),
+                suite.getId(), dur);
     }
 }
