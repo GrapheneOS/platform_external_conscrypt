@@ -61,7 +61,7 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
         super(socket, hostname, port, autoClose);
     }
 
-    @android.compat.annotation.UnsupportedAppUsage
+    @android.compat.annotation.UnsupportedAppUsage(maxTargetSdk = 30, trackingBug = 170729553)
     @Override
     public String getHostname() {
         return super.getHostname();
@@ -77,7 +77,7 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
         super.setHostname(hostname);
     }
 
-    @android.compat.annotation.UnsupportedAppUsage
+    @android.compat.annotation.UnsupportedAppUsage(maxTargetSdk = 30, trackingBug = 170729553)
     @Override
     public String getHostnameOrIP() {
         return super.getHostnameOrIP();
@@ -89,21 +89,21 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
     }
 
     @android.compat.annotation
-            .UnsupportedAppUsage
+            .UnsupportedAppUsage(maxTargetSdk = 30, trackingBug = 170729553)
             @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
             @Override
             public void setSoWriteTimeout(int writeTimeoutMilliseconds) throws SocketException {
         super.setSoWriteTimeout(writeTimeoutMilliseconds);
     }
 
-    @android.compat.annotation.UnsupportedAppUsage
+    @android.compat.annotation.UnsupportedAppUsage(maxTargetSdk = 30, trackingBug = 170729553)
     @Override
     public int getSoWriteTimeout() throws SocketException {
         return super.getSoWriteTimeout();
     }
 
     @android.compat.annotation
-            .UnsupportedAppUsage
+            .UnsupportedAppUsage(maxTargetSdk = 30, trackingBug = 170729553)
             @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
             @Override
             public void setHandshakeTimeout(int handshakeTimeoutMilliseconds)
@@ -123,15 +123,16 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
             public abstract void
             setUseSessionTickets(boolean useSessionTickets);
 
-    @android.compat.annotation.UnsupportedAppUsage
+    @android.compat.annotation.UnsupportedAppUsage(maxTargetSdk = 30, trackingBug = 170729553)
     @Override
     public abstract void setChannelIdEnabled(boolean enabled);
 
-    @android.compat.annotation.UnsupportedAppUsage
+    @android.compat.annotation.UnsupportedAppUsage(maxTargetSdk = 30, trackingBug = 170729553)
     @Override
     public abstract byte[] getChannelId() throws SSLException;
 
-    @android.compat.annotation.UnsupportedAppUsage
+    @android.compat.
+    annotation.UnsupportedAppUsage(maxTargetSdk = 30, trackingBug = 170729553)
     @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
     @Override
     public abstract void setChannelIdPrivateKey(PrivateKey privateKey);
