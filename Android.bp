@@ -173,12 +173,20 @@ genrule {
     tools: ["conscrypt_generate_constants"],
 }
 
+genrule {
+    name: "statslog-conscrypt-bundled-java-gen",
+    tools: ["stats-log-api-gen"],
+    cmd: "$(location stats-log-api-gen) --java $(out) --module conscrypt --javaPackage com.android.org.conscrypt --javaClass ConscryptStatsLog",
+    out: ["com/android/org/conscrypt/ConscryptStatsLog.java"],
+}
+
 filegroup {
     name: "conscrypt_java_files",
     srcs: [
         "repackaged/common/src/main/java/**/*.java",
         "repackaged/platform/src/main/java/**/*.java",
         ":conscrypt_generated_constants",
+        ":statslog-conscrypt-bundled-java-gen",
     ],
 }
 
@@ -216,7 +224,10 @@ java_library {
         ":conscrypt_public_api_files",
     ],
 
-    libs: ["unsupportedappusage"],
+    libs: [
+        "unsupportedappusage",
+        "framework-statsd.stubs.module_lib",
+    ],
 
     // Conscrypt can be updated independently from the other core libraries so it must only depend
     // on public SDK and intra-core APIs.
