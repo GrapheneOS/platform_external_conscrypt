@@ -12242,7 +12242,7 @@ static jboolean NativeCrypto_SSL_CTX_ech_enable_server(JNIEnv* env, jclass, jlon
 #define REF_X509_REVOKED "L" TO_STRING(JNI_JARJAR_PREFIX) "org/conscrypt/OpenSSLX509CRLEntry;"
 #define REF_SSL "L" TO_STRING(JNI_JARJAR_PREFIX) "org/conscrypt/NativeSsl;"
 #define REF_SSL_CTX "L" TO_STRING(JNI_JARJAR_PREFIX) "org/conscrypt/AbstractSessionContext;"
-static JNINativeMethod sNativeCryptoMethods[] = {
+static const JNINativeMethod sNativeCryptoMethods[] = {
         CONSCRYPT_NATIVE_METHOD(CMAC_CTX_new, "()J"),
         CONSCRYPT_NATIVE_METHOD(CMAC_CTX_free, "(J)V"),
         CONSCRYPT_NATIVE_METHOD(CMAC_Init, "(" REF_CMAC_CTX "[B)V"),
