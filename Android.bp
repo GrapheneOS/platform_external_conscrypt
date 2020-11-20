@@ -291,6 +291,9 @@ java_sdk_library {
 
     sdk_version: "none",
     system_modules: "legacy-art-module-platform-api-stubs-system-modules",
+
+    // Don't copy any output files to the dist.
+    no_dist: true,
 }
 
 // Referenced implicitly from conscrypt.module.public.api.
@@ -338,6 +341,9 @@ java_sdk_library {
 
     sdk_version: "none",
     system_modules: "art-module-public-api-stubs-system-modules",
+
+    // Don't copy any output files to the dist.
+    no_dist: true,
 }
 
 // Referenced implicitly from conscrypt.module.intra.core.api.
@@ -387,6 +393,9 @@ java_sdk_library {
 
     sdk_version: "none",
     system_modules: "art-module-intra-core-api-stubs-system-modules",
+
+    // Don't copy any output files to the dist.
+    no_dist: true,
 }
 
 // Platform conscrypt crypto JNI library
