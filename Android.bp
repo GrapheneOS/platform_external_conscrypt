@@ -282,6 +282,9 @@ java_sdk_library {
     ],
     api_dir: "api/platform",
     api_only: true,
+    api_lint: {
+        enabled: true,
+    },
     droiddoc_options: [
         "--hide-annotation libcore.api.Hide",
         "--show-single-annotation libcore.api.CorePlatformApi\\(status=libcore.api.CorePlatformApi.Status.STABLE\\)",
@@ -300,7 +303,8 @@ java_sdk_library {
 filegroup {
     name: "conscrypt.module.public.api.api.public.latest",
     srcs: [
-        "api/public/last-api.txt",
+        // Use the filegroup defined by prebuilt_apis in prebuilts/sdk.
+        ":conscrypt.api.public.latest",
     ],
 }
 
@@ -308,7 +312,8 @@ filegroup {
 filegroup {
     name: "conscrypt.module.public.api-removed.api.public.latest",
     srcs: [
-        "api/public/last-removed.txt",
+        // Use the filegroup defined by prebuilt_apis in prebuilts/sdk.
+        ":conscrypt-removed.api.public.latest",
     ],
 }
 
