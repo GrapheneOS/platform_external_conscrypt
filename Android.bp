@@ -299,24 +299,6 @@ java_sdk_library {
     no_dist: true,
 }
 
-// Referenced implicitly from conscrypt.module.public.api.
-filegroup {
-    name: "conscrypt.module.public.api.api.public.latest",
-    srcs: [
-        // Use the filegroup defined by prebuilt_apis in prebuilts/sdk.
-        ":conscrypt.api.public.latest",
-    ],
-}
-
-// Referenced implicitly from conscrypt.module.public.api.
-filegroup {
-    name: "conscrypt.module.public.api-removed.api.public.latest",
-    srcs: [
-        // Use the filegroup defined by prebuilt_apis in prebuilts/sdk.
-        ":conscrypt-removed.api.public.latest",
-    ],
-}
-
 // A library containing the public API stubs of the Conscrypt module.
 java_sdk_library {
     name: "conscrypt.module.public.api",
@@ -335,6 +317,14 @@ java_sdk_library {
     srcs: [
         ":conscrypt_public_api_files",
     ],
+
+    // The base name for the artifacts that are automatically published to the
+    // dist and which end up in one of the sub-directories of prebuilts/sdk.
+    // As long as this matches the name of the artifacts in prebuilts/sdk then
+    // the API will be checked for compatibility against the latest released
+    // version of the API.
+    dist_stem: "conscrypt",
+
     api_dir: "api/public",
     api_only: true,
     droiddoc_options: [
@@ -346,9 +336,6 @@ java_sdk_library {
 
     sdk_version: "none",
     system_modules: "art-module-public-api-stubs-system-modules",
-
-    // Don't copy any output files to the dist.
-    no_dist: true,
 }
 
 // Referenced implicitly from conscrypt.module.intra.core.api.
