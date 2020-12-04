@@ -110,6 +110,10 @@ cc_library {
 
 cc_library_host_shared {
     name: "libconscrypt_openjdk_jni",
+    visibility: [
+        "//build/make/tools/signapk",
+        "//tools/apksig",
+    ],
     defaults: ["conscrypt_global"],
 
     cflags: [
