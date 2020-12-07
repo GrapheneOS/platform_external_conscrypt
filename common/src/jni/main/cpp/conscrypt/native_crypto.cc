@@ -3986,31 +3986,26 @@ static jobject GENERAL_NAME_to_jobject(JNIEnv* env, GENERAL_NAME* gen) {
             /* Write in RFC 2253 format */
             return X509_NAME_to_jstring(env, gen->d.directoryName, XN_FLAG_RFC2253);
         case GEN_IPADD: {
-#ifdef _WIN32
-            void* ip = reinterpret_cast<void*>(gen->d.ip->data);
-#else
-            const void* ip = reinterpret_cast<const void*>(gen->d.ip->data);
-#endif
-            if (gen->d.ip->length == 4) {
-                // IPv4
-                std::unique_ptr<char[]> buffer(new char[INET_ADDRSTRLEN]);
-                if (inet_ntop(AF_INET, ip, buffer.get(), INET_ADDRSTRLEN) != nullptr) {
-                    JNI_TRACE("GENERAL_NAME_to_jobject(%p) => IPv4 %s", gen, buffer.get());
-                    return env->NewStringUTF(buffer.get());
-                } else {
-                    JNI_TRACE("GENERAL_NAME_to_jobject(%p) => IPv4 failed %s", gen,
-                              strerror(errno));
-                }
-            } else if (gen->d.ip->length == 16) {
-                // IPv6
-                std::unique_ptr<char[]> buffer(new char[INET6_ADDRSTRLEN]);
-                if (inet_ntop(AF_INET6, ip, buffer.get(), INET6_ADDRSTRLEN) != nullptr) {
-                    JNI_TRACE("GENERAL_NAME_to_jobject(%p) => IPv6 %s", gen, buffer.get());
-                    return env->NewStringUTF(buffer.get());
-                } else {
-                    JNI_TRACE("GENERAL_NAME_to_jobject(%p) => IPv6 failed %s", gen,
-                              strerror(errno));
-                }
+            const uint8_t* data = ASN1_STRING_get0_data(gen->d.ip);
+            if (ASN1_STRING_length(gen->d.ip) == 4) {
+                // IPv4 addresses are returned in dotted quad notiation.
+                char buffer[4 * 3 + 3 + 1];  // 4 3-digit fields, 3 separators, and a NUL
+                snprintf(buffer, sizeof(buffer), "%d.%d.%d.%d", data[0], data[1], data[2], data[3]);
+                JNI_TRACE("GENERAL_NAME_to_jobject(%p) => IPv4 %s", gen, buffer);
+                return env->NewStringUTF(buffer);
+            } else if (ASN1_STRING_length(gen->d.ip) == 16) {
+                // IPv6 addresses are returned as eight 16-bit components. Note that Java requires
+                // the long form syntax (e.g. "0:0:0:0:0:0:0:1"), while inet_ntop will abbreviate
+                // strings of zeros (e.g. "::1").
+                char buffer[8 * 4 + 7 + 1];  // 8 4-digit fields, 7 separators, and a NUL.
+                snprintf(buffer, sizeof(buffer), "%x:%x:%x:%x:%x:%x:%x:%x",
+                         (uint16_t(data[0]) << 8) | data[1], (uint16_t(data[2]) << 8) | data[3],
+                         (uint16_t(data[4]) << 8) | data[5], (uint16_t(data[6]) << 8) | data[7],
+                         (uint16_t(data[8]) << 8) | data[9], (uint16_t(data[10]) << 8) | data[11],
+                         (uint16_t(data[12]) << 8) | data[13],
+                         (uint16_t(data[14]) << 8) | data[15]);
+                JNI_TRACE("GENERAL_NAME_to_jobject(%p) => IPv6 %s", gen, buffer);
+                return env->NewStringUTF(buffer);
             }
 
             /* Invalid IP encodings are pruned out without throwing an exception. */
@@ -4052,6 +4047,13 @@ static jobjectArray NativeCrypto_get_X509_GENERAL_NAME_stack(JNIEnv* env, jclass
                 X509_get_ext_d2i(x509, NID_issuer_alt_name, nullptr, nullptr)));
     } else {
         JNI_TRACE("get_X509_GENERAL_NAME_stack(%p, %d) => unknown type", x509, type);
+        return nullptr;
+    }
+    // TODO(https://github.com/google/conscrypt/issues/916): Handle errors, remove
+    // |ERR_clear_error|, and throw CertificateParsingException.
+    if (gn_stack == nullptr) {
+        JNI_TRACE("get_X509_GENERAL_NAME_stack(%p, %d) => null (no extension or error)", x509, type);
+        ERR_clear_error();
         return nullptr;
     }
 
@@ -4262,12 +4264,21 @@ static jint NativeCrypto_get_X509_ex_flags(JNIEnv* env, jclass, jlong x509Ref,
         return 0;
     }
 
-    return X509_get_extension_flags(x509);
+    uint32_t flags = X509_get_extension_flags(x509);
+    // X509_get_extension_flags sometimes leaves values in the error queue. See
+    // https://crbug.com/boringssl/382.
+    //
+    // TODO(https://github.com/google/conscrypt/issues/916): This function is used to check
+    // EXFLAG_CA, but does not check EXFLAG_INVALID. Fold the two JNI calls in getBasicConstraints()
+    // together and handle errors. (See also NativeCrypto_get_X509_ex_pathlen.) From there, limit
+    // this JNI call to EXFLAG_CRITICAL.
+    ERR_clear_error();
+    return flags;
 }
 
-static jboolean NativeCrypto_X509_check_issued(JNIEnv* env, jclass, jlong x509Ref1,
-                                               CONSCRYPT_UNUSED jobject holder, jlong x509Ref2,
-                                               CONSCRYPT_UNUSED jobject holder2) {
+static jint NativeCrypto_X509_check_issued(JNIEnv* env, jclass, jlong x509Ref1,
+                                           CONSCRYPT_UNUSED jobject holder, jlong x509Ref2,
+                                           CONSCRYPT_UNUSED jobject holder2) {
     CHECK_ERROR_QUEUE_ON_RETURN;
     X509* x509_1 = reinterpret_cast<X509*>(static_cast<uintptr_t>(x509Ref1));
     X509* x509_2 = reinterpret_cast<X509*>(static_cast<uintptr_t>(x509Ref2));
@@ -4275,7 +4286,7 @@ static jboolean NativeCrypto_X509_check_issued(JNIEnv* env, jclass, jlong x509Re
 
     int ret = X509_check_issued(x509_1, x509_2);
     JNI_TRACE("X509_check_issued(%p, %p) => %d", x509_1, x509_2, ret);
-    return static_cast<jboolean>(ret);
+    return ret;
 }
 
 static const ASN1_BIT_STRING* get_X509_signature(X509* x509) {
@@ -5839,10 +5850,14 @@ static jbooleanArray NativeCrypto_get_X509_ex_kusage(JNIEnv* env, jclass, jlong 
         return nullptr;
     }
 
+    // TODO(https://github.com/google/conscrypt/issues/916): Handle errors and remove
+    // |ERR_clear_error|. Note X509Certificate.getKeyUsage() cannot throw
+    // CertificateParsingException, so this needs to be checked earlier, e.g. in the constructor.
     bssl::UniquePtr<ASN1_BIT_STRING> bitStr(
             static_cast<ASN1_BIT_STRING*>(X509_get_ext_d2i(x509, NID_key_usage, nullptr, nullptr)));
     if (bitStr.get() == nullptr) {
         JNI_TRACE("get_X509_ex_kusage(%p) => null", x509);
+        ERR_clear_error();
         return nullptr;
     }
 
@@ -5861,10 +5876,13 @@ static jobjectArray NativeCrypto_get_X509_ex_xkusage(JNIEnv* env, jclass, jlong 
         return nullptr;
     }
 
+    // TODO(https://github.com/google/conscrypt/issues/916): Handle errors, remove
+    // |ERR_clear_error|, and throw CertificateParsingException.
     bssl::UniquePtr<STACK_OF(ASN1_OBJECT)> objArray(static_cast<STACK_OF(ASN1_OBJECT)*>(
             X509_get_ext_d2i(x509, NID_ext_key_usage, nullptr, nullptr)));
     if (objArray.get() == nullptr) {
         JNI_TRACE("get_X509_ex_xkusage(%p) => null", x509);
+        ERR_clear_error();
         return nullptr;
     }
 
@@ -5898,12 +5916,51 @@ static jint NativeCrypto_get_X509_ex_pathlen(JNIEnv* env, jclass, jlong x509Ref,
         return 0;
     }
 
-    // TODO(davidben): It is possible for |x509| to have an invalid basicConstraints extension, in
-    // which case |X509_get_pathlen| will report the extension is missing. The |EXFLAG_INVALID| can
-    // be checked for error, but Java's X509Certificate API does not allow for getBasicConstraints()
-    // to throw an exception, so we'd have to check this extension at parse time.
-    long pathlen = X509_get_pathlen(x509);
-    JNI_TRACE("get_X509_ex_pathlen(%p) => %ld", x509, pathlen);
+    // Use |X509_get_ext_d2i| instead of |X509_get_pathlen| because the latter treats
+    // |EXFLAG_INVALID| as the error case. |EXFLAG_INVALID| is set if any built-in extension is
+    // invalid. For now, we preserve Conscrypt's historical behavior in accepting certificates in
+    // the constructor even if |EXFLAG_INVALID| is set.
+    //
+    // TODO(https://github.com/google/conscrypt/issues/916): Handle errors and remove
+    // |ERR_clear_error|. Note X509Certificate.getBasicConstraints() cannot throw
+    // CertificateParsingException, so this needs to be checked earlier, e.g. in the constructor.
+    bssl::UniquePtr<BASIC_CONSTRAINTS> basic_constraints(static_cast<BASIC_CONSTRAINTS*>(
+            X509_get_ext_d2i(x509, NID_basic_constraints, nullptr, nullptr)));
+    if (basic_constraints == nullptr) {
+        JNI_TRACE("get_X509_ex_path(%p) => -1 (no extension or error)", x509);
+        ERR_clear_error();
+        return -1;
+    }
+
+    if (basic_constraints->pathlen == nullptr) {
+        JNI_TRACE("get_X509_ex_path(%p) => -1 (no pathLenConstraint)", x509);
+        return -1;
+    }
+
+    if (!basic_constraints->ca) {
+        // Path length constraints are only valid for CA certificates.
+        // TODO(https://github.com/google/conscrypt/issues/916): Treat this as an error condition.
+        JNI_TRACE("get_X509_ex_path(%p) => -1 (not a CA)", x509);
+        return -1;
+    }
+
+    if (basic_constraints->pathlen->type == V_ASN1_NEG_INTEGER) {
+        // Path length constraints may not be negative.
+        // TODO(https://github.com/google/conscrypt/issues/916): Treat this as an error condition.
+        JNI_TRACE("get_X509_ex_path(%p) => -1 (negative)", x509);
+        return -1;
+    }
+
+    long pathlen = ASN1_INTEGER_get(basic_constraints->pathlen);
+    if (pathlen == -1 || pathlen > INT_MAX) {
+        // TODO(https://github.com/google/conscrypt/issues/916): Treat this as an error condition.
+        // If the integer overflows, the certificate is effectively unconstrained. Reporting no
+        // constraint is plausible, but Chromium rejects all values above 255.
+        JNI_TRACE("get_X509_ex_path(%p) => -1 (overflow)", x509);
+        return -1;
+    }
+
+    JNI_TRACE("get_X509_ex_path(%p) => %ld", x509, pathlen);
     return pathlen;
 }
 
