@@ -13,6 +13,7 @@ dependencies {
     compileOnly project(':conscrypt-constants')
 
     compile project(':conscrypt-libcore-stub'),
+            project(':conscrypt-android-stub'),
             libraries.bouncycastle_apis,
             libraries.bouncycastle_provider
 }

@@ -500,6 +500,7 @@ java_test {
         "core-test-rules",
         "junit",
         "mockito-target-minus-junit4",
+        "framework-statsd.stubs.module_lib",
     ],
 
     static_libs: [
