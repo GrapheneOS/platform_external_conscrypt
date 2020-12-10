@@ -41,7 +41,6 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public class KeyFactoryTestRSA extends
         AbstractKeyFactoryTest<RSAPublicKeySpec, RSAPrivateKeySpec> {
-
     // BEGIN Android-Added: Allow access to deprecated BC algorithms.
     // Allow access to deprecated BC algorithms in this test, so we can ensure they
     // continue to work
