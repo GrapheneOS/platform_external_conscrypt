@@ -19,6 +19,7 @@ package org.conscrypt;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.os.Build;
+import android.os.SystemClock;
 import android.util.Log;
 import dalvik.system.BlockGuard;
 import dalvik.system.CloseGuard;
@@ -59,6 +60,9 @@ import javax.net.ssl.StandardConstants;
 import javax.net.ssl.X509TrustManager;
 import org.conscrypt.ct.CTLogStore;
 import org.conscrypt.ct.CTPolicy;
+import org.conscrypt.metrics.CipherSuite;
+import org.conscrypt.metrics.ConscryptStatsLog;
+import org.conscrypt.metrics.Protocol;
 
 /**
  * Platform-specific methods for unbundled Android.
@@ -1022,5 +1026,32 @@ final class Platform {
 
     public static ConscryptHostnameVerifier getDefaultHostnameVerifier() {
         return OkHostnameVerifier.strictInstance();
+    }
+
+    /**
+     * Returns milliseconds elapsed since boot, including time spent in sleep.
+     * @return long number of milliseconds elapsed since boot
+     */
+    static long getMillisSinceBoot() {
+        return SystemClock.elapsedRealtime();
+    }
+
+    static void countTlsHandshake(
+            boolean success, String protocol, String cipherSuite, long duration) {
+        // Statsd classes appeared in SDK 30 and aren't available in earlier versions
+
+        if (Build.VERSION.SDK_INT >= 30) {
+            Protocol proto = Protocol.forName(protocol);
+            CipherSuite suite = CipherSuite.forName(cipherSuite);
+            int dur = (int) duration;
+
+            writeStats(success, proto.getId(), suite.getId(), dur);
+        }
+    }
+
+    @TargetApi(30)
+    private static void writeStats(boolean success, int protocol, int cipherSuite, int duration) {
+        ConscryptStatsLog.write(
+                ConscryptStatsLog.TLS_HANDSHAKE_REPORTED, success, protocol, cipherSuite, duration);
     }
 }
