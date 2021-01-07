@@ -29,17 +29,19 @@ import com.android.org.conscrypt.Internal;
 final class OptionalMethod {
     private final Method cachedMethod;
 
-    public OptionalMethod(Class<?> clazz, String methodName, Class... methodParams) {
+    public OptionalMethod(Class<?> clazz, String methodName, Class<?>... methodParams) {
         this.cachedMethod = initializeMethod(clazz, methodName, methodParams);
     }
 
     private static Method initializeMethod(
-            Class<?> clazz, String methodName, Class... methodParams) {
+            Class<?> clazz, String methodName, Class<?>... methodParams) {
         try {
-            return clazz.getMethod(methodName, methodParams);
+            if (clazz != null) {
+                return clazz.getMethod(methodName, methodParams);
+            }
         } catch (NoSuchMethodException ignored) {
-            return null;
         }
+        return null;
     }
 
     public Object invoke(Object target, Object... args) {
