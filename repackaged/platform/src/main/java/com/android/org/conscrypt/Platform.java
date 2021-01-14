@@ -536,10 +536,6 @@ final class Platform {
         return false;
     }
 
-    public static ConscryptHostnameVerifier getDefaultHostnameVerifier() {
-        return Conscrypt.wrapHostnameVerifier(HttpsURLConnection.getDefaultHostnameVerifier());
-    }
-
     /**
      * Returns milliseconds elapsed since boot, including time spent in sleep.
      * @return long number of milliseconds elapsed since boot

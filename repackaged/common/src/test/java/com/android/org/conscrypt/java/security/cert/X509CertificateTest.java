@@ -17,11 +17,14 @@
 
 package com.android.org.conscrypt.java.security.cert;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import com.android.org.conscrypt.TestUtils;
 import java.io.ByteArrayInputStream;
+import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
 import java.security.Provider;
