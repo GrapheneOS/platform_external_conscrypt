@@ -66,7 +66,6 @@ import static javax.net.ssl.SSLEngineResult.Status.BUFFER_UNDERFLOW;
 import static javax.net.ssl.SSLEngineResult.Status.CLOSED;
 import static javax.net.ssl.SSLEngineResult.Status.OK;
 
-import com.android.org.conscrypt.ExternalSession.Provider;
 import com.android.org.conscrypt.NativeRef.SSL_SESSION;
 import com.android.org.conscrypt.NativeSsl.BioWrapper;
 import com.android.org.conscrypt.SSLParametersImpl.AliasChooser;
@@ -157,12 +156,12 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
      * The session object exposed externally from this class.
      */
     private final SSLSession externalSession =
-        Platform.wrapSSLSession(new ExternalSession(new Provider() {
-            @Override
-            public ConscryptSession provideSession() {
-                return ConscryptEngine.this.provideSession();
-            }
-        }));
+            Platform.wrapSSLSession(new ExternalSession(new ExternalSession.Provider() {
+                @Override
+                public ConscryptSession provideSession() {
+                    return ConscryptEngine.this.provideSession();
+                }
+            }));
 
     /**
      * Private key for the TLS Channel ID extension. This field is client-side only. Set during
@@ -587,7 +586,7 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
     SSLSession handshakeSession() {
         synchronized (ssl) {
             if (state == STATE_HANDSHAKE_STARTED) {
-                return Platform.wrapSSLSession(new ExternalSession(new Provider() {
+                return Platform.wrapSSLSession(new ExternalSession(new ExternalSession.Provider() {
                     @Override
                     public ConscryptSession provideSession() {
                         return ConscryptEngine.this.provideHandshakeSession();
