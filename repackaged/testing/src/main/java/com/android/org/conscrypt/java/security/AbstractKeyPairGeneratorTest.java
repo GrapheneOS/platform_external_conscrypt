@@ -44,13 +44,9 @@ public abstract class AbstractKeyPairGeneratorTest {
         generator = KeyPairGenerator.getInstance(algorithmName);
     }
 
-    protected int getKeySize() {
-        return 1024;
-    }
-
     @Test
     public void testKeyPairGenerator() throws Exception {
-        generator.initialize(getKeySize());
+        generator.initialize(1024);
 
         KeyPair keyPair = generator.generateKeyPair();
 
