@@ -494,6 +494,8 @@ public final class OpenSSLProvider extends Provider {
         put("Alg.Alias.Mac.HMAC/SHA512", "HmacSHA512");
         put("Alg.Alias.Mac.PBEWITHHMACSHA512", "HmacSHA512");
 
+        putMacImplClass("AESCMAC", "OpenSSLMac$AesCmac");
+
         /* === Certificate === */
 
         put("CertificateFactory.X509", PREFIX + "OpenSSLX509CertificateFactory");
