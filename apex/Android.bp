@@ -13,6 +13,15 @@
 // limitations under the License.
 
 // Defaults shared between real and test versions of the APEX.
+package {
+    // See: http://go/android-license-faq
+    // A large-scale-change added 'default_applicable_licenses' to import
+    // all of the 'license_kinds' from "external_conscrypt_license"
+    // to get the below license kinds:
+    //   SPDX-license-identifier-Apache-2.0
+    default_applicable_licenses: ["external_conscrypt_license"],
+}
+
 apex_defaults {
     name: "com.android.conscrypt-defaults",
     updatable: true,
