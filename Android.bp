@@ -293,6 +293,14 @@ filegroup {
     ],
 }
 
+// Referenced implicitly from conscrypt.module.platform.api.
+filegroup {
+    name: "conscrypt.module.platform.api-incompatibilities.api.public.latest",
+    srcs: [
+        "api/platform/last-incompatibilities.txt",
+    ],
+}
+
 // A library containing the core platform API stubs of the Conscrypt module.
 //
 // Core platform APIs are only intended for use of other parts of the platform, not the
@@ -389,6 +397,14 @@ filegroup {
     name: "conscrypt.module.intra.core.api-removed.api.public.latest",
     srcs: [
         "api/intra/last-removed.txt",
+    ],
+}
+
+// Referenced implicitly from conscrypt.module.intra.core.api.
+filegroup {
+    name: "conscrypt.module.intra.core.api-incompatibilities.api.public.latest",
+    srcs: [
+        "api/intra/last-incompatibilities.txt",
     ],
 }
 
