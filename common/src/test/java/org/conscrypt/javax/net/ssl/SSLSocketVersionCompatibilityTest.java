@@ -110,7 +110,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import tests.net.DelegatingSSLSocketFactory;
 import tests.util.ForEachRunner;
-import tests.util.ForEachRunner.Callback;
 import tests.util.Pair;
 
 /**
@@ -1554,7 +1553,7 @@ public class SSLSocketVersionCompatibilityTest {
 
     @Test
     public void test_SSLSocket_ClientHello_SNI() throws Exception {
-        ForEachRunner.runNamed(new Callback<SSLSocketFactory>() {
+        ForEachRunner.runNamed(new ForEachRunner.Callback<SSLSocketFactory>() {
             @Override
             public void run(SSLSocketFactory sslSocketFactory) throws Exception {
                 ClientHello clientHello = TlsTester
@@ -1573,7 +1572,7 @@ public class SSLSocketVersionCompatibilityTest {
     public void test_SSLSocket_ClientHello_ALPN() throws Exception {
         final String[] protocolList = new String[] { "h2", "http/1.1" };
         
-        ForEachRunner.runNamed(new Callback<SSLSocketFactory>() {
+        ForEachRunner.runNamed(new ForEachRunner.Callback<SSLSocketFactory>() {
             @Override
             public void run(SSLSocketFactory sslSocketFactory) throws Exception {
                 ClientHello clientHello = TlsTester.captureTlsHandshakeClientHello(executor,
