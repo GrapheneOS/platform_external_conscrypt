@@ -251,14 +251,16 @@ public final class OpenSSLX509Certificate extends X509Certificate {
     }
 
     @Override
-    public void checkValidity() throws CertificateExpiredException,
-            CertificateNotYetValidException {
+    @SuppressWarnings("JdkObsolete") // Needed for API compatibility
+    public void checkValidity()
+            throws CertificateExpiredException, CertificateNotYetValidException {
         checkValidity(new Date());
     }
 
     @Override
-    public void checkValidity(Date date) throws CertificateExpiredException,
-            CertificateNotYetValidException {
+    @SuppressWarnings("JdkObsolete") // Needed for API compatibility
+    public void checkValidity(Date date)
+            throws CertificateExpiredException, CertificateNotYetValidException {
         if (getNotBefore().compareTo(date) > 0) {
             throw new CertificateNotYetValidException("Certificate not valid until "
                     + getNotBefore().toString() + " (compared to " + date.toString() + ")");
