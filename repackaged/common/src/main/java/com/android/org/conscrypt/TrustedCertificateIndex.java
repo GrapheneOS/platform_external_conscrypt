@@ -124,6 +124,7 @@ public final class TrustedCertificateIndex {
                     cert.verify(publicKey);
                     return anchor;
                 } catch (Exception ignored) {
+                    // Ignored
                 }
             }
         }
@@ -202,6 +203,7 @@ public final class TrustedCertificateIndex {
                     cert.verify(publicKey);
                     result.add(anchor);
                 } catch (Exception ignored) {
+                    // Ignored
                 }
             }
             return result;
