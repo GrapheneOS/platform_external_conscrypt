@@ -60,9 +60,8 @@ import javax.security.auth.x500.X500Principal;
  * <p>In addition to supporting the {@code
  * TrustedCertificateKeyStoreSpi} implementation, {@code
  * TrustedCertificateStore} also provides the additional public
- * methods {@link #isTrustAnchor} and {@link #findIssuer} to allow
- * efficient lookup operations for CAs again based on the file naming
- * convention.
+ * method  {@link #findIssuer} to allow  efficient lookup operations
+ * for CAs again based on the file naming convention.
  *
  * <p>The KeyChainService users the {@link installCertificate} and
  * {@link #deleteCertificateEntry} to install user CAs as well as
@@ -226,6 +225,7 @@ public class TrustedCertificateStore implements ConscryptCertStore {
     }
 
     @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
+    @SuppressWarnings("JdkObsolete") // Used in public API TrustedCertificateKeyStoreSpi
     public Date getCreationDate(String alias) {
         // containsAlias check ensures the later fileForAlias result
         // was not a deleted system cert.
