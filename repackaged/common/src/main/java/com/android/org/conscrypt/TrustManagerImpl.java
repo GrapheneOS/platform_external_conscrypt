@@ -148,8 +148,6 @@ public final class TrustManagerImpl extends X509ExtendedTrustManager {
 
     /**
      * Creates X509TrustManager based on a keystore
-     *
-     * @param keyStore
      */
     @android.compat.annotation
             .UnsupportedAppUsage
