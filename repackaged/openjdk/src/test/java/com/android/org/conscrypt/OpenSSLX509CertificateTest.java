@@ -19,6 +19,7 @@ package com.android.org.conscrypt;
 
 import static com.android.org.conscrypt.TestUtils.openTestFile;
 
+import com.android.org.conscrypt.OpenSSLX509CertificateFactory.ParsingException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -26,10 +27,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import junit.framework.TestCase;
-import com.android.org.conscrypt.OpenSSLX509CertificateFactory.ParsingException;
 
 /**
  * @hide This class is not part of the Android public SDK API
@@ -47,10 +49,29 @@ public class OpenSSLX509CertificateTest extends TestCase {
 
             // Mark the field as non-final on JVM that need it.
             try {
-                Field modifiersField = Field.class.getDeclaredField("modifiers");
-                modifiersField.setAccessible(true);
-                modifiersField.setInt(targetUID, targetUID.getModifiers() & ~Modifier.FINAL);
-            } catch (NoSuchFieldException ignored) {
+                Field modifiersField = null;
+                try {
+                    modifiersField = Field.class.getDeclaredField("modifiers");
+                } catch (NoSuchFieldException e) {
+                    try {
+                        Method getDeclaredFields0 =
+                                Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class);
+                        getDeclaredFields0.setAccessible(true);
+                        Field[] fields = (Field[]) getDeclaredFields0.invoke(Field.class, false);
+                        for (Field field : fields) {
+                            if ("modifiers".equals(field.getName())) {
+                                modifiersField = field;
+                                break;
+                            }
+                        }
+                    } catch (NoSuchMethodException | InvocationTargetException ignored) {
+                    }
+                }
+                if (modifiersField != null) {
+                    modifiersField.setAccessible(true);
+                    modifiersField.setInt(targetUID, targetUID.getModifiers() & ~Modifier.FINAL);
+                }
+            } catch (Exception ignored) {
             }
 
             targetUID.set(null, clDesc.getSerialVersionUID());
