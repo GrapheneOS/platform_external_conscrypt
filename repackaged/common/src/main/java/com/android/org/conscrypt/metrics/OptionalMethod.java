@@ -55,6 +55,7 @@ public final class OptionalMethod {
                 return clazz.getMethod(checkNotNull(methodName), methodParams);
             }
         } catch (NoSuchMethodException ignored) {
+            // Ignored
         }
         return null;
     }
