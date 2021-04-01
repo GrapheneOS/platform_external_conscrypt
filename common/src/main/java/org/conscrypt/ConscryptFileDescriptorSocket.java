@@ -108,7 +108,7 @@ class ConscryptFileDescriptorSocket extends OpenSSLSocketImpl
      * The session object exposed externally from this class.
      */
     private final SSLSession externalSession =
-        Platform.wrapSSLSession(new ExternalSession(new Provider() {
+        Platform.wrapSSLSession(new ExternalSession(new ExternalSession.Provider() {
             @Override
             public ConscryptSession provideSession() {
                 return ConscryptFileDescriptorSocket.this.provideSession();
@@ -730,7 +730,7 @@ class ConscryptFileDescriptorSocket extends OpenSSLSocketImpl
     public final SSLSession getHandshakeSession() {
         synchronized (ssl) {
             if (state >= STATE_HANDSHAKE_STARTED && state < STATE_READY) {
-                return Platform.wrapSSLSession(new ExternalSession(new Provider() {
+                return Platform.wrapSSLSession(new ExternalSession(new ExternalSession.Provider() {
                     @Override
                     public ConscryptSession provideSession() {
                         return ConscryptFileDescriptorSocket.this.provideHandshakeSession();
