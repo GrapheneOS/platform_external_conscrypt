@@ -93,7 +93,7 @@ public abstract class OpenSSLAeadCipher extends OpenSSLCipher {
      */
     int tagLengthInBytes;
 
-    public OpenSSLAeadCipher(Mode mode) {
+    protected OpenSSLAeadCipher(Mode mode) {
         super(mode, Padding.NOPADDING);
     }
 

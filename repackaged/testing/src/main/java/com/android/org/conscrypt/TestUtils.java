@@ -51,6 +51,8 @@ import java.util.Base64;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Random;
 import java.util.Set;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -81,6 +83,44 @@ public final class TestUtils {
     private static final String[] PROTOCOLS = getProtocolsInternal();
 
     static final String TEST_CIPHER = "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256";
+
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
+    public enum BufferType {
+        HEAP {
+            @Override
+            ByteBuffer newBuffer(int size) {
+                return ByteBuffer.allocate(size);
+            }
+        },
+        DIRECT {
+            @Override
+            ByteBuffer newBuffer(int size) {
+                return ByteBuffer.allocateDirect(size);
+            }
+        };
+        private static final Random random = new Random(System.currentTimeMillis());
+        abstract ByteBuffer newBuffer(int size);
+
+        public ByteBuffer[] newRandomBuffers(int... sizes) {
+            int numBuffers = sizes.length;
+            ByteBuffer[] result = new ByteBuffer[numBuffers];
+            for (int i = 0; i < numBuffers; i++) {
+                result[i] = newRandomBuffer(sizes[i]);
+            }
+            return result;
+        }
+
+        public ByteBuffer newRandomBuffer(int size) {
+            byte[] data = new byte[size];
+            random.nextBytes(data);
+            ByteBuffer buffer = newBuffer(size);
+            buffer.put(data);
+            buffer.flip();
+            return buffer;
+        }
+    }
 
     private TestUtils() {}
 
@@ -715,5 +755,22 @@ public final class TestUtils {
 
     public static void assumeJava8() {
         Assume.assumeTrue("Require Java 8: " + javaVersion(), isJavaVersion(8));
+    }
+
+    public static String osName() {
+        return System.getProperty("os.name").toLowerCase(Locale.US).replaceAll("[^a-z0-9]+", "");
+    }
+
+    public static boolean isLinux() {
+        return osName().startsWith("linux");
+    }
+
+    public static boolean isWindows() {
+        return osName().startsWith("windows");
+    }
+
+    public static boolean isOsx() {
+        String name = osName();
+        return name.startsWith("macosx") || name.startsWith("osx");
     }
 }
