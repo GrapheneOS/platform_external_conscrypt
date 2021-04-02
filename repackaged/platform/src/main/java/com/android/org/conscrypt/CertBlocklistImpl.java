@@ -88,6 +88,7 @@ public final class CertBlocklistImpl implements CertBlocklist {
         try {
             return readFileAsString(path);
         } catch (FileNotFoundException ignored) {
+            // Ignored
         } catch (IOException e) {
             logger.log(Level.WARNING, "Could not read blocklist", e);
         }
@@ -126,6 +127,7 @@ public final class CertBlocklistImpl implements CertBlocklist {
             } catch (RuntimeException rethrown) {
                 throw rethrown;
             } catch (Exception ignored) {
+                // Ignored
             }
         }
     }

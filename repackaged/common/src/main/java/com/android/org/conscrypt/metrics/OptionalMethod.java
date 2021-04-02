@@ -55,6 +55,7 @@ public final class OptionalMethod {
                 return clazz.getMethod(checkNotNull(methodName), methodParams);
             }
         } catch (NoSuchMethodException ignored) {
+            // Ignored
         }
         return null;
     }
@@ -67,7 +68,9 @@ public final class OptionalMethod {
         try {
             return cachedMethod.invoke(target, args);
         } catch (IllegalAccessException ignored) {
+            // Ignored
         } catch (InvocationTargetException ignored) {
+            // Ignored
         }
         return null;
     }
