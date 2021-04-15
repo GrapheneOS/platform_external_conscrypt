@@ -21,10 +21,7 @@ public class OptionalMethodTest {
                 new OptionalMethod(String.class, "substring", int.class, int.class);
         assertNotNull(substring);
 
-        String input = "thermostats";
-        String result = (String) substring.invoke(input, 6, 10);
-        assertEquals("stat", result);
-
+        assertEquals("put", substring.invoke("input", 2, 5));
     }
 
     @Test
@@ -33,9 +30,7 @@ public class OptionalMethodTest {
                 new OptionalMethod(null, "substring", int.class, int.class);
         assertNotNull(substring);
 
-        String input = "thermostats";
-        String result = (String) substring.invoke(input, 6, 10);
-        assertNull(result);
+        assertNull(substring.invoke("input", 2, 5));
     }
 
     @Test(expected = NullPointerException.class)
@@ -43,9 +38,12 @@ public class OptionalMethodTest {
         new OptionalMethod(String.class, null, int.class, int.class);
     }
 
-    @Test(expected =  NullPointerException.class)
+    @Test
     public void nullArgumentClasses() {
-        new OptionalMethod(String.class, "substring", null, null);
+        OptionalMethod substring = new OptionalMethod(String.class, "substring", int.class, null);
+        assertNotNull(substring);
+
+        assertNull(substring.invoke("input", 2, 5));
     }
 
     @Test
@@ -54,8 +52,7 @@ public class OptionalMethodTest {
                 new OptionalMethod(null, "subwrong", int.class, int.class);
         assertNotNull(subwrong);
 
-        String input = "input";
-        assertNull(subwrong.invoke(input, 1, 3));
+        assertNull(subwrong.invoke("input", 2, 5));
     }
 
     @Test
@@ -64,7 +61,6 @@ public class OptionalMethodTest {
                 new OptionalMethod(null, "substring", long.class, byte[].class);
         assertNotNull(subwrong);
 
-        String input = "input";
-        assertNull(subwrong.invoke(input, 1, 3));
+        assertNull(subwrong.invoke("input", 2, 5));
     }
 }
