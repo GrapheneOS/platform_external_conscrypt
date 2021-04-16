@@ -349,6 +349,7 @@ java_sdk_library {
 java_sdk_library {
     name: "conscrypt.module.public.api",
     visibility: [
+        "//packages/modules/common/sdk",
         "//frameworks/base",
         "//frameworks/base/api",
         "//libcore",
