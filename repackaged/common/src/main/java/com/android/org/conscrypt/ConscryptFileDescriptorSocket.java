@@ -973,7 +973,7 @@ class ConscryptFileDescriptorSocket extends OpenSSLSocketImpl
      * Note write timeouts are not part of the javax.net.ssl.SSLSocket API
      */
     @Override
-    public final int getSoWriteTimeout() throws SocketException {
+    public final int getSoWriteTimeout() {
         return writeTimeoutMilliseconds;
     }
 
@@ -1085,6 +1085,7 @@ class ConscryptFileDescriptorSocket extends OpenSSLSocketImpl
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     protected final void finalize() throws Throwable {
         try {
             /*
