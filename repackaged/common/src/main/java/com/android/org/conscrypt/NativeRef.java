@@ -47,6 +47,7 @@ abstract class NativeRef {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     protected void finalize() throws Throwable {
         try {
             if (address != 0) {
