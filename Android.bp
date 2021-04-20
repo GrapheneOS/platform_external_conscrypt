@@ -277,6 +277,20 @@ java_library {
     plugins: ["java_api_finder"],
 }
 
+// Java library for use on host, e.g. by robolectric.
+java_library {
+    name: "conscrypt-for-host",
+    visibility: [
+        "//art/build",
+        "//external/robolectric-shadows",
+    ],
+    static_libs: [
+        "conscrypt",
+    ],
+    sdk_version: "none",
+    system_modules: "none",
+}
+
 // Referenced implicitly from conscrypt.module.platform.api.
 filegroup {
     name: "conscrypt.module.platform.api.api.public.latest",
@@ -657,6 +671,7 @@ module_exports {
             java_libs: [
                 // For use by robolectric and ART tests.
                 "conscrypt",
+                "conscrypt-for-host",
             ],
             java_tests: [
                 // For use by CTS
