@@ -4977,13 +4977,9 @@ static void NativeCrypto_X509_REVOKED_print(JNIEnv* env, jclass, jlong bioRef,
     BIO_printf(bio, "\nRevocation Date: ");
     ASN1_TIME_print(bio, X509_REVOKED_get0_revocationDate(revoked));
     BIO_printf(bio, "\n");
-    // TODO(davidben): Remove the const_cast after
-    // https://boringssl-review.googlesource.com/c/boringssl/+/43565 has landed.
-    //
     // TODO(davidben): Should the flags parameter be |X509V3_EXT_DUMP_UNKNOWN| so we don't error on
     // unknown extensions. Alternatively, maybe we can use a simpler toString() implementation.
-    X509V3_extensions_print(bio, "CRL entry extensions",
-                            const_cast<X509_EXTENSIONS*>(X509_REVOKED_get0_extensions(revoked)), 0,
+    X509V3_extensions_print(bio, "CRL entry extensions", X509_REVOKED_get0_extensions(revoked), 0,
                             0);
 }
 #ifndef _WIN32
@@ -4995,7 +4991,7 @@ static jbyteArray NativeCrypto_get_X509_CRL_crl_enc(JNIEnv* env, jclass, jlong x
     CHECK_ERROR_QUEUE_ON_RETURN;
     X509_CRL* crl = reinterpret_cast<X509_CRL*>(static_cast<uintptr_t>(x509CrlRef));
     JNI_TRACE("get_X509_CRL_crl_enc(%p)", crl);
-    return ASN1ToByteArray<X509_CRL_INFO>(env, crl->crl, i2d_X509_CRL_INFO);
+    return ASN1ToByteArray<X509_CRL>(env, crl, i2d_X509_CRL_tbs);
 }
 
 static void NativeCrypto_X509_CRL_verify(JNIEnv* env, jclass, jlong x509CrlRef,

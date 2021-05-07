@@ -17,12 +17,14 @@
 
 package com.android.org.conscrypt.java.security.cert;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import com.android.org.conscrypt.TestUtils;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.Provider;
@@ -106,6 +108,12 @@ public class X509CRLTest {
             + "nDN0LLg=\n"
             + "-----END X509 CRL-----\n";
 
+    private static final String CRL_TBS_BASE64 =
+            "MIG7AgEBMA0GCSqGSIb3DQEBCwUAMFUxCzAJBgNVBAYTAkdCMSQwIgYDVQQKExtD"
+            + "ZXJ0aWZpY2F0ZSBUcmFuc3BhcmVuY3kgQ0ExDjAMBgNVBAgTBVdhbGVzMRAwDgYD"
+            + "VQQHEwdFcncgV2VuFw0xOTA4MDcxMDI3MTBaFw0xOTA5MDYxMDI3MTBaMCIwIAIB"
+            + "BxcNMTkwODA3MTAyNjU0WjAMMAoGA1UdFQQDCgEBoA4wDDAKBgNVHRQEAwIBAg==";
+
     private static final String UNKNOWN_SIGNATURE_OID = "-----BEGIN X509 CRL-----\n"
             + "MIIBVzCBvgIBATAQBgwqhkiG9xIEAYS3CQIFADBVMQswCQYDVQQGEwJHQjEkMCIG\n"
             + "A1UEChMbQ2VydGlmaWNhdGUgVHJhbnNwYXJlbmN5IENBMQ4wDAYDVQQIEwVXYWxl\n"
@@ -140,6 +148,9 @@ public class X509CRLTest {
                         fail();
                     } catch (SignatureException expected) {
                     }
+
+                    byte[] expectedTBSCertList = TestUtils.decodeBase64(CRL_TBS_BASE64);
+                    assertArrayEquals(expectedTBSCertList, crl.getTBSCertList());
 
                     assertTrue(crl.isRevoked(revoked));
                     X509CRLEntry entry = crl.getRevokedCertificate(revoked);
