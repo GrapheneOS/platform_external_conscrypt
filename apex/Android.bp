@@ -27,7 +27,7 @@ apex_defaults {
     updatable: true,
     androidManifest: ":com.android.conscrypt-androidManifest",
     compile_multilib: "both",
-    java_libs: ["conscrypt"],
+    bootclasspath_fragments: ["com.android.conscrypt-bootclasspath-fragment"],
     jni_libs: ["libjavacrypto"],
     multilib: {
         both: {
@@ -80,4 +80,11 @@ apex {
     manifest: "apex_manifest.json",
     binaries: ["boringssl_self_test"],
     prebuilts: ["com.android.conscrypt.ld.config.txt"],
+}
+
+// Encapsulate the contributions made by the com.android.conscrypt to the bootclasspath.
+bootclasspath_fragment {
+    name: "com.android.conscrypt-bootclasspath-fragment",
+    contents: ["conscrypt"],
+    apex_available: ["com.android.conscrypt"],
 }
