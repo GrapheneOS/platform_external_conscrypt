@@ -69,7 +69,7 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
 
     @android.compat.annotation
             .UnsupportedAppUsage(maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
-                    publicAlternatives = "Use {@link javax.net.ssl.SSLParameters#setServerNames}.")
+                    publicAlternatives = "Use {@code javax.net.ssl.SSLParameters#setServerNames}.")
             @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
             @Override
             public void
@@ -167,7 +167,7 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
     @android.compat.annotation.
     UnsupportedAppUsage(maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
             publicAlternatives =
-                    "Use {@link javax.net.ssl.SSLParameters#setApplicationProtocols(java.lang.String[])}.")
+                    "Use {@code javax.net.ssl.SSLParameters#setApplicationProtocols(java.lang.String[])}.")
     @Override
     @Deprecated
     public final void
@@ -181,7 +181,7 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
     @android.compat.annotation
             .UnsupportedAppUsage(maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
                     publicAlternatives =
-                            "Use {@link javax.net.ssl.SSLSocket#getApplicationProtocol()}.")
+                            "Use {@code javax.net.ssl.SSLSocket#getApplicationProtocol()}.")
             @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
             @Override
             @Deprecated
@@ -195,7 +195,7 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
     @android.compat.annotation
             .UnsupportedAppUsage(maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
                     publicAlternatives =
-                            "Use {@link javax.net.ssl.SSLParameters#setApplicationProtocols(java.lang.String[])}.")
+                            "Use {@code javax.net.ssl.SSLParameters#setApplicationProtocols(java.lang.String[])}.")
             @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
             @Override
             @Deprecated
