@@ -379,7 +379,7 @@ class ConscryptEngineSocket extends OpenSSLSocketImpl implements SSLParametersIm
      */
     @android.compat.annotation.
     UnsupportedAppUsage(maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
-            publicAlternatives = "Use {@link javax.net.ssl.SSLParameters#setServerNames}.")
+            publicAlternatives = "Use {@code javax.net.ssl.SSLParameters#setServerNames}.")
     @Override
     public final void
     setHostname(String hostname) {
