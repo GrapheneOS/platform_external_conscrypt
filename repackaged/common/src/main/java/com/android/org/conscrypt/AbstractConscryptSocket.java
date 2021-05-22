@@ -529,7 +529,7 @@ abstract class AbstractConscryptSocket extends SSLSocket {
      */
     @android.compat.annotation.
     UnsupportedAppUsage(maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
-            publicAlternatives = "Use {@link javax.net.ssl.SSLParameters#setServerNames}.")
+            publicAlternatives = "Use {@code javax.net.ssl.SSLParameters#setServerNames}.")
     void
     setHostname(String hostname) {
         peerHostname = hostname;
@@ -703,7 +703,7 @@ abstract class AbstractConscryptSocket extends SSLSocket {
      */
     @android.compat.annotation.
     UnsupportedAppUsage(maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
-            publicAlternatives = "Use {@link javax.net.ssl.SSLSocket#getApplicationProtocol()}.")
+            publicAlternatives = "Use {@code javax.net.ssl.SSLSocket#getApplicationProtocol()}.")
     @Deprecated
     abstract byte[] getAlpnSelectedProtocol();
 
@@ -717,7 +717,7 @@ abstract class AbstractConscryptSocket extends SSLSocket {
     @android.compat.annotation.
     UnsupportedAppUsage(maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
             publicAlternatives =
-                    "Use {@link javax.net.ssl.SSLParameters#setApplicationProtocols(java.lang.String[])}.")
+                    "Use {@code javax.net.ssl.SSLParameters#setApplicationProtocols(java.lang.String[])}.")
     @Deprecated
     abstract void setAlpnProtocols(String[] alpnProtocols);
 
@@ -732,7 +732,7 @@ abstract class AbstractConscryptSocket extends SSLSocket {
     @android.compat.annotation.
     UnsupportedAppUsage(maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
             publicAlternatives =
-                    "Use {@link javax.net.ssl.SSLParameters#setApplicationProtocols(java.lang.String[])}.")
+                    "Use {@code javax.net.ssl.SSLParameters#setApplicationProtocols(java.lang.String[])}.")
     @Deprecated
     abstract void setAlpnProtocols(byte[] alpnProtocols);
 
@@ -744,7 +744,7 @@ abstract class AbstractConscryptSocket extends SSLSocket {
     @android.compat.annotation.
     UnsupportedAppUsage(maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
             publicAlternatives =
-                    "Use {@link javax.net.ssl.SSLParameters#setApplicationProtocols(java.lang.String[])}.")
+                    "Use {@code javax.net.ssl.SSLParameters#setApplicationProtocols(java.lang.String[])}.")
     @SuppressWarnings("MissingOverride") // For compiling pre Java 9.
     abstract void setApplicationProtocols(String[] protocols);
 
@@ -754,7 +754,7 @@ abstract class AbstractConscryptSocket extends SSLSocket {
     @android.compat.annotation.
     UnsupportedAppUsage(maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
             publicAlternatives =
-                    "Use {@link javax.net.ssl.SSLParameters#getApplicationProtocols()}.")
+                    "Use {@code javax.net.ssl.SSLParameters#getApplicationProtocols()}.")
     @SuppressWarnings("MissingOverride") // For compiling pre Java 9.
     abstract String[] getApplicationProtocols();
 
