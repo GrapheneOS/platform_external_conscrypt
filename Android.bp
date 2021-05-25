@@ -639,8 +639,8 @@ java_test {
 // Device SDK exposed by the Conscrypt module.
 sdk {
     name: "conscrypt-module-sdk",
-    java_boot_libs: [
-        "conscrypt",
+    bootclasspath_fragments: [
+        "com.android.conscrypt-bootclasspath-fragment",
     ],
     java_sdk_libs: [
         "conscrypt.module.public.api",
