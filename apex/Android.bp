@@ -87,4 +87,28 @@ bootclasspath_fragment {
     name: "com.android.conscrypt-bootclasspath-fragment",
     contents: ["conscrypt"],
     apex_available: ["com.android.conscrypt"],
+    // The bootclasspath_fragments that provide APIs on which this depends.
+    fragments: [
+        {
+            apex: "com.android.art",
+            module: "art-bootclasspath-fragment",
+        },
+    ],
+    // The APIs provided by this fragment.
+    api: {
+        stub_libs: [
+            "conscrypt.module.public.api",
+        ],
+    },
+    // The core platform APIs provided by this fragment.
+    core_platform_api: {
+        stub_libs: [
+            "conscrypt.module.platform.api",
+        ],
+    },
+    // Additional hidden API flags that override the default flags derived
+    // from the api stub libraries.
+    hidden_api: {
+        max_target_o_low_priority: ["hiddenapi/hiddenapi-max-target-o-low-priority.txt"],
+    },
 }
