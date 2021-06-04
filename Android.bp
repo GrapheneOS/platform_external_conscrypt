@@ -353,8 +353,10 @@ java_sdk_library {
     sdk_version: "none",
     system_modules: "legacy-art-module-platform-api-stubs-system-modules",
 
-    // Don't copy any output files to the dist.
-    no_dist: true,
+    dist_group: "android",
+    dist_stem: "conscrypt-coreplatform",
+    // TODO: remove this when Conscrypt's @CorePlatformApi has been migrated to @SystemApi
+    unsafe_ignore_missing_latest_api: true,
 }
 
 // A library containing the public API stubs of the Conscrypt module.
