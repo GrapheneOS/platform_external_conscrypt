@@ -396,6 +396,7 @@ java_sdk_library {
 
     sdk_version: "none",
     system_modules: "art-module-public-api-stubs-system-modules",
+    dist_group: "android",
 }
 
 // Referenced implicitly from conscrypt.module.intra.core.api.
