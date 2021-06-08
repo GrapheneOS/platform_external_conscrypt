@@ -29,6 +29,7 @@ apex_defaults {
     compile_multilib: "both",
     bootclasspath_fragments: ["com.android.conscrypt-bootclasspath-fragment"],
     jni_libs: ["libjavacrypto"],
+    prebuilts: ["current_sdkinfo"],
     multilib: {
         both: {
             binaries: ["boringssl_self_test"],
