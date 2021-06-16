@@ -346,7 +346,6 @@ java_sdk_library {
     droiddoc_options: [
         "--hide-annotation libcore.api.Hide",
         "--show-single-annotation libcore.api.CorePlatformApi\\(status=libcore.api.CorePlatformApi.Status.STABLE\\)",
-        "--skip-annotation-instance-methods=false",
     ],
     hostdex: true,
 
@@ -450,7 +449,6 @@ java_sdk_library {
     droiddoc_options: [
         "--hide-annotation libcore.api.Hide",
         "--show-single-annotation libcore.api.IntraCoreApi",
-        "--skip-annotation-instance-methods=false",
     ],
 
     sdk_version: "none",
