@@ -33,7 +33,8 @@ import tests.util.ServiceTester;
  * @hide This class is not part of the Android public SDK API
  */
 public abstract class AbstractKeyFactoryTest<PublicKeySpec extends KeySpec, PrivateKeySpec extends KeySpec> {
-    protected final String algorithmName;
+
+    private final String algorithmName;
     private final Class<PublicKeySpec> publicKeySpecClass;
     private final Class<PrivateKeySpec> privateKeySpecClass;
 
