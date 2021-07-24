@@ -30,7 +30,7 @@ import tests.util.ServiceTester;
 
 public abstract class AbstractKeyFactoryTest<PublicKeySpec extends KeySpec, PrivateKeySpec extends KeySpec> {
 
-    protected final String algorithmName;
+    private final String algorithmName;
     private final Class<PublicKeySpec> publicKeySpecClass;
     private final Class<PrivateKeySpec> privateKeySpecClass;
 
