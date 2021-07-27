@@ -522,7 +522,7 @@ java_library_host {
         ":conscrypt-unbundled_generated_constants",
     ],
     javacflags: ["-XDignore.symbol.file"],
-    java_version: "1.7",
+    java_version: "1.8",
 }
 
 // Static unbundled Conscrypt crypto JNI library
@@ -596,7 +596,7 @@ java_test {
             enabled: false,
         },
     },
-    java_version: "1.7",
+    java_version: "1.8",
 }
 
 // Make the conscrypt-benchmarks library.
@@ -633,7 +633,7 @@ java_test {
             enabled: false,
         },
     },
-    java_version: "1.7",
+    java_version: "1.8",
 }
 
 // Device SDK exposed by the Conscrypt module.
