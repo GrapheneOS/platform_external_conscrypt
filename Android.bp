@@ -147,6 +147,7 @@ cc_library_host_shared {
     visibility: [
         "//build/make/tools/signapk",
         "//tools/apksig",
+        "//vendor:__subpackages__",
     ],
     defaults: ["conscrypt_global"],
 
