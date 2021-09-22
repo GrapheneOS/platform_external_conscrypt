@@ -281,6 +281,7 @@ java_library {
     visibility: [
         "//art/build",
         "//external/robolectric-shadows",
+        "//frameworks/layoutlib",
     ],
     static_libs: [
         "conscrypt",
