@@ -49,6 +49,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
@@ -169,6 +170,18 @@ public final class TestUtils {
             available = false;
         }
         Assume.assumeTrue("SHA2 with DSA signatures not available", available);
+    }
+
+    private static Method findMethod(Class<?> cls, String methodName, Class<?>... methodParams) {
+        try {
+            return cls.getDeclaredMethod(methodName, methodParams);
+        } catch (NoSuchMethodException e) {
+            return null;
+        }
+    }
+
+    public static Method findWrapVerifierMethod() {
+        return findMethod(Conscrypt.class, "wrapHostnameVerifier", HostnameVerifier.class);
     }
 
     public static InetAddress getLoopbackAddress() {

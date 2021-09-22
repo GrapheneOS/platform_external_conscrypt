@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.security.KeyStore;
 import java.security.Principal;
 import java.security.cert.Certificate;
@@ -29,6 +30,7 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.List;
 import javax.net.ssl.HandshakeCompletedListener;
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLPeerUnverifiedException;
@@ -165,9 +167,13 @@ public class TrustManagerImplTest {
 
             // Override the global default hostname verifier with a Conscrypt-specific one that
             // always passes.  Both scenarios should pass.
-            Conscrypt.setDefaultHostnameVerifier(new ConscryptHostnameVerifier() {
-                @Override public boolean verify(String s, SSLSession sslSession) { return true; }
-            });
+            HostnameVerifier alwaysTrue = new HostnameVerifier() {
+                @Override
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            };
+            HttpsURLConnection.setDefaultHostnameVerifier(alwaysTrue);
 
             certs = tmi.getTrustedChainForServer(chain, "RSA",
                 new FakeSSLSocket(new FakeSSLSession(badHostname, chain), params));
@@ -179,7 +185,7 @@ public class TrustManagerImplTest {
 
             // Now set an instance-specific verifier on the trust manager.  The bad hostname should
             // fail again.
-            Conscrypt.setHostnameVerifier(tmi, new TestHostnameVerifier());
+            Conscrypt.setHostnameVerifier(tmi, wrapVerifier(new TestHostnameVerifier()));
 
             try {
                 tmi.getTrustedChainForServer(chain, "RSA",
@@ -206,6 +212,29 @@ public class TrustManagerImplTest {
             Conscrypt.setDefaultHostnameVerifier(null);
             HttpsURLConnection.setDefaultHostnameVerifier(oldDefault);
         }
+    }
+
+    /*
+     * Wrap a HostnameVerifier in a ConscryptHostnameVerifier.
+     * In the Android platform ConscryptHostnameVerifier is a private API and the interface
+     * definition changed between Android 11 and Android 12.
+     * If an Android 12 Conscrypt module is present then there will also be a (non-public)
+     * method to wrap it with the correct interface.
+     * If an earlier module is present then the interface is the same as in the CTS 11 codebase
+     * and so we can just wrap it directly with an anonymous class.
+     * See also b/195615915
+     */
+    private ConscryptHostnameVerifier wrapVerifier(final HostnameVerifier verifier) throws Exception {
+        Method wrapMethod = TestUtils.findWrapVerifierMethod();
+        if (wrapMethod != null) {
+            return (ConscryptHostnameVerifier) wrapMethod.invoke(null, verifier);
+        }
+        return new ConscryptHostnameVerifier() {
+            @Override
+            public boolean verify(String hostname, SSLSession session) {
+                return  verifier.verify(hostname, session);
+            }
+        };
     }
 
     private X509TrustManager trustManager(X509Certificate ca) throws Exception {
