@@ -17,6 +17,9 @@
 
 package com.android.org.conscrypt;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
@@ -25,13 +28,15 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 import javax.net.ssl.X509TrustManager;
-import junit.framework.TestCase;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  * @hide This class is not part of the Android public SDK API
  */
-public class CertBlacklistTest extends TestCase {
-
+@RunWith(JUnit4.class)
+public class CertBlacklistTest {
     private static final String BLACKLIST_CA = "test_blacklist_ca.pem";
     private static final String BLACKLISTED_CHAIN = "blacklist_test_chain.pem";
     private static final String BLACKLIST_FALLBACK_VALID_CA = "blacklist_test_valid_ca.pem";
@@ -40,7 +45,11 @@ public class CertBlacklistTest extends TestCase {
     /**
      * Ensure that the test blacklisted CA is actually blacklisted by default.
      */
+    @Test
     public void testBlacklistedPublicKey() throws Exception {
+        // This class was renamed in the Android 12 based Conscrypt module.
+        // If such a module is installed, simply skip the test as it is covered by MTS
+        TestUtils.assumeBeforeAndroid12Mainline();
         X509Certificate blacklistedCa = loadCertificate(BLACKLIST_CA);
         CertBlacklist blacklist = CertBlacklistImpl.getDefault();
         assertTrue(blacklist.isPublicKeyBlackListed(blacklistedCa.getPublicKey()));
@@ -49,6 +58,7 @@ public class CertBlacklistTest extends TestCase {
     /**
      * Check that the blacklisted CA is rejected even if it used as a root of trust
      */
+    @Test
     public void testBlacklistedCaUntrusted() throws Exception {
         X509Certificate blacklistedCa = loadCertificate(BLACKLIST_CA);
         assertUntrusted(new X509Certificate[] {blacklistedCa}, getTrustManager(blacklistedCa));
@@ -57,6 +67,7 @@ public class CertBlacklistTest extends TestCase {
     /**
      * Check that a chain that is rooted in a blacklisted trusted CA is rejected.
      */
+    @Test
     public void testBlacklistedRootOfTrust() throws Exception {
         // Chain is leaf -> blacklisted
         X509Certificate[] chain = loadCertificates(BLACKLISTED_CHAIN);
@@ -73,6 +84,7 @@ public class CertBlacklistTest extends TestCase {
      *               \
      *                -------> trusted_ca
      */
+    @Test
     public void testBlacklistedIntermediateFallback() throws Exception {
         X509Certificate[] chain = loadCertificates(BLACKLISTED_VALID_CHAIN);
         X509Certificate blacklistedCa = loadCertificate(BLACKLIST_CA);

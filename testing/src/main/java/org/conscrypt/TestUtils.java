@@ -149,10 +149,21 @@ public final class TestUtils {
         }
     }
 
+    // Is a pre-Android 12 mainline module installed.  Detect based on a class that
+    // was renamed in the Android 12 codebase.
+    private static boolean isBeforeAndroid12Mainline() {
+        return isClassAvailable("org.conscrypt.CertBlacklistImpl");
+    }
+
     public static void assumeAndroid() {
         Assume.assumeTrue(isAndroid());
     }
 
+    public static void assumeBeforeAndroid12Mainline() {
+        Assume.assumeTrue(isAndroid() && isBeforeAndroid12Mainline());
+    }
+
+    // Assume a pre-Android 12 mainline module is installed.
     public static void assumeAllowsUnsignedCrypto() {
         // The Oracle JRE disallows loading crypto providers from unsigned jars
         Assume.assumeTrue(isAndroid()
