@@ -45,6 +45,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
@@ -148,10 +149,21 @@ public final class TestUtils {
         }
     }
 
+    // Is a pre-Android 12 mainline module installed.  Detect based on a class that
+    // was renamed in the Android 12 codebase.
+    private static boolean isBeforeAndroid12Mainline() {
+        return isClassAvailable("org.conscrypt.CertBlacklistImpl");
+    }
+
     public static void assumeAndroid() {
         Assume.assumeTrue(isAndroid());
     }
 
+    public static void assumeBeforeAndroid12Mainline() {
+        Assume.assumeTrue(isAndroid() && isBeforeAndroid12Mainline());
+    }
+
+    // Assume a pre-Android 12 mainline module is installed.
     public static void assumeAllowsUnsignedCrypto() {
         // The Oracle JRE disallows loading crypto providers from unsigned jars
         Assume.assumeTrue(isAndroid()
@@ -167,6 +179,18 @@ public final class TestUtils {
             available = false;
         }
         Assume.assumeTrue("SHA2 with DSA signatures not available", available);
+    }
+
+    private static Method findMethod(Class<?> cls, String methodName,  Class<?>... methodParams) {
+        try {
+            return cls.getDeclaredMethod(methodName, methodParams);
+        } catch (NoSuchMethodException e) {
+            return null;
+        }
+    }
+
+    public static Method findWrapVerifierMethod() {
+        return findMethod(Conscrypt.class, "wrapHostnameVerifier", HostnameVerifier.class);
     }
 
     public static InetAddress getLoopbackAddress() {
