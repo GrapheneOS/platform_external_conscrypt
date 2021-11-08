@@ -52,6 +52,7 @@
 #include <openssl/x509v3.h>
 
 #include <limits>
+#include <type_traits>
 #include <vector>
 
 using conscrypt::AppData;
@@ -283,10 +284,19 @@ static jbyteArray bignumToArray(JNIEnv* env, const BIGNUM* source, const char* s
 /**
  * Converts various OpenSSL ASN.1 types to a jbyteArray with DER-encoded data
  * inside. The "i2d_func" function pointer is a function of the "i2d_<TYPE>"
- * from the OpenSSL ASN.1 API.
+ * from the OpenSSL ASN.1 API. Note i2d_func may take a const parameter, so we
+ * use a separate type parameter.
+ *
+ * TODO(https://crbug.com/boringssl/407): When all BoringSSL i2d functions are
+ * const, switch back to a single template parameter.
  */
-template <typename T>
-jbyteArray ASN1ToByteArray(JNIEnv* env, T* obj, int (*i2d_func)(T*, unsigned char**)) {
+template <typename T, typename U>
+jbyteArray ASN1ToByteArray(JNIEnv* env, T* obj, int (*i2d_func)(U*, unsigned char**)) {
+    // T and U should be the same type, but may differ in const.
+    static_assert(std::is_same<typename std::remove_const<T>::type,
+                               typename std::remove_const<U>::type>::value,
+                  "obj and i2d_func have incompatible types");
+
     if (obj == nullptr) {
         conscrypt::jniutil::throwNullPointerException(env, "ASN1 input == null");
         JNI_TRACE("ASN1ToByteArray(%p) => null input", obj);
@@ -4164,17 +4174,24 @@ static jobject GENERAL_NAME_to_jobject(JNIEnv* env, GENERAL_NAME* gen) {
         case GEN_EMAIL:
         case GEN_DNS:
         case GEN_URI: {
-            // This must not be a T61String and must not contain NULs.
-            const char* data = reinterpret_cast<const char*>(ASN1_STRING_data(gen->d.ia5));
+            // This must be a valid IA5String and must not contain NULs.
+            // BoringSSL does not currently enforce the former (see
+            // https://crbug.com/boringssl/427). The latter was historically an
+            // issue for parsers that truncate at NUL.
+            const uint8_t* data = ASN1_STRING_get0_data(gen->d.ia5);
             ssize_t len = ASN1_STRING_length(gen->d.ia5);
-            if ((len == static_cast<ssize_t>(strlen(data))) &&
-                (ASN1_PRINTABLE_type(ASN1_STRING_data(gen->d.ia5), len) != V_ASN1_T61STRING)) {
-                JNI_TRACE("GENERAL_NAME_to_jobject(%p) => Email/DNS/URI \"%s\"", gen, data);
-                return env->NewStringUTF(data);
-            } else {
-                JNI_TRACE("GENERAL_NAME_to_jobject(%p) => Email/DNS/URI invalid", gen);
-                return nullptr;
+            std::vector<jchar> jchars;
+            jchars.reserve(len);
+            for (ssize_t i = 0; i < len; i++) {
+                if (data[i] == 0 || data[i] > 127) {
+                    JNI_TRACE("GENERAL_NAME_to_jobject(%p) => Email/DNS/URI invalid", gen);
+                    return nullptr;
+                }
+                // Converting ASCII to UTF-16 is the identity function.
+                jchars.push_back(data[i]);
             }
+            JNI_TRACE("GENERAL_NAME_to_jobject(%p)=> Email/DNS/URI \"%.*s\"", gen, (int) len, data);
+            return env->NewString(jchars.data(), jchars.size());
         }
         case GEN_DIRNAME:
             /* Write in RFC 2253 format */
