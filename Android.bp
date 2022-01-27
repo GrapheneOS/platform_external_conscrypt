@@ -387,6 +387,16 @@ java_sdk_library {
     // version of the API.
     dist_stem: "conscrypt",
 
+    public: {
+        enabled: true,
+    },
+    system: {
+        enabled: true,
+    },
+    module_lib: {
+        enabled: true,
+    },
+
     api_dir: "api/public",
     api_only: true,
 
