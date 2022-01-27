@@ -389,10 +389,9 @@ java_sdk_library {
 
     api_dir: "api/public",
     api_only: true,
-    droiddoc_options: [
-        // Emit nullability annotations from the source to the stub files.
-        "--include-annotations",
-    ],
+
+    // Emit nullability annotations from the source to the stub files.
+    annotations_enabled: true,
 
     java_version: "1.9",
 
