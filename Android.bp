@@ -387,12 +387,21 @@ java_sdk_library {
     // version of the API.
     dist_stem: "conscrypt",
 
+    public: {
+        enabled: true,
+    },
+    system: {
+        enabled: true,
+    },
+    module_lib: {
+        enabled: true,
+    },
+
     api_dir: "api/public",
     api_only: true,
-    droiddoc_options: [
-        // Emit nullability annotations from the source to the stub files.
-        "--include-annotations",
-    ],
+
+    // Emit nullability annotations from the source to the stub files.
+    annotations_enabled: true,
 
     java_version: "1.9",
 
