@@ -612,7 +612,7 @@ java_test {
             enabled: false,
         },
     },
-    java_version: "1.8",
+    java_version: "1.7",
 }
 
 // Make the conscrypt-benchmarks library.
@@ -649,7 +649,7 @@ java_test {
             enabled: false,
         },
     },
-    java_version: "1.8",
+    java_version: "1.7",
 }
 
 // Device SDK exposed by the Conscrypt module.

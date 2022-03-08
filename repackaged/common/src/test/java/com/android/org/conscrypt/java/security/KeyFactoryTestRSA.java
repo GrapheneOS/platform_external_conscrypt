@@ -43,6 +43,7 @@ import java.util.Arrays;
 import java.util.List;
 import libcore.junit.util.EnableDeprecatedBouncyCastleAlgorithmsRule;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
@@ -71,6 +72,7 @@ public class KeyFactoryTestRSA extends AbstractKeyFactoryTest<RSAPublicKeySpec, 
     }
 
     @Test
+    @Ignore("b/209335673 Base image has fix for b/191150645 but release version of module does not")
     public void getEncodedFailsWhenCrtValuesMissing() throws Exception {
         PrivateKey privateKey = getPrivateKey();
         try {
@@ -122,6 +124,7 @@ public class KeyFactoryTestRSA extends AbstractKeyFactoryTest<RSAPublicKeySpec, 
     }
 
     @Test
+    @Ignore("b/209335673 Base image has fix for b/191150645 but release version of module does not")
     public void javaSerialization() throws Exception {
         PrivateKey privatekey = getPrivateKey();
 
@@ -136,10 +139,13 @@ public class KeyFactoryTestRSA extends AbstractKeyFactoryTest<RSAPublicKeySpec, 
         assertEquals(privatekey, copy);
     }
 
-    @Override
-    protected List<KeyPair> getKeys() throws NoSuchAlgorithmException, InvalidKeySpecException {
-        return Arrays.asList(new KeyPair(DefaultKeys.getPublicKey(algorithmName), getPrivateKey()));
-    }
+    // b/209335673 Base image has fix for b/191150645 but release version of module does not,
+    // @Override
+    // protected List<KeyPair> getKeys() throws NoSuchAlgorithmException, InvalidKeySpecException {
+    //     return Arrays.asList(
+    //             new KeyPair(DefaultKeys.getPublicKey(algorithmName), getPrivateKey())
+    //     );
+    // }
 
     // The private RSA key returned by DefaultKeys.getPrivateKey() is built from a PKCS#8
     // KeySpec and so will be an instance of RSAPrivateCrtKey, but we want to test RSAPrivateKey
