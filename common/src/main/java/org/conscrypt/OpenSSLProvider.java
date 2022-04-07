@@ -211,6 +211,9 @@ public final class OpenSSLProvider extends Provider {
         /* == SecretKeyFactory == */
         put("SecretKeyFactory.DESEDE", PREFIX + "DESEDESecretKeyFactory");
         put("Alg.Alias.SecretKeyFactory.TDEA", "DESEDE");
+        put("SecretKeyFactory.SCRYPT", PREFIX + "ScryptSecretKeyFactory");
+        put("Alg.Alias.SecretKeyFactory.1.3.6.1.4.1.11591.4.11", "SCRYPT");
+        put("Alg.Alias.SecretKeyFactory.OID.1.3.6.1.4.1.11591.4.11", "SCRYPT");
 
         /* == KeyAgreement == */
         putECDHKeyAgreementImplClass("OpenSSLECDHKeyAgreement");
