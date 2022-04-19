@@ -4,7 +4,6 @@ package com.android.org.conscrypt.metrics;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,10 +33,9 @@ public class OptionalMethodTest {
         assertNull(substring.invoke("input", 2, 5));
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void nullMethodName() {
-        assertThrows(NullPointerException.class,
-                () -> new OptionalMethod(String.class, null, int.class, int.class));
+        new OptionalMethod(String.class, null, int.class, int.class);
     }
 
     @Test
