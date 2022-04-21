@@ -24,11 +24,9 @@
 namespace conscrypt {
 namespace trace {
 
-constexpr bool kWithJniTrace = false;
-constexpr bool kWithJniTraceMd = false;
-constexpr bool kWithJniTraceData = false;
-// Don't overwhelm logcat when tracing data.
-constexpr std::size_t kWithJniTraceDataChunkSize = 512;
+extern const bool kWithJniTrace;
+extern const bool kWithJniTraceMd;
+extern const bool kWithJniTraceData;
 
 /*
  * To print create a pcap-style dump you can take the log output and
@@ -40,7 +38,7 @@ constexpr std::size_t kWithJniTraceDataChunkSize = 512;
  *  awk "match(\$0,/ssl=$address SSL_DATA: (.*)\$/,a){print a[1]}" | text2pcap -T 443,1337 -t
  * '%s.' -n -D - $address.pcapng
  */
-constexpr bool kWithJniTracePackets = false;
+extern const bool kWithJniTracePackets;
 
 /*
  * How to use this for debugging with Wireshark:
@@ -59,7 +57,10 @@ constexpr bool kWithJniTracePackets = false;
  * 4. Follow the stream that corresponds to the desired "Session-ID" in
  *    the Server Hello.
  */
- constexpr bool kWithJniTraceKeys = false;
+extern const bool kWithJniTraceKeys;
+
+// don't overwhelm logcat
+extern const std::size_t kWithJniTraceDataChunkSize;
 
 }  // namespace trace
 }  // namespace conscrypt
