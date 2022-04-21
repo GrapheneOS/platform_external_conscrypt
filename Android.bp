@@ -100,6 +100,7 @@ cc_defaults {
         "common/src/jni/main/cpp/conscrypt/jniutil.cc",
         "common/src/jni/main/cpp/conscrypt/native_crypto.cc",
         "common/src/jni/main/cpp/conscrypt/netutil.cc",
+        "common/src/jni/main/cpp/conscrypt/trace.cc",
     ],
 
     header_libs: ["jni_headers"],
