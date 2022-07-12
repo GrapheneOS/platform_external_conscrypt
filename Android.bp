@@ -654,13 +654,13 @@ java_test {
 // Device SDK exposed by the Conscrypt module.
 sdk {
     name: "conscrypt-module-sdk",
-    bootclasspath_fragments: [
-        "com.android.conscrypt-bootclasspath-fragment",
+    apexes: [
+        // Adds exportable dependencies of the APEX to the sdk,
+        // e.g. *classpath_fragments.
+        "com.android.conscrypt",
     ],
     java_sdk_libs: [
-        "conscrypt.module.public.api",
         "conscrypt.module.intra.core.api",
-        "conscrypt.module.platform.api",
     ],
     native_shared_libs: [
         "libconscrypt_jni",

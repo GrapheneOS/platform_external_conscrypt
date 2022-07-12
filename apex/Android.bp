@@ -76,6 +76,7 @@ prebuilt_etc {
 apex {
     name: "com.android.conscrypt",
     visibility: [
+        "//external/conscrypt",
         "//vendor:__subpackages__",
     ],
     defaults: ["com.android.conscrypt-defaults"],
