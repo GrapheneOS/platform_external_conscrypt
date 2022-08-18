@@ -232,7 +232,6 @@ java_library {
     name: "conscrypt",
     visibility: [
         "//device:__subpackages__",
-        "//system/apex/tests",
         ":__subpackages__",
     ],
     apex_available: [
