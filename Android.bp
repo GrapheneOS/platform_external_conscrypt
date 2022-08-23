@@ -528,12 +528,18 @@ cc_library_shared {
 // Unbundled Conscrypt jar for use by signapk and apksigner tool
 //
 // Builds against standard host libraries.
-java_library_host {
+//
+// This does not use java_library_host as that does not support the
+// min_sdk_version property which needs to be set to make sure that this
+// library is added to the sdk snapshot correctly.
+java_library {
     name: "conscrypt-unbundled",
     visibility: [
         "//build/make/tools/signapk",
         "//tools/apksig",
     ],
+    device_supported: false,
+    host_supported: true,
     srcs: [
         "common/src/main/java/**/*.java",
         "openjdk/src/main/java/**/*.java",
@@ -546,6 +552,8 @@ java_library_host {
             enabled: true,
         },
     },
+    // Make sure that this will be added to the sdk snapshot for S.
+    min_sdk_version: "S",
 }
 
 // Static unbundled Conscrypt crypto JNI library
