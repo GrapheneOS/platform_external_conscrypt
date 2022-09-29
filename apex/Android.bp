@@ -40,13 +40,13 @@ apex_defaults {
     // Whether it actually will be compressed is controlled on per-device basis.
     compressible: true,
 
-    // IMPORTANT: q-launched-apex-module enables the build system to make
+    // IMPORTANT: q-launched-dcla-enabled-apex-module enables the build system to make
     // sure the package compatible to Android 10 in two ways:
     // - build the APEX package compatible to Android 10
     //   so that the package can be installed.
     // - build artifacts (lib/javalib/bin) against Android 10 SDK
     //   so that the artifacts can run.
-    defaults: ["q-launched-apex-module"],
+    defaults: ["q-launched-dcla-enabled-apex-module"],
 }
 
 filegroup {
