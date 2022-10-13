@@ -543,7 +543,7 @@ java_library {
     visibility: [
         "//build/make/tools/signapk",
         "//tools/apksig",
-        "//external/robolectric/robolectric",
+        "//external/robolectric:__subpackages__",
     ],
     device_supported: false,
     host_supported: true,
