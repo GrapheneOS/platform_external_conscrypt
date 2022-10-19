@@ -133,7 +133,9 @@ final class Platform {
         } catch (ErrnoException errnoException) {
             // Equivalent to errnoException.rethrowAsSocketException() but that causes
             // lint issues on AOSP.
-            throw new SocketException(errnoException.getMessage(), errnoException);
+            SocketException exception = new SocketException(errnoException.getMessage());
+            exception.addSuppressed(errnoException);
+            throw exception;
         }
     }
 
