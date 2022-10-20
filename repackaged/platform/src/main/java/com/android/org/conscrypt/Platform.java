@@ -131,7 +131,11 @@ final class Platform {
         try {
             Os.setsockoptTimeval(s.getFileDescriptor$(), SOL_SOCKET, SO_SNDTIMEO, tv);
         } catch (ErrnoException errnoException) {
-            throw errnoException.rethrowAsSocketException();
+            // Equivalent to errnoException.rethrowAsSocketException() but that causes
+            // lint issues on AOSP.
+            SocketException exception = new SocketException(errnoException.getMessage());
+            exception.addSuppressed(errnoException);
+            throw exception;
         }
     }
 
