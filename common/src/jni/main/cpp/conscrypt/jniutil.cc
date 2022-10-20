@@ -109,8 +109,8 @@ void init(JavaVM* vm, JNIEnv* env) {
     buffer_positionMethod = getMethodRef(env, bufferClass, "position", "()I");
     buffer_limitMethod = getMethodRef(env, bufferClass, "limit", "()I");
     buffer_isDirectMethod = getMethodRef(env, bufferClass, "isDirect", "()Z");
-    sslHandshakeCallbacks_verifyCertificateChain = getMethodRef(
-            env, sslHandshakeCallbacksClass, "verifyCertificateChain", "([[BLjava/lang/String;)V");
+    sslHandshakeCallbacks_verifyCertificateChain =
+	    getMethodRef(env, sslHandshakeCallbacksClass, "verifyCertificateChain", "([[BLjava/lang/String;)V");
     sslHandshakeCallbacks_onSSLStateChange =
             getMethodRef(env, sslHandshakeCallbacksClass, "onSSLStateChange", "(II)V");
     sslHandshakeCallbacks_clientCertificateRequested = getMethodRef(
