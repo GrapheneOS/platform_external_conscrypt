@@ -281,6 +281,7 @@ java_library {
     visibility: [
         "//art/build",
         "//external/robolectric-shadows",
+        "//external/robolectric",
         "//frameworks/layoutlib",
     ],
     static_libs: [
@@ -537,6 +538,7 @@ java_library {
     visibility: [
         "//build/make/tools/signapk",
         "//tools/apksig",
+        "//external/robolectric/robolectric",
     ],
     device_supported: false,
     host_supported: true,
