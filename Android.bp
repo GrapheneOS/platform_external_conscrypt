@@ -536,6 +536,7 @@ java_library_host {
         "//build/make/tools/signapk",
         "//tools/apksig",
         "//external/robolectric/robolectric",
+        "//external/robolectric:__subpackages__",
     ],
     srcs: [
         "common/src/main/java/**/*.java",
