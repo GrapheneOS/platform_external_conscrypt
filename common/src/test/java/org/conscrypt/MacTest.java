@@ -22,7 +22,6 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -32,7 +31,6 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.HashSet;
@@ -166,7 +164,7 @@ public class MacTest {
     }
 
     @Test
-    public void invalidKeyTypeThrows() {
+    public void invalidKeyThrows() {
         newMacServiceTester()
             // BC actually accepts RSA public keys for these algorithms for some reason.
             .skipCombination("BC", "PBEWITHHMACSHA")
@@ -187,16 +185,6 @@ public class MacTest {
                     }
                 }
             });
-    }
-
-    @Test
-    public void invalidCmacKeySizeThrows() throws Exception {
-        // TODO(prb): extend to other Macs, deal with inconsistencies between providers.
-        Mac mac = Mac.getInstance("AESCMAC", conscryptProvider);
-        byte[] keyBytes = new byte[1];
-        SecretKeySpec key = new SecretKeySpec(keyBytes, "RawBytes");
-
-        assertThrows(InvalidKeyException.class, () -> mac.init(key));
     }
 
     @Test
