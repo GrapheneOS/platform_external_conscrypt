@@ -263,8 +263,14 @@ java_library {
 
     target: {
         // boringssl_self_test needed in both /system/bin and /apex/com.android.conscrypt/bin
+        // prng_seeder is only needed in /system/bin
+        // The required directive is here rather than under boringssl to avoid circular
+        // dependencies.
         android: {
-            required: ["boringssl_self_test"],
+            required: [
+                "boringssl_self_test",
+                "prng_seeder",
+            ],
         },
     },
 
@@ -282,6 +288,7 @@ java_library {
     visibility: [
         "//art/build",
         "//external/robolectric-shadows",
+        "//external/robolectric",
         "//frameworks/layoutlib",
     ],
     static_libs: [
@@ -534,6 +541,8 @@ java_library_host {
     visibility: [
         "//build/make/tools/signapk",
         "//tools/apksig",
+        "//external/robolectric/robolectric",
+        "//external/robolectric:__subpackages__",
     ],
     srcs: [
         "common/src/main/java/**/*.java",
