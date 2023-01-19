@@ -731,3 +731,39 @@ module_exports {
         },
     },
 }
+
+java_api_contribution {
+    name: "conscrypt-module-intra-core-stubs",
+    api_surface: "intra-core",
+    api_file: "api/intra/current.txt",
+    visibility: [
+        "//build/orchestrator/apis",
+    ],
+}
+
+java_api_contribution {
+    name: "conscrypt-module-public-stubs",
+    api_surface: "public",
+    api_file: "api/public/current.txt",
+    visibility: [
+        "//build/orchestrator/apis",
+    ],
+}
+
+java_api_contribution {
+    name: "conscrypt-module-platform-stubs",
+    api_surface: "core-platform",
+    api_file: "api/platform/current.txt",
+    visibility: [
+        "//build/orchestrator/apis",
+    ],
+}
+
+java_api_contribution {
+    name: "conscrypt-module-lib-stubs",
+    api_surface: "module-lib",
+    api_file: "api/public/module-lib-current.txt",
+    visibility: [
+        "//build/orchestrator/apis",
+    ],
+}
