@@ -246,7 +246,7 @@ public class TrustedCertificateStore implements ConscryptCertStore {
         }
         long time = file.lastModified();
         if (time == 0) {
-            return null;
+            time = 1672531200L; // Jan 1st, 2023
         }
         return new Date(time);
     }
