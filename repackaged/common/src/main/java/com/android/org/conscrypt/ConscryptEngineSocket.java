@@ -205,9 +205,8 @@ class ConscryptEngineSocket extends OpenSSLSocketImpl implements SSLParametersIm
                         state = STATE_HANDSHAKE_STARTED;
                         handshakeStartedMillis = Platform.getMillisSinceBoot();
                         engine.beginHandshake();
-                        // Ensure streams are created
-                        getInputStream();
-                        getOutputStream();
+                        createInputStream();
+                        createOutputStream();
                     } else {
                         // We've either started the handshake already or have been closed.
                         // Do nothing in both cases.
@@ -220,9 +219,6 @@ class ConscryptEngineSocket extends OpenSSLSocketImpl implements SSLParametersIm
 
                 doHandshake();
             }
-        } catch (SSLException e) {
-            close();
-            throw e;
         } catch (IOException e) {
             close();
             throw e;
@@ -290,7 +286,10 @@ class ConscryptEngineSocket extends OpenSSLSocketImpl implements SSLParametersIm
     @Override
     public final InputStream getInputStream() throws IOException {
         checkOpen();
+        return createInputStream();
+    }
 
+    private SSLInputStream createInputStream() {
         synchronized (stateLock) {
             if (in == null) {
                 in = new SSLInputStream();
@@ -302,7 +301,10 @@ class ConscryptEngineSocket extends OpenSSLSocketImpl implements SSLParametersIm
     @Override
     public final OutputStream getOutputStream() throws IOException {
         checkOpen();
+        return createOutputStream();
+    }
 
+    private SSLOutputStream createOutputStream() {
         synchronized (stateLock) {
             if (out == null) {
                 out = new SSLOutputStream();
