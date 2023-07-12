@@ -599,7 +599,7 @@ java_test {
             enabled: false,
         },
     },
-    java_version: "1.7",
+    java_version: "1.8",
 }
 
 // Make the conscrypt-benchmarks library.
