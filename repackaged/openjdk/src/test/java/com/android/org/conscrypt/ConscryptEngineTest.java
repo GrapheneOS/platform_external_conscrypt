@@ -19,7 +19,7 @@ package com.android.org.conscrypt;
 
 import static com.android.org.conscrypt.TestUtils.getConscryptProvider;
 import static com.android.org.conscrypt.TestUtils.getJdkProvider;
-import static com.android.org.conscrypt.TestUtils.getProtocols;
+import static com.android.org.conscrypt.TestUtils.highestCommonProtocol;
 import static com.android.org.conscrypt.TestUtils.initSslContext;
 import static com.android.org.conscrypt.TestUtils.newTextMessage;
 import static org.junit.Assert.assertArrayEquals;
@@ -578,7 +578,7 @@ public class ConscryptEngineTest {
 
     private static SSLContext newContext(Provider provider, TestKeyStore keyStore) {
         try {
-            SSLContext ctx = SSLContext.getInstance(getProtocols()[0], provider);
+            SSLContext ctx = SSLContext.getInstance(highestCommonProtocol(), provider);
             return initSslContext(ctx, keyStore);
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
