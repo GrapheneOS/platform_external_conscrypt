@@ -17,10 +17,11 @@
 
 package com.android.org.conscrypt;
 
-import static com.android.org.conscrypt.TestUtils.getProtocols;
+import static com.android.org.conscrypt.TestUtils.getCommonProtocolSuites;
 import static com.android.org.conscrypt.TestUtils.newTextMessage;
 import static org.junit.Assert.assertEquals;
 
+import com.android.org.conscrypt.ServerEndpoint.MessageProcessor;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.SocketException;
@@ -30,7 +31,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
-import com.android.org.conscrypt.ServerEndpoint.MessageProcessor;
 
 /**
  * Benchmark for comparing performance of server socket implementations.
@@ -64,7 +64,7 @@ public final class ServerSocketBenchmark {
         final ChannelType channelType = config.channelType();
 
         server = config.serverFactory().newServer(
-            channelType, config.messageSize(), getProtocols(), ciphers(config));
+                channelType, config.messageSize(), getCommonProtocolSuites(), ciphers(config));
         server.setMessageProcessor(new MessageProcessor() {
             @Override
             public void processMessage(byte[] inMessage, int numBytes, OutputStream os) {
@@ -88,7 +88,7 @@ public final class ServerSocketBenchmark {
 
         // Always use the same client for consistency across the benchmarks.
         client = config.clientFactory().newClient(
-                ChannelType.CHANNEL, server.port(), getProtocols(), ciphers(config));
+                ChannelType.CHANNEL, server.port(), getCommonProtocolSuites(), ciphers(config));
         client.start();
 
         // Wait for the initial connection to complete.
