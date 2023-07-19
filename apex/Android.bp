@@ -136,6 +136,7 @@ apex {
         "target-cacert-apex-7892ad52.0",
         "target-cacert-apex-7a7c655d.0",
         "target-cacert-apex-7a819ef2.0",
+        "target-cacert-apex-7e067d03.0",
         "target-cacert-apex-81b9768f.0",
         "target-cacert-apex-82223c44.0",
         "target-cacert-apex-83e9984f.0",
@@ -154,7 +155,6 @@ apex {
         "target-cacert-apex-9576d26b.0",
         "target-cacert-apex-9591a472.0",
         "target-cacert-apex-95aff9e3.0",
-        "target-cacert-apex-9685a493.0",
         "target-cacert-apex-985c1f52.0",
         "target-cacert-apex-99e1b953.0",
         "target-cacert-apex-9aef356c.0",
@@ -218,6 +218,7 @@ apex {
         "target-cacert-apex-fb5fa911.0",
         "target-cacert-apex-fd08c599.0",
         "target-cacert-apex-fde84897.0",
+        "target-cacert-apex-ffa7f1eb.0",
     ],
 }
 
