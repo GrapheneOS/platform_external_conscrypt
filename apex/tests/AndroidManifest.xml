@@ -28,8 +28,6 @@
   <instrumentation android:name="androidx.test.runner.AndroidJUnitRunner"
                    android:targetPackage="com.android.conscrypt.mts"
                    android:label="MTS tests for the Conscrypt mainline module">
-    <meta-data android:name="listener"
-               android:value="com.android.cts.runner.CtsTestRunListener" />
   </instrumentation>
 
 </manifest>
