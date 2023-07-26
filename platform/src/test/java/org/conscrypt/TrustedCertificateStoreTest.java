@@ -828,14 +828,14 @@ public class TrustedCertificateStoreTest extends TestCase {
         assertFalse(store.isUserAddedCertificate(getCa2()));
     }
 
-    @Test
-    public void testSystemCaCertsUseCorrectFileNames() throws Exception {
+
+    // TODO(b/293296163): re-enable once https://r.android.com/2675835 ships via Mainline.
+    private void dontestSystemCaCertsUseCorrectFileNames() throws Exception {
         File dir = new File(System.getenv("ANDROID_ROOT") + "/etc/security/cacerts");
         useCorrectFileNamesTest(dir);
     }
 
-    @Test
-    public void testSystemCaCertsUseCorrectFileNamesUpdatable() throws Exception {
+    private void dontTestSystemCaCertsUseCorrectFileNamesUpdatable() throws Exception {
         File dir = new File("/apex/com.android.conscrypt/cacerts");
         useCorrectFileNamesTest(dir);
     }
