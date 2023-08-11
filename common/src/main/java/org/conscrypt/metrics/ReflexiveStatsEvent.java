@@ -52,8 +52,8 @@ public class ReflexiveStatsEvent {
         return new ReflexiveStatsEvent.Builder();
     }
 
-    public static ReflexiveStatsEvent buildEvent(
-            int atomId, boolean success, int protocol, int cipherSuite, int duration, int source) {
+    public static ReflexiveStatsEvent buildEvent(int atomId, boolean success, int protocol,
+            int cipherSuite, int duration, int source, int[] uids) {
         ReflexiveStatsEvent.Builder builder = ReflexiveStatsEvent.newBuilder();
         builder.setAtomId(atomId);
         builder.writeBoolean(success);
@@ -61,6 +61,7 @@ public class ReflexiveStatsEvent {
         builder.writeInt(cipherSuite);
         builder.writeInt(duration);
         builder.writeInt(source);
+        builder.writeIntArray(uids);
         builder.usePooledBuffer();
         return builder.build();
     }
@@ -72,6 +73,7 @@ public class ReflexiveStatsEvent {
         private static final OptionalMethod writeInt;
         private static final OptionalMethod build;
         private static final OptionalMethod usePooledBuffer;
+        private static final OptionalMethod writeIntArray;
 
         static {
             c_statsEvent_Builder = initStatsEventBuilderClass();
@@ -80,6 +82,7 @@ public class ReflexiveStatsEvent {
             writeInt = new OptionalMethod(c_statsEvent_Builder, "writeInt", int.class);
             build = new OptionalMethod(c_statsEvent_Builder, "build");
             usePooledBuffer = new OptionalMethod(c_statsEvent_Builder, "usePooledBuffer");
+            writeIntArray = new OptionalMethod(c_statsEvent_Builder, "writeIntArray", int[].class);
         }
 
         private static Class<?> initStatsEventBuilderClass() {
@@ -113,6 +116,11 @@ public class ReflexiveStatsEvent {
 
         public void usePooledBuffer() {
             usePooledBuffer.invoke(this.builder);
+        }
+
+        public Builder writeIntArray(final int[] values) {
+            writeIntArray.invoke(this.builder, values);
+            return this;
         }
 
         public ReflexiveStatsEvent build() {
