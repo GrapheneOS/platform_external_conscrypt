@@ -60,7 +60,7 @@ import javax.security.auth.x500.X500Principal;
 public final class OpenSSLX509Certificate extends X509Certificate {
     private static final long serialVersionUID = 1992239142393372128L;
 
-    @android.compat.annotation.UnsupportedAppUsage private transient final long mContext;
+    @android.compat.annotation.UnsupportedAppUsage private transient volatile long mContext;
     private transient Integer mHashCode;
 
     private final Date notBefore;
@@ -578,8 +578,10 @@ public final class OpenSSLX509Certificate extends X509Certificate {
     @SuppressWarnings("deprecation")
     protected void finalize() throws Throwable {
         try {
-            if (mContext != 0) {
-                NativeCrypto.X509_free(mContext, this);
+            long toFree = mContext;
+            if (toFree != 0) {
+                mContext = 0;
+                NativeCrypto.X509_free(toFree, this);
             }
         } finally {
             super.finalize();
