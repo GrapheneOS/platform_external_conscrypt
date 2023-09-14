@@ -4658,7 +4658,7 @@ public final class CipherTest {
      * PBEWITHSHAAND128BITAES-CBC-BC cipher. The former is PKCS5 and the latter is PKCS12, and so
      * mixing them is not recommended.
      */
-    @NonCts(bug = 287231726, reason = NonCtsReasons.NON_BREAKING_BEHAVIOR_FIX)
+    @NonCts(bug = 290912610, reason = NonCtsReasons.NON_BREAKING_BEHAVIOR_FIX)
     @Test
     public void test_PBKDF2WITHHMACSHA1_SKFactory_and_PBEAESCBC_Cipher_noIV() throws Exception {
         Assume.assumeNotNull(Security.getProvider("BC"));
