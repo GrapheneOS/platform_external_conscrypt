@@ -20,7 +20,6 @@ import static org.junit.Assert.assertEquals;
 
 import android.util.StatsEvent;
 import org.conscrypt.TestUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -32,7 +31,6 @@ public class MetricsTest {
 
     // Tests that ReflexiveEvent produces the same event as framework's.
     @Test
-    @Ignore // Ignore on CTS 12 only: b/259508875
     public void test_reflexiveEvent() throws Exception {
         TestUtils.assumeStatsLogAvailable();
 
