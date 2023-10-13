@@ -2,6 +2,10 @@
 package com.android.org.conscrypt {
 
   public class OpenSSLMessageDigestJDK extends java.security.MessageDigestSpi implements java.lang.Cloneable {
+    method protected byte[] engineDigest();
+    method protected void engineReset();
+    method protected void engineUpdate(byte);
+    method protected void engineUpdate(byte[], int, int);
   }
 
   public static final class OpenSSLMessageDigestJDK.MD5 extends com.android.org.conscrypt.OpenSSLMessageDigestJDK {
@@ -34,6 +38,9 @@ package com.android.org.conscrypt {
 
   public final class OpenSSLRandom extends java.security.SecureRandomSpi implements java.io.Serializable {
     ctor public OpenSSLRandom();
+    method protected byte[] engineGenerateSeed(int);
+    method protected void engineNextBytes(byte[]);
+    method protected void engineSetSeed(byte[]);
   }
 
 }

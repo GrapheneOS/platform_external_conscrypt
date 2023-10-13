@@ -39,6 +39,7 @@ package com.android.org.conscrypt {
     method public final int getSoTimeout() throws java.net.SocketException;
     method public void removeHandshakeCompletedListener(javax.net.ssl.HandshakeCompletedListener);
     method public final void sendUrgentData(int) throws java.io.IOException;
+    method @Deprecated public final void setAlpnProtocols(String[]);
     method @Deprecated public final void setAlpnProtocols(byte[]);
     method public abstract void setChannelIdPrivateKey(java.security.PrivateKey);
     method public void setHandshakeTimeout(int) throws java.net.SocketException;
@@ -59,7 +60,11 @@ package com.android.org.conscrypt {
     method public void checkClientTrusted(java.security.cert.X509Certificate[], String) throws java.security.cert.CertificateException;
     method public void checkClientTrusted(java.security.cert.X509Certificate[], String, java.net.Socket) throws java.security.cert.CertificateException;
     method public void checkClientTrusted(java.security.cert.X509Certificate[], String, javax.net.ssl.SSLEngine) throws java.security.cert.CertificateException;
+    method public void checkServerTrusted(java.security.cert.X509Certificate[], String) throws java.security.cert.CertificateException;
     method public java.util.List<java.security.cert.X509Certificate> checkServerTrusted(java.security.cert.X509Certificate[], String, String) throws java.security.cert.CertificateException;
+    method public void checkServerTrusted(java.security.cert.X509Certificate[], String, java.net.Socket) throws java.security.cert.CertificateException;
+    method public void checkServerTrusted(java.security.cert.X509Certificate[], String, javax.net.ssl.SSLEngine) throws java.security.cert.CertificateException;
+    method public java.security.cert.X509Certificate[] getAcceptedIssuers();
     method public java.util.List<java.security.cert.X509Certificate> getTrustedChainForServer(java.security.cert.X509Certificate[], String, java.net.Socket) throws java.security.cert.CertificateException;
     method public java.util.List<java.security.cert.X509Certificate> getTrustedChainForServer(java.security.cert.X509Certificate[], String, javax.net.ssl.SSLEngine) throws java.security.cert.CertificateException;
     method public void handleTrustStorageUpdate();
