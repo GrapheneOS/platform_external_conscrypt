@@ -346,6 +346,7 @@ java_sdk_library {
     ],
     srcs: [
         ":conscrypt_java_files",
+        ":conscrypt_public_api_files",
     ],
     api_dir: "api/platform",
     api_only: true,
@@ -354,6 +355,8 @@ java_sdk_library {
     },
     droiddoc_options: [
         "--hide-annotation libcore.api.Hide",
+        // Include the "public" API in the "platform" API.
+        "--show-unannotated",
         "--show-single-annotation libcore.api.CorePlatformApi\\(status=libcore.api.CorePlatformApi.Status.STABLE\\)",
     ],
     hostdex: true,
