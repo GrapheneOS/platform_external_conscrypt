@@ -82,7 +82,11 @@ public abstract class OpenSSLMac extends MacSpi {
             throw new InvalidKeyException("key cannot be encoded");
         }
 
-        resetContext();
+        try {
+            resetContext();
+        } catch (RuntimeException e) {
+            throw new InvalidKeyException("invalid key", e);
+        }
     }
 
     @Override
