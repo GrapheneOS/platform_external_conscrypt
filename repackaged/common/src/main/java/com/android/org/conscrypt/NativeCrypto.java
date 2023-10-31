@@ -18,6 +18,7 @@
 package com.android.org.conscrypt;
 
 import com.android.org.conscrypt.OpenSSLX509CertificateFactory.ParsingException;
+import com.android.org.conscrypt.Platform;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -44,7 +45,6 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.ShortBufferException;
 import javax.net.ssl.SSLException;
 import javax.security.auth.x500.X500Principal;
-import com.android.org.conscrypt.Platform;
 
 /**
  * Provides the Java side of our JNI glue for OpenSSL.
@@ -1054,6 +1054,7 @@ public final class NativeCrypto {
             SUPPORTED_PROTOCOL_TLSV1_2,
             SUPPORTED_PROTOCOL_TLSV1_3,
     };
+
     public static String[] getDefaultProtocols() {
         if (Platform.isTlsV1Deprecated()) {
           return DEFAULT_PROTOCOLS.clone();
