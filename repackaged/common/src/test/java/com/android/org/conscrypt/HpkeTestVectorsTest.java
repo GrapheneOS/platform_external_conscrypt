@@ -22,13 +22,11 @@ import static com.android.org.conscrypt.HpkeSuite.AEAD_AES_256_GCM;
 import static com.android.org.conscrypt.HpkeSuite.AEAD_CHACHA20POLY1305;
 import static com.android.org.conscrypt.HpkeSuite.KDF_HKDF_SHA256;
 import static com.android.org.conscrypt.HpkeSuite.KEM_DHKEM_X25519_HKDF_SHA256;
-import static com.android.org.conscrypt.TestUtils.conscryptClass;
 import static com.android.org.conscrypt.TestUtils.decodeHex;
 import static com.android.org.conscrypt.TestUtils.encodeHex;
 import static org.junit.Assert.assertArrayEquals;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
@@ -92,15 +90,13 @@ public class HpkeTestVectorsTest {
         }
     }
 
-    private void testHpkeEncryption(HpkeData record) {
+    private void testHpkeEncryption(HpkeData record) throws Exception {
         final byte[] enc = record.pkEm;
-        final HpkeContextSenderHelper contextHelper =
-                new HpkeTestingContextSenderHelper(record.skEm);
 
         // Encryption
         final HpkeContextSender contextSender =
-                setupBaseForTesting(contextHelper, record.hpkeSuite, record.pkRm, record.info);
-        final byte[] encResult = contextSender.getEnc();
+                setupBaseForTesting(record.hpkeSuite, record.pkRm, record.info, record.skEm);
+        final byte[] encResult = contextSender.getEncapsulated();
         assertArrayEquals("Failed encryption 'enc' " + encodeHex(enc), enc, encResult);
         for (HpkeEncryptionData encryption : record.encryptions) {
             final byte[] ciphertext = contextSender.seal(encryption.pt, encryption.aad);
@@ -110,7 +106,8 @@ public class HpkeTestVectorsTest {
 
         // Decryption
         final HpkeContextRecipient contextRecipient =
-                HpkeContextRecipient.setupBase(record.hpkeSuite, enc, record.skRm, record.info);
+                HpkeContextRecipient.getInstance(record.hpkeSuite.name());
+        contextRecipient.init(enc, record.skRm, record.info);
         for (HpkeEncryptionData encryption : record.encryptions) {
             final byte[] plaintext = contextRecipient.open(encryption.ct, encryption.aad);
             assertArrayEquals(
@@ -118,15 +115,13 @@ public class HpkeTestVectorsTest {
         }
     }
 
-    private void testHpkeExport(HpkeData record) {
+    private void testHpkeExport(HpkeData record) throws Exception {
         final byte[] enc = record.pkEm;
-        final HpkeContextSenderHelper contextHelper =
-                new HpkeTestingContextSenderHelper(record.skEm);
 
         // Sender secret export
         final HpkeContextSender contextSender =
-                setupBaseForTesting(contextHelper, record.hpkeSuite, record.pkRm, record.info);
-        final byte[] encResult = contextSender.getEnc();
+                setupBaseForTesting(record.hpkeSuite, record.pkRm, record.info, record.skEm);
+        final byte[] encResult = contextSender.getEncapsulated();
         assertArrayEquals("Failed encryption 'enc' " + encodeHex(enc), enc, encResult);
         for (HpkeExporterData exporterData : record.exports) {
             final byte[] export =
@@ -137,7 +132,8 @@ public class HpkeTestVectorsTest {
 
         // Recipient secret export
         final HpkeContextRecipient contextRecipient =
-                HpkeContextRecipient.setupBase(record.hpkeSuite, enc, record.skRm, record.info);
+                HpkeContextRecipient.getInstance(record.hpkeSuite.name());
+        contextRecipient.init(enc, record.skRm, record.info);
         for (HpkeExporterData exporterData : record.exports) {
             final byte[] export =
                     contextRecipient.export(exporterData.l, exporterData.exporterContext);
@@ -146,7 +142,7 @@ public class HpkeTestVectorsTest {
         }
     }
 
-    private List<HpkeData> getHpkeEncryptionRecords() throws IOException {
+    static List<HpkeData> getHpkeEncryptionRecords() throws IOException {
         final List<HpkeData> records = new ArrayList<>();
         final List<String[]> data = TestUtils.readCsvResource(TEST_DATA_ENCRYPTION);
 
@@ -215,7 +211,7 @@ public class HpkeTestVectorsTest {
         return records;
     }
 
-    private HpkeSuite convertSuite(String kemId, String kdfId, String aeadId) {
+    private static HpkeSuite convertSuite(String kemId, String kdfId, String aeadId) {
         final String suite = String.join(":", kemId, kdfId, aeadId);
 
         if (SUPPORTED_HPKE_SUITES.containsKey(suite)) {
@@ -225,24 +221,15 @@ public class HpkeTestVectorsTest {
         throw new IllegalArgumentException("Invalid KEM, KDF, AEAD : " + suite);
     }
 
-    public static HpkeContextSender setupBaseForTesting(
-            HpkeContextSenderHelper helper, HpkeSuite suite, PublicKey publicKey, byte[] info) {
-        try {
-            final Class<?> contextClass = conscryptClass("HpkeContextSender");
-            final Method method = contextClass.getDeclaredMethod(
-                    /* name = */ "setupBaseForTesting",
-                    /* parameterType = */ HpkeContextSenderHelper.class,
-                    /* parameterType = */ HpkeSuite.class,
-                    /* parameterType = */ PublicKey.class,
-                    /* parameterType = */ byte[].class);
-            method.setAccessible(true);
-            return (HpkeContextSender) method.invoke(contextClass, helper, suite, publicKey, info);
-        } catch (Exception e) {
-            throw new RuntimeException("Error while calling setupBaseForTesting", e);
-        }
+    private static HpkeContextSender setupBaseForTesting(
+            HpkeSuite suite, PublicKey publicKey, byte[] info, byte[] sKem) throws Exception {
+        String algorithm = suite.name();
+        HpkeContextSender sender = HpkeContextSender.getInstance(algorithm);
+        sender.initForTesting(publicKey, info, sKem);
+        return sender;
     }
 
-    private static class HpkeData {
+    static class HpkeData {
         HpkeSuite hpkeSuite;
 
         byte[] info;
@@ -264,7 +251,7 @@ public class HpkeTestVectorsTest {
         }
     }
 
-    private static class HpkeEncryptionData {
+    static class HpkeEncryptionData {
         byte[] aad;
         byte[] ct;
         byte[] pt;
