@@ -178,6 +178,11 @@ final class OpenSSLKey {
         if (key instanceof OpenSSLKeyHolder) {
             return ((OpenSSLKeyHolder) key).getOpenSSLKey();
         }
+
+        if ("RSA".equals(key.getAlgorithm())) {
+            return Platform.wrapRsaKey(key);
+        }
+
         return null;
     }
 
