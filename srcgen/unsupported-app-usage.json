@@ -125,6 +125,9 @@
     "@location": "method:com.android.org.conscrypt.NativeCrypto#ASN1_seq_unpack_X509_bio(long)"
   },
   {
+    "@location": "method:com.android.org.conscrypt.NativeCrypto#ASN1_TIME_to_Calendar(long,Calendar)"
+  },
+  {
     "@location": "method:com.android.org.conscrypt.NativeCrypto#BIO_free_all(long)"
   },
   {
