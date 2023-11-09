@@ -4396,31 +4396,16 @@ static jbyteArray NativeCrypto_CMAC_Final(JNIEnv* env, jclass, jobject cmacCtxRe
     return resultArray.release();
 }
 
-static void NativeCrypto_CMAC_Reset(JNIEnv* env, jclass, jobject cmacCtxRef) {
-    CHECK_ERROR_QUEUE_ON_RETURN;
-    CMAC_CTX* cmacCtx = fromContextObject<CMAC_CTX>(env, cmacCtxRef);
-    JNI_TRACE("CMAC_Reset(%p)", cmacCtx);
-
-    if (cmacCtx == nullptr) {
-        return;
-    }
-
-    if (!CMAC_Reset(cmacCtx)) {
-        JNI_TRACE("CMAC_Reset(%p) => threw exception", cmacCtx);
-        conscrypt::jniutil::throwExceptionFromBoringSSLError(env, "CMAC_Reset");
-        return;
-    }
-}
-
 static jlong NativeCrypto_HMAC_CTX_new(JNIEnv* env, jclass) {
     CHECK_ERROR_QUEUE_ON_RETURN;
     JNI_TRACE("HMAC_CTX_new");
-    auto hmacCtx = HMAC_CTX_new();
+    auto hmacCtx = new HMAC_CTX;
     if (hmacCtx == nullptr) {
         conscrypt::jniutil::throwOutOfMemory(env, "Unable to allocate HMAC_CTX");
         return 0;
     }
 
+    HMAC_CTX_init(hmacCtx);
     return reinterpret_cast<jlong>(hmacCtx);
 }
 
@@ -4432,7 +4417,8 @@ static void NativeCrypto_HMAC_CTX_free(JNIEnv* env, jclass, jlong hmacCtxRef) {
         conscrypt::jniutil::throwNullPointerException(env, "hmacCtx == null");
         return;
     }
-    HMAC_CTX_free(hmacCtx);
+    HMAC_CTX_cleanup(hmacCtx);
+    delete hmacCtx;
 }
 
 static void NativeCrypto_HMAC_Init_ex(JNIEnv* env, jclass, jobject hmacCtxRef, jbyteArray keyArray,
@@ -4537,24 +4523,6 @@ static jbyteArray NativeCrypto_HMAC_Final(JNIEnv* env, jclass, jobject hmacCtxRe
     }
     memcpy(resultBytes.get(), result, len);
     return resultArray.release();
-}
-
-static void NativeCrypto_HMAC_Reset(JNIEnv* env, jclass, jobject hmacCtxRef) {
-    CHECK_ERROR_QUEUE_ON_RETURN;
-    HMAC_CTX* hmacCtx = fromContextObject<HMAC_CTX>(env, hmacCtxRef);
-    JNI_TRACE("HMAC_Reset(%p)", hmacCtx);
-
-    if (hmacCtx == nullptr) {
-        return;
-    }
-
-    // HMAC_Init_ex with all nulls will reuse the existing key. This is slightly
-    // more efficient than re-initializing the context with the key again.
-    if (!HMAC_Init_ex(hmacCtx, /*key=*/nullptr, /*key_len=*/0, /*md=*/nullptr, /*impl=*/nullptr)) {
-        JNI_TRACE("HMAC_Reset(%p) => threw exception", hmacCtx);
-        conscrypt::jniutil::throwExceptionFromBoringSSLError(env, "HMAC_Init_ex");
-        return;
-    }
 }
 
 static void NativeCrypto_RAND_bytes(JNIEnv* env, jclass, jbyteArray output) {
@@ -4860,20 +4828,6 @@ static jobjectArray NativeCrypto_get_X509_GENERAL_NAME_stack(JNIEnv* env, jclass
     return joa.release();
 }
 
-/*
- * Converts an ASN1_TIME to epoch time in milliseconds.
- */
-static jlong ASN1_TIME_convert_to_posix(JNIEnv* env, const ASN1_TIME* time) {
-    int64_t retval;
-    if (!ASN1_TIME_to_posix(time, &retval)) {
-        JNI_TRACE("ASN1_TIME_convert_to_posix(%p) => Invalid date value", time);
-        conscrypt::jniutil::throwParsingException(env, "Invalid date value");
-        return 0;
-    }
-    // ASN1_TIME_to_posix can only return years from 0000 to 9999, so this won't overflow.
-    return static_cast<jlong>(retval * 1000);
-}
-
 static jlong NativeCrypto_X509_get_notBefore(JNIEnv* env, jclass, jlong x509Ref,
                                              CONSCRYPT_UNUSED jobject holder) {
     CHECK_ERROR_QUEUE_ON_RETURN;
@@ -4888,7 +4842,7 @@ static jlong NativeCrypto_X509_get_notBefore(JNIEnv* env, jclass, jlong x509Ref,
 
     ASN1_TIME* notBefore = X509_get_notBefore(x509);
     JNI_TRACE("X509_get_notBefore(%p) => %p", x509, notBefore);
-    return ASN1_TIME_convert_to_posix(env, notBefore);
+    return reinterpret_cast<uintptr_t>(notBefore);
 }
 
 static jlong NativeCrypto_X509_get_notAfter(JNIEnv* env, jclass, jlong x509Ref,
@@ -4905,7 +4859,7 @@ static jlong NativeCrypto_X509_get_notAfter(JNIEnv* env, jclass, jlong x509Ref,
 
     ASN1_TIME* notAfter = X509_get_notAfter(x509);
     JNI_TRACE("X509_get_notAfter(%p) => %p", x509, notAfter);
-    return ASN1_TIME_convert_to_posix(env, notAfter);
+    return reinterpret_cast<uintptr_t>(notAfter);
 }
 
 // NOLINTNEXTLINE(runtime/int)
@@ -5541,7 +5495,7 @@ static jlong NativeCrypto_get_X509_REVOKED_revocationDate(JNIEnv* env, jclass,
 
     JNI_TRACE("get_X509_REVOKED_revocationDate(%p) => %p", revoked,
               X509_REVOKED_get0_revocationDate(revoked));
-    return ASN1_TIME_convert_to_posix(env, X509_REVOKED_get0_revocationDate(revoked));
+    return reinterpret_cast<uintptr_t>(X509_REVOKED_get0_revocationDate(revoked));
 }
 
 #ifdef __GNUC__
@@ -5635,7 +5589,7 @@ static jlong NativeCrypto_X509_CRL_get_lastUpdate(JNIEnv* env, jclass, jlong x50
 
     ASN1_TIME* lastUpdate = X509_CRL_get_lastUpdate(crl);
     JNI_TRACE("X509_CRL_get_lastUpdate(%p) => %p", crl, lastUpdate);
-    return ASN1_TIME_convert_to_posix(env, lastUpdate);
+    return reinterpret_cast<uintptr_t>(lastUpdate);
 }
 
 static jlong NativeCrypto_X509_CRL_get_nextUpdate(JNIEnv* env, jclass, jlong x509CrlRef,
@@ -5652,7 +5606,7 @@ static jlong NativeCrypto_X509_CRL_get_nextUpdate(JNIEnv* env, jclass, jlong x50
 
     ASN1_TIME* nextUpdate = X509_CRL_get_nextUpdate(crl);
     JNI_TRACE("X509_CRL_get_nextUpdate(%p) => %p", crl, nextUpdate);
-    return ASN1_TIME_convert_to_posix(env, nextUpdate);
+    return reinterpret_cast<uintptr_t>(nextUpdate);
 }
 
 static jbyteArray NativeCrypto_i2d_X509_REVOKED(JNIEnv* env, jclass, jlong x509RevokedRef) {
@@ -5674,6 +5628,63 @@ static jint NativeCrypto_X509_supported_extension(JNIEnv* env, jclass, jlong x50
     }
 
     return X509_supported_extension(ext);
+}
+
+static inline bool decimal_to_integer(const char* data, size_t len, int* out) {
+    int ret = 0;
+    for (size_t i = 0; i < len; i++) {
+        ret *= 10;
+        if (data[i] < '0' || data[i] > '9') {
+            return false;
+        }
+        ret += data[i] - '0';
+    }
+    *out = ret;
+    return true;
+}
+
+static void NativeCrypto_ASN1_TIME_to_Calendar(JNIEnv* env, jclass, jlong asn1TimeRef,
+                                               jobject calendar) {
+    CHECK_ERROR_QUEUE_ON_RETURN;
+    ASN1_TIME* asn1Time = reinterpret_cast<ASN1_TIME*>(static_cast<uintptr_t>(asn1TimeRef));
+    JNI_TRACE("ASN1_TIME_to_Calendar(%p, %p)", asn1Time, calendar);
+
+    if (asn1Time == nullptr) {
+        conscrypt::jniutil::throwNullPointerException(env, "asn1Time == null");
+        return;
+    }
+
+    if (!ASN1_TIME_check(asn1Time)) {
+        conscrypt::jniutil::throwParsingException(env, "Invalid date format");
+        return;
+    }
+
+    bssl::UniquePtr<ASN1_GENERALIZEDTIME> gen(ASN1_TIME_to_generalizedtime(asn1Time, nullptr));
+    if (gen.get() == nullptr) {
+        conscrypt::jniutil::throwParsingException(env,
+                                                  "ASN1_TIME_to_generalizedtime returned null");
+        return;
+    }
+
+    if (ASN1_STRING_length(gen.get()) < 14 || ASN1_STRING_get0_data(gen.get()) == nullptr) {
+        conscrypt::jniutil::throwNullPointerException(env, "gen->length < 14 || gen->data == null");
+        return;
+    }
+
+    int year, mon, mday, hour, min, sec;
+    const char* data = reinterpret_cast<const char*>(ASN1_STRING_get0_data(gen.get()));
+    if (!decimal_to_integer(data, 4, &year) ||
+        !decimal_to_integer(data + 4, 2, &mon) ||
+        !decimal_to_integer(data + 6, 2, &mday) ||
+        !decimal_to_integer(data + 8, 2, &hour) ||
+        !decimal_to_integer(data + 10, 2, &min) ||
+        !decimal_to_integer(data + 12, 2, &sec)) {
+        conscrypt::jniutil::throwParsingException(env, "Invalid date format");
+        return;
+    }
+
+    env->CallVoidMethod(calendar, conscrypt::jniutil::calendar_setMethod, year, mon - 1, mday, hour,
+                        min, sec);
 }
 
 // A CbsHandle is a structure used to manage resources allocated by asn1_read-*
@@ -10937,7 +10948,6 @@ static JNINativeMethod sNativeCryptoMethods[] = {
         CONSCRYPT_NATIVE_METHOD(CMAC_Update, "(" REF_CMAC_CTX "[BII)V"),
         CONSCRYPT_NATIVE_METHOD(CMAC_UpdateDirect, "(" REF_CMAC_CTX "JI)V"),
         CONSCRYPT_NATIVE_METHOD(CMAC_Final, "(" REF_CMAC_CTX ")[B"),
-        CONSCRYPT_NATIVE_METHOD(CMAC_Reset, "(" REF_CMAC_CTX ")V"),
         CONSCRYPT_NATIVE_METHOD(EVP_PKEY_new_RSA, "([B[B[B[B[B[B[B[B)J"),
         CONSCRYPT_NATIVE_METHOD(EVP_PKEY_new_EC_KEY, "(" REF_EC_GROUP REF_EC_POINT "[B)J"),
         CONSCRYPT_NATIVE_METHOD(EVP_PKEY_type, "(" REF_EVP_PKEY ")I"),
@@ -11057,7 +11067,6 @@ static JNINativeMethod sNativeCryptoMethods[] = {
         CONSCRYPT_NATIVE_METHOD(HMAC_Update, "(" REF_HMAC_CTX "[BII)V"),
         CONSCRYPT_NATIVE_METHOD(HMAC_UpdateDirect, "(" REF_HMAC_CTX "JI)V"),
         CONSCRYPT_NATIVE_METHOD(HMAC_Final, "(" REF_HMAC_CTX ")[B"),
-        CONSCRYPT_NATIVE_METHOD(HMAC_Reset, "(" REF_HMAC_CTX ")V"),
         CONSCRYPT_NATIVE_METHOD(RAND_bytes, "([B)V"),
         CONSCRYPT_NATIVE_METHOD(create_BIO_InputStream, ("(" REF_BIO_IN_STREAM "Z)J")),
         CONSCRYPT_NATIVE_METHOD(create_BIO_OutputStream, "(Ljava/io/OutputStream;)J"),
@@ -11130,6 +11139,7 @@ static JNINativeMethod sNativeCryptoMethods[] = {
         CONSCRYPT_NATIVE_METHOD(X509_REVOKED_dup, "(J)J"),
         CONSCRYPT_NATIVE_METHOD(i2d_X509_REVOKED, "(J)[B"),
         CONSCRYPT_NATIVE_METHOD(X509_supported_extension, "(J)I"),
+        CONSCRYPT_NATIVE_METHOD(ASN1_TIME_to_Calendar, "(JLjava/util/Calendar;)V"),
         CONSCRYPT_NATIVE_METHOD(asn1_read_init, "([B)J"),
         CONSCRYPT_NATIVE_METHOD(asn1_read_sequence, "(J)J"),
         CONSCRYPT_NATIVE_METHOD(asn1_read_next_tag_is, "(JI)Z"),
