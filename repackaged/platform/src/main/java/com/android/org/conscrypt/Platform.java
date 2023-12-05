@@ -570,6 +570,6 @@ final class Platform {
     }
 
     public static boolean isTlsV1Deprecated() {
-        return false;
+        return true;
     }
 }
