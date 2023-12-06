@@ -18,7 +18,6 @@
 package com.android.org.conscrypt;
 
 import com.android.org.conscrypt.OpenSSLX509CertificateFactory.ParsingException;
-import com.android.org.conscrypt.Platform;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -1043,16 +1042,20 @@ public final class NativeCrypto {
 
     static native void set_SSL_psk_server_callback_enabled(long ssl, NativeSsl ssl_holder, boolean enabled);
 
+    private static final String[] ENABLED_PROTOCOLS_TLSV1 = Platform.isTlsV1Deprecated()
+            ? new String[0]
+            : new String[] {
+                    DEPRECATED_PROTOCOL_TLSV1,
+                    DEPRECATED_PROTOCOL_TLSV1_1,
+            };
+
     /** Protocols to enable by default when "TLSv1.3" is requested. */
-    static final String[] TLSV13_PROTOCOLS = new String[] {
-            SUPPORTED_PROTOCOL_TLSV1_2,
-            SUPPORTED_PROTOCOL_TLSV1_3,
-    };
+    static final String[] TLSV13_PROTOCOLS = ArrayUtils.concatValues(
+            ENABLED_PROTOCOLS_TLSV1, SUPPORTED_PROTOCOL_TLSV1_2, SUPPORTED_PROTOCOL_TLSV1_3);
 
     /** Protocols to enable by default when "TLSv1.2" is requested. */
-    static final String[] TLSV12_PROTOCOLS = new String[] {
-            SUPPORTED_PROTOCOL_TLSV1_2,
-    };
+    static final String[] TLSV12_PROTOCOLS =
+            ArrayUtils.concatValues(ENABLED_PROTOCOLS_TLSV1, SUPPORTED_PROTOCOL_TLSV1_2);
 
     /** Protocols to enable by default when "TLSv1.1" is requested. */
     static final String[] TLSV11_PROTOCOLS = new String[] {
