@@ -244,12 +244,21 @@ genrule {
     tools: ["conscrypt_generate_constants"],
 }
 
+genrule {
+    name: "conscrypt_generated_blocklist",
+    out: ["com/android/org/conscrypt/StaticBlocklist.java"],
+    srcs: ["constants/src/gen/java/cert_verify_proc_blocklist.inc"],
+    tool_files: ["constants/src/gen/java/generate_blocklist.awk"],
+    cmd: "awk -v package=com.android.org.conscrypt -f $(location constants/src/gen/java/generate_blocklist.awk) $(in) > $(out)",
+}
+
 filegroup {
     name: "conscrypt_java_files",
     srcs: [
         "repackaged/common/src/main/java/**/*.java",
         "repackaged/platform/src/main/java/**/*.java",
         ":conscrypt_generated_constants",
+        ":conscrypt_generated_blocklist",
     ],
 }
 
