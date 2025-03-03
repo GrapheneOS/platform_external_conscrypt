@@ -392,6 +392,7 @@ java_sdk_library {
     ],
     api_dir: "api/platform",
     api_only: true,
+    annotations_enabled: true,
     api_lint: {
         enabled: true,
     },
@@ -529,6 +530,7 @@ java_sdk_library {
     ],
     api_dir: "api/intra",
     api_only: true,
+    annotations_enabled: true,
     droiddoc_options: [
         "--hide-annotation libcore.api.Hide",
         "--show-single-annotation libcore.api.IntraCoreApi",
