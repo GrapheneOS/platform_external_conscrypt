@@ -687,6 +687,7 @@ public final class NativeCrypto {
             byte[] id_prover_array,
             byte[] id_verifier_array,
             boolean is_client,
+            int handshake_limit,
             long ssl_ctx,
             AbstractSessionContext holder)
         throws SSLException;

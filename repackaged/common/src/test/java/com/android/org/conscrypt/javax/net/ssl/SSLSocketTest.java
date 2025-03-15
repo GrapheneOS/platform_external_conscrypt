@@ -310,21 +310,21 @@ public class SSLSocketTest {
         try (SSLSocket ssl = (SSLSocket) sf.createSocket()) {
             // The TLS 1.3 cipher suites should be enabled by default
             assertTrue(new HashSet<>(Arrays.asList(ssl.getEnabledCipherSuites()))
-                               .containsAll(StandardNames.CIPHER_SUITES_TLS13));
+                            .containsAll(StandardNames.CIPHER_SUITES_TLS13));
             // Disabling them should be ignored
             ssl.setEnabledCipherSuites(new String[0]);
             assertTrue(new HashSet<>(Arrays.asList(ssl.getEnabledCipherSuites()))
-                               .containsAll(StandardNames.CIPHER_SUITES_TLS13));
+                            .containsAll(StandardNames.CIPHER_SUITES_TLS13));
 
             ssl.setEnabledCipherSuites(new String[] {
                     TestUtils.pickArbitraryNonTls13Suite(ssl.getSupportedCipherSuites())});
             assertTrue(new HashSet<>(Arrays.asList(ssl.getEnabledCipherSuites()))
-                               .containsAll(StandardNames.CIPHER_SUITES_TLS13));
+                            .containsAll(StandardNames.CIPHER_SUITES_TLS13));
 
             // Disabling TLS 1.3 should disable 1.3 cipher suites
             ssl.setEnabledProtocols(new String[] {"TLSv1.2"});
             assertFalse(new HashSet<>(Arrays.asList(ssl.getEnabledCipherSuites()))
-                                .containsAll(StandardNames.CIPHER_SUITES_TLS13));
+                            .containsAll(StandardNames.CIPHER_SUITES_TLS13));
         }
     }
 

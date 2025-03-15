@@ -19,6 +19,7 @@ package android.net.ssl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 
 import android.platform.test.annotations.RequiresFlagsEnabled;
 
@@ -40,36 +41,38 @@ public class PakeOptionTest {
         assertNotNull(option.getMessageComponent("password"));
     }
 
-    @Test(expected = InvalidParameterException.class)
+    @Test
     @RequiresFlagsEnabled(com.android.org.conscrypt.flags.Flags.FLAG_SPAKE2PLUS_API)
     public void testBuilder_invalidAlgorithm() {
-        new PakeOption.Builder(null);
+        assertThrows(InvalidParameterException.class, () -> new PakeOption.Builder(null));
     }
 
-    @Test(expected = InvalidParameterException.class)
+    @Test
     @RequiresFlagsEnabled(com.android.org.conscrypt.flags.Flags.FLAG_SPAKE2PLUS_API)
     public void testBuilder_emptyAlgorithm() {
-        new PakeOption.Builder("");
+        assertThrows(InvalidParameterException.class, () -> new PakeOption.Builder(""));
     }
 
-    @Test(expected = InvalidParameterException.class)
+    @Test
     @RequiresFlagsEnabled(com.android.org.conscrypt.flags.Flags.FLAG_SPAKE2PLUS_API)
     public void testBuilder_noComponents() {
-        new PakeOption.Builder("SPAKE2PLUS_PRERELEASE").build();
+        assertThrows(
+                InvalidParameterException.class,
+                () -> new PakeOption.Builder("SPAKE2PLUS_PRERELEASE").build());
     }
 
-    @Test(expected = InvalidParameterException.class)
+    @Test
     @RequiresFlagsEnabled(com.android.org.conscrypt.flags.Flags.FLAG_SPAKE2PLUS_API)
     public void testBuilder_invalidKey() {
-        new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
-                .addMessageComponent(null, new byte[] {1, 2, 3});
+        assertThrows(InvalidParameterException.class, () -> new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
+                .addMessageComponent(null, new byte[] {1, 2, 3}));
     }
 
-    @Test(expected = InvalidParameterException.class)
+    @Test
     @RequiresFlagsEnabled(com.android.org.conscrypt.flags.Flags.FLAG_SPAKE2PLUS_API)
     public void testBuilder_emptyKey() {
-        new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
-                .addMessageComponent("", new byte[] {1, 2, 3});
+        assertThrows(InvalidParameterException.class, () -> new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
+                .addMessageComponent("", new byte[] {1, 2, 3}));
     }
 
     @Test
@@ -84,11 +87,54 @@ public class PakeOptionTest {
         assertNull(option.getMessageComponent("non_existing_key"));
     }
 
-    @Test(expected = InvalidParameterException.class)
+    @Test
+    @RequiresFlagsEnabled(com.android.org.conscrypt.flags.Flags.FLAG_SPAKE2PLUS_API)
+    public void testBuilder_spake2Plus_passwordWithHandshakeLimits() {
+        PakeOption option = new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
+                .addMessageComponent("password", new byte[] {1, 2, 3})
+                .addMessageComponent("server-handshake-limit", new byte[] {16})
+                .addMessageComponent("client-handshake-limit", new byte[] {16})
+                .build();
+        assertNotNull(option.getMessageComponent("password"));
+        assertNotNull(option.getMessageComponent("server-handshake-limit"));
+        assertNotNull(option.getMessageComponent("client-handshake-limit"));
+    }
+
+    @Test
+    @RequiresFlagsEnabled(com.android.org.conscrypt.flags.Flags.FLAG_SPAKE2PLUS_API)
+    public void testBuilder_spake2Plus_passwordInvalidServerHandshakeLimit1() {
+        assertThrows(InvalidParameterException.class, () -> new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
+                .addMessageComponent("password", new byte[] {1, 2, 3})
+                .addMessageComponent("server-handshake-limit", new byte[] {64})
+                .addMessageComponent("client-handshake-limit", new byte[] {16})
+                .build());
+    }
+
+    @Test
+    @RequiresFlagsEnabled(com.android.org.conscrypt.flags.Flags.FLAG_SPAKE2PLUS_API)
+    public void testBuilder_spake2Plus_passwordInvalidServerHandshakeLimit2() {
+        assertThrows(InvalidParameterException.class, () -> new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
+                .addMessageComponent("password", new byte[] {1, 2, 3})
+                .addMessageComponent("server-handshake-limit", new byte[] {0})
+                .addMessageComponent("client-handshake-limit", new byte[] {16})
+                .build());
+    }
+
+    @Test
+    @RequiresFlagsEnabled(com.android.org.conscrypt.flags.Flags.FLAG_SPAKE2PLUS_API)
+    public void testBuilder_spake2Plus_passwordInvalidClientHandshakeLimit() {
+        assertThrows(InvalidParameterException.class, () ->new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
+                .addMessageComponent("password", new byte[] {1, 2, 3})
+                .addMessageComponent("server-handshake-limit", new byte[] {16})
+                .addMessageComponent("client-handshake-limit", new byte[] {64})
+                .build());
+    }
+
+    @Test
     @RequiresFlagsEnabled(com.android.org.conscrypt.flags.Flags.FLAG_SPAKE2PLUS_API)
     public void testBuilder_invalidSpake2Plus_noPassword() {
-        new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
+        assertThrows(InvalidParameterException.class, () -> new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
                 .addMessageComponent("w0", new byte[] {1, 2, 3})
-                .build();
+                .build());
     }
 }

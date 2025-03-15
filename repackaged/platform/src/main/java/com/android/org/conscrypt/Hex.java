@@ -23,7 +23,6 @@ package com.android.org.conscrypt;
  */
 @Internal
 // public for testing by TrustedCertificateStoreTest
-// TODO(nathanmittler): Move to InternalUtil?
 public final class Hex {
     private Hex() {}
 

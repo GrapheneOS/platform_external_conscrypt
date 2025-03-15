@@ -39,10 +39,7 @@ import java.util.Map;
 @SystemApi
 @FlaggedApi(com.android.org.conscrypt.flags.Flags.FLAG_SPAKE2PLUS_API)
 public final class PakeOption {
-    // Required length of the password verifier parameters
-    private static final int W_LENGTH = 32;
-    // Required length of the L parameter
-    private static final int L_LENGTH = 65;
+    private static final int MAX_HANDSHAKE_LIMIT = 24;
 
     /**
      * The algorithm of the PAKE algorithm.
@@ -107,7 +104,12 @@ public final class PakeOption {
         }
 
         /**
-         * Adds a message component.
+         * Adds a message component. For SPAKE2+ password is the only required component. For
+         * SPAKE2+ 'client-handshake-limit' and 'server-handshake-limit' are optional and will be obtained using
+         * the first byte found in the input byte array. It must be an integer between 1 and 24. These limits are used to limit the number of unfinished or
+         * failed handshakes that can be performed using this PAKE option. If not specified, the
+         * default limit is 1. Be aware that higher limits increase the security risk of the
+         * connection since there are more opportunities for brute force attacks.
          *
          * @param key The algorithm of the component.
          * @param value The component data.
@@ -147,6 +149,26 @@ public final class PakeOption {
             if (!messageComponents.containsKey("password")) {
                 throw new InvalidParameterException(
                         "For SPAKE2+, 'password' must be present.");
+            }
+            // If 'client-handshake-limit' or 'server-handshake-limit' are present,
+            // they must be integers between 1 and 24.
+            if (messageComponents.containsKey("client-handshake-limit")) {
+                int clientHandshakeLimit =
+                        messageComponents
+                                .get("client-handshake-limit")[0];
+                if (clientHandshakeLimit < 1 || clientHandshakeLimit > MAX_HANDSHAKE_LIMIT) {
+                    throw new InvalidParameterException(
+                            "For SPAKE2+, 'client-handshake-limit' must be between 1 and 24.");
+                }
+            }
+            if (messageComponents.containsKey("server-handshake-limit")) {
+                int serverHandshakeLimit =
+                        messageComponents
+                                .get("server-handshake-limit")[0];
+                if (serverHandshakeLimit < 1 || serverHandshakeLimit > MAX_HANDSHAKE_LIMIT) {
+                    throw new InvalidParameterException(
+                            "For SPAKE2+, 'server-handshake-limit' must be between 1 and 24.");
+                }
             }
         }
     }

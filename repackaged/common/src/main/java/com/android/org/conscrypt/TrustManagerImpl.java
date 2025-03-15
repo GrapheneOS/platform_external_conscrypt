@@ -320,7 +320,7 @@ public final class TrustManagerImpl extends X509ExtendedTrustManager {
      * Socket (e.g., Cronet).
      */
     @android.annotation.FlaggedApi(com.android.org.conscrypt.flags.Flags
-                                           .FLAG_CERTIFICATE_TRANSPARENCY_CHECKSERVERTRUSTED_API)
+                    .FLAG_CERTIFICATE_TRANSPARENCY_CHECKSERVERTRUSTED_API)
     @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
     public List<X509Certificate>
     checkServerTrusted(X509Certificate[] chain, byte[] ocspData, byte[] tlsSctData, String authType,
