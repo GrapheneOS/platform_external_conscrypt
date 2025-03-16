@@ -3175,7 +3175,6 @@ public class NativeCryptoTest {
         NativeCrypto.d2i_X509(new byte[1]);
     }
 
-
     private static void assertContains(String actualValue, String expectedSubstring) {
         if (actualValue == null) {
             return;

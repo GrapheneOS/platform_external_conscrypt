@@ -864,11 +864,11 @@ final public class Platform {
         return ENABLED_TLS_V1;
     }
 
-    public static boolean isSdkGreater(int sdk) {
+    public static boolean isPakeSupported() {
         return false;
     }
 
-    public static boolean isPakeSupported() {
+    public static boolean isSdkGreater(int sdk) {
         return false;
     }
 }

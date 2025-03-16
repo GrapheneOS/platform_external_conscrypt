@@ -419,7 +419,7 @@ public class X509CertificateTest {
         // Collection, so there is no guarantee of the provider using a particular order. Normalize
         // the order before comparing.
         result.sort(Comparator.comparingInt((Pair<Integer, String> a) -> a.getFirst())
-                            .thenComparing(Pair::getSecond));
+                        .thenComparing(Pair::getSecond));
         return result;
     }
 

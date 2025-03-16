@@ -212,6 +212,7 @@ abstract class AbstractSessionContext implements SSLSessionContext {
         byte[] idVerifierArray = spakeKeyManager.getIdVerifier();
         byte[] pwArray = spakeKeyManager.getPassword();
         boolean isClient = spakeKeyManager.isClient();
+        int handshakeLimit = spakeKeyManager.getHandshakeLimit();
         lock.writeLock().lock();
         try {
             if (isValid()) {
@@ -221,6 +222,7 @@ abstract class AbstractSessionContext implements SSLSessionContext {
                             idProverArray,
                             idVerifierArray,
                             isClient,
+                            handshakeLimit,
                             sslCtxNativePointer,
                             this);
             }
