@@ -41,13 +41,17 @@ public class LogInfo {
     public static final int STATE_RETIRED = 5;
     public static final int STATE_REJECTED = 6;
 
+    public static final int TYPE_UNKNOWN = 0;
+    public static final int TYPE_RFC6962 = 1;
+    public static final int TYPE_STATIC_CT_API = 2;
+
     private final byte[] logId;
     private final PublicKey publicKey;
     private final int state;
     private final long stateTimestamp;
     private final String description;
-    private final String url;
     private final String operator;
+    private final int type;
 
     private LogInfo(Builder builder) {
         /* Based on the required fields for the log list schema v3. Notably,
@@ -55,7 +59,6 @@ public class LogInfo {
          * is validated in the builder. */
         Objects.requireNonNull(builder.logId);
         Objects.requireNonNull(builder.publicKey);
-        Objects.requireNonNull(builder.url);
         Objects.requireNonNull(builder.operator);
 
         this.logId = builder.logId;
@@ -63,8 +66,8 @@ public class LogInfo {
         this.state = builder.state;
         this.stateTimestamp = builder.stateTimestamp;
         this.description = builder.description;
-        this.url = builder.url;
         this.operator = builder.operator;
+        this.type = builder.type;
     }
 
     public static class Builder {
@@ -73,8 +76,8 @@ public class LogInfo {
         private int state;
         private long stateTimestamp;
         private String description;
-        private String url;
         private String operator;
+        private int type;
 
         public Builder setPublicKey(PublicKey publicKey) {
             Objects.requireNonNull(publicKey);
@@ -103,15 +106,17 @@ public class LogInfo {
             return this;
         }
 
-        public Builder setUrl(String url) {
-            Objects.requireNonNull(url);
-            this.url = url;
-            return this;
-        }
-
         public Builder setOperator(String operator) {
             Objects.requireNonNull(operator);
             this.operator = operator;
+            return this;
+        }
+
+        public Builder setType(int type) {
+            if (type < 0 || type > TYPE_STATIC_CT_API) {
+                throw new IllegalArgumentException("invalid type value");
+            }
+            this.type = type;
             return this;
         }
 
@@ -135,10 +140,6 @@ public class LogInfo {
         return description;
     }
 
-    public String getUrl() {
-        return url;
-    }
-
     public int getState() {
         return state;
     }
@@ -158,6 +159,10 @@ public class LogInfo {
         return operator;
     }
 
+    public int getType() {
+        return type;
+    }
+
     @Override
     public boolean equals(Object other) {
         if (this == other) {
@@ -169,15 +174,14 @@ public class LogInfo {
 
         LogInfo that = (LogInfo) other;
         return this.state == that.state && this.description.equals(that.description)
-                && this.url.equals(that.url) && this.operator.equals(that.operator)
-                && this.stateTimestamp == that.stateTimestamp
-                && Arrays.equals(this.logId, that.logId);
+                && this.operator.equals(that.operator) && this.stateTimestamp == that.stateTimestamp
+                && this.type == that.type && Arrays.equals(this.logId, that.logId);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-                Arrays.hashCode(logId), description, url, state, stateTimestamp, operator);
+                Arrays.hashCode(logId), description, state, stateTimestamp, operator, type);
     }
 
     /**

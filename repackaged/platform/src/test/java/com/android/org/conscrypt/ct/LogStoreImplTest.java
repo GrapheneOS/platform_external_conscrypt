@@ -162,6 +162,25 @@ public class LogStoreImplTest {
 "            \"end_exclusive\": 1735693261000" +
 "          }" +
 "        }" +
+"      ]," +
+"      \"tiled_logs\": [" +
+"        {" +
+"         \"description\": \"Operator 2 'Test2025' log\"," +
+"          \"log_id\": \"DleUvPOuqT4zGyyZB7P3kN+bwj1xMiXdIaklrGHFTiE=\"," +
+"          \"key\": \"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEB/we6GOO/xwxivy4HhkrYFAAPo6e2nc346Wo2o2U+GvoPWSPJz91s/xrEvA3Bk9kWHUUXVZS5morFEzsgdHqPg==\"," +
+"          \"submission_url\": \"https://operator2.example.com/tiled/test2025\"," +
+"          \"monitoring_url\": \"https://operator2.exmaple.com/tiled_monitor/test2025\"," +
+"          \"mmd\": 86400," +
+"          \"state\": {" +
+"            \"usable\": {" +
+"              \"timestamp\": 1727734767000" +
+"            }" +
+"          }," +
+"          \"temporal_interval\": {" +
+"            \"start_inclusive\": 1767225600000," +
+"            \"end_exclusive\": 1782864000000" +
+"          }" +
+"        }" +
 "      ]" +
 "    }" +
 "  ]" +
@@ -196,7 +215,7 @@ public class LogStoreImplTest {
                 new LogInfo.Builder()
                         .setPublicKey(OpenSSLKey.fromPublicKeyPemInputStream(is).getPublicKey())
                         .setDescription("Operator 1 'Test2024' log")
-                        .setUrl("https://operator1.example.com/logs/test2024/")
+                        .setType(LogInfo.TYPE_RFC6962)
                         .setState(LogInfo.STATE_USABLE, 1667328840000L)
                         .setOperator("Operator 1")
                         .build();

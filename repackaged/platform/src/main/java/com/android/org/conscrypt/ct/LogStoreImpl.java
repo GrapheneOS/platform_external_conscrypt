@@ -55,17 +55,17 @@ import java.util.logging.Logger;
 @Internal
 public class LogStoreImpl implements LogStore {
     private static final Logger logger = Logger.getLogger(LogStoreImpl.class.getName());
-    private static final int COMPAT_VERSION = 1;
-    private static final Path DEFAULT_LOG_LIST;
+    private static final int COMPAT_VERSION = 2;
+    private static final Path logListPrefix;
+    private static final Path logListSuffix;
     private static final long LOG_LIST_CHECK_INTERVAL_IN_NS =
             10L * 60 * 1_000 * 1_000_000; // 10 minutes
 
     static {
         String androidData = System.getenv("ANDROID_DATA");
-        String compatVersion = String.format("v%d", COMPAT_VERSION);
         // /data/misc/keychain/ct/v1/current/log_list.json
-        DEFAULT_LOG_LIST = Paths.get(
-                androidData, "misc", "keychain", "ct", compatVersion, "current", "log_list.json");
+        logListPrefix = Paths.get(androidData, "misc", "keychain", "ct");
+        logListSuffix = Paths.get("current", "log_list.json");
     }
 
     private final Path logList;
@@ -88,8 +88,13 @@ public class LogStoreImpl implements LogStore {
         }
     }
 
+    private static Path getPathForCompatVersion(int compatVersion) {
+        String version = String.format("v%d", compatVersion);
+        return logListPrefix.resolve(version).resolve(logListSuffix);
+    }
+
     public LogStoreImpl(Policy policy) {
-        this(policy, DEFAULT_LOG_LIST);
+        this(policy, getPathForCompatVersion(COMPAT_VERSION));
     }
 
     public LogStoreImpl(Policy policy, Path logList) {
@@ -131,8 +136,7 @@ public class LogStoreImpl implements LogStore {
 
     @Override
     public int getCompatVersion() {
-        // Currently, there is only one compatibility version supported. If we
-        // are loaded or initialized, it means the expected compatibility
+        // If we are loaded or initialized, it means the expected compatibility
         // version was found.
         if (state == State.LOADED || state == State.COMPLIANT || state == State.NON_COMPLIANT) {
             return COMPAT_VERSION;
@@ -142,6 +146,9 @@ public class LogStoreImpl implements LogStore {
 
     @Override
     public int getMinCompatVersionAvailable() {
+        if (Files.exists(getPathForCompatVersion(1))) {
+            return 1;
+        }
         return getCompatVersion();
     }
 
@@ -234,33 +241,13 @@ public class LogStoreImpl implements LogStore {
             for (int i = 0; i < operators.length(); i++) {
                 JSONObject operator = operators.getJSONObject(i);
                 String operatorName = operator.getString("name");
+
                 JSONArray logs = operator.getJSONArray("logs");
-                for (int j = 0; j < logs.length(); j++) {
-                    JSONObject log = logs.getJSONObject(j);
+                addLogsToMap(logs, operatorName, LogInfo.TYPE_RFC6962, logsMap);
 
-                    LogInfo.Builder builder =
-                            new LogInfo.Builder()
-                                    .setDescription(log.getString("description"))
-                                    .setPublicKey(parsePubKey(log.getString("key")))
-                                    .setUrl(log.getString("url"))
-                                    .setOperator(operatorName);
-
-                    JSONObject stateObject = log.optJSONObject("state");
-                    if (stateObject != null) {
-                        String state = stateObject.keys().next();
-                        long stateTimestamp = stateObject.getJSONObject(state).getLong("timestamp");
-                        builder.setState(parseState(state), stateTimestamp);
-                    }
-
-                    LogInfo logInfo = builder.build();
-                    byte[] logId = Base64.getDecoder().decode(log.getString("log_id"));
-
-                    // The logId computed using the public key should match the log_id field.
-                    if (!Arrays.equals(logInfo.getID(), logId)) {
-                        throw new IllegalArgumentException("logId does not match publicKey");
-                    }
-
-                    logsMap.put(new ByteArray(logId), logInfo);
+                JSONArray tiledLogs = operator.optJSONArray("tiled_logs");
+                if (tiledLogs != null) {
+                    addLogsToMap(tiledLogs, operatorName, LogInfo.TYPE_STATIC_CT_API, logsMap);
                 }
             }
         } catch (JSONException | IllegalArgumentException e) {
@@ -270,6 +257,33 @@ public class LogStoreImpl implements LogStore {
         this.logs = Collections.unmodifiableMap(logsMap);
         this.logListLastModified = lastModified;
         return State.LOADED;
+    }
+
+    private static void addLogsToMap(JSONArray logs, String operatorName, int logType,
+            Map<ByteArray, LogInfo> logsMap) throws JSONException {
+        for (int j = 0; j < logs.length(); j++) {
+            JSONObject log = logs.getJSONObject(j);
+            LogInfo.Builder builder = new LogInfo.Builder()
+                                              .setDescription(log.getString("description"))
+                                              .setPublicKey(parsePubKey(log.getString("key")))
+                                              .setType(logType)
+                                              .setOperator(operatorName);
+            JSONObject stateObject = log.optJSONObject("state");
+            if (stateObject != null) {
+                String state = stateObject.keys().next();
+                long stateTimestamp = stateObject.getJSONObject(state).getLong("timestamp");
+                builder.setState(parseState(state), stateTimestamp);
+            }
+            LogInfo logInfo = builder.build();
+
+            // The logId computed using the public key should match the log_id field.
+            byte[] logId = Base64.getDecoder().decode(log.getString("log_id"));
+            if (!Arrays.equals(logInfo.getID(), logId)) {
+                throw new IllegalArgumentException("logId does not match publicKey");
+            }
+
+            logsMap.put(new ByteArray(logId), logInfo);
+        }
     }
 
     private static int parseMajorVersion(String version) {

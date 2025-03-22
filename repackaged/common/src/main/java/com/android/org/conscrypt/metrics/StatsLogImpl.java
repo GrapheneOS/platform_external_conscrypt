@@ -112,7 +112,8 @@ public final class StatsLogImpl implements StatsLog {
         } else if (result.getValidSCTs().size() == 0) {
             return CERTIFICATE_TRANSPARENCY_VERIFICATION_REPORTED__RESULT__RESULT_FAILURE_NO_SCTS_FOUND;
         } else if (compliance == PolicyCompliance.NOT_ENOUGH_SCTS
-                || compliance == PolicyCompliance.NOT_ENOUGH_DIVERSE_SCTS) {
+                || compliance == PolicyCompliance.NOT_ENOUGH_DIVERSE_SCTS
+                || compliance == PolicyCompliance.NO_RFC6962_LOG) {
             return CERTIFICATE_TRANSPARENCY_VERIFICATION_REPORTED__RESULT__RESULT_FAILURE_SCTS_NOT_COMPLIANT;
         }
         return CERTIFICATE_TRANSPARENCY_VERIFICATION_REPORTED__RESULT__RESULT_UNKNOWN;

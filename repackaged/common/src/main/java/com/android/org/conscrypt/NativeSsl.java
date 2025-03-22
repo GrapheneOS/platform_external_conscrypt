@@ -310,11 +310,14 @@ final class NativeSsl {
                     + " and " + NativeCrypto.DEPRECATED_PROTOCOL_TLSV1_1
                     + " are no longer supported and were filtered from the list");
         }
-        NativeCrypto.setEnabledProtocols(ssl, this, parameters.enabledProtocols);
         // We can use default cipher suites for SPAKE.
         if (!parameters.isSpake()) {
+            NativeCrypto.setEnabledProtocols(ssl, this, parameters.enabledProtocols);
             NativeCrypto.setEnabledCipherSuites(
                 ssl, this, parameters.enabledCipherSuites, parameters.enabledProtocols);
+        } else {
+            // SPAKE only supports TLSv1.3.
+            NativeCrypto.setEnabledProtocols(ssl, this, new String[] {"TLSv1.3"});
         }
 
         if (parameters.applicationProtocols.length > 0) {
