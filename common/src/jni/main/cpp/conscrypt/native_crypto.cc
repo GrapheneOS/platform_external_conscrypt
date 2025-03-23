@@ -11073,13 +11073,13 @@ static void NativeCrypto_SSL_CTX_set_spake_credential(JNIEnv* env, jclass,
                                                       jlong ssl_ctx_address,
                                                       CONSCRYPT_UNUSED jobject holder) {
     CHECK_ERROR_QUEUE_ON_RETURN;
-    JNI_TRACE("SSL_CTX_set_spake_credential(%p, %p, %p, %p, %d, %d, %ld)", context, pw_array,
-              id_prover_array, id_verifier_array, is_client, handshake_limit,
-              ssl_ctx_address);
 
     SSL_CTX* ssl_ctx = to_SSL_CTX(env, ssl_ctx_address, true);
 
-    std::size_t hs_limit = static_cast<std::size_t>(handshake_limit);
+    if (ssl_ctx == nullptr) {
+        JNI_TRACE("SSL_CTX_set_spake_credential => ssl_ctx == null");
+        return;
+    }
 
     JNI_TRACE("SSL_CTX_set_spake_credential(%p, %p, %p, %p, %d, %d, %p)", context, pw_array,
               id_prover_array, id_verifier_array, is_client, handshake_limit,
