@@ -15,6 +15,7 @@
  */
 package org.conscrypt.metrics;
 
+import org.conscrypt.metrics.GeneratedStatsLog;
 import org.conscrypt.Internal;
 
 /**

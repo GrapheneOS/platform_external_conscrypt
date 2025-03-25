@@ -16,6 +16,7 @@
  */
 package com.android.org.conscrypt.metrics;
 
+import com.android.org.conscrypt.metrics.GeneratedStatsLog;
 import com.android.org.conscrypt.Internal;
 
 /**
