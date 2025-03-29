@@ -290,6 +290,7 @@ java_library {
     ],
     static_libs: [
         "conscrypt-aconfig-flags-lib",
+        "conscrypt-statslog-java",
     ],
 
     // Conscrypt can be updated independently from the other core libraries so it must only depend
@@ -938,4 +939,27 @@ module_exports {
             ],
         },
     },
+}
+
+java_library {
+    name: "conscrypt-statslog-java",
+    srcs: [
+        ":conscrypt-statslog-java-gen",
+    ],
+    libs: [
+        "framework-statsd.stubs.module_lib",
+        "androidx.annotation_annotation",
+    ],
+    sdk_version: "system_server_current",
+    min_sdk_version: "30",
+    apex_available: [
+        "com.android.conscrypt",
+    ],
+}
+
+genrule {
+    name: "conscrypt-statslog-java-gen",
+    tools: ["stats-log-api-gen"],
+    cmd: "$(location stats-log-api-gen) --java $(out) --module conscrypt --javaPackage com.android.org.conscrypt.metrics --javaClass GeneratedStatsLog",
+    out: ["repackaged/common/src/main/java/com/android/org/conscrypt/metrics/GeneratedStatsLog.java"],
 }
