@@ -17,16 +17,23 @@
 
 package com.android.org.conscrypt;
 
+import static com.android.org.conscrypt.metrics.MetricsCipher.CHACHA20;
+import static com.android.org.conscrypt.metrics.MetricsMode.POLY1305;
+import static com.android.org.conscrypt.metrics.MetricsPadding.NO_PADDING;
+
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
-/**
+/**xs
  * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public class OpenSSLAeadCipherChaCha20 extends OpenSSLAeadCipher {
     public OpenSSLAeadCipherChaCha20() {
-        super(Mode.POLY1305);
+        super(Mode.POLY1305,
+                CHACHA20.getId(),
+                POLY1305.getId(),
+                NO_PADDING.getId());
     }
 
     @Override

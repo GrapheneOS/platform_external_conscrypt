@@ -17,27 +17,35 @@
 package com.android.org.conscrypt.metrics;
 
 import com.android.org.conscrypt.Internal;
-import com.android.org.conscrypt.ct.LogStore;
-import com.android.org.conscrypt.ct.PolicyCompliance;
-import com.android.org.conscrypt.ct.VerificationResult;
 
 /**
+ * Cipher to metric mapping for metrics instrumentation.
+ *
+ * Must be in sync with frameworks/base/cmds/statsd/src/atoms.proto
  * @hide This class is not part of the Android public SDK API
  */
 @Internal
-public class NoopStatsLog implements StatsLog {
-    private static final StatsLog INSTANCE = new NoopStatsLog();
-    public static StatsLog getInstance() {
-        return INSTANCE;
+public enum MetricsAlgorithm {
+    UNKNOWN_ALGORITHM(0x0000),
+    CIPHER(0x0001),
+    SIGNATURE(0x0002),
+    ;
+
+    final int id;
+
+    public int getId() {
+        return this.id;
     }
 
-    public void countTlsHandshake(
-            boolean success, String protocol, String cipherSuite, long duration) {}
+    public static MetricsAlgorithm forName(String name) {
+        try {
+            return MetricsAlgorithm.valueOf(name);
+        } catch (IllegalArgumentException e) {
+            return MetricsAlgorithm.UNKNOWN_ALGORITHM;
+        }
+    }
 
-    public void updateCTLogListStatusChanged(LogStore logStore) {}
-
-    public void reportCTVerificationResult(LogStore logStore, VerificationResult result,
-            PolicyCompliance compliance, CertificateTransparencyVerificationReason reason) {}
-
-    public void countServiceUsage(int algorithmId, int cipherId, int modeId, int paddingId) {}
+    private MetricsAlgorithm(int id) {
+        this.id = id;
+    }
 }
