@@ -17,9 +17,17 @@
 
 package com.android.org.conscrypt;
 
+import static com.android.org.conscrypt.metrics.MetricsCipher.AES;
+import static com.android.org.conscrypt.metrics.MetricsMode.CBC;
+import static com.android.org.conscrypt.metrics.MetricsMode.ECB;
+import static com.android.org.conscrypt.metrics.MetricsMode.CTR;
+import static com.android.org.conscrypt.metrics.MetricsPadding.NO_PADDING;
+import static com.android.org.conscrypt.metrics.MetricsPadding.PKCS5;
+
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
+
 import javax.crypto.NoSuchPaddingException;
 
 /**
@@ -29,8 +37,8 @@ import javax.crypto.NoSuchPaddingException;
 public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
     private static final int AES_BLOCK_SIZE = 16;
 
-    OpenSSLEvpCipherAES(Mode mode, Padding padding) {
-        super(mode, padding);
+    OpenSSLEvpCipherAES(Mode mode, Padding padding, int modeId, int paddingId) {
+        super(mode, padding, AES.getId(), modeId, paddingId);
     }
 
     @Override
@@ -76,16 +84,16 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
      * @hide This class is not part of the Android public SDK API
      */
     public static class AES extends OpenSSLEvpCipherAES {
-        AES(Mode mode, Padding padding) {
-            super(mode, padding);
+        AES(Mode mode, Padding padding, int modeId, int paddingId) {
+            super(mode, padding, modeId, paddingId);
         }
 
         /**
          * @hide This class is not part of the Android public SDK API
          */
         public static class CBC extends AES {
-            CBC(Padding padding) {
-                super(Mode.CBC, padding);
+            CBC(Padding padding, int paddingId) {
+                super(Mode.CBC, padding, CBC.getId(), paddingId);
             }
 
             /**
@@ -93,7 +101,8 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
              */
             public static class NoPadding extends AES.CBC {
                 public NoPadding() {
-                    super(Padding.NOPADDING);
+                    super(Padding.NOPADDING,
+                        NO_PADDING.getId());
                 }
             }
 
@@ -102,7 +111,8 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
              */
             public static class PKCS5Padding extends AES.CBC {
                 public PKCS5Padding() {
-                    super(Padding.PKCS5PADDING);
+                    super(Padding.PKCS5PADDING,
+                        PKCS5.getId());
                 }
             }
         }
@@ -112,7 +122,9 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
          */
         public static class CTR extends AES {
             public CTR() {
-                super(Mode.CTR, Padding.NOPADDING);
+                super(Mode.CTR, Padding.NOPADDING,
+                    CTR.getId(),
+                    NO_PADDING.getId());
             }
         }
 
@@ -120,8 +132,8 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
          * @hide This class is not part of the Android public SDK API
          */
         public static class ECB extends AES {
-            ECB(Padding padding) {
-                super(Mode.ECB, padding);
+            ECB(Padding padding, int paddingId) {
+                super(Mode.ECB, padding, ECB.getId(), paddingId);
             }
 
             /**
@@ -129,7 +141,8 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
              */
             public static class NoPadding extends AES.ECB {
                 public NoPadding() {
-                    super(Padding.NOPADDING);
+                    super(Padding.NOPADDING,
+                        NO_PADDING.getId());
                 }
             }
 
@@ -138,7 +151,8 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
              */
             public static class PKCS5Padding extends AES.ECB {
                 public PKCS5Padding() {
-                    super(Padding.PKCS5PADDING);
+                    super(Padding.PKCS5PADDING,
+                        PKCS5.getId());
                 }
             }
         }
@@ -161,16 +175,16 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
      * @hide This class is not part of the Android public SDK API
      */
     public static class AES_128 extends OpenSSLEvpCipherAES {
-        AES_128(Mode mode, Padding padding) {
-            super(mode, padding);
+        AES_128(Mode mode, Padding padding, int modeId, int paddingId) {
+            super(mode, padding, modeId, paddingId);
         }
 
         /**
          * @hide This class is not part of the Android public SDK API
          */
         public static class CBC extends AES_128 {
-            CBC(Padding padding) {
-                super(Mode.CBC, padding);
+            CBC(Padding padding, int paddingId) {
+                super(Mode.CBC, padding, CBC.getId(), paddingId);
             }
 
             /**
@@ -178,7 +192,8 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
              */
             public static class NoPadding extends AES_128.CBC {
                 public NoPadding() {
-                    super(Padding.NOPADDING);
+                    super(Padding.NOPADDING,
+                        NO_PADDING.getId());
                 }
             }
 
@@ -187,7 +202,8 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
              */
             public static class PKCS5Padding extends AES_128.CBC {
                 public PKCS5Padding() {
-                    super(Padding.PKCS5PADDING);
+                    super(Padding.PKCS5PADDING,
+                        PKCS5.getId());
                 }
             }
         }
@@ -197,7 +213,9 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
          */
         public static class CTR extends AES_128 {
             public CTR() {
-                super(Mode.CTR, Padding.NOPADDING);
+                super(Mode.CTR, Padding.NOPADDING,
+                    CTR.getId(),
+                    NO_PADDING.getId());
             }
         }
 
@@ -205,8 +223,8 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
          * @hide This class is not part of the Android public SDK API
          */
         public static class ECB extends AES_128 {
-            ECB(Padding padding) {
-                super(Mode.ECB, padding);
+            ECB(Padding padding, int paddingId) {
+                super(Mode.ECB, padding, ECB.getId(), paddingId);
             }
 
             /**
@@ -214,7 +232,8 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
              */
             public static class NoPadding extends AES_128.ECB {
                 public NoPadding() {
-                    super(Padding.NOPADDING);
+                    super(Padding.NOPADDING,
+                        NO_PADDING.getId());
                 }
             }
 
@@ -223,7 +242,8 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
              */
             public static class PKCS5Padding extends AES_128.ECB {
                 public PKCS5Padding() {
-                    super(Padding.PKCS5PADDING);
+                    super(Padding.PKCS5PADDING,
+                        PKCS5.getId());
                 }
             }
         }
@@ -240,16 +260,16 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
      * @hide This class is not part of the Android public SDK API
      */
     public static class AES_256 extends OpenSSLEvpCipherAES {
-        AES_256(Mode mode, Padding padding) {
-            super(mode, padding);
+        AES_256(Mode mode, Padding padding, int modeId, int paddingId) {
+            super(mode, padding, modeId, paddingId);
         }
 
         /**
          * @hide This class is not part of the Android public SDK API
          */
         public static class CBC extends AES_256 {
-            CBC(Padding padding) {
-                super(Mode.CBC, padding);
+            CBC(Padding padding, int paddingId) {
+                super(Mode.CBC, padding, CBC.getId(), paddingId);
             }
 
             /**
@@ -257,7 +277,8 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
              */
             public static class NoPadding extends AES_256.CBC {
                 public NoPadding() {
-                    super(Padding.NOPADDING);
+                    super(Padding.NOPADDING,
+                        NO_PADDING.getId());
                 }
             }
 
@@ -266,7 +287,8 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
              */
             public static class PKCS5Padding extends AES_256.CBC {
                 public PKCS5Padding() {
-                    super(Padding.PKCS5PADDING);
+                    super(Padding.PKCS5PADDING,
+                        PKCS5.getId());
                 }
             }
         }
@@ -276,7 +298,9 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
          */
         public static class CTR extends AES_256 {
             public CTR() {
-                super(Mode.CTR, Padding.NOPADDING);
+                super(Mode.CTR, Padding.NOPADDING,
+                    CTR.getId(),
+                    NO_PADDING.getId());
             }
         }
 
@@ -284,8 +308,8 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
          * @hide This class is not part of the Android public SDK API
          */
         public static class ECB extends AES_256 {
-            ECB(Padding padding) {
-                super(Mode.ECB, padding);
+            ECB(Padding padding, int paddingId) {
+                super(Mode.ECB, padding, ECB.getId(), paddingId);
             }
 
             /**
@@ -293,7 +317,8 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
              */
             public static class NoPadding extends AES_256.ECB {
                 public NoPadding() {
-                    super(Padding.NOPADDING);
+                    super(Padding.NOPADDING,
+                        NO_PADDING.getId());
                 }
             }
 
@@ -302,7 +327,8 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
              */
             public static class PKCS5Padding extends AES_256.ECB {
                 public PKCS5Padding() {
-                    super(Padding.PKCS5PADDING);
+                    super(Padding.PKCS5PADDING,
+                        PKCS5.getId());
                 }
             }
         }
