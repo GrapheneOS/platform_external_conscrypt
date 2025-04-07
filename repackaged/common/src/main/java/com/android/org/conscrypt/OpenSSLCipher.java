@@ -17,6 +17,8 @@
 
 package com.android.org.conscrypt;
 
+import static com.android.org.conscrypt.metrics.MetricsAlgorithm.CIPHER;
+
 import java.security.AlgorithmParameters;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -132,6 +134,12 @@ public abstract class OpenSSLCipher extends CipherSpi {
         this.mode = mode;
         this.padding = padding;
         blockSize = getCipherBlockSize();
+    }
+
+    OpenSSLCipher(Mode mode, Padding padding, int cipherId, int modeId, int paddingId) {
+        this(mode, padding);
+        Platform.getStatsLog().countServiceUsage(
+                CIPHER.getId(), cipherId, modeId, paddingId);
     }
 
     /**
