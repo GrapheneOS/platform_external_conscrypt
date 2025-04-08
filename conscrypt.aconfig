@@ -48,7 +48,7 @@ flag {
     namespace: "core_libraries"
     name: "use_chromium_cert_blocklist"
     description: "This flag controls whether conscrypt will use the new certificate blocklist"
-    bug: "3340363351"
+    bug: "340363351"
     # APIs provided by a mainline module can only use a frozen flag.
     is_fixed_read_only: true
 }
