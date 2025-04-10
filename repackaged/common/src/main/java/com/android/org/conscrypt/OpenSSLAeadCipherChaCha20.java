@@ -24,7 +24,7 @@ import static com.android.org.conscrypt.metrics.MetricsPadding.NO_PADDING;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
-/**xs
+/**
  * @hide This class is not part of the Android public SDK API
  */
 @Internal

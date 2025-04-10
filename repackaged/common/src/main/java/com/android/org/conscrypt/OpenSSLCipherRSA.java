@@ -20,13 +20,13 @@ package com.android.org.conscrypt;
 import static com.android.org.conscrypt.metrics.MetricsAlgorithm.CIPHER;
 import static com.android.org.conscrypt.metrics.MetricsCipher.RSA;
 import static com.android.org.conscrypt.metrics.MetricsMode.NO_MODE;
-import static com.android.org.conscrypt.metrics.MetricsPadding.PKCS1;
 import static com.android.org.conscrypt.metrics.MetricsPadding.NO_PADDING;
 import static com.android.org.conscrypt.metrics.MetricsPadding.OAEP_SHA1;
 import static com.android.org.conscrypt.metrics.MetricsPadding.OAEP_SHA224;
 import static com.android.org.conscrypt.metrics.MetricsPadding.OAEP_SHA256;
 import static com.android.org.conscrypt.metrics.MetricsPadding.OAEP_SHA384;
 import static com.android.org.conscrypt.metrics.MetricsPadding.OAEP_SHA512;
+import static com.android.org.conscrypt.metrics.MetricsPadding.PKCS1;
 
 import java.security.AlgorithmParameters;
 import java.security.InvalidAlgorithmParameterException;
