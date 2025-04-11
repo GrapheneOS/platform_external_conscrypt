@@ -254,7 +254,7 @@ public class LogStoreImpl implements LogStore {
         return State.LOADED;
     }
 
-    private static void addLogsToMap(JSONArray logs, String operatorName, int logType,
+    private void addLogsToMap(JSONArray logs, String operatorName, int logType,
             Map<ByteArray, LogInfo> logsMap) throws JSONException {
         for (int j = 0; j < logs.length(); j++) {
             JSONObject log = logs.getJSONObject(j);
@@ -271,10 +271,19 @@ public class LogStoreImpl implements LogStore {
             }
             LogInfo logInfo = builder.build();
 
+            String logIdFromList = log.getString("log_id");
             // The logId computed using the public key should match the log_id field.
-            byte[] logId = Base64.getDecoder().decode(log.getString("log_id"));
+            byte[] logId = Base64.getDecoder().decode(logIdFromList);
             if (!Arrays.equals(logInfo.getID(), logId)) {
                 throw new IllegalArgumentException("logId does not match publicKey");
+            }
+
+            //  Verify that the log is in a known state now. This might fail if
+            //  there is an issue with the device's clock which can cause false
+            //  positives when validating SCTs.
+            if (logInfo.getStateAt(clock.get()) == LogInfo.STATE_UNKNOWN) {
+                throw new IllegalArgumentException("Log current state is "
+                        + "unknown, logId: " + logIdFromList);
             }
 
             logsMap.put(new ByteArray(logId), logInfo);
