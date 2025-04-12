@@ -217,6 +217,33 @@ java_aconfig_library {
     ],
 }
 
+aconfig_declarations {
+    name: "networksecurity-aconfig-flags",
+    package: "com.android.org.conscrypt.net.flags",
+    container: "com.android.conscrypt",
+    srcs: ["networksecurity.aconfig"],
+    exportable: true,
+    visibility: [
+        "//frameworks/base",
+    ],
+}
+
+java_aconfig_library {
+    name: "networksecurity-aconfig-flags-lib",
+    aconfig_declarations: "networksecurity-aconfig-flags",
+    system_modules: "core-all-system-modules",
+    sdk_version: "none",
+    patch_module: "java.base",
+    apex_available: [
+        "com.android.conscrypt",
+    ],
+    min_sdk_version: "30",
+    installable: false,
+    visibility: [
+        "//frameworks/base",
+    ],
+}
+
 cc_binary_host {
     name: "conscrypt_generate_constants",
     srcs: ["constants/src/gen/cpp/generate_constants.cc"],
@@ -300,6 +327,7 @@ java_library {
     static_libs: [
         "conscrypt-aconfig-flags-lib",
         "conscrypt-statslog-java",
+        "networksecurity-aconfig-flags-lib",
     ],
 
     // Conscrypt can be updated independently from the other core libraries so it must only depend
@@ -400,6 +428,7 @@ java_sdk_library {
     ],
     aconfig_declarations: [
         "conscrypt-aconfig-flags",
+        "networksecurity-aconfig-flags",
     ],
     api_dir: "api/platform",
     api_only: true,
@@ -430,6 +459,7 @@ java_sdk_library {
     unsafe_ignore_missing_latest_api: true,
     libs: [
         "conscrypt-aconfig-flags-lib",
+        "networksecurity-aconfig-flags-lib",
     ],
 }
 
@@ -459,9 +489,11 @@ java_sdk_library {
     ],
     libs: [
         "conscrypt-aconfig-flags-lib",
+        "networksecurity-aconfig-flags-lib",
     ],
     aconfig_declarations: [
         "conscrypt-aconfig-flags",
+        "networksecurity-aconfig-flags",
     ],
 
     // The base name for the artifacts that are automatically published to the
