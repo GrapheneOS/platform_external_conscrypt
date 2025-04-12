@@ -19,8 +19,8 @@ package com.android.org.conscrypt;
 
 import static com.android.org.conscrypt.metrics.MetricsCipher.DESEDE;
 import static com.android.org.conscrypt.metrics.MetricsMode.CBC;
-import static com.android.org.conscrypt.metrics.MetricsPadding.PKCS5;
 import static com.android.org.conscrypt.metrics.MetricsPadding.NO_PADDING;
+import static com.android.org.conscrypt.metrics.MetricsPadding.PKCS5;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;

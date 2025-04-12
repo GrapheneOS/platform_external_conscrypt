@@ -19,8 +19,8 @@ package com.android.org.conscrypt;
 
 import static com.android.org.conscrypt.metrics.MetricsCipher.AES;
 import static com.android.org.conscrypt.metrics.MetricsMode.CBC;
-import static com.android.org.conscrypt.metrics.MetricsMode.ECB;
 import static com.android.org.conscrypt.metrics.MetricsMode.CTR;
+import static com.android.org.conscrypt.metrics.MetricsMode.ECB;
 import static com.android.org.conscrypt.metrics.MetricsPadding.NO_PADDING;
 import static com.android.org.conscrypt.metrics.MetricsPadding.PKCS5;
 
