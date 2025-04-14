@@ -30,4 +30,8 @@ public final class GeneratedStatsLog {
               source, uids);
       ReflexiveStatsLog.write(event);
     }
+
+    public static void write(int atomId, int algorithmId, int cipherId, int modeId, int paddingId) {
+        ConscryptStatsLog.write(atomId, algorithmId, cipherId, modeId, paddingId);
+    }
 }
