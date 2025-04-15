@@ -768,6 +768,7 @@ filegroup {
         "repackaged/platform/src/test/java/com/android/org/conscrypt/ct/*.java",
         "repackaged/platform/src/test/java/com/android/org/conscrypt/CertBlocklistTest.java",
         "repackaged/common/src/test/java/com/android/org/conscrypt/ct/*.java",
+        "repackaged/common/src/test/java/com/android/org/conscrypt/securityconfig/*.java",
     ],
 }
 
