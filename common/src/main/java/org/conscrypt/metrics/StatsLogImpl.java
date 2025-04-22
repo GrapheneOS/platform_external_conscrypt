@@ -192,7 +192,7 @@ public final class StatsLogImpl implements StatsLog {
         e.execute(new Runnable() {
             @Override
             public void run() {
-                ConscryptStatsLog.write(atomId, algorithmId, cipherId, modeId, paddingId);
+                GeneratedStatsLog.write(atomId, algorithmId, cipherId, modeId, paddingId);
             }
         });
     }

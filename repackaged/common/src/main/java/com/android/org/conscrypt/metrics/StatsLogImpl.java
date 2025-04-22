@@ -45,6 +45,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import javax.annotation.processing.Generated;
 
 /**
  * @hide This class is not part of the Android public SDK API
@@ -196,7 +197,7 @@ public final class StatsLogImpl implements StatsLog {
         e.execute(new Runnable() {
             @Override
             public void run() {
-                ConscryptStatsLog.write(atomId, algorithmId, cipherId, modeId, paddingId);
+                GeneratedStatsLog.write(atomId, algorithmId, cipherId, modeId, paddingId);
             }
         });
     }
