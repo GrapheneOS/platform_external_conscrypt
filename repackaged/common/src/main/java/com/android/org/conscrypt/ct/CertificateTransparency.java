@@ -60,8 +60,8 @@ public class CertificateTransparency {
         return Platform.reasonCTVerificationRequired(host);
     }
 
-    public void checkCT(List<X509Certificate> chain, byte[] ocspData, byte[] tlsData, String host)
-            throws CertificateException {
+    private void checkCTInternal(List<X509Certificate> chain, byte[] ocspData, byte[] tlsData,
+            String host) throws CertificateException {
         if (logStore.getState() != LogStore.State.COMPLIANT) {
             /* Fail open. For some reason, the LogStore is not usable. It could
              * be because there is no log list available or that the log list
@@ -82,6 +82,19 @@ public class CertificateTransparency {
             throw new CertificateException(
                     "Certificate chain does not conform to required transparency policy: "
                     + compliance.name());
+        }
+    }
+
+    public void checkCT(List<X509Certificate> chain, byte[] ocspData, byte[] tlsData, String host)
+            throws CertificateException {
+        boolean dryRun = (reasonCTVerificationRequired(host)
+                == CertificateTransparencyVerificationReason.DRY_RUN);
+        try {
+            checkCTInternal(chain, ocspData, tlsData, host);
+        } catch (CertificateException e) {
+            if (!dryRun) {
+                throw e;
+            }
         }
     }
 }

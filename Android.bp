@@ -425,6 +425,7 @@ java_sdk_library {
         ":conscrypt_java_files",
         ":conscrypt_public_api_files",
         ":framework-metalava-annotations",
+        ":visible_api_surface_annotation_files",
     ],
     aconfig_declarations: [
         "conscrypt-aconfig-flags",
