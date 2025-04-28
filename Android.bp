@@ -1001,6 +1001,6 @@ java_library {
 genrule {
     name: "conscrypt-statslog-java-gen",
     tools: ["stats-log-api-gen"],
-    cmd: "$(location stats-log-api-gen) --java $(out) --module conscrypt --javaPackage com.android.org.conscrypt.metrics --javaClass GeneratedStatsLog",
-    out: ["repackaged/common/src/main/java/com/android/org/conscrypt/metrics/GeneratedStatsLog.java"],
+    cmd: "$(location stats-log-api-gen) --java $(out) --module conscrypt --javaPackage com.android.org.conscrypt.metrics --javaClass ConscryptStatsLog",
+    out: ["repackaged/common/src/main/java/com/android/org/conscrypt/metrics/ConscryptStatsLog.java"],
 }
