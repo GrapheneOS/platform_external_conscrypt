@@ -58,8 +58,7 @@ public class LogStoreImpl implements LogStore {
     private static final int COMPAT_VERSION = 2;
     private static final Path logListPrefix;
     private static final Path logListSuffix;
-    private static final long LOG_LIST_CHECK_INTERVAL_IN_NS =
-            10L * 60 * 1_000 * 1_000_000; // 10 minutes
+    private static final long LOG_LIST_CHECK_INTERVAL_IN_MS = 10L * 60 * 1_000; // 10 minutes
 
     static {
         String androidData = System.getenv("ANDROID_DATA");
@@ -84,7 +83,7 @@ public class LogStoreImpl implements LogStore {
     static class SystemTimeSupplier implements Supplier<Long> {
         @Override
         public Long get() {
-            return System.nanoTime();
+            return System.currentTimeMillis();
         }
     }
 
@@ -188,7 +187,8 @@ public class LogStoreImpl implements LogStore {
 
     private synchronized void resetLogListIfRequired() {
         long now = clock.get();
-        if (this.logListLastChecked + LOG_LIST_CHECK_INTERVAL_IN_NS > now) {
+        if (now >= this.logListLastChecked
+                && now < this.logListLastChecked + LOG_LIST_CHECK_INTERVAL_IN_MS) {
             return;
         }
         this.logListLastChecked = now;
