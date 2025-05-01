@@ -82,19 +82,19 @@ public class LogStoreImplTest {
 
     /* Time supplier that can be set to any arbitrary time */
     static class TimeSupplier implements Supplier<Long> {
-        private long currentTimeInNs;
+        private long currentTimeInMs;
 
-        TimeSupplier(long currentTimeInNs) {
-            this.currentTimeInNs = currentTimeInNs;
+        TimeSupplier(long currentTimeInMs) {
+            this.currentTimeInMs = currentTimeInMs;
         }
 
         @Override
         public Long get() {
-            return currentTimeInNs;
+            return currentTimeInMs;
         }
 
-        public void setCurrentTimeInNs(long currentTimeInNs) {
-            this.currentTimeInNs = currentTimeInNs;
+        public void setCurrentTimeInMs(long currentTimeInMs) {
+            this.currentTimeInMs = currentTimeInMs;
         }
     }
 
@@ -206,7 +206,7 @@ public class LogStoreImplTest {
     public void loadValidLogList_returnsCompliantState() throws Exception {
         FakeStatsLog metrics = new FakeStatsLog();
         logList = writeLogList(validLogList);
-        TimeSupplier fakeTime = new TimeSupplier(/* currentTimeInNs= */ JAN2024);
+        TimeSupplier fakeTime = new TimeSupplier(/* currentTimeInMs= */ JAN2024);
         LogStore store = new LogStoreImpl(alwaysCompliantStorePolicy, logList, metrics, fakeTime);
         byte[] pem = ("-----BEGIN PUBLIC KEY-----\n"
                 + "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEHblsqctplMVc5ramA7vSuNxUQxcomQwGAVAdnWTAWUYr"
@@ -236,7 +236,7 @@ public class LogStoreImplTest {
         FakeStatsLog metrics = new FakeStatsLog();
         String content = "}}";
         logList = writeLogList(content);
-        TimeSupplier fakeTime = new TimeSupplier(/* currentTimeInNs= */ JAN2024);
+        TimeSupplier fakeTime = new TimeSupplier(/* currentTimeInMs= */ JAN2024);
         LogStore store = new LogStoreImpl(alwaysCompliantStorePolicy, logList, metrics, fakeTime);
 
         assertEquals(
@@ -250,7 +250,7 @@ public class LogStoreImplTest {
     public void loadFutureLogList_returnsMalformedState() throws Exception {
         FakeStatsLog metrics = new FakeStatsLog();
         logList = writeLogList(validLogList); // The logs are usable from 2024 onwards.
-        TimeSupplier fakeTime = new TimeSupplier(/* currentTimeInNs= */ JAN2022);
+        TimeSupplier fakeTime = new TimeSupplier(/* currentTimeInMs= */ JAN2022);
         LogStore store = new LogStoreImpl(alwaysCompliantStorePolicy, logList, metrics, fakeTime);
 
         assertEquals(
@@ -264,7 +264,7 @@ public class LogStoreImplTest {
     public void loadMissingLogList_returnsNotFoundState() throws Exception {
         FakeStatsLog metrics = new FakeStatsLog();
         Path missingLogList = Paths.get("missing_dir", "missing_subdir", "does_not_exist_log_list");
-        TimeSupplier fakeTime = new TimeSupplier(/* currentTimeInNs= */ JAN2024);
+        TimeSupplier fakeTime = new TimeSupplier(/* currentTimeInMs= */ JAN2024);
         LogStore store =
                 new LogStoreImpl(alwaysCompliantStorePolicy, missingLogList, metrics, fakeTime);
 
@@ -285,7 +285,7 @@ public class LogStoreImplTest {
         Files.deleteIfExists(logList);
         Files.deleteIfExists(parentDir);
         Files.deleteIfExists(grandparentDir);
-        TimeSupplier fakeTime = new TimeSupplier(/* currentTimeInNs= */ JAN2024);
+        TimeSupplier fakeTime = new TimeSupplier(/* currentTimeInMs= */ JAN2024);
         LogStore store = new LogStoreImpl(alwaysCompliantStorePolicy, logList, metrics, fakeTime);
         assertEquals(
                 "The log state should be not found", LogStore.State.NOT_FOUND, store.getState());
@@ -296,13 +296,38 @@ public class LogStoreImplTest {
         Files.write(logList, validLogList.getBytes());
 
         // Assert
-        // 10ns < 10min, we should not check the log list yet.
-        fakeTime.setCurrentTimeInNs(JAN2024 + 10);
+        // 5min < 10min, we should not check the log list yet.
+        fakeTime.setCurrentTimeInMs(JAN2024 + 5L * 60 * 1000);
         assertEquals(
                 "The log state should be not found", LogStore.State.NOT_FOUND, store.getState());
 
         // 12min, the log list should be reloadable.
-        fakeTime.setCurrentTimeInNs(JAN2024 + 12L * 60 * 1000 * 1_000_000);
+        fakeTime.setCurrentTimeInMs(JAN2024 + 12L * 60 * 1000);
+        assertEquals(
+                "The log state should be compliant", LogStore.State.COMPLIANT, store.getState());
+    }
+
+    @Test
+    public void loadMissingThenTimeTravelBackwardsAndThenFoundLogList_logListIsLoaded()
+            throws Exception {
+        FakeStatsLog metrics = new FakeStatsLog();
+        // Allocate a temporary file path and delete it. We keep the temporary
+        // path so that we can add a valid log list later on.
+        logList = writeLogList("");
+        Files.deleteIfExists(logList);
+        Files.deleteIfExists(parentDir);
+        Files.deleteIfExists(grandparentDir);
+        TimeSupplier fakeTime = new TimeSupplier(/* currentTimeInMs= */ JAN2024 + 100L * 60 * 1000);
+        LogStore store = new LogStoreImpl(alwaysCompliantStorePolicy, logList, metrics, fakeTime);
+        assertEquals(
+                "The log state should be not found", LogStore.State.NOT_FOUND, store.getState());
+
+        Files.createDirectory(grandparentDir);
+        Files.createDirectory(parentDir);
+        Files.write(logList, validLogList.getBytes());
+        // Move back in time.
+        fakeTime.setCurrentTimeInMs(JAN2024);
+
         assertEquals(
                 "The log state should be compliant", LogStore.State.COMPLIANT, store.getState());
     }
@@ -311,13 +336,13 @@ public class LogStoreImplTest {
     public void loadExistingAndThenRemovedLogList_logListIsNotFound() throws Exception {
         FakeStatsLog metrics = new FakeStatsLog();
         logList = writeLogList(validLogList);
-        TimeSupplier fakeTime = new TimeSupplier(/* currentTimeInNs= */ JAN2024);
+        TimeSupplier fakeTime = new TimeSupplier(/* currentTimeInMs= */ JAN2024);
         LogStore store = new LogStoreImpl(alwaysCompliantStorePolicy, logList, metrics, fakeTime);
         assertEquals("The log should be loaded", LogStore.State.COMPLIANT, store.getState());
 
         Files.delete(logList);
         // 12min, the log list should be reloadable.
-        fakeTime.setCurrentTimeInNs(JAN2024 + 12L * 60 * 1000 * 1_000_000);
+        fakeTime.setCurrentTimeInMs(JAN2024 + 12L * 60 * 1000);
 
         assertEquals(
                 "The log should have been refreshed", LogStore.State.NOT_FOUND, store.getState());
@@ -327,7 +352,7 @@ public class LogStoreImplTest {
     public void loadExistingLogListAndThenMoveDirectory_logListIsNotFound() throws Exception {
         FakeStatsLog metrics = new FakeStatsLog();
         logList = writeLogList(validLogList);
-        TimeSupplier fakeTime = new TimeSupplier(/* currentTimeInNs= */ JAN2024);
+        TimeSupplier fakeTime = new TimeSupplier(/* currentTimeInMs= */ JAN2024);
         LogStore store = new LogStoreImpl(alwaysCompliantStorePolicy, logList, metrics, fakeTime);
         assertEquals("The log should be loaded", LogStore.State.COMPLIANT, store.getState());
 
@@ -336,7 +361,7 @@ public class LogStoreImplTest {
         Files.move(oldParentDir, parentDir);
         logList = parentDir.resolve("log_list.json");
         // 12min, the log list should be reloadable.
-        fakeTime.setCurrentTimeInNs(JAN2024 + 12L * 60 * 1000 * 1_000_000);
+        fakeTime.setCurrentTimeInMs(JAN2024 + 12L * 60 * 1000);
 
         assertEquals(
                 "The log should have been refreshed", LogStore.State.NOT_FOUND, store.getState());
