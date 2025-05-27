@@ -29,7 +29,6 @@ import static com.android.org.conscrypt.metrics.ConscryptStatsLog.CERTIFICATE_TR
 import static com.android.org.conscrypt.metrics.ConscryptStatsLog.CERTIFICATE_TRANSPARENCY_VERIFICATION_REPORTED__RESULT__RESULT_FAIL_OPEN_NO_LOG_LIST_AVAILABLE;
 import static com.android.org.conscrypt.metrics.ConscryptStatsLog.CERTIFICATE_TRANSPARENCY_VERIFICATION_REPORTED__RESULT__RESULT_SUCCESS;
 import static com.android.org.conscrypt.metrics.ConscryptStatsLog.CERTIFICATE_TRANSPARENCY_VERIFICATION_REPORTED__RESULT__RESULT_UNKNOWN;
-import static com.android.org.conscrypt.metrics.ConscryptStatsLog.CONSCRYPT_SERVICE_USED;
 import static com.android.org.conscrypt.metrics.ConscryptStatsLog.TLS_HANDSHAKE_REPORTED;
 
 import com.android.org.conscrypt.Internal;
@@ -57,11 +56,6 @@ public final class StatsLogImpl implements StatsLog {
 
         write(TLS_HANDSHAKE_REPORTED, success, proto.getId(), suite.getId(), (int) duration,
                 Platform.getStatsSource().getId(), Platform.getUids());
-    }
-
-    @Override
-    public void countServiceUsage(int algorithmId, int cipherId, int modeId, int paddingId) {
-        write(CONSCRYPT_SERVICE_USED, algorithmId, cipherId, modeId, paddingId);
     }
 
     private static int logStoreStateToMetricsState(LogStore.State state) {
@@ -159,9 +153,5 @@ public final class StatsLogImpl implements StatsLog {
             int numOcspScts, int numTlsScts) {
         ConscryptStatsLog.write(atomId, verificationResult, verificationReason, policyCompatVersion,
                 majorVersion, minorVersion, numEmbeddedScts, numOcspScts, numTlsScts);
-    }
-
-    private void write(int atomId, int algorithmId, int cipherId, int modeId, int paddingId) {
-        ConscryptStatsLog.write(atomId, algorithmId, cipherId, modeId, paddingId);
     }
 }

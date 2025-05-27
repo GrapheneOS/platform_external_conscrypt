@@ -17,11 +17,6 @@
 
 package com.android.org.conscrypt;
 
-import static com.android.org.conscrypt.metrics.MetricsCipher.DESEDE;
-import static com.android.org.conscrypt.metrics.MetricsMode.CBC;
-import static com.android.org.conscrypt.metrics.MetricsPadding.NO_PADDING;
-import static com.android.org.conscrypt.metrics.MetricsPadding.PKCS5;
-
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
@@ -35,16 +30,16 @@ import javax.crypto.NoSuchPaddingException;
 public abstract class OpenSSLEvpCipherDESEDE extends OpenSSLEvpCipher {
     private static final int DES_BLOCK_SIZE = 8;
 
-    OpenSSLEvpCipherDESEDE(Mode mode, Padding padding, int modeId, int paddingId) {
-        super(mode, padding, DESEDE.getId(), modeId, paddingId);
+    OpenSSLEvpCipherDESEDE(Mode mode, Padding padding) {
+        super(mode, padding);
     }
 
     /**
      * @hide This class is not part of the Android public SDK API
      */
     public static class CBC extends OpenSSLEvpCipherDESEDE {
-        CBC(Padding padding, int paddingId) {
-            super(Mode.CBC, padding, CBC.getId(), paddingId);
+        CBC(Padding padding) {
+            super(Mode.CBC, padding);
         }
 
         /**
@@ -52,8 +47,7 @@ public abstract class OpenSSLEvpCipherDESEDE extends OpenSSLEvpCipher {
          */
         public static class NoPadding extends CBC {
             public NoPadding() {
-                super(Padding.NOPADDING,
-                    NO_PADDING.getId());
+                super(Padding.NOPADDING);
             }
         }
 
@@ -62,8 +56,7 @@ public abstract class OpenSSLEvpCipherDESEDE extends OpenSSLEvpCipher {
          */
         public static class PKCS5Padding extends CBC {
             public PKCS5Padding() {
-                super(Padding.PKCS5PADDING,
-                    PKCS5.getId());
+                super(Padding.PKCS5PADDING);
             }
         }
     }
