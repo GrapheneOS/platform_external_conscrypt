@@ -88,6 +88,10 @@ apex {
         "cacerts_apex",
     ],
     min_sdk_version: "30",
+    licenses: [
+        "external_conscrypt_license",
+        "opensourcerequest",
+    ],
 }
 
 // Encapsulate the contributions made by the com.android.conscrypt to the bootclasspath.
