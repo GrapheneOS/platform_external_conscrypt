@@ -97,7 +97,13 @@ apex {
 // Encapsulate the contributions made by the com.android.conscrypt to the bootclasspath.
 bootclasspath_fragment {
     name: "com.android.conscrypt-bootclasspath-fragment",
-    contents: ["conscrypt"],
+    contents: select(release_flag("RELEASE_CONSCRYPT_NSC"), {
+        true: [
+            "conscrypt",
+            "framework-conscrypt-nsc",
+        ],
+        default: ["conscrypt"],
+    }),
     apex_available: ["com.android.conscrypt"],
     // The bootclasspath_fragments that provide APIs on which this depends.
     fragments: [
@@ -134,6 +140,7 @@ bootclasspath_fragment {
         // result in a build failure due to inconsistent flags.
         package_prefixes: [
             "android.net.ssl",
+            "com.android.nsc",
             "com.android.org.conscrypt",
         ],
     },
