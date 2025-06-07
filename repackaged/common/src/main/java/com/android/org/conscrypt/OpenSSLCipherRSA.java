@@ -17,17 +17,6 @@
 
 package com.android.org.conscrypt;
 
-import static com.android.org.conscrypt.metrics.MetricsAlgorithm.CIPHER;
-import static com.android.org.conscrypt.metrics.MetricsCipher.RSA;
-import static com.android.org.conscrypt.metrics.MetricsMode.NO_MODE;
-import static com.android.org.conscrypt.metrics.MetricsPadding.NO_PADDING;
-import static com.android.org.conscrypt.metrics.MetricsPadding.OAEP_SHA1;
-import static com.android.org.conscrypt.metrics.MetricsPadding.OAEP_SHA224;
-import static com.android.org.conscrypt.metrics.MetricsPadding.OAEP_SHA256;
-import static com.android.org.conscrypt.metrics.MetricsPadding.OAEP_SHA384;
-import static com.android.org.conscrypt.metrics.MetricsPadding.OAEP_SHA512;
-import static com.android.org.conscrypt.metrics.MetricsPadding.PKCS1;
-
 import java.security.AlgorithmParameters;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -102,10 +91,8 @@ public abstract class OpenSSLCipherRSA extends CipherSpi {
      */
     int padding = NativeConstants.RSA_PKCS1_PADDING;
 
-    OpenSSLCipherRSA(int padding, int paddingId) {
+    OpenSSLCipherRSA(int padding) {
         this.padding = padding;
-        Platform.getStatsLog().countServiceUsage(
-                CIPHER.getId(), RSA.getId(), NO_MODE.getId(), paddingId);
     }
 
     @Override
@@ -396,8 +383,8 @@ public abstract class OpenSSLCipherRSA extends CipherSpi {
      * @hide This class is not part of the Android public SDK API
      */
     public abstract static class DirectRSA extends OpenSSLCipherRSA {
-        protected DirectRSA(int padding, int paddingId) {
-            super(padding, paddingId);
+        protected DirectRSA(int padding) {
+            super(padding);
         }
 
         @Override
@@ -436,8 +423,7 @@ public abstract class OpenSSLCipherRSA extends CipherSpi {
      */
     public static final class PKCS1 extends DirectRSA {
         public PKCS1() {
-            super(NativeConstants.RSA_PKCS1_PADDING,
-                PKCS1.getId());
+            super(NativeConstants.RSA_PKCS1_PADDING);
         }
     }
 
@@ -446,8 +432,7 @@ public abstract class OpenSSLCipherRSA extends CipherSpi {
      */
     public static final class Raw extends DirectRSA {
         public Raw() {
-            super(NativeConstants.RSA_NO_PADDING,
-                NO_PADDING.getId());
+            super(NativeConstants.RSA_NO_PADDING);
         }
     }
 
@@ -465,19 +450,10 @@ public abstract class OpenSSLCipherRSA extends CipherSpi {
         private NativeRef.EVP_PKEY_CTX pkeyCtx;
 
         public OAEP(long defaultMd, int defaultMdSizeBytes) {
-            super(NativeConstants.RSA_PKCS1_OAEP_PADDING,
-                    OAEP_SHA1.getId());
+            super(NativeConstants.RSA_PKCS1_OAEP_PADDING);
             oaepMd = mgf1Md = defaultMd;
             oaepMdSizeBytes = defaultMdSizeBytes;
         }
-
-        private OAEP(long defaultMd, int defaultMdSizeBytes, int paddingId) {
-            super(NativeConstants.RSA_PKCS1_OAEP_PADDING,
-                    paddingId);
-            oaepMd = mgf1Md = defaultMd;
-            oaepMdSizeBytes = defaultMdSizeBytes;
-        }
-
         @Override
         protected AlgorithmParameters engineGetParameters() {
             if (!isInitialized()) {
@@ -640,8 +616,7 @@ public abstract class OpenSSLCipherRSA extends CipherSpi {
          */
         public static final class SHA1 extends OAEP {
             public SHA1() {
-                super(EvpMdRef.SHA1.EVP_MD, EvpMdRef.SHA1.SIZE_BYTES,
-                    OAEP_SHA1.getId());
+                super(EvpMdRef.SHA1.EVP_MD, EvpMdRef.SHA1.SIZE_BYTES);
             }
         }
 
@@ -650,8 +625,7 @@ public abstract class OpenSSLCipherRSA extends CipherSpi {
          */
         public static final class SHA224 extends OAEP {
             public SHA224() {
-                super(EvpMdRef.SHA224.EVP_MD, EvpMdRef.SHA224.SIZE_BYTES,
-                    OAEP_SHA224.getId());
+                super(EvpMdRef.SHA224.EVP_MD, EvpMdRef.SHA224.SIZE_BYTES);
             }
         }
 
@@ -660,8 +634,7 @@ public abstract class OpenSSLCipherRSA extends CipherSpi {
          */
         public static final class SHA256 extends OAEP {
             public SHA256() {
-                super(EvpMdRef.SHA256.EVP_MD, EvpMdRef.SHA256.SIZE_BYTES,
-                    OAEP_SHA256.getId());
+                super(EvpMdRef.SHA256.EVP_MD, EvpMdRef.SHA256.SIZE_BYTES);
             }
         }
 
@@ -670,8 +643,7 @@ public abstract class OpenSSLCipherRSA extends CipherSpi {
          */
         public static final class SHA384 extends OAEP {
             public SHA384() {
-                super(EvpMdRef.SHA384.EVP_MD, EvpMdRef.SHA384.SIZE_BYTES,
-                    OAEP_SHA384.getId());
+                super(EvpMdRef.SHA384.EVP_MD, EvpMdRef.SHA384.SIZE_BYTES);
             }
         }
 
@@ -680,8 +652,7 @@ public abstract class OpenSSLCipherRSA extends CipherSpi {
          */
         public static final class SHA512 extends OAEP {
             public SHA512() {
-                super(EvpMdRef.SHA512.EVP_MD, EvpMdRef.SHA512.SIZE_BYTES,
-                    OAEP_SHA512.getId());
+                super(EvpMdRef.SHA512.EVP_MD, EvpMdRef.SHA512.SIZE_BYTES);
             }
         }
     }
