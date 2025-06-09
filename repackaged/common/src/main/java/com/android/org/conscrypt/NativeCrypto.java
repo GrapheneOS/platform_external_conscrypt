@@ -806,6 +806,10 @@ public final class NativeCrypto {
     @FastNative
     static native void X509_REVOKED_print(long bioRef, long x509RevokedCtx);
 
+    @android.compat.annotation.UnsupportedAppUsage
+    @FastNative
+    static native void X509_REVOKED_free(long x509RevokedCtx);
+
     // --- X509_EXTENSION ------------------------------------------------------
 
     @android.compat.annotation.UnsupportedAppUsage
