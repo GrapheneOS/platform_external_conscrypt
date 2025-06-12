@@ -139,8 +139,8 @@ bootclasspath_fragment {
         // classes into an API surface, e.g. public, system, etc.. Doing so will
         // result in a build failure due to inconsistent flags.
         package_prefixes: [
+            "android.conscrypt.nsc",
             "android.net.ssl",
-            "com.android.nsc",
             "com.android.org.conscrypt",
         ],
     },

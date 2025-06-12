@@ -14,11 +14,16 @@
  * limitations under the License.
  */
 
-package com.android.nsc;
+package android.conscrypt.nsc;
 
-/**
- * An application's network security configuration.
- *
- * @hide
- */
-public final class ApplicationConfig {}
+import java.security.cert.X509Certificate;
+import java.util.Set;
+
+/** @hide */
+public interface CertificateSource {
+    Set<X509Certificate> getCertificates();
+    X509Certificate findBySubjectAndPublicKey(X509Certificate cert);
+    X509Certificate findByIssuerAndSignature(X509Certificate cert);
+    Set<X509Certificate> findAllByIssuerAndSignature(X509Certificate cert);
+    void handleTrustStorageUpdate();
+}

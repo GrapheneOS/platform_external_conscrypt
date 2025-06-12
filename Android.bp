@@ -658,10 +658,17 @@ java_sdk_library {
         "nsc/src/**/*.java",
     ],
     libs: [
-        "networksecurity-aconfig-flags-lib",
+        "android.sdk.flags-aconfig-java",
+        "android.security.flags-aconfig-java-export",
+        "app-compat-annotations",
         "framework-annotations-lib",
+        "androidx.annotation_annotation",
         "unsupportedappusage",
+        "conscrypt.module.platform.api.stubs",
+        "modules-xml-utils",
+        "networksecurity-aconfig-flags-lib",
     ],
+
     api_dir: "api/nsc",
     unsafe_ignore_missing_latest_api: true,
 
@@ -669,7 +676,7 @@ java_sdk_library {
         "com.android.conscrypt",
     ],
     permitted_packages: [
-        "com.android.nsc",
+        "android.conscrypt.nsc",
         "com.android.org.conscrypt.net.flags",
     ],
     aconfig_declarations: [
