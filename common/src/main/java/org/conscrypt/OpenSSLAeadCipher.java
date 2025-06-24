@@ -24,6 +24,7 @@ import java.security.InvalidKeyException;
 import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
+import java.util.logging.Logger;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
@@ -32,6 +33,8 @@ import javax.crypto.spec.IvParameterSpec;
 
 @Internal
 public abstract class OpenSSLAeadCipher extends OpenSSLCipher {
+    private static final Logger logger = Logger.getLogger(OpenSSLAeadCipher.class.getName());
+
     /**
      * Controls whether no-copy optimizations for direct ByteBuffers are enabled.
      */
@@ -394,6 +397,10 @@ public abstract class OpenSSLAeadCipher extends OpenSSLCipher {
         } else {
             if (inputLen == 0 && input == null) {
                 in = EmptyArray.BYTE; // input can be null when inputLen == 0
+            } else if (input == output && (inputOffset + inputLen) > outputOffset && inputOffset < outputOffset) {
+                // BoringSSL requires that input and output do not overlap. To be on the safe side,
+                // we copy the input to a new array.
+                in = Arrays.copyOfRange(input, inputOffset, inputOffset + inputLen);
             } else {
                 in = input;
             }
