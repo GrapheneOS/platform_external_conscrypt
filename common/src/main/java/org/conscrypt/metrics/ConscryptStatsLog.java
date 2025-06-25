@@ -226,7 +226,7 @@ public final class ConscryptStatsLog {
         ReflexiveStatsLog.write(builder.build());
     }
 
-    public static void write(int code, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8) {
+    public static void write(int code, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9) {
         final ReflexiveStatsEvent.Builder builder = ReflexiveStatsEvent.newBuilder();
         builder.setAtomId(code);
         builder.writeInt(arg1);
@@ -237,6 +237,7 @@ public final class ConscryptStatsLog {
         builder.writeInt(arg6);
         builder.writeInt(arg7);
         builder.writeInt(arg8);
+        builder.writeInt(arg9);
 
         builder.usePooledBuffer();
         ReflexiveStatsLog.write(builder.build());
