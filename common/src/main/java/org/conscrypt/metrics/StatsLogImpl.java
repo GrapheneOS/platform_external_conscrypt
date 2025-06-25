@@ -93,6 +93,14 @@ public final class StatsLogImpl implements StatsLog {
         return CERTIFICATE_TRANSPARENCY_VERIFICATION_REPORTED__RESULT__RESULT_UNKNOWN;
     }
 
+    private static int getUid() {
+        int[] uids = Platform.getUids();
+        if (uids != null && uids.length != 0) {
+            return uids[0];
+        }
+        return 0;
+    }
+
     @Override
     public void reportCTVerificationResult(LogStore store, VerificationResult result,
             PolicyCompliance compliance, CertificateTransparencyVerificationReason reason) {
@@ -100,16 +108,16 @@ public final class StatsLogImpl implements StatsLog {
                 || store.getState() == LogStore.State.MALFORMED) {
             write(CERTIFICATE_TRANSPARENCY_VERIFICATION_REPORTED,
                     CERTIFICATE_TRANSPARENCY_VERIFICATION_REPORTED__RESULT__RESULT_FAIL_OPEN_NO_LOG_LIST_AVAILABLE,
-                    reason.getId(), 0, 0, 0, 0, 0, 0);
+                    reason.getId(), 0, 0, 0, 0, 0, 0, getUid());
         } else if (store.getState() == LogStore.State.NON_COMPLIANT) {
             write(CERTIFICATE_TRANSPARENCY_VERIFICATION_REPORTED,
                     CERTIFICATE_TRANSPARENCY_VERIFICATION_REPORTED__RESULT__RESULT_FAIL_OPEN_LOG_LIST_NOT_COMPLIANT,
-                    reason.getId(), 0, 0, 0, 0, 0, 0);
+                    reason.getId(), 0, 0, 0, 0, 0, 0, getUid());
         } else if (store.getState() == LogStore.State.COMPLIANT) {
             int comp = policyComplianceToMetrics(result, compliance);
             write(CERTIFICATE_TRANSPARENCY_VERIFICATION_REPORTED, comp, reason.getId(),
                     store.getCompatVersion(), store.getMajorVersion(), store.getMinorVersion(),
-                    result.numCertSCTs(), result.numOCSPSCTs(), result.numTlsSCTs());
+                    result.numCertSCTs(), result.numOCSPSCTs(), result.numTlsSCTs(), getUid());
         }
     }
 
@@ -147,9 +155,8 @@ public final class StatsLogImpl implements StatsLog {
 
     private void write(int atomId, int verificationResult, int verificationReason,
             int policyCompatVersion, int majorVersion, int minorVersion, int numEmbeddedScts,
-            int numOcspScts, int numTlsScts) {
-        ConscryptStatsLog.write(atomId, verificationResult, verificationReason,
-                policyCompatVersion, majorVersion, minorVersion, numEmbeddedScts,
-                numOcspScts, numTlsScts);
+            int numOcspScts, int numTlsScts, int uid) {
+        ConscryptStatsLog.write(atomId, verificationResult, verificationReason, policyCompatVersion,
+                majorVersion, minorVersion, numEmbeddedScts, numOcspScts, numTlsScts, uid);
     }
 }

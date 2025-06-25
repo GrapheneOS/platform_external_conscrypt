@@ -454,6 +454,7 @@ public abstract class OpenSSLCipherRSA extends CipherSpi {
             oaepMd = mgf1Md = defaultMd;
             oaepMdSizeBytes = defaultMdSizeBytes;
         }
+
         @Override
         protected AlgorithmParameters engineGetParameters() {
             if (!isInitialized()) {
