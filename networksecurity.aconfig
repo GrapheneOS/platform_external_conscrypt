@@ -34,6 +34,14 @@ flag {
 }
 
 flag {
+    name: "deprecate_uses_cleartext_traffic"
+    namespace: "network_security"
+    description: "If enabled, the XML application flag usesCleartextTraffic is ignored for targetSdk version C+."
+    bug: "415007211"
+    is_fixed_read_only: true
+}
+
+flag {
     name: "network_security_config"
     namespace: "network_security"
     description: "This flag controls whether the NetworkSecurityConfig is provided by Conscrypt"
