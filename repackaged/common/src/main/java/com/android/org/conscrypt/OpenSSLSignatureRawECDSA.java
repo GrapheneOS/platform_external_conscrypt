@@ -16,7 +16,6 @@
  */
 package com.android.org.conscrypt;
 
-import java.io.ByteArrayOutputStream;
 import java.security.InvalidKeyException;
 import java.security.InvalidParameterException;
 import java.security.PrivateKey;
@@ -39,7 +38,7 @@ public class OpenSSLSignatureRawECDSA extends SignatureSpi {
     /**
      * Buffer to hold value to be signed or verified.
      */
-    private ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+    private ExposedByteArrayOutputStream buffer = new ExposedByteArrayOutputStream();
 
     public OpenSSLSignatureRawECDSA() {}
 
@@ -92,8 +91,8 @@ public class OpenSSLSignatureRawECDSA extends SignatureSpi {
         int output_size = NativeCrypto.ECDSA_size(key.getNativeRef());
         byte[] outputBuffer = new byte[output_size];
         try {
-            int bytes_written =
-                    NativeCrypto.ECDSA_sign(buffer.toByteArray(), outputBuffer, key.getNativeRef());
+            int bytes_written = NativeCrypto.ECDSA_sign(
+                    buffer.array(), buffer.size(), outputBuffer, key.getNativeRef());
             if (bytes_written < 0) {
                 throw new SignatureException("Could not compute signature.");
             }
@@ -121,8 +120,8 @@ public class OpenSSLSignatureRawECDSA extends SignatureSpi {
         }
 
         try {
-            int result =
-                    NativeCrypto.ECDSA_verify(buffer.toByteArray(), sigBytes, key.getNativeRef());
+            int result = NativeCrypto.ECDSA_verify(
+                    buffer.array(), buffer.size(), sigBytes, key.getNativeRef());
             if (result == -1) {
                 throw new SignatureException("Could not verify signature.");
             }

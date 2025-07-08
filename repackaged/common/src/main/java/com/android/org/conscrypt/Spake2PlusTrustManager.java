@@ -20,6 +20,7 @@ package com.android.org.conscrypt;
 import javax.net.ssl.TrustManager;
 
 /**
+ * Noop TrustManager for Spake2Plus
  * @hide This class is not part of the Android public SDK API
  * @hide This class is not part of the Android public SDK API
  */
