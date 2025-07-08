@@ -53,7 +53,6 @@ public final class NetworkSecurityConfig {
      * can still opt-out via their Network Security Config.
      */
     @ChangeId
-    @FlaggedApi(android.sdk.Flags.FLAG_MAJOR_MINOR_VERSIONING_SCHEME)
     @EnabledAfter(targetSdkVersion = Build.VERSION_CODES.BAKLAVA)
     static final long DEFAULT_ENABLE_CERTIFICATE_TRANSPARENCY = 407952621L;
 
