@@ -241,6 +241,9 @@
     "@location": "method:com.android.org.conscrypt.NativeCrypto#X509_REVOKED_print(long,long,OpenSSLX509CRLEntry)"
   },
   {
+    "@location": "method:com.android.org.conscrypt.NativeCrypto#X509_REVOKED_free(long,OpenSSLX509CRLEntry)"
+  },
+  {
     "@location": "method:com.android.org.conscrypt.NativeCrypto#X509_supported_extension(long)"
   },
   {
