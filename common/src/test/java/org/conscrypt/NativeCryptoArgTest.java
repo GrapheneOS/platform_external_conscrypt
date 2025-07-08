@@ -251,6 +251,18 @@ public class NativeCryptoArgTest {
         checkMethodsTested();
     }
 
+    @Test
+    public void spake2Methods() throws Throwable {
+        expectNPE("SSL_CTX_set_spake_credential", null, new byte[0], new byte[0], new byte[0],
+                false, 1, NOT_NULL, null);
+        expectNPE("SSL_CTX_set_spake_credential", new byte[0], null, new byte[0], new byte[0],
+                false, 1, NOT_NULL, null);
+        expectNPE("SSL_CTX_set_spake_credential", new byte[0], new byte[0], null, new byte[0],
+                false, 1, NOT_NULL, null);
+        expectNPE("SSL_CTX_set_spake_credential", new byte[0], new byte[0], new byte[0], null,
+                false, 1, NOT_NULL, null);
+    }
+
     private void testMethods(MethodFilter filter, Class<? extends Throwable> exceptionClass)
             throws Throwable {
         List<Method> methods = filter.filter(methodMap.values());
