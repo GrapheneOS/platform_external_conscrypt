@@ -16,8 +16,6 @@
 
 package org.conscrypt;
 
-import org.conscrypt.OpenSSLX509CertificateFactory.ParsingException;
-
 import dalvik.annotation.optimization.CriticalNative;
 import dalvik.annotation.optimization.FastNative;
 import java.io.FileDescriptor;
@@ -41,21 +39,20 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.ShortBufferException;
 import javax.net.ssl.SSLException;
 import javax.security.auth.x500.X500Principal;
+import org.conscrypt.OpenSSLX509CertificateFactory.ParsingException;
 
 /**
  * Provides the Java side of our JNI glue for OpenSSL.
- * <p>
- * Note: Many methods in this class take a reference to a Java object that holds a
- * native pointer in the form of a long in addition to the long itself and don't use
- * the Java object in the native implementation.  This is to prevent the Java object
- * from becoming eligible for GC while the native method is executing.  See
- * <a
+ *
+ * <p>Note: Many methods in this class take a reference to a Java object that holds a native pointer
+ * in the form of a long in addition to the long itself and don't use the Java object in the native
+ * implementation. This is to prevent the Java object from becoming eligible for GC while the native
+ * method is executing. See <a
  * href="https://github.com/google/error-prone/blob/master/docs/bugpattern/UnsafeFinalization.md">this</a>
  * for more details.
  */
@@ -224,38 +221,14 @@ public final class NativeCrypto {
 
     @FastNative static native int ECDSA_size(NativeRef.EVP_PKEY pkey);
 
-    @FastNative static native int ECDSA_sign(byte[] data, int dataLen, byte[] sig, NativeRef.EVP_PKEY pkey);
+    @FastNative static native int ECDSA_sign(byte[] data, byte[] sig, NativeRef.EVP_PKEY pkey);
 
-    @FastNative static native int ECDSA_verify(byte[] data, int dataLen, byte[] sig, NativeRef.EVP_PKEY pkey);
-
-    // --- MLDSA65 --------------------------------------------------------------
-
-    @FastNative static native byte[] MLDSA65_public_key_from_seed(byte[] privateKeySeed);
-
-    @FastNative static native byte[] MLDSA65_sign(byte[] data, int dataLen, byte[] privateKeySeed);
-
-    @FastNative static native int MLDSA65_verify(byte[] data, int dataLen, byte[] sig, byte[] publicKey);
-
-    // --- MLDSA87 --------------------------------------------------------------
-
-    @FastNative static native byte[] MLDSA87_public_key_from_seed(byte[] privateKeySeed);
-
-    @FastNative static native byte[] MLDSA87_sign(byte[] data, int dataLen, byte[] privateKeySeed);
-
-    @FastNative static native int MLDSA87_verify(byte[] data, int dataLen, byte[] sig, byte[] publicKey);
-
-    // --- SLHDSA_SHA2_128S --------------------------------------------------------------
-
-    @FastNative static native void SLHDSA_SHA2_128S_generate_key(byte[] outPublicKey, byte[] outPrivateKey);
-
-    @FastNative static native byte[] SLHDSA_SHA2_128S_sign(byte[] data, int dataLen, byte[] privateKey);
-
-    @FastNative static native int SLHDSA_SHA2_128S_verify(
-            byte[] data, int dataLen, byte[] sig, byte[] publicKey);
+    @FastNative static native int ECDSA_verify(byte[] data, byte[] sig, NativeRef.EVP_PKEY pkey);
 
     // --- Curve25519 --------------
 
-    @FastNative static native boolean X25519(byte[] out, byte[] privateKey, byte[] publicKey)
+    @FastNative
+    static native boolean X25519(byte[] out, byte[] privateKey, byte[] publicKey)
             throws InvalidKeyException;
 
     @FastNative static native void X25519_keypair(byte[] outPublicKey, byte[] outPrivateKey);
@@ -427,7 +400,8 @@ public final class NativeCrypto {
             int outOffset, byte[] nonce, byte[] in, int inOffset, int inLength, byte[] ad)
             throws ShortBufferException, BadPaddingException;
 
-    @FastNative static native int EVP_AEAD_CTX_seal_buf(long evpAead, byte[] key, int tagLengthInBytes,
+    @FastNative
+    static native int EVP_AEAD_CTX_seal_buf(long evpAead, byte[] key, int tagLengthInBytes,
             ByteBuffer out, byte[] nonce, ByteBuffer input, byte[] ad)
             throws ShortBufferException, BadPaddingException;
 
@@ -436,7 +410,8 @@ public final class NativeCrypto {
             int outOffset, byte[] nonce, byte[] in, int inOffset, int inLength, byte[] ad)
             throws ShortBufferException, BadPaddingException;
 
-    @FastNative static native int EVP_AEAD_CTX_open_buf(long evpAead, byte[] key, int tagLengthInBytes,
+    @FastNative
+    static native int EVP_AEAD_CTX_open_buf(long evpAead, byte[] key, int tagLengthInBytes,
             ByteBuffer out, byte[] nonce, ByteBuffer input, byte[] ad)
             throws ShortBufferException, BadPaddingException;
 
@@ -577,10 +552,12 @@ public final class NativeCrypto {
 
     @FastNative static native void X509_free(long x509ctx, OpenSSLX509Certificate holder);
 
-    @FastNative static native int X509_cmp(long x509ctx1, OpenSSLX509Certificate holder, long x509ctx2,
+    @FastNative
+    static native int X509_cmp(long x509ctx1, OpenSSLX509Certificate holder, long x509ctx2,
             OpenSSLX509Certificate holder2);
 
-    @FastNative static native void X509_print_ex(
+    @FastNative
+    static native void X509_print_ex(
             long bioCtx, long x509ctx, OpenSSLX509Certificate holder, long nmflag, long certflag);
 
     @FastNative
@@ -611,10 +588,12 @@ public final class NativeCrypto {
     @FastNative
     static native byte[] X509_get_ext_oid(long x509ctx, OpenSSLX509Certificate holder, String oid);
 
-    @FastNative static native String[] get_X509_ext_oids(
+    @FastNative
+    static native String[] get_X509_ext_oids(
             long x509ctx, OpenSSLX509Certificate holder, int critical);
 
-    @FastNative static native Object[][] get_X509_GENERAL_NAME_stack(long x509ctx,
+    @FastNative
+    static native Object[][] get_X509_GENERAL_NAME_stack(long x509ctx,
             OpenSSLX509Certificate holder, int type) throws CertificateParsingException;
 
     @FastNative
@@ -638,15 +617,18 @@ public final class NativeCrypto {
     @FastNative
     static native byte[] X509_get_serialNumber(long x509ctx, OpenSSLX509Certificate holder);
 
-    @FastNative static native void X509_verify(long x509ctx, OpenSSLX509Certificate holder,
+    @FastNative
+    static native void X509_verify(long x509ctx, OpenSSLX509Certificate holder,
             NativeRef.EVP_PKEY pkeyCtx) throws BadPaddingException, IllegalBlockSizeException;
 
     @FastNative static native byte[] get_X509_tbs_cert(long x509ctx, OpenSSLX509Certificate holder);
 
-    @FastNative static native byte[] get_X509_tbs_cert_without_ext(
+    @FastNative
+    static native byte[] get_X509_tbs_cert_without_ext(
             long x509ctx, OpenSSLX509Certificate holder, String oid);
 
-    @FastNative static native byte[] get_X509_signature(long x509ctx, OpenSSLX509Certificate holder);
+    @FastNative
+    static native byte[] get_X509_signature(long x509ctx, OpenSSLX509Certificate holder);
 
     @FastNative static native int get_X509_ex_flags(long x509ctx, OpenSSLX509Certificate holder);
 
@@ -708,7 +690,8 @@ public final class NativeCrypto {
     /** Returns an array of X509_REVOKED that are owned by the caller. */
     @FastNative static native long[] X509_CRL_get_REVOKED(long x509CrlCtx, OpenSSLX509CRL holder);
 
-    @FastNative static native String[] get_X509_CRL_ext_oids(
+    @FastNative
+    static native String[] get_X509_CRL_ext_oids(
             long x509Crlctx, OpenSSLX509CRL holder, int critical);
 
     @FastNative
@@ -721,10 +704,11 @@ public final class NativeCrypto {
 
     @FastNative static native byte[] get_X509_CRL_signature(long x509ctx, OpenSSLX509CRL holder);
 
-    @FastNative static native void X509_CRL_verify(long x509CrlCtx, OpenSSLX509CRL holder,
-            NativeRef.EVP_PKEY pkeyCtx) throws BadPaddingException, SignatureException,
-                                               NoSuchAlgorithmException, InvalidKeyException,
-                                               IllegalBlockSizeException;
+    @FastNative
+    static native void X509_CRL_verify(
+            long x509CrlCtx, OpenSSLX509CRL holder, NativeRef.EVP_PKEY pkeyCtx)
+            throws BadPaddingException, SignatureException, NoSuchAlgorithmException,
+                   InvalidKeyException, IllegalBlockSizeException;
 
     @FastNative static native byte[] get_X509_CRL_crl_enc(long x509CrlCtx, OpenSSLX509CRL holder);
 
@@ -742,24 +726,18 @@ public final class NativeCrypto {
 
     @FastNative static native byte[] i2d_X509_REVOKED(long x509RevokedCtx, OpenSSLX509CRLEntry holder);
 
-    @FastNative static native String[] get_X509_REVOKED_ext_oids(
-            long x509ctx, int critical, OpenSSLX509CRLEntry holder);
+    @FastNative static native String[] get_X509_REVOKED_ext_oids(long x509ctx, int critical, OpenSSLX509CRLEntry holder);
 
-    @FastNative static native byte[] X509_REVOKED_get_ext_oid(
-            long x509RevokedCtx, String oid, OpenSSLX509CRLEntry holder);
+    @FastNative static native byte[] X509_REVOKED_get_ext_oid(long x509RevokedCtx, String oid, OpenSSLX509CRLEntry holder);
 
-    @FastNative static native byte[] X509_REVOKED_get_serialNumber(
-            long x509RevokedCtx, OpenSSLX509CRLEntry holder);
+    @FastNative static native byte[] X509_REVOKED_get_serialNumber(long x509RevokedCtx, OpenSSLX509CRLEntry holder);
 
-    @FastNative static native long X509_REVOKED_get_ext(
-            long x509RevokedCtx, String oid, OpenSSLX509CRLEntry holder);
+    @FastNative static native long X509_REVOKED_get_ext(long x509RevokedCtx, String oid, OpenSSLX509CRLEntry holder);
 
     /** Returns ASN1_TIME reference. */
-    @FastNative static native long get_X509_REVOKED_revocationDate(
-            long x509RevokedCtx, OpenSSLX509CRLEntry holder);
+    @FastNative static native long get_X509_REVOKED_revocationDate(long x509RevokedCtx, OpenSSLX509CRLEntry holder);
 
-    @FastNative static native void X509_REVOKED_print(
-            long bioRef, long x509RevokedCtx, OpenSSLX509CRLEntry holder);
+    @FastNative static native void X509_REVOKED_print(long bioRef, long x509RevokedCtx, OpenSSLX509CRLEntry holder);
 
     @FastNative static native void X509_REVOKED_free(long x509RevokedCtx, OpenSSLX509CRLEntry holder);
 
@@ -1095,22 +1073,26 @@ public final class NativeCrypto {
 
     @FastNative static native void SSL_CTX_free(long ssl_ctx, AbstractSessionContext holder);
 
-    @FastNative static native void SSL_CTX_set_session_id_context(
+    @FastNative
+    static native void SSL_CTX_set_session_id_context(
             long ssl_ctx, AbstractSessionContext holder, byte[] sid_ctx);
 
-    @FastNative static native long SSL_CTX_set_timeout(
+    @FastNative
+    static native long SSL_CTX_set_timeout(
             long ssl_ctx, AbstractSessionContext holder, long seconds);
 
     @FastNative
     static native long SSL_new(long ssl_ctx, AbstractSessionContext holder) throws SSLException;
 
-    @FastNative static native void SSL_enable_tls_channel_id(long ssl, NativeSsl ssl_holder)
+    @FastNative
+    static native void SSL_enable_tls_channel_id(long ssl, NativeSsl ssl_holder)
             throws SSLException;
 
     @FastNative
     static native byte[] SSL_get_tls_channel_id(long ssl, NativeSsl ssl_holder) throws SSLException;
 
-    @FastNative static native void SSL_set1_tls_channel_id(
+    @FastNative
+    static native void SSL_set1_tls_channel_id(
             long ssl, NativeSsl ssl_holder, NativeRef.EVP_PKEY pkey);
 
     /**
@@ -1121,10 +1103,12 @@ public final class NativeCrypto {
      * @param pkey a reference to the private key.
      * @throws SSLException if a problem occurs setting the cert/key.
      */
-    @FastNative static native void setLocalCertsAndPrivateKey(long ssl, NativeSsl ssl_holder,
+    @FastNative
+    static native void setLocalCertsAndPrivateKey(long ssl, NativeSsl ssl_holder,
             byte[][] encodedCertificates, NativeRef.EVP_PKEY pkey) throws SSLException;
 
-    @FastNative static native void SSL_set_client_CA_list(long ssl, NativeSsl ssl_holder,
+    @FastNative
+    static native void SSL_set_client_CA_list(long ssl, NativeSsl ssl_holder,
             byte[][] asn1DerEncodedX500Principals) throws SSLException;
 
     @FastNative static native long SSL_set_mode(long ssl, NativeSsl ssl_holder, long mode);
@@ -1133,7 +1117,8 @@ public final class NativeCrypto {
 
     @FastNative static native long SSL_clear_options(long ssl, NativeSsl ssl_holder, long options);
 
-    @FastNative static native int SSL_set_protocol_versions(
+    @FastNative
+    static native int SSL_set_protocol_versions(
             long ssl, NativeSsl ssl_holder, int min_version, int max_version);
 
     @FastNative
@@ -1142,7 +1127,8 @@ public final class NativeCrypto {
     @FastNative
     static native byte[] SSL_get_signed_cert_timestamp_list(long ssl, NativeSsl ssl_holder);
 
-    @FastNative static native void SSL_set_signed_cert_timestamp_list(
+    @FastNative
+    static native void SSL_set_signed_cert_timestamp_list(
             long ssl, NativeSsl ssl_holder, byte[] list);
 
     @FastNative static native void SSL_enable_ocsp_stapling(long ssl, NativeSsl ssl_holder);
@@ -1154,16 +1140,20 @@ public final class NativeCrypto {
 
     @FastNative static native byte[] SSL_get_tls_unique(long ssl, NativeSsl ssl_holder);
 
-    @FastNative static native byte[] SSL_export_keying_material(long ssl, NativeSsl ssl_holder, byte[] label,
+    @FastNative
+    static native byte[] SSL_export_keying_material(long ssl, NativeSsl ssl_holder, byte[] label,
             byte[] context, int num_bytes) throws SSLException;
 
-    @FastNative static native void SSL_use_psk_identity_hint(
+    @FastNative
+    static native void SSL_use_psk_identity_hint(
             long ssl, NativeSsl ssl_holder, String identityHint) throws SSLException;
 
-    @FastNative static native void set_SSL_psk_client_callback_enabled(
+    @FastNative
+    static native void set_SSL_psk_client_callback_enabled(
             long ssl, NativeSsl ssl_holder, boolean enabled);
 
-    @FastNative static native void set_SSL_psk_server_callback_enabled(
+    @FastNative
+    static native void set_SSL_psk_server_callback_enabled(
             long ssl, NativeSsl ssl_holder, boolean enabled);
 
     public static void setTlsV1DeprecationStatus(boolean deprecated, boolean supported) {
@@ -1356,7 +1346,7 @@ public final class NativeCrypto {
             }
             // Not sure if we need to do this for SPAKE, but the SPAKE cipher suite
             // not registered at the moment.
-            if (DEFAULT_SPAKE_CIPHER_SUITES[0].equals(cipherSuites[i])) {
+            if (DEFAULT_SPAKE_CIPHER_SUITES[0] == cipherSuites[i]) {
                 continue;
             }
 
@@ -1606,7 +1596,8 @@ public final class NativeCrypto {
      * protocol during a handshake. Calling this method overrides {@link
      * #setApplicationProtocols(long, NativeSsl, boolean, byte[])}.
      */
-    @FastNative static native void setHasApplicationProtocolSelector(
+    @FastNative
+    static native void setHasApplicationProtocolSelector(
             long ssl, NativeSsl ssl_holder, boolean hasSelector) throws IOException;
 
     /**
@@ -1651,21 +1642,15 @@ public final class NativeCrypto {
     static native int ENGINE_SSL_write_direct(long ssl, NativeSsl ssl_holder, long address,
             int length, SSLHandshakeCallbacks shc) throws IOException;
 
-    /**
-     * Writes data from the given direct {@link java.nio.ByteBuffer} to the BIO.
-     */
+    /** Writes data from the given direct {@link java.nio.ByteBuffer} to the BIO. */
     static native int ENGINE_SSL_write_BIO_direct(long ssl, NativeSsl ssl_holder, long bioRef,
             long pos, int length, SSLHandshakeCallbacks shc) throws IOException;
 
-    /**
-     * Reads data from the given BIO into a direct {@link java.nio.ByteBuffer}.
-     */
+    /** Reads data from the given BIO into a direct {@link java.nio.ByteBuffer}. */
     static native int ENGINE_SSL_read_BIO_direct(long ssl, NativeSsl ssl_holder, long bioRef,
             long address, int len, SSLHandshakeCallbacks shc) throws IOException;
 
-    /**
-     * Forces the SSL object to process any data pending in the BIO.
-     */
+    /** Forces the SSL object to process any data pending in the BIO. */
     static native void ENGINE_SSL_force_read(
             long ssl, NativeSsl ssl_holder, SSLHandshakeCallbacks shc) throws IOException;
 
@@ -1676,10 +1661,9 @@ public final class NativeCrypto {
     static native void ENGINE_SSL_shutdown(
             long ssl, NativeSsl ssl_holder, SSLHandshakeCallbacks shc) throws IOException;
 
-    /**
-     * Generates a key from a password and salt using Scrypt.
-     */
-    @FastNative static native byte[] Scrypt_generate_key(
+    /** Generates a key from a password and salt using Scrypt. */
+    @FastNative
+    static native byte[] Scrypt_generate_key(
             byte[] password, byte[] salt, int n, int r, int p, int key_len);
 
     /** Return {@code true} if BoringSSL has been built in FIPS mode. */
@@ -1700,4 +1684,3 @@ public final class NativeCrypto {
 
     @FastNative static native long SSL_get1_session(long ssl, NativeSsl ssl_holder);
 }
-

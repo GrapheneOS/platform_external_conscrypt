@@ -19,7 +19,6 @@ package com.android.org.conscrypt.java.security;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import com.android.org.conscrypt.TestUtils;
 
@@ -33,13 +32,15 @@ import org.junit.runners.JUnit4;
 
 import java.security.AlgorithmParameters;
 import java.security.Provider;
-import java.security.SecureRandom;
-import java.util.Arrays;
 
 import javax.crypto.Cipher;
-import javax.crypto.ShortBufferException;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+
+import java.security.SecureRandom;
+import java.util.Arrays;
+import javax.crypto.ShortBufferException;
+import static org.junit.Assert.fail;
 
 import tests.util.ServiceTester;
 

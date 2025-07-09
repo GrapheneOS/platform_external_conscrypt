@@ -425,8 +425,8 @@ model {
                         linker.args "-O3",
                                 "-fvisibility=hidden",
                                 "-lpthread",
-                                libPath + "/libssl.a",
-                                libPath + "/libcrypto.a"
+                                libPath + "/ssl/libssl.a",
+                                libPath + "/crypto/libcrypto.a"
                         if (targetPlatform.operatingSystem.isLinux()) {
                             // Static link libstdc++ and libgcc because
                             // they are not available in some restrictive Linux
@@ -478,8 +478,8 @@ model {
                         linker.args "-WX",
                                 "ws2_32.lib",
                                 "advapi32.lib",
-                                "${libPath}\\ssl.lib",
-                                "${libPath}\\crypto.lib"
+                                "${libPath}\\ssl\\ssl.lib",
+                                "${libPath}\\crypto\\crypto.lib"
                     }
                 }
 

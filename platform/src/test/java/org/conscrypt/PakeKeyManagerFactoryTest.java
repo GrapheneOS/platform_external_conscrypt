@@ -23,7 +23,6 @@ import static org.junit.Assert.assertThrows;
 import android.net.ssl.PakeClientKeyManagerParameters;
 import android.net.ssl.PakeServerKeyManagerParameters;
 import android.net.ssl.PakeOption;
-import android.net.ssl.PakeServerKeyManagerParameters;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,7 +30,6 @@ import org.junit.runners.JUnit4;
 
 import java.security.KeyStoreException;
 import java.util.Arrays;
-
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 
@@ -45,15 +43,17 @@ public class PakeKeyManagerFactoryTest {
     public void pakeKeyManagerFactoryTest() throws Exception {
         KeyManagerFactory kmf = KeyManagerFactory.getInstance("PAKE");
         assertThrows(KeyStoreException.class, () -> kmf.init(null, null));
-        PakeOption option = new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
-                                    .addMessageComponent("password", PASSWORD)
-                                    .build();
+        PakeOption option =
+                new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
+                        .addMessageComponent("password", PASSWORD)
+                        .build();
 
-        PakeClientKeyManagerParameters params = new PakeClientKeyManagerParameters.Builder()
-                                                        .setClientId(CLIENT_ID.clone())
-                                                        .setServerId(SERVER_ID.clone())
-                                                        .addOption(option)
-                                                        .build();
+        PakeClientKeyManagerParameters params =
+                new PakeClientKeyManagerParameters.Builder()
+                        .setClientId(CLIENT_ID.clone())
+                        .setServerId(SERVER_ID.clone())
+                        .addOption(option)
+                        .build();
         kmf.init(params);
 
         KeyManager[] keyManagers = kmf.getKeyManagers();
@@ -67,22 +67,23 @@ public class PakeKeyManagerFactoryTest {
 
     @Test
     public void pakeKeyManagerFactoryTestHanshakeLimitClient() throws Exception {
-        PakeOption option = new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
-                                    .addMessageComponent("password", PASSWORD)
-                                    .addMessageComponent("client-handshake-limit", new byte[] {16})
-                                    .build();
+        PakeOption option =
+                new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
+                        .addMessageComponent("password", PASSWORD)
+                        .addMessageComponent("client-handshake-limit", new byte[] {16})
+                        .build();
 
         // Client
-        PakeClientKeyManagerParameters paramsClient = new PakeClientKeyManagerParameters.Builder()
-                                                              .setClientId(CLIENT_ID.clone())
-                                                              .setServerId(SERVER_ID.clone())
-                                                              .addOption(option)
-                                                              .build();
+        PakeClientKeyManagerParameters paramsClient =
+                new PakeClientKeyManagerParameters.Builder()
+                        .setClientId(CLIENT_ID.clone())
+                        .setServerId(SERVER_ID.clone())
+                        .addOption(option)
+                        .build();
         KeyManagerFactory kmfClient = KeyManagerFactory.getInstance("PAKE");
         kmfClient.init(paramsClient);
 
-        Spake2PlusKeyManager keyManagerClient =
-                (Spake2PlusKeyManager) kmfClient.getKeyManagers()[0];
+        Spake2PlusKeyManager keyManagerClient = (Spake2PlusKeyManager) kmfClient.getKeyManagers()[0];
         assertArrayEquals(PASSWORD, keyManagerClient.getPassword());
         assertArrayEquals(CLIENT_ID, keyManagerClient.getIdProver());
         assertArrayEquals(SERVER_ID, keyManagerClient.getIdVerifier());
@@ -96,8 +97,7 @@ public class PakeKeyManagerFactoryTest {
         KeyManagerFactory kmfServer = KeyManagerFactory.getInstance("PAKE");
         kmfServer.init(paramsServer);
 
-        Spake2PlusKeyManager keyManagerServer =
-                (Spake2PlusKeyManager) kmfServer.getKeyManagers()[0];
+        Spake2PlusKeyManager keyManagerServer = (Spake2PlusKeyManager) kmfServer.getKeyManagers()[0];
         assertArrayEquals(PASSWORD, keyManagerServer.getPassword());
         assertArrayEquals(CLIENT_ID, keyManagerServer.getIdProver());
         assertArrayEquals(SERVER_ID, keyManagerServer.getIdVerifier());
@@ -106,22 +106,23 @@ public class PakeKeyManagerFactoryTest {
 
     @Test
     public void pakeKeyManagerFactoryTestHanshakeLimitServer() throws Exception {
-        PakeOption option = new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
-                                    .addMessageComponent("password", PASSWORD)
-                                    .addMessageComponent("server-handshake-limit", new byte[] {16})
-                                    .build();
+        PakeOption option =
+                new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
+                        .addMessageComponent("password", PASSWORD)
+                        .addMessageComponent("server-handshake-limit", new byte[] {16})
+                        .build();
 
         // Client
-        PakeClientKeyManagerParameters paramsClient = new PakeClientKeyManagerParameters.Builder()
-                                                              .setClientId(CLIENT_ID.clone())
-                                                              .setServerId(SERVER_ID.clone())
-                                                              .addOption(option)
-                                                              .build();
+        PakeClientKeyManagerParameters paramsClient =
+                new PakeClientKeyManagerParameters.Builder()
+                        .setClientId(CLIENT_ID.clone())
+                        .setServerId(SERVER_ID.clone())
+                        .addOption(option)
+                        .build();
         KeyManagerFactory kmfClient = KeyManagerFactory.getInstance("PAKE");
         kmfClient.init(paramsClient);
 
-        Spake2PlusKeyManager keyManagerClient =
-                (Spake2PlusKeyManager) kmfClient.getKeyManagers()[0];
+        Spake2PlusKeyManager keyManagerClient = (Spake2PlusKeyManager) kmfClient.getKeyManagers()[0];
         assertArrayEquals(PASSWORD, keyManagerClient.getPassword());
         assertArrayEquals(CLIENT_ID, keyManagerClient.getIdProver());
         assertArrayEquals(SERVER_ID, keyManagerClient.getIdVerifier());
@@ -135,8 +136,7 @@ public class PakeKeyManagerFactoryTest {
         KeyManagerFactory kmfServer = KeyManagerFactory.getInstance("PAKE");
         kmfServer.init(paramsServer);
 
-        Spake2PlusKeyManager keyManagerServer =
-                (Spake2PlusKeyManager) kmfServer.getKeyManagers()[0];
+        Spake2PlusKeyManager keyManagerServer = (Spake2PlusKeyManager) kmfServer.getKeyManagers()[0];
         assertArrayEquals(PASSWORD, keyManagerServer.getPassword());
         assertArrayEquals(CLIENT_ID, keyManagerServer.getIdProver());
         assertArrayEquals(SERVER_ID, keyManagerServer.getIdVerifier());

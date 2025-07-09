@@ -23,14 +23,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.conscrypt.Conscrypt;
-import org.conscrypt.TestUtils;
-import org.conscrypt.testing.BrokenProvider;
-import org.conscrypt.testing.OpaqueProvider;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -63,15 +55,27 @@ import java.security.spec.RSAPrivateCrtKeySpec;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import libcore.junit.util.EnableDeprecatedBouncyCastleAlgorithmsRule;
-
+import org.conscrypt.Conscrypt;
+import org.conscrypt.TestUtils;
+import org.conscrypt.testing.BrokenProvider;
+import org.conscrypt.testing.OpaqueProvider;
 import org.junit.ClassRule;
+import org.junit.Test;
 import org.junit.rules.TestRule;
-
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import tests.util.ServiceTester;
 
 @RunWith(JUnit4.class)
@@ -90,53 +94,45 @@ public class SignatureTest {
 
     @Test
     public void test_getInstance() throws Exception {
-        ServiceTester
-                .test("Signature")
-                // Do not test AndroidKeyStore's Signature. It needs an AndroidKeyStore-specific
-                // key. It's OKish not to test AndroidKeyStore's Signature here because it's tested
-                // by cts/tests/test/keystore.
-                .skipProvider("AndroidKeyStore")
-                .skipProvider("AndroidKeyStoreBCWorkaround")
-                // The SunMSCAPI is very strange, including only supporting its own keys,
-                // so don't test it.
-                .skipProvider("SunMSCAPI")
-                // SunPKCS11-NSS has a problem where failed verifications can leave the
-                // operation open, which results in future init() calls to throw an exception.
-                // This appears to be a problem in the underlying library (see
-                // https://bugs.openjdk.java.net/browse/JDK-8044554), but skip verifying it all
-                // the same.
-                .skipProvider("SunPKCS11-NSS")
-                // We don't have code to generate key pairs for these yet.
-                .skipAlgorithm("Ed448")
-                .skipAlgorithm("EdDSA")
-                // ML-DSA is skipped because it doesn't yet support getFormat() and getEncoded().
-                .skipAlgorithm("ML-DSA")
-                .skipAlgorithm("ML-DSA-44")
-                .skipAlgorithm("ML-DSA-65")
-                .skipAlgorithm("ML-DSA-87")
-                // SLH-DSA-SHA2-128S is skipped because it doesn't yet support getFormat() and
-                // getEncoded().
-                .skipAlgorithm("SLH-DSA-SHA2-128S")
-                .skipAlgorithm("HSS/LMS")
-                .run((provider, algorithm) -> {
-                    KeyPair kp = keyPair(algorithm);
-                    // Signature.getInstance(String)
-                    Signature sig1 = Signature.getInstance(algorithm);
-                    assertEquals(algorithm, sig1.getAlgorithm());
-                    test_Signature(sig1, kp);
+        ServiceTester.test("Signature")
+            // Do not test AndroidKeyStore's Signature. It needs an AndroidKeyStore-specific key.
+            // It's OKish not to test AndroidKeyStore's Signature here because it's tested
+            // by cts/tests/test/keystore.
+            .skipProvider("AndroidKeyStore")
+            .skipProvider("AndroidKeyStoreBCWorkaround")
+            // The SunMSCAPI is very strange, including only supporting its own keys,
+            // so don't test it.
+            .skipProvider("SunMSCAPI")
+            // SunPKCS11-NSS has a problem where failed verifications can leave the
+            // operation open, which results in future init() calls to throw an exception.
+            // This appears to be a problem in the underlying library (see
+            // https://bugs.openjdk.java.net/browse/JDK-8044554), but skip verifying it all
+            // the same.
+            .skipProvider("SunPKCS11-NSS")
+            // We don't have code to generate key pairs for these yet.
+            .skipAlgorithm("Ed448")
+            .skipAlgorithm("Ed25519")
+            .skipAlgorithm("EdDSA")
+            .skipAlgorithm("HSS/LMS")
+            .run((provider, algorithm) -> {
+                KeyPair kp = keyPair(algorithm);
+                // Signature.getInstance(String)
+                Signature sig1 = Signature.getInstance(algorithm);
+                assertEquals(algorithm, sig1.getAlgorithm());
+                test_Signature(sig1, kp);
 
-                    // Signature.getInstance(String, Provider)
-                    Signature sig2 = Signature.getInstance(algorithm, provider);
-                    assertEquals(algorithm, sig2.getAlgorithm());
-                    assertEquals(provider, sig2.getProvider());
-                    test_Signature(sig2, kp);
+                // Signature.getInstance(String, Provider)
+                Signature sig2 = Signature.getInstance(algorithm, provider);
+                assertEquals(algorithm, sig2.getAlgorithm());
+                assertEquals(provider, sig2.getProvider());
+                test_Signature(sig2, kp);
 
-                    // Signature.getInstance(String, String)
-                    Signature sig3 = Signature.getInstance(algorithm, provider.getName());
-                    assertEquals(algorithm, sig3.getAlgorithm());
-                    assertEquals(provider, sig3.getProvider());
-                    test_Signature(sig3, kp);
-                });
+                // Signature.getInstance(String, String)
+                Signature sig3 = Signature.getInstance(algorithm, provider.getName());
+                assertEquals(algorithm, sig3.getAlgorithm());
+                assertEquals(provider, sig3.getProvider());
+                test_Signature(sig3, kp);
+            });
     }
 
     private final Map<String, KeyPair> keypairAlgorithmToInstance
@@ -161,10 +157,6 @@ public class SignatureTest {
                 || sigAlgorithmUpperCase.endsWith("RSA/PSS")
                 || sigAlgorithmUpperCase.endsWith("RSASSA-PSS")) {
             kpAlgorithm = "RSA";
-        } else if (sigAlgorithmUpperCase.equals("ED25519")) {
-            kpAlgorithm = "ED25519";
-        } else if (sigAlgorithmUpperCase.startsWith("ML-DSA")) {
-            kpAlgorithm = "ML-DSA";
         } else {
             throw new Exception("Unknown KeyPair algorithm for Signature algorithm "
                                 + sigAlgorithm);
@@ -172,14 +164,7 @@ public class SignatureTest {
 
         KeyPair kp = keypairAlgorithmToInstance.get(kpAlgorithm);
         if (kp == null) {
-            KeyPairGenerator kpg;
-            if (kpAlgorithm.equals("ED25519")) {
-                // We use SunEC to generate Ed25519 keys because Conscrypt's Ed25519 keys
-                // are not yet implement the EdECPublicKey and EdECPrivateKey interfaces.
-                kpg = KeyPairGenerator.getInstance(kpAlgorithm, "SunEC");
-            } else {
-                kpg = KeyPairGenerator.getInstance(kpAlgorithm);
-            }
+            KeyPairGenerator kpg = KeyPairGenerator.getInstance(kpAlgorithm);
             if (kpAlgorithm.equals("DSA")) {
                 kpg.initialize(1024);
             }
@@ -249,7 +234,7 @@ public class SignatureTest {
         }
 
         if (Conscrypt.isConscrypt(sig.getProvider())) {
-            testSignature_ThreadMisuse(sig, keyPair.getPrivate());
+            testSignature_MultipleThreads_Misuse(sig, keyPair.getPrivate());
         }
     }
 
@@ -3082,15 +3067,42 @@ public class SignatureTest {
         assertTrue("Signature must verify correctly", sig.verify(SHA256withDSA_Vector2Signature));
     }
 
-    // Abuse a single Signature object across multiple threads to check for any native crashes.
-    private void testSignature_ThreadMisuse(final Signature signature, final PrivateKey key)
+    private final int THREAD_COUNT = 10;
+
+    private void testSignature_MultipleThreads_Misuse(final Signature s, final PrivateKey p)
             throws Exception {
+        ExecutorService es = Executors.newFixedThreadPool(THREAD_COUNT);
+
+        final CountDownLatch latch = new CountDownLatch(THREAD_COUNT);
         final byte[] message = new byte[64];
-        TestUtils.stressTestAllowingExceptions(16, 100, () -> {
-            signature.initSign(key);
-            signature.update(message);
-            signature.sign();
-        });
+        List<Future<Void>> futures = new ArrayList<>();
+
+        for (int i = 0; i < THREAD_COUNT; i++) {
+            futures.add(es.submit(() -> {
+                // Try to make sure all the threads are ready first.
+                latch.countDown();
+                latch.await();
+
+                for (int j = 0; j < 100; j++) {
+                    s.initSign(p);
+                    s.update(message);
+                    s.sign();
+                }
+
+                return null;
+            }));
+        }
+        es.shutdown();
+        assertTrue("Test should not timeout", es.awaitTermination(1, TimeUnit.MINUTES));
+
+        for (Future<Void> f : futures) {
+            try {
+                f.get();
+            } catch (ExecutionException expected) {
+                // We expect concurrent execution to cause instances to eventually throw, though
+                // if they happen to get lucky and execute completely, that's fine.
+            }
+        }
     }
 
     private static final byte[] NAMED_CURVE_VECTOR = "Satoshi Nakamoto".getBytes(

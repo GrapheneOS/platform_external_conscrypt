@@ -25,7 +25,6 @@ import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
 import java.util.logging.Logger;
-
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
@@ -48,6 +47,11 @@ public abstract class OpenSSLAeadCipher extends OpenSSLCipher {
     static final int DEFAULT_TAG_SIZE_BITS = 16 * 8;
 
     /**
+     * Keeps track of the last used block size.
+     */
+    private static int lastGlobalMessageSize = 32;
+
+    /**
      * The previously used key to prevent key + nonce (IV) reuse.
      */
     private byte[] previousKey;
@@ -64,10 +68,9 @@ public abstract class OpenSSLAeadCipher extends OpenSSLCipher {
     private boolean mustInitialize;
 
     /**
-     * The byte array containing the bytes written. It is initialized to null because it is only
-     * needed when update is called. So we don't want to allocate it until it is needed.
+     * The byte array containing the bytes written.
      */
-    private ExposedByteArrayOutputStream buf = null;
+    byte[] buf;
 
     /**
      * The number of bytes written.
@@ -80,9 +83,9 @@ public abstract class OpenSSLAeadCipher extends OpenSSLCipher {
     long evpAead;
 
     /**
-     * Additional authenticated data. It is initialized when needed.
+     * Additional authenticated data.
      */
-    private ExposedByteArrayOutputStream aadBuf = null;
+    private byte[] aad;
 
     /**
      * The length of the AEAD cipher tag in bytes.
@@ -114,20 +117,27 @@ public abstract class OpenSSLAeadCipher extends OpenSSLCipher {
         return diff == 0;
     }
 
-    private void reset() {
-        aadBuf = null;
-        if (buf == null) {
-            bufCount = 0;
+    private void expand(int i) {
+        /* Can the buffer handle i more bytes, if not expand it */
+        if (bufCount + i <= buf.length) {
             return;
         }
-        int bufMemSize = buf.array().length;
-        if (bufMemSize > 1024 && bufCount < bufMemSize / 8) {
-            // The memory usage of the buffer much larger than what was used.
-            // We prefer to release it to avoid keeping too much memory.
-            buf = null;
-        } else {
-            // Keep using the same buffer, to save on memory allocation.
-            buf.reset();
+
+        byte[] newbuf = new byte[(bufCount + i) * 2];
+        System.arraycopy(buf, 0, newbuf, 0, bufCount);
+        buf = newbuf;
+    }
+
+    private void reset() {
+        aad = null;
+        final int lastBufSize = lastGlobalMessageSize;
+        if (buf == null) {
+            buf = new byte[lastBufSize];
+        } else if (bufCount > 0 && bufCount != lastBufSize) {
+            lastGlobalMessageSize = bufCount;
+            if (buf.length != bufCount) {
+                buf = new byte[bufCount];
+            }
         }
         bufCount = 0;
     }
@@ -198,11 +208,7 @@ public abstract class OpenSSLAeadCipher extends OpenSSLCipher {
         }
         mustInitialize = false;
         this.iv = iv;
-        aadBuf = null;
-        if (buf != null) {
-            buf.reset();
-        }
-        bufCount = 0;
+        reset();
     }
 
     void checkSupportedTagLength(int tagLenBits)
@@ -303,12 +309,16 @@ public abstract class OpenSSLAeadCipher extends OpenSSLCipher {
     }
 
     void appendToBuf(byte[] input, int inputOffset, int inputLen) {
-        ArrayUtils.checkOffsetAndCount(input.length, inputOffset, inputLen);
         if (buf == null) {
-            buf = new ExposedByteArrayOutputStream(inputLen);
+            throw new IllegalStateException("Cipher not initialized");
         }
-        buf.write(input, inputOffset, inputLen);
-        this.bufCount += inputLen;
+
+        ArrayUtils.checkOffsetAndCount(input.length, inputOffset, inputLen);
+        if (inputLen > 0) {
+            expand(inputLen);
+            System.arraycopy(input, inputOffset, buf, this.bufCount, inputLen);
+            this.bufCount += inputLen;
+        }
     }
 
     @Override
@@ -347,21 +357,9 @@ public abstract class OpenSSLAeadCipher extends OpenSSLCipher {
         }
     }
 
-    private byte[] getAad() {
-        if (aadBuf == null) {
-            return EmptyArray.BYTE;
-        }
-        if (aadBuf.array().length == aadBuf.size()) {
-            // no need to copy.
-            return aadBuf.array();
-        }
-        return aadBuf.toByteArray();
-    }
-
     int doFinalInternal(ByteBuffer input, ByteBuffer output)
             throws ShortBufferException, IllegalBlockSizeException, BadPaddingException {
         checkInitialization();
-        byte[] aad = getAad();
         final int bytesWritten;
         try {
             if (isEncrypting()) {
@@ -393,7 +391,7 @@ public abstract class OpenSSLAeadCipher extends OpenSSLCipher {
             if (inputLen > 0) {
                 appendToBuf(input, inputOffset, inputLen);
             }
-            in = buf.array();
+            in = buf;
             inOffset = 0;
             inLen = bufCount;
         } else {
@@ -413,7 +411,6 @@ public abstract class OpenSSLAeadCipher extends OpenSSLCipher {
             inLen = inputLen;
         }
 
-        byte[] aad = getAad();
         final int bytesWritten;
         try {
             if (isEncrypting()) {
@@ -453,27 +450,31 @@ public abstract class OpenSSLAeadCipher extends OpenSSLCipher {
     @SuppressWarnings("MissingOverride")
     protected void engineUpdateAAD(byte[] input, int inputOffset, int inputLen) {
         checkInitialization();
-        if (aadBuf == null) {
-            aadBuf = new ExposedByteArrayOutputStream(inputLen);
+        if (aad == null) {
+            aad = Arrays.copyOfRange(input, inputOffset, inputOffset + inputLen);
+        } else {
+            int newSize = aad.length + inputLen;
+            byte[] newaad = new byte[newSize];
+            System.arraycopy(aad, 0, newaad, 0, aad.length);
+            System.arraycopy(input, inputOffset, newaad, aad.length, inputLen);
+            aad = newaad;
         }
-        aadBuf.write(input, inputOffset, inputLen);
     }
 
     // Intentionally missing Override to compile on old versions of Android
     @SuppressWarnings("MissingOverride")
     protected void engineUpdateAAD(ByteBuffer buf) {
         checkInitialization();
-        int inputLen = buf.remaining();
-        if (aadBuf == null) {
-            aadBuf = new ExposedByteArrayOutputStream(inputLen);
-            // Directly write the content of buf to aadBuf.array()
-            buf.get(aadBuf.array(), 0, inputLen);
-            aadBuf.setCountManually(inputLen);
-            return;
+        if (aad == null) {
+            aad = new byte[buf.remaining()];
+            buf.get(aad);
+        } else {
+            int newSize = aad.length + buf.remaining();
+            byte[] newaad = new byte[newSize];
+            System.arraycopy(aad, 0, newaad, 0, aad.length);
+            buf.get(newaad, aad.length, buf.remaining());
+            aad = newaad;
         }
-        byte[] input = new byte[inputLen];
-        buf.get(input);
-        aadBuf.write(input, 0, inputLen);
     }
 
     abstract long getEVP_AEAD(int keyLength) throws InvalidKeyException;

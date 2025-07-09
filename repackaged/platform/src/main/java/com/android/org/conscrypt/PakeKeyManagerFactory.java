@@ -47,6 +47,7 @@ import javax.net.ssl.ManagerFactoryParameters;
  * PakeKeyManagerFactory implementation.
  * @see KeyManagerFactorySpi
  * @hide This class is not part of the Android public SDK API
+ * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public class PakeKeyManagerFactory extends KeyManagerFactorySpi {
@@ -146,8 +147,15 @@ public class PakeKeyManagerFactory extends KeyManagerFactorySpi {
                 byte[] password = option.getMessageComponent("password");
                 int serverHandshakeLimit = getHandshakeLimit(option, "server-handshake-limit");
                 if (password != null) {
-                    return new KeyManager[] {new Spake2PlusKeyManager(
-                            context, password, idProver, idVerifier, false, serverHandshakeLimit)};
+                    return new KeyManager[] {
+                        new Spake2PlusKeyManager(
+                                context,
+                                password,
+                                idProver,
+                                idVerifier,
+                                false,
+                                serverHandshakeLimit)
+                    };
                 }
                 break;
             }

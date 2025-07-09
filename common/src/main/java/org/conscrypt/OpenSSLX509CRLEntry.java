@@ -16,8 +16,6 @@
 
 package org.conscrypt;
 
-import org.conscrypt.OpenSSLX509CertificateFactory.ParsingException;
-
 import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.security.cert.CRLException;
@@ -26,6 +24,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import org.conscrypt.OpenSSLX509CertificateFactory.ParsingException;
 
 /**
  * An implementation of {@link X509CRLEntry} based on BoringSSL.
@@ -38,14 +37,14 @@ final class OpenSSLX509CRLEntry extends X509CRLEntry {
         mContext = ctx;
         // The legacy X509 OpenSSL APIs don't validate ASN1_TIME structures until access, so
         // parse them here because this is the only time we're allowed to throw ParsingException
-        revocationDate =
-                OpenSSLX509CRL.toDate(NativeCrypto.get_X509_REVOKED_revocationDate(mContext, this));
+        revocationDate = OpenSSLX509CRL.toDate(NativeCrypto.get_X509_REVOKED_revocationDate(mContext, this));
     }
 
     @Override
     public Set<String> getCriticalExtensionOIDs() {
-        String[] critOids = NativeCrypto.get_X509_REVOKED_ext_oids(
-                mContext, NativeCrypto.EXTENSION_TYPE_CRITICAL, this);
+        String[] critOids =
+                NativeCrypto.get_X509_REVOKED_ext_oids(mContext,
+                        NativeCrypto.EXTENSION_TYPE_CRITICAL, this);
 
         /*
          * This API has a special case that if there are no extensions, we
@@ -53,10 +52,8 @@ final class OpenSSLX509CRLEntry extends X509CRLEntry {
          * non-critical extensions.
          */
         if ((critOids.length == 0)
-                && (NativeCrypto.get_X509_REVOKED_ext_oids(
-                                        mContext, NativeCrypto.EXTENSION_TYPE_NON_CRITICAL, this)
-                                .length
-                        == 0)) {
+                && (NativeCrypto.get_X509_REVOKED_ext_oids(mContext,
+                        NativeCrypto.EXTENSION_TYPE_NON_CRITICAL, this).length == 0)) {
             return null;
         }
 
@@ -70,8 +67,9 @@ final class OpenSSLX509CRLEntry extends X509CRLEntry {
 
     @Override
     public Set<String> getNonCriticalExtensionOIDs() {
-        String[] critOids = NativeCrypto.get_X509_REVOKED_ext_oids(
-                mContext, NativeCrypto.EXTENSION_TYPE_NON_CRITICAL, this);
+        String[] critOids =
+                NativeCrypto.get_X509_REVOKED_ext_oids(mContext,
+                        NativeCrypto.EXTENSION_TYPE_NON_CRITICAL, this);
 
         /*
          * This API has a special case that if there are no extensions, we
@@ -79,10 +77,8 @@ final class OpenSSLX509CRLEntry extends X509CRLEntry {
          * check critical extensions.
          */
         if ((critOids.length == 0)
-                && (NativeCrypto.get_X509_REVOKED_ext_oids(
-                                        mContext, NativeCrypto.EXTENSION_TYPE_CRITICAL, this)
-                                .length
-                        == 0)) {
+                && (NativeCrypto.get_X509_REVOKED_ext_oids(mContext,
+                        NativeCrypto.EXTENSION_TYPE_CRITICAL, this).length == 0)) {
             return null;
         }
 
@@ -91,8 +87,9 @@ final class OpenSSLX509CRLEntry extends X509CRLEntry {
 
     @Override
     public boolean hasUnsupportedCriticalExtension() {
-        final String[] criticalOids = NativeCrypto.get_X509_REVOKED_ext_oids(
-                mContext, NativeCrypto.EXTENSION_TYPE_CRITICAL, this);
+        final String[] criticalOids =
+                NativeCrypto.get_X509_REVOKED_ext_oids(mContext,
+                        NativeCrypto.EXTENSION_TYPE_CRITICAL, this);
         for (String oid : criticalOids) {
             final long extensionRef = NativeCrypto.X509_REVOKED_get_ext(mContext, oid, this);
             if (NativeCrypto.X509_supported_extension(extensionRef) != 1) {
@@ -121,14 +118,10 @@ final class OpenSSLX509CRLEntry extends X509CRLEntry {
 
     @Override
     public boolean hasExtensions() {
-        return (NativeCrypto.get_X509_REVOKED_ext_oids(
-                                    mContext, NativeCrypto.EXTENSION_TYPE_NON_CRITICAL, this)
-                               .length
-                       != 0)
-                || (NativeCrypto.get_X509_REVOKED_ext_oids(
-                                        mContext, NativeCrypto.EXTENSION_TYPE_CRITICAL, this)
-                                .length
-                        != 0);
+        return (NativeCrypto.get_X509_REVOKED_ext_oids(mContext,
+                NativeCrypto.EXTENSION_TYPE_NON_CRITICAL, this).length != 0)
+                || (NativeCrypto.get_X509_REVOKED_ext_oids(mContext,
+                        NativeCrypto.EXTENSION_TYPE_CRITICAL, this).length != 0);
     }
 
     @Override
