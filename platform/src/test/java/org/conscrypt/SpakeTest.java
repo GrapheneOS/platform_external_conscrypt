@@ -68,8 +68,10 @@ public class SpakeTest {
     private final ExecutorService executor =
             Executors.newCachedThreadPool(t -> new Thread(threadGroup, t));
 
-    private Pair<SSLContext, SSLContext> createContexts(PakeClientKeyManagerParameters clientParams,
-            PakeServerKeyManagerParameters serverParams) throws Exception {
+    private Pair<SSLContext, SSLContext> createContexts(
+            PakeClientKeyManagerParameters clientParams,
+            PakeServerKeyManagerParameters serverParams)
+            throws Exception {
         InetAddress hostC = TestUtils.getLoopbackAddress();
         InetAddress hostS = TestUtils.getLoopbackAddress();
 
@@ -100,7 +102,8 @@ public class SpakeTest {
         return Pair.of(contextClient, contextServer);
     }
 
-    private SSLContext createClientContext(PakeClientKeyManagerParameters clientParams)
+    private SSLContext createClientContext(
+            PakeClientKeyManagerParameters clientParams)
             throws Exception {
         InetAddress hostC = TestUtils.getLoopbackAddress();
 
@@ -120,7 +123,8 @@ public class SpakeTest {
         return contextClient;
     }
 
-    private SSLContext createServerContext(PakeServerKeyManagerParameters serverParams)
+    private SSLContext createServerContext(
+            PakeServerKeyManagerParameters serverParams)
             throws Exception {
         InetAddress hostS = TestUtils.getLoopbackAddress();
 
@@ -143,25 +147,31 @@ public class SpakeTest {
             throws Exception {
         InetAddress hostC = TestUtils.getLoopbackAddress();
         InetAddress hostS = TestUtils.getLoopbackAddress();
-        SSLServerSocket serverSocket = (SSLServerSocket) contexts.getSecond()
-                                               .getServerSocketFactory()
-                                               .createServerSocket();
+        SSLServerSocket serverSocket =
+                (SSLServerSocket)
+                        contexts.getSecond().getServerSocketFactory().createServerSocket();
         serverSocket.bind(new InetSocketAddress(hostS, 0));
-        SSLSocket client = (SSLSocket) contexts.getFirst().getSocketFactory().createSocket(
-                hostC, serverSocket.getLocalPort());
+        SSLSocket client =
+                (SSLSocket)
+                        contexts.getFirst()
+                                .getSocketFactory()
+                                .createSocket(hostC, serverSocket.getLocalPort());
         SSLSocket server = (SSLSocket) serverSocket.accept();
 
         assertTrue(client.getUseClientMode());
         return Pair.of(client, server);
     }
 
-    private void connectSockets(Pair<SSLSocket, SSLSocket> sockets) throws Exception {
+    private void connectSockets(Pair<SSLSocket, SSLSocket> sockets)
+            throws Exception {
         SSLSocket client = sockets.getFirst();
         SSLSocket server = sockets.getSecond();
-        Future<Void> s = runAsync(() -> {
-            server.startHandshake();
-            return null;
-        });
+        Future<Void> s =
+                runAsync(
+                        () -> {
+                            server.startHandshake();
+                            return null;
+                        });
         client.startHandshake();
         s.get();
     }
@@ -187,9 +197,10 @@ public class SpakeTest {
     public void testSpake2PlusPassword() throws Exception {
         byte[] password = new byte[] {1, 2, 3};
 
-        PakeOption option = new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
-                                    .addMessageComponent("password", password)
-                                    .build();
+        PakeOption option =
+                new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
+                        .addMessageComponent("password", password)
+                        .build();
 
         PakeClientKeyManagerParameters kmfParamsClient =
                 new PakeClientKeyManagerParameters.Builder()
@@ -215,9 +226,10 @@ public class SpakeTest {
     public void testSpake2PlusPasswordMultipleConnections() throws Exception {
         byte[] password = new byte[] {1, 2, 3};
 
-        PakeOption option = new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
-                                    .addMessageComponent("password", password)
-                                    .build();
+        PakeOption option =
+                new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
+                        .addMessageComponent("password", password)
+                        .build();
 
         PakeClientKeyManagerParameters kmfParamsClient =
                 new PakeClientKeyManagerParameters.Builder()
@@ -246,16 +258,18 @@ public class SpakeTest {
         byte[] password = new byte[] {1, 2, 3};
         byte[] password2 = new byte[] {4, 5, 6};
 
-        PakeOption option = new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
-                                    .addMessageComponent("password", password)
-                                    .addMessageComponent("server-handshake-limit", new byte[] {16})
-                                    .addMessageComponent("client-handshake-limit", new byte[] {24})
-                                    .build();
-        PakeOption option2 = new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
-                                     .addMessageComponent("password", password2)
-                                     .addMessageComponent("server-handshake-limit", new byte[] {16})
-                                     .addMessageComponent("client-handshake-limit", new byte[] {24})
-                                     .build();
+        PakeOption option =
+                new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
+                        .addMessageComponent("password", password)
+                        .addMessageComponent("server-handshake-limit", new byte[] {16})
+                        .addMessageComponent("client-handshake-limit", new byte[] {24})
+                        .build();
+        PakeOption option2 =
+                new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
+                        .addMessageComponent("password", password2)
+                        .addMessageComponent("server-handshake-limit", new byte[] {16})
+                        .addMessageComponent("client-handshake-limit", new byte[] {24})
+                        .build();
 
         // Client uses wrong password first
         PakeClientKeyManagerParameters kmfParamsClient =
@@ -270,8 +284,7 @@ public class SpakeTest {
                         .setOptions(CLIENT_ID.clone(), SERVER_ID.clone(), Arrays.asList(option))
                         .build();
 
-        Pair<SSLContext, SSLContext> failingContexts =
-                createContexts(kmfParamsClient, kmfParamsServer);
+        Pair<SSLContext, SSLContext> failingContexts = createContexts(kmfParamsClient, kmfParamsServer);
 
         // Server handshake limit is 16, so it is ok if 15 connections fail.
         for (int i = 0; i < 15; i++) {
@@ -281,14 +294,14 @@ public class SpakeTest {
         }
 
         // 16th connection should succeed (but requires a new client)
-        kmfParamsClient = new PakeClientKeyManagerParameters.Builder()
-                                  .setClientId(CLIENT_ID.clone())
-                                  .setServerId(SERVER_ID.clone())
-                                  .addOption(option)
-                                  .build();
+        kmfParamsClient =
+                new PakeClientKeyManagerParameters.Builder()
+                        .setClientId(CLIENT_ID.clone())
+                        .setServerId(SERVER_ID.clone())
+                        .addOption(option)
+                        .build();
         SSLContext workingClientContext = createClientContext(kmfParamsClient);
-        Pair<SSLContext, SSLContext> workingContexts =
-                Pair.of(workingClientContext, failingContexts.getSecond());
+        Pair<SSLContext, SSLContext> workingContexts = Pair.of(workingClientContext, failingContexts.getSecond());
         Pair<SSLSocket, SSLSocket> workingSockets1 = createSockets(workingContexts);
         connectSockets(workingSockets1);
         sendData(workingSockets1);
@@ -306,16 +319,18 @@ public class SpakeTest {
         byte[] password = new byte[] {1, 2, 3};
         byte[] password2 = new byte[] {4, 5, 6};
 
-        PakeOption option = new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
-                                    .addMessageComponent("password", password)
-                                    .addMessageComponent("server-handshake-limit", new byte[] {24})
-                                    .addMessageComponent("client-handshake-limit", new byte[] {16})
-                                    .build();
-        PakeOption option2 = new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
-                                     .addMessageComponent("password", password2)
-                                     .addMessageComponent("server-handshake-limit", new byte[] {24})
-                                     .addMessageComponent("client-handshake-limit", new byte[] {16})
-                                     .build();
+        PakeOption option =
+                new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
+                        .addMessageComponent("password", password)
+                        .addMessageComponent("server-handshake-limit", new byte[] {24})
+                        .addMessageComponent("client-handshake-limit", new byte[] {16})
+                        .build();
+        PakeOption option2 =
+                new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
+                        .addMessageComponent("password", password2)
+                        .addMessageComponent("server-handshake-limit", new byte[] {24})
+                        .addMessageComponent("client-handshake-limit", new byte[] {16})
+                        .build();
 
         PakeClientKeyManagerParameters kmfParamsClient =
                 new PakeClientKeyManagerParameters.Builder()
@@ -330,8 +345,7 @@ public class SpakeTest {
                         .setOptions(CLIENT_ID.clone(), SERVER_ID.clone(), Arrays.asList(option2))
                         .build();
 
-        Pair<SSLContext, SSLContext> failingContexts =
-                createContexts(kmfParamsClient, kmfParamsServer);
+        Pair<SSLContext, SSLContext> failingContexts = createContexts(kmfParamsClient, kmfParamsServer);
 
         // Server handshake limit is 16, so it is ok if 15 connections fail.
         for (int i = 0; i < 15; i++) {
@@ -346,8 +360,7 @@ public class SpakeTest {
                         .setOptions(CLIENT_ID.clone(), SERVER_ID.clone(), Arrays.asList(option))
                         .build();
         SSLContext workingServerContext = createServerContext(kmfParamsServer);
-        Pair<SSLContext, SSLContext> workingContexts =
-                Pair.of(failingContexts.getFirst(), workingServerContext);
+        Pair<SSLContext, SSLContext> workingContexts = Pair.of(failingContexts.getFirst(), workingServerContext);
         Pair<SSLSocket, SSLSocket> workingSockets1 = createSockets(workingContexts);
         connectSockets(workingSockets1);
         sendData(workingSockets1);
@@ -365,12 +378,14 @@ public class SpakeTest {
         byte[] password = new byte[] {1, 2, 3};
         byte[] password2 = new byte[] {4, 5, 6};
 
-        PakeOption option = new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
-                                    .addMessageComponent("password", password)
-                                    .build();
-        PakeOption option2 = new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
-                                     .addMessageComponent("password", password2)
-                                     .build();
+        PakeOption option =
+                new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
+                        .addMessageComponent("password", password)
+                        .build();
+        PakeOption option2 =
+                new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
+                        .addMessageComponent("password", password2)
+                        .build();
 
         PakeClientKeyManagerParameters kmfParamsClient =
                 new PakeClientKeyManagerParameters.Builder()
@@ -395,12 +410,14 @@ public class SpakeTest {
     public void testSpake2PlusMismatchedIds() throws Exception {
         byte[] password = new byte[] {1, 2, 3};
 
-        PakeOption option = new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
-                                    .addMessageComponent("password", password)
-                                    .build();
-        PakeOption option2 = new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
-                                     .addMessageComponent("password", password)
-                                     .build();
+        PakeOption option =
+                new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
+                        .addMessageComponent("password", password)
+                        .build();
+        PakeOption option2 =
+                new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
+                        .addMessageComponent("password", password)
+                        .build();
 
         // Client ID is different from the one in the server.
         PakeClientKeyManagerParameters kmfParamsClient =
@@ -426,12 +443,14 @@ public class SpakeTest {
     public void testSpake2PlusEmptyIds() throws Exception {
         byte[] password = new byte[] {1, 2, 3};
 
-        PakeOption option = new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
-                                    .addMessageComponent("password", password)
-                                    .build();
-        PakeOption option2 = new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
-                                     .addMessageComponent("password", password)
-                                     .build();
+        PakeOption option =
+                new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
+                        .addMessageComponent("password", password)
+                        .build();
+        PakeOption option2 =
+                new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
+                        .addMessageComponent("password", password)
+                        .build();
 
         PakeClientKeyManagerParameters kmfParamsClient =
                 new PakeClientKeyManagerParameters.Builder()

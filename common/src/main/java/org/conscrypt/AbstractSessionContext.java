@@ -216,8 +216,15 @@ abstract class AbstractSessionContext implements SSLSessionContext {
         lock.writeLock().lock();
         try {
             if (isValid()) {
-                NativeCrypto.SSL_CTX_set_spake_credential(context, pwArray, idProverArray,
-                        idVerifierArray, isClient, handshakeLimit, sslCtxNativePointer, this);
+                NativeCrypto.SSL_CTX_set_spake_credential(
+                            context,
+                            pwArray,
+                            idProverArray,
+                            idVerifierArray,
+                            isClient,
+                            handshakeLimit,
+                            sslCtxNativePointer,
+                            this);
             }
         } finally {
             lock.writeLock().unlock();

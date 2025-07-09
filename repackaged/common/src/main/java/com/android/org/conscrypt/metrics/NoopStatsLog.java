@@ -22,7 +22,6 @@ import com.android.org.conscrypt.ct.PolicyCompliance;
 import com.android.org.conscrypt.ct.VerificationResult;
 
 /**
- * Noop class for stats logging
  * @hide This class is not part of the Android public SDK API
  */
 @Internal

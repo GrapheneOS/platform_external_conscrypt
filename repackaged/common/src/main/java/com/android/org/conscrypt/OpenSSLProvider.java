@@ -219,17 +219,6 @@ public final class OpenSSLProvider extends Provider {
         put("Alg.Alias.KeyPairGenerator.1.3.101.110", "XDH");
         put("Alg.Alias.KeyPairGenerator.X25519", "XDH");
 
-        put("KeyPairGenerator.EdDSA", PREFIX + "OpenSslEdDsaKeyPairGenerator");
-        put("Alg.Alias.KeyPairGenerator.1.3.101.112", "EdDSA");
-        put("Alg.Alias.KeyPairGenerator.Ed25519", "EdDSA");
-
-        put("KeyPairGenerator.ML-DSA", PREFIX + "OpenSslMlDsaKeyPairGenerator$MlDsa");
-        put("KeyPairGenerator.ML-DSA-65", PREFIX + "OpenSslMlDsaKeyPairGenerator$MlDsa65");
-        put("KeyPairGenerator.ML-DSA-87", PREFIX + "OpenSslMlDsaKeyPairGenerator$MlDsa87");
-
-        // We don't support SLH-DSA, because it's not clear which algorithm to use.
-        put("KeyPairGenerator.SLH-DSA-SHA2-128S", PREFIX + "OpenSslSlhDsaKeyPairGenerator");
-
         /* == KeyFactory == */
         put("KeyFactory.RSA", PREFIX + "OpenSSLRSAKeyFactory");
         put("Alg.Alias.KeyFactory.1.2.840.113549.1.1.1", "RSA");
@@ -243,17 +232,6 @@ public final class OpenSSLProvider extends Provider {
         put("KeyFactory.XDH", PREFIX + "OpenSSLXDHKeyFactory");
         put("Alg.Alias.KeyFactory.1.3.101.110", "XDH");
         put("Alg.Alias.KeyFactory.X25519", "XDH");
-
-        put("KeyFactory.EdDSA", PREFIX + "OpenSslEdDsaKeyFactory");
-        put("Alg.Alias.KeyFactory.1.3.101.112", "EdDSA");
-        put("Alg.Alias.KeyFactory.Ed25519", "EdDSA");
-
-        put("KeyFactory.ML-DSA", PREFIX + "OpenSslMlDsaKeyFactory$MlDsa");
-        put("KeyFactory.ML-DSA-65", PREFIX + "OpenSslMlDsaKeyFactory$MlDsa65");
-        put("KeyFactory.ML-DSA-87", PREFIX + "OpenSslMlDsaKeyFactory$MlDsa87");
-
-        // We don't support SLH-DSA, because it's not clear which algorithm to use.
-        put("KeyFactory.SLH-DSA-SHA2-128S", PREFIX + "OpenSslSlhDsaKeyFactory");
 
         /* == SecretKeyFactory == */
         put("SecretKeyFactory.DESEDE", PREFIX + "DESEDESecretKeyFactory");
@@ -376,17 +354,6 @@ public final class OpenSSLProvider extends Provider {
 
         putSignatureImplClass("SHA512withRSA/PSS", "OpenSSLSignature$SHA512RSAPSS");
         put("Alg.Alias.Signature.SHA512withRSAandMGF1", "SHA512withRSA/PSS");
-
-        putSignatureImplClass("EdDSA", "OpenSslSignatureEdDsa");
-        put("Alg.Alias.Signature.1.3.101.112", "EdDSA");
-        put("Alg.Alias.Signature.Ed25519", "EdDSA");
-
-        putSignatureImplClass("ML-DSA", "OpenSslSignatureMlDsa$MlDsa");
-        putSignatureImplClass("ML-DSA-65", "OpenSslSignatureMlDsa$MlDsa65");
-        putSignatureImplClass("ML-DSA-87", "OpenSslSignatureMlDsa$MlDsa87");
-
-        // We don't support SLH-DSA, because it's not clear which algorithm to use.
-        putSignatureImplClass("SLH-DSA-SHA2-128S", "OpenSslSignatureSlhDsa");
 
         /* === SecureRandom === */
         /*
