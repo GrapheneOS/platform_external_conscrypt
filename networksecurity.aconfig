@@ -49,3 +49,12 @@ flag {
     is_fixed_read_only: true
     is_exported: true
 }
+
+flag {
+    name: "network_security_config_localhost"
+    namespace: "network_security"
+    description: "Define a default NetworkSecurityConfig for localhost"
+    bug: "398997783"
+    is_fixed_read_only: true
+    is_exported: true
+}
