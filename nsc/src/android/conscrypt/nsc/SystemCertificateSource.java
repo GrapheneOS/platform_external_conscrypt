@@ -16,7 +16,6 @@
 
 package android.conscrypt.nsc;
 
-import android.os.Environment;
 import android.os.UserHandle;
 
 import com.android.internal.util.ArrayUtils;

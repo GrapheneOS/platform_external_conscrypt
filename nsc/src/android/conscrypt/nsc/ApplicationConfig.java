@@ -29,7 +29,7 @@ import javax.net.ssl.X509TrustManager;
  * An application's network security configuration.
  *
  * <p>{@link #getConfigForHostname(String)} provides a means to obtain network security
- * configuration to be used for communicating with a specific hostname.</p>
+ * configuration to be used for communicating with a specific hostname.
  *
  * @hide
  */
@@ -45,40 +45,34 @@ public final class ApplicationConfig {
     private boolean mInitialized;
     private final Object mLock = new Object();
 
-    /**
-     * @hide
-     */
     public ApplicationConfig(ConfigSource configSource) {
         mConfigSource = configSource;
         mInitialized = false;
     }
 
-    /**
-     * @hide
-     */
     public boolean hasPerDomainConfigs() {
         ensureInitialized();
         return mConfigs != null && !mConfigs.isEmpty();
     }
 
     /**
-     * Get the {@link NetworkSecurityConfig} corresponding to the provided hostname.
-     * When matching the most specific matching domain rule will be used, if no match exists
-     * then the default configuration will be returned.
+     * Get the {@link NetworkSecurityConfig} corresponding to the provided hostname. When matching
+     * the most specific matching domain rule will be used, if no match exists then the default
+     * configuration will be returned.
      *
-     * {@code NetworkSecurityConfig} objects returned by this method can be safely cached for
-     * {@code hostname}. Subsequent calls with the same hostname will always return the same
-     * {@code NetworkSecurityConfig}.
+     * <p>{@code NetworkSecurityConfig} objects returned by this method can be safely cached for
+     * {@code hostname}. Subsequent calls with the same hostname will always return the same {@code
+     * NetworkSecurityConfig}.
      *
-     * @return {@link NetworkSecurityConfig} to be used to determine
-     * the network security configuration for connections to {@code hostname}.
+     * @return {@link NetworkSecurityConfig} to be used to determine the network security
+     *     configuration for connections to {@code hostname}.
      */
     public NetworkSecurityConfig getConfigForHostname(String hostname) {
         ensureInitialized();
         if (hostname == null || hostname.isEmpty() || mConfigs == null) {
             return mDefaultConfig;
         }
-        if (hostname.charAt(0) ==  '.') {
+        if (hostname.charAt(0) == '.') {
             throw new IllegalArgumentException("hostname must not begin with a .");
         }
         // Domains are case insensitive.
@@ -129,8 +123,8 @@ public final class ApplicationConfig {
 
     /**
      * Returns {@code true} if cleartext traffic is permitted for this application, which is the
-     * case only if all configurations permit cleartext traffic. For finer-grained policy use
-     * {@link #isCleartextTrafficPermitted(String)}.
+     * case only if all configurations permit cleartext traffic. For finer-grained policy use {@link
+     * #isCleartextTrafficPermitted(String)}.
      */
     public boolean isCleartextTrafficPermitted() {
         ensureInitialized();
@@ -168,7 +162,7 @@ public final class ApplicationConfig {
     }
 
     public void handleTrustStorageUpdate() {
-        synchronized(mLock) {
+        synchronized (mLock) {
             // If the config is uninitialized then there is no work to be done to handle an update,
             // avoid needlessly parsing configs.
             if (!mInitialized) {
@@ -188,7 +182,7 @@ public final class ApplicationConfig {
     }
 
     private void ensureInitialized() {
-        synchronized(mLock) {
+        synchronized (mLock) {
             if (mInitialized) {
                 return;
             }

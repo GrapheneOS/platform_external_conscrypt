@@ -47,10 +47,9 @@ public final class NetworkSecurityConfigProvider extends Provider {
     }
 
     /**
-     * For a shared process, resolves conflicting values of usesCleartextTraffic.
-     * 1. Throws a RuntimeException if the shared process with conflicting
-     * usesCleartextTraffic values have per domain rules.
-     * 2. Sets the default instance to the least strict config.
+     * For a shared process, resolves conflicting values of usesCleartextTraffic. 1. Throws a
+     * RuntimeException if the shared process with conflicting usesCleartextTraffic values have per
+     * domain rules. 2. Sets the default instance to the least strict config.
      */
     public static void handleNewApplication(Context context) {
         ApplicationConfig config = new ApplicationConfig(new ManifestConfigSource(context));
@@ -59,11 +58,10 @@ public final class NetworkSecurityConfigProvider extends Provider {
         if (defaultConfig != null) {
             if (defaultConfig.isCleartextTrafficPermitted()
                     != config.isCleartextTrafficPermitted()) {
-                Log.w(LOG_TAG, mProcessName
-                        + ": New config does not match the previously set config.");
+                Log.w(LOG_TAG,
+                        mProcessName + ": New config does not match the previously set config.");
 
-                if (defaultConfig.hasPerDomainConfigs()
-                        || config.hasPerDomainConfigs()) {
+                if (defaultConfig.hasPerDomainConfigs() || config.hasPerDomainConfigs()) {
                     throw new RuntimeException("Found multiple conflicting per-domain rules");
                 }
                 config = defaultConfig.isCleartextTrafficPermitted() ? defaultConfig : config;

@@ -20,7 +20,6 @@ import static android.sdk.Flags.majorMinorVersioningScheme;
 
 import static com.android.org.conscrypt.net.flags.Flags.certificateTransparencyDefaultEnabled;
 
-import android.annotation.FlaggedApi;
 import android.app.compat.CompatChanges;
 import android.compat.annotation.ChangeId;
 import android.compat.annotation.EnabledAfter;
@@ -39,12 +38,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-/**
- * @hide
- */
+/** @hide */
 public final class NetworkSecurityConfig {
     /** @hide */
     public static final boolean DEFAULT_CLEARTEXT_TRAFFIC_PERMITTED = true;
+
     /** @hide */
     public static final boolean DEFAULT_HSTS_ENFORCED = false;
 
@@ -139,7 +137,7 @@ public final class NetworkSecurityConfig {
     }
 
     public NetworkSecurityTrustManager getTrustManager() {
-        synchronized(mTrustManagerLock) {
+        synchronized (mTrustManagerLock) {
             if (mTrustManager == null) {
                 mTrustManager = new NetworkSecurityTrustManager(this);
             }
@@ -208,32 +206,32 @@ public final class NetworkSecurityConfig {
     /**
      * Return a {@link Builder} for the default {@code NetworkSecurityConfig}.
      *
-     * <p>
-     * The default configuration has the following properties:
+     * <p>The default configuration has the following properties:
+     *
      * <ol>
-     * <li>If the application targets API level 27 (Android O MR1) or lower then cleartext traffic
-     * is allowed by default.</li>
-     * <li>Cleartext traffic is not permitted for ephemeral apps.</li>
-     * <li>HSTS is not enforced.</li>
-     * <li>No certificate pinning is used.</li>
-     * <li>The system certificate store is trusted for connections.</li>
-     * <li>If the application targets API level 23 (Android M) or lower then the user certificate
-     * store is trusted by default as well for non-privileged applications.</li>
-     * <li>Privileged applications do not trust the user certificate store on Android P and higher.
-     * </li>
+     *   <li>If the application targets API level 27 (Android O MR1) or lower then cleartext traffic
+     *       is allowed by default.
+     *   <li>Cleartext traffic is not permitted for ephemeral apps.
+     *   <li>HSTS is not enforced.
+     *   <li>No certificate pinning is used.
+     *   <li>The system certificate store is trusted for connections.
+     *   <li>If the application targets API level 23 (Android M) or lower then the user certificate
+     *       store is trusted by default as well for non-privileged applications.
+     *   <li>Privileged applications do not trust the user certificate store on Android P and
+     *       higher.
      * </ol>
      *
      * @hide
      */
     public static Builder getDefaultBuilder(ApplicationInfo info) {
         // System certificate store, does not bypass static pins, does not disable CT.
-        CertificatesEntryRef systemRef = new CertificatesEntryRef(
-                SystemCertificateSource.getInstance(), false, false);
+        CertificatesEntryRef systemRef =
+                new CertificatesEntryRef(SystemCertificateSource.getInstance(), false, false);
         Builder builder = new Builder()
-                .setHstsEnforced(DEFAULT_HSTS_ENFORCED)
-                .addCertificatesEntryRef(systemRef);
-        final boolean cleartextTrafficPermitted = info.targetSdkVersion < Build.VERSION_CODES.P
-                && !info.isInstantApp();
+                                  .setHstsEnforced(DEFAULT_HSTS_ENFORCED)
+                                  .addCertificatesEntryRef(systemRef);
+        final boolean cleartextTrafficPermitted =
+                info.targetSdkVersion < Build.VERSION_CODES.P && !info.isInstantApp();
         builder.setCleartextTrafficPermitted(cleartextTrafficPermitted);
         // Applications targeting N and above must opt in into trusting the user added certificate
         // store.
@@ -247,6 +245,7 @@ public final class NetworkSecurityConfig {
 
     /**
      * Builder for creating {@code NetworkSecurityConfig} objects.
+     *
      * @hide
      */
     public static final class Builder {
@@ -262,9 +261,9 @@ public final class NetworkSecurityConfig {
         private Builder mParentBuilder;
 
         /**
-         * Sets the parent {@code Builder} for this {@code Builder}.
-         * The parent will be used to determine values not configured in this {@code Builder}
-         * in {@link Builder#build()}, recursively if needed.
+         * Sets the parent {@code Builder} for this {@code Builder}. The parent will be used to
+         * determine values not configured in this {@code Builder} in {@link Builder#build()},
+         * recursively if needed.
          */
         public Builder setParent(Builder parent) {
             // Quick check to avoid adding loops.

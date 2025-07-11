@@ -16,21 +16,15 @@
 
 package android.conscrypt.nsc;
 
-import android.util.Pair;
+import com.android.internal.annotations.VisibleForTesting;
+
 import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidParameterException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.Provider;
-import java.security.Security;
-import java.util.Set;
+
 import javax.net.ssl.ManagerFactoryParameters;
 import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.TrustManagerFactorySpi;
-
-import com.android.internal.annotations.VisibleForTesting;
 
 /** @hide */
 public class RootTrustManagerFactorySpi extends TrustManagerFactorySpi {
@@ -41,9 +35,8 @@ public class RootTrustManagerFactorySpi extends TrustManagerFactorySpi {
     public void engineInit(ManagerFactoryParameters spec)
             throws InvalidAlgorithmParameterException {
         if (!(spec instanceof ApplicationConfigParameters)) {
-            throw new InvalidAlgorithmParameterException("Unsupported spec: " +  spec + ". Only "
+            throw new InvalidAlgorithmParameterException("Unsupported spec: " + spec + ". Only "
                     + ApplicationConfigParameters.class.getName() + " supported");
-
         }
         mApplicationConfig = ((ApplicationConfigParameters) spec).config;
     }
@@ -62,12 +55,13 @@ public class RootTrustManagerFactorySpi extends TrustManagerFactorySpi {
         if (mApplicationConfig == null) {
             throw new IllegalStateException("TrustManagerFactory not initialized");
         }
-        return new TrustManager[] { mApplicationConfig.getTrustManager() };
+        return new TrustManager[] {mApplicationConfig.getTrustManager()};
     }
 
     @VisibleForTesting
     public static final class ApplicationConfigParameters implements ManagerFactoryParameters {
         public final ApplicationConfig config;
+
         public ApplicationConfigParameters(ApplicationConfig config) {
             this.config = config;
         }
