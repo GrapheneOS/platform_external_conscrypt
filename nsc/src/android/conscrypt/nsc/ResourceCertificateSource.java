@@ -18,7 +18,11 @@ package android.conscrypt.nsc;
 
 import android.content.Context;
 import android.util.ArraySet;
+
+import com.android.org.conscrypt.TrustedCertificateIndex;
+
 import libcore.io.IoUtils;
+
 import java.io.InputStream;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -28,15 +32,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
-import com.android.org.conscrypt.TrustedCertificateIndex;
-
 /**
  * {@link CertificateSource} based on certificates contained in an application resource file.
+ *
  * @hide
  */
 public class ResourceCertificateSource implements CertificateSource {
     private final Object mLock = new Object();
-    private final int  mResourceId;
+    private final int mResourceId;
 
     private Set<X509Certificate> mCertificates;
     private Context mContext;
@@ -60,8 +63,8 @@ public class ResourceCertificateSource implements CertificateSource {
                 in = mContext.getResources().openRawResource(mResourceId);
                 certs = factory.generateCertificates(in);
             } catch (CertificateException e) {
-                throw new RuntimeException("Failed to load trust anchors from id " + mResourceId,
-                        e);
+                throw new RuntimeException(
+                        "Failed to load trust anchors from id " + mResourceId, e);
             } finally {
                 IoUtils.closeQuietly(in);
             }
