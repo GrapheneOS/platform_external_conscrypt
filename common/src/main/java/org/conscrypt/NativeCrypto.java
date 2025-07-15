@@ -248,7 +248,7 @@ public final class NativeCrypto {
 
     @FastNative static native void EVP_MD_CTX_cleanup(NativeRef.EVP_MD_CTX ctx);
 
-    @CriticalNative static native void EVP_MD_CTX_destroy(long ctx);
+    @FastNative static native void EVP_MD_CTX_destroy(long ctx);
 
     @FastNative
     static native int EVP_MD_CTX_copy_ex(
