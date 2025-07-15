@@ -969,6 +969,7 @@ android_test {
         "bouncycastle-unbundled",
         "bouncycastle-bcpkix-unbundled",
         "bouncycastle-ocsp-unbundled",
+        "truth",
     ],
     java_version: "1.8",
     test_suites: ["general-tests"],

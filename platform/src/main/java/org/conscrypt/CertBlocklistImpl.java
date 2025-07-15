@@ -16,9 +16,13 @@
 
 package org.conscrypt;
 
+import static org.conscrypt.CertBlocklistEntry.Origin;
+
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import org.conscrypt.Platform;
 import org.conscrypt.flags.Flags;
+import org.conscrypt.metrics.StatsLog;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -29,13 +33,12 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,10 +49,31 @@ public final class CertBlocklistImpl implements CertBlocklist {
     private static final String DIGEST_SHA1 = "SHA-1";
     private static final String DIGEST_SHA256 = "SHA-256";
 
+    private static class Entry implements CertBlocklistEntry {
+        private final Origin origin;
+        private final int index;
+
+        public Entry(Origin origin, int index) {
+            this.origin = origin;
+            this.index = index;
+        }
+
+        @Override
+        public Origin getOrigin() {
+            return origin;
+        }
+
+        @Override
+        public int getIndex() {
+            return index;
+        }
+    }
+
     private final Set<BigInteger> serialBlocklist;
-    private final Set<ByteArray> sha1PubkeyBlocklist;
-    private final Set<ByteArray> sha256PubkeyBlocklist;
-    private Map<ByteArray, Boolean> cache;
+    private final Map<ByteArray, Entry> sha1PubkeyBlocklist;
+    private final Map<ByteArray, Entry> sha256PubkeyBlocklist;
+    private final StatsLog metrics;
+    private Map<ByteArray, Optional<Entry>> cache;
 
     /**
      * Number of entries in the cache. The cache contains public keys which are
@@ -58,32 +82,83 @@ public final class CertBlocklistImpl implements CertBlocklist {
      */
     private static final int CACHE_SIZE = 64;
 
-    public CertBlocklistImpl(Set<BigInteger> serialBlocklist, Set<ByteArray> sha1PubkeyBlocklist,
-            Set<ByteArray> sha256PubkeyBlocklist) {
-        this.cache = Collections.synchronizedMap(new LinkedHashMap<ByteArray, Boolean>() {
+    private CertBlocklistImpl(Builder builder) {
+        this.cache = Collections.synchronizedMap(new LinkedHashMap<ByteArray, Optional<Entry>>() {
             @Override
-            protected boolean removeEldestEntry(Map.Entry<ByteArray, Boolean> eldest) {
+            protected boolean removeEldestEntry(
+                    Map.Entry<ByteArray, Optional<CertBlocklistImpl.Entry>> eldest) {
                 return size() > CACHE_SIZE;
             }
         });
-        this.serialBlocklist = serialBlocklist;
-        this.sha1PubkeyBlocklist = sha1PubkeyBlocklist;
-        this.sha256PubkeyBlocklist = sha256PubkeyBlocklist;
+        this.serialBlocklist = builder.serialBlocklist;
+        this.sha1PubkeyBlocklist = Collections.unmodifiableMap(builder.sha1PubkeyBlocklist);
+        this.sha256PubkeyBlocklist = Collections.unmodifiableMap(builder.sha256PubkeyBlocklist);
+        this.metrics = builder.metrics;
     }
 
-    public static CertBlocklist getDefault() {
-        String androidData = System.getenv("ANDROID_DATA");
-        String blocklistRoot = androidData + "/misc/keychain/";
-        String defaultPubkeyBlocklistPath = blocklistRoot + "pubkey_blacklist.txt";
-        String defaultSerialBlocklistPath = blocklistRoot + "serial_blacklist.txt";
-        String defaultPubkeySha256BlocklistPath = blocklistRoot + "pubkey_sha256_blocklist.txt";
+    public static class Builder {
+        private static String ANDROID_DATA = System.getenv("ANDROID_DATA");
+        private static String BLOCKLIST_ROOT = ANDROID_DATA + "/misc/keychain/";
+        private static String DEFAULT_PUBKEY_BLOCKLIST_PATH =
+                BLOCKLIST_ROOT + "pubkey_blacklist.txt";
+        private static String DEFAULT_SERIAL_BLOCKLIST_PATH =
+                BLOCKLIST_ROOT + "serial_blacklist.txt";
+        private static String DEFAULT_PUBKEY_SHA256_BLOCKLIST_PATH =
+                BLOCKLIST_ROOT + "pubkey_sha256_blocklist.txt";
 
-        Set<ByteArray> sha1PubkeyBlocklist =
-                readPublicKeyBlockList(defaultPubkeyBlocklistPath, DIGEST_SHA1);
-        Set<ByteArray> sha256PubkeyBlocklist =
-                readPublicKeyBlockList(defaultPubkeySha256BlocklistPath, DIGEST_SHA256);
-        Set<BigInteger> serialBlocklist = readSerialBlockList(defaultSerialBlocklistPath);
-        return new CertBlocklistImpl(serialBlocklist, sha1PubkeyBlocklist, sha256PubkeyBlocklist);
+        private Set<BigInteger> serialBlocklist;
+        private Map<ByteArray, Entry> sha1PubkeyBlocklist;
+        private Map<ByteArray, Entry> sha256PubkeyBlocklist;
+        private StatsLog metrics;
+
+        public Builder setMetrics(StatsLog metrics) {
+            this.metrics = metrics;
+            return this;
+        }
+
+        public Builder loadSha1Default() {
+            sha1PubkeyBlocklist =
+                    readPublicKeyBlockList(DEFAULT_PUBKEY_BLOCKLIST_PATH, DIGEST_SHA1);
+            return this;
+        }
+
+        public Builder loadSha256Default() {
+            sha256PubkeyBlocklist =
+                    readPublicKeyBlockList(DEFAULT_PUBKEY_SHA256_BLOCKLIST_PATH, DIGEST_SHA256);
+            return this;
+        }
+
+        public Builder loadSerialDefault() {
+            serialBlocklist = readSerialBlockList(DEFAULT_SERIAL_BLOCKLIST_PATH);
+            return this;
+        }
+
+        public Builder loadAllDefaults() {
+            loadSha1Default();
+            loadSha256Default();
+            loadSerialDefault();
+            return this;
+        }
+
+        public CertBlocklistImpl build() {
+            if (sha1PubkeyBlocklist == null) {
+                sha1PubkeyBlocklist = Collections.emptyMap();
+            }
+            if (sha256PubkeyBlocklist == null) {
+                sha256PubkeyBlocklist = Collections.emptyMap();
+            }
+            if (serialBlocklist == null) {
+                serialBlocklist = Collections.emptySet();
+            }
+            if (metrics == null) {
+                metrics = Platform.getStatsLog();
+            }
+            return new CertBlocklistImpl(this);
+        }
+    }
+
+    public static CertBlocklistImpl getDefault() {
+        return new Builder().loadAllDefaults().build();
     }
 
     private static boolean isHex(String value) {
@@ -161,7 +236,7 @@ public final class CertBlocklistImpl implements CertBlocklist {
         Set<BigInteger> bl = new HashSet<BigInteger>();
         String serialBlocklist = readBlocklist(path);
         if (!serialBlocklist.equals("")) {
-            for (String value : serialBlocklist.split(",", -1)) {
+            for (String value : serialBlocklist.split(",", /* limit= */ -1)) {
                 try {
                     bl.add(new BigInteger(value, 16));
                 } catch (NumberFormatException e) {
@@ -175,7 +250,7 @@ public final class CertBlocklistImpl implements CertBlocklist {
     }
 
     // clang-format off
-    static final byte[] SHA1_BUILTIN = {
+    static final byte[] SHA1_TEST = {
             // Blocklist test cert for CTS. The cert and key can be found in
             // src/test/resources/blocklist_test_ca.pem and
             // src/test/resources/blocklist_test_ca_key.pem.
@@ -252,7 +327,7 @@ public final class CertBlocklistImpl implements CertBlocklist {
         },
     };
 
-    static final byte[] SHA256_BUILTIN = {
+    static final byte[] SHA256_TEST = {
             // Blocklist test cert for CTS. The cert and key can be found in
             // src/test/resources/blocklist_test_ca2.pem and
             // src/test/resources/blocklist_test_ca2_key.pem.
@@ -267,24 +342,26 @@ public final class CertBlocklistImpl implements CertBlocklist {
     };
     // clang-format on
 
-    private static Set<ByteArray> readPublicKeyBlockList(String path, String hashType) {
-        Set<ByteArray> bl = new HashSet<ByteArray>();
+    private static Map<ByteArray, Entry> readPublicKeyBlockList(String path, String hashType) {
+        Map<ByteArray, Entry> bl = new HashMap<ByteArray, Entry>();
 
         switch (hashType) {
             case DIGEST_SHA1:
-                bl.add(new ByteArray(SHA1_BUILTIN));
+                bl.put(new ByteArray(SHA1_TEST), new Entry(Origin.SHA1_TEST, /* index= */ 0));
                 if (!Flags.useChromiumCertBlocklist()) {
-                    for (byte[] staticPubKey : SHA1_DEPRECATED_BUILTINS) {
-                        bl.add(new ByteArray(staticPubKey));
+                    for (int i = 0; i < SHA1_DEPRECATED_BUILTINS.length; i++) {
+                        bl.put(new ByteArray(SHA1_DEPRECATED_BUILTINS[i]),
+                                new Entry(Origin.SHA1_BUILT_IN, /* index= */ i));
                     }
                 }
                 break;
             case DIGEST_SHA256:
-                bl.add(new ByteArray(SHA256_BUILTIN));
+                bl.put(new ByteArray(SHA256_TEST), new Entry(Origin.SHA256_TEST, /* index= */ 0));
                 if (Flags.useChromiumCertBlocklist()) {
                     // Blocklist statically included in Conscrypt. See constants/.
-                    for (byte[] staticPubKey : StaticBlocklist.PUBLIC_KEYS) {
-                        bl.add(new ByteArray(staticPubKey));
+                    for (int i = 0; i < StaticBlocklist.PUBLIC_KEYS.length; i++) {
+                        bl.put(new ByteArray(StaticBlocklist.PUBLIC_KEYS[i]),
+                                new Entry(Origin.SHA256_BUILT_IN, /* index= */ i));
                     }
                 }
                 break;
@@ -307,11 +384,14 @@ public final class CertBlocklistImpl implements CertBlocklist {
 
         // Attempt to augment it with values taken from /data/misc/keychain.
         String pubkeyBlocklist = readBlocklist(path);
+        Origin origin = (DIGEST_SHA1.equals(hashType)) ? Origin.SHA1_FILE : Origin.SHA256_FILE;
         if (!pubkeyBlocklist.equals("")) {
-            for (String value : pubkeyBlocklist.split(",", -1)) {
+            String[] fileBlocklist = pubkeyBlocklist.split(",", /* limit= */ -1);
+            for (int i = 0; i < fileBlocklist.length; i++) {
+                String value = fileBlocklist[i];
                 value = value.trim();
                 if (isPubkeyHash(value, hashLength)) {
-                    bl.add(new ByteArray(Hex.decodeHex(value)));
+                    bl.putIfAbsent(new ByteArray(Hex.decodeHex(value)), new Entry(origin, i));
                 } else {
                     logger.log(Level.WARNING, "Tried to blocklist invalid pubkey " + value);
                 }
@@ -321,20 +401,17 @@ public final class CertBlocklistImpl implements CertBlocklist {
         return bl;
     }
 
-    private static boolean isPublicKeyBlockListed(
-            byte[] encodedPublicKey, Set<ByteArray> blocklist, String hashType) {
+    private static Entry isPublicKeyBlockListed(
+            byte[] encodedPublicKey, Map<ByteArray, Entry> blocklist, String hashType) {
         MessageDigest md;
         try {
             md = MessageDigest.getInstance(hashType);
         } catch (NoSuchAlgorithmException e) {
             logger.log(Level.SEVERE, "Unable to get " + hashType + " MessageDigest", e);
-            return false;
+            return null;
         }
         ByteArray out = new ByteArray(md.digest(encodedPublicKey));
-        if (blocklist.contains(out)) {
-            return true;
-        }
-        return false;
+        return blocklist.get(out);
     }
 
     @Override
@@ -344,23 +421,33 @@ public final class CertBlocklistImpl implements CertBlocklist {
         // for a Map, its underlying array (encodedPublicKey) should not be
         // modified.
         ByteArray cacheKey = new ByteArray(encodedPublicKey);
-        Boolean cachedResult = cache.get(cacheKey);
+        Optional<Entry> cachedResult = cache.get(cacheKey);
         if (cachedResult != null) {
-            return cachedResult.booleanValue();
+            if (cachedResult.isPresent()) {
+                metrics.reportBlocklistHit(cachedResult.get());
+                return true;
+            }
+            return false;
         }
         if (!sha1PubkeyBlocklist.isEmpty()) {
-            if (isPublicKeyBlockListed(encodedPublicKey, sha1PubkeyBlocklist, DIGEST_SHA1)) {
-                cache.put(cacheKey, true);
+            Entry entry =
+                    isPublicKeyBlockListed(encodedPublicKey, sha1PubkeyBlocklist, DIGEST_SHA1);
+            if (entry != null) {
+                cache.put(cacheKey, Optional.of(entry));
+                metrics.reportBlocklistHit(entry);
                 return true;
             }
         }
         if (!sha256PubkeyBlocklist.isEmpty()) {
-            if (isPublicKeyBlockListed(encodedPublicKey, sha256PubkeyBlocklist, DIGEST_SHA256)) {
-                cache.put(cacheKey, true);
+            Entry entry =
+                    isPublicKeyBlockListed(encodedPublicKey, sha256PubkeyBlocklist, DIGEST_SHA256);
+            if (entry != null) {
+                cache.put(cacheKey, Optional.of(entry));
+                metrics.reportBlocklistHit(entry);
                 return true;
             }
         }
-        cache.put(cacheKey, false);
+        cache.put(cacheKey, Optional.empty());
         return false;
     }
 
