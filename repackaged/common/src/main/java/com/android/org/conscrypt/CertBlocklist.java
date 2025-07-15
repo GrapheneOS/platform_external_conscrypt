@@ -17,6 +17,8 @@
 
 package com.android.org.conscrypt;
 
+import com.android.org.conscrypt.Internal;
+
 import java.math.BigInteger;
 import java.security.PublicKey;
 
@@ -24,8 +26,8 @@ import java.security.PublicKey;
  * A set of certificates that are blacklisted from trust.
  * @hide This class is not part of the Android public SDK API
  */
+@Internal
 public interface CertBlocklist {
-
     /**
      * Returns whether the given public key is in the blacklist.
      */
