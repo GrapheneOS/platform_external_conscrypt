@@ -16,6 +16,14 @@
  */
 package com.android.org.conscrypt.metrics;
 
+import static com.android.org.conscrypt.metrics.ConscryptStatsLog.CERTIFICATE_BLOCKLIST_BLOCK_REPORTED;
+import static com.android.org.conscrypt.metrics.ConscryptStatsLog.CERTIFICATE_BLOCKLIST_BLOCK_REPORTED__SOURCE__BLOCKLIST_SOURCE_SHA1_BUILT_IN;
+import static com.android.org.conscrypt.metrics.ConscryptStatsLog.CERTIFICATE_BLOCKLIST_BLOCK_REPORTED__SOURCE__BLOCKLIST_SOURCE_SHA1_FILE;
+import static com.android.org.conscrypt.metrics.ConscryptStatsLog.CERTIFICATE_BLOCKLIST_BLOCK_REPORTED__SOURCE__BLOCKLIST_SOURCE_SHA1_TEST;
+import static com.android.org.conscrypt.metrics.ConscryptStatsLog.CERTIFICATE_BLOCKLIST_BLOCK_REPORTED__SOURCE__BLOCKLIST_SOURCE_SHA256_BUILT_IN;
+import static com.android.org.conscrypt.metrics.ConscryptStatsLog.CERTIFICATE_BLOCKLIST_BLOCK_REPORTED__SOURCE__BLOCKLIST_SOURCE_SHA256_FILE;
+import static com.android.org.conscrypt.metrics.ConscryptStatsLog.CERTIFICATE_BLOCKLIST_BLOCK_REPORTED__SOURCE__BLOCKLIST_SOURCE_SHA256_TEST;
+import static com.android.org.conscrypt.metrics.ConscryptStatsLog.CERTIFICATE_BLOCKLIST_BLOCK_REPORTED__SOURCE__BLOCKLIST_SOURCE_UNKNOWN;
 import static com.android.org.conscrypt.metrics.ConscryptStatsLog.CERTIFICATE_TRANSPARENCY_LOG_LIST_STATE_CHANGED;
 import static com.android.org.conscrypt.metrics.ConscryptStatsLog.CERTIFICATE_TRANSPARENCY_LOG_LIST_STATE_CHANGED__STATUS__STATUS_EXPIRED;
 import static com.android.org.conscrypt.metrics.ConscryptStatsLog.CERTIFICATE_TRANSPARENCY_LOG_LIST_STATE_CHANGED__STATUS__STATUS_NOT_FOUND;
@@ -31,6 +39,7 @@ import static com.android.org.conscrypt.metrics.ConscryptStatsLog.CERTIFICATE_TR
 import static com.android.org.conscrypt.metrics.ConscryptStatsLog.CERTIFICATE_TRANSPARENCY_VERIFICATION_REPORTED__RESULT__RESULT_UNKNOWN;
 import static com.android.org.conscrypt.metrics.ConscryptStatsLog.TLS_HANDSHAKE_REPORTED;
 
+import com.android.org.conscrypt.CertBlocklistEntry;
 import com.android.org.conscrypt.Internal;
 import com.android.org.conscrypt.Platform;
 import com.android.org.conscrypt.ct.LogStore;
@@ -125,6 +134,30 @@ public final class StatsLogImpl implements StatsLog {
         }
     }
 
+    private static int blocklistOriginToMetrics(CertBlocklistEntry.Origin origin) {
+        switch (origin) {
+            case SHA1_TEST:
+                return CERTIFICATE_BLOCKLIST_BLOCK_REPORTED__SOURCE__BLOCKLIST_SOURCE_SHA1_TEST;
+            case SHA1_BUILT_IN:
+                return CERTIFICATE_BLOCKLIST_BLOCK_REPORTED__SOURCE__BLOCKLIST_SOURCE_SHA1_BUILT_IN;
+            case SHA1_FILE:
+                return CERTIFICATE_BLOCKLIST_BLOCK_REPORTED__SOURCE__BLOCKLIST_SOURCE_SHA1_FILE;
+            case SHA256_TEST:
+                return CERTIFICATE_BLOCKLIST_BLOCK_REPORTED__SOURCE__BLOCKLIST_SOURCE_SHA256_TEST;
+            case SHA256_BUILT_IN:
+                return CERTIFICATE_BLOCKLIST_BLOCK_REPORTED__SOURCE__BLOCKLIST_SOURCE_SHA256_BUILT_IN;
+            case SHA256_FILE:
+                return CERTIFICATE_BLOCKLIST_BLOCK_REPORTED__SOURCE__BLOCKLIST_SOURCE_SHA256_FILE;
+        }
+        return CERTIFICATE_BLOCKLIST_BLOCK_REPORTED__SOURCE__BLOCKLIST_SOURCE_UNKNOWN;
+    }
+
+    @Override
+    public void reportBlocklistHit(CertBlocklistEntry entry) {
+        write(CERTIFICATE_BLOCKLIST_BLOCK_REPORTED, blocklistOriginToMetrics(entry.getOrigin()),
+                entry.getIndex(), getUid());
+    }
+
     private static final boolean sdkVersionBiggerThan32;
 
     static {
@@ -161,5 +194,9 @@ public final class StatsLogImpl implements StatsLog {
             int numOcspScts, int numTlsScts, int uid) {
         ConscryptStatsLog.write(atomId, verificationResult, verificationReason, policyCompatVersion,
                 majorVersion, minorVersion, numEmbeddedScts, numOcspScts, numTlsScts, uid);
+    }
+
+    private void write(int atomId, int origin, int index, int uid) {
+        ConscryptStatsLog.write(atomId, origin, index, uid);
     }
 }
