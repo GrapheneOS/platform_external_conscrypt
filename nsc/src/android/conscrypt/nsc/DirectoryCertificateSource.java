@@ -39,6 +39,7 @@ import javax.security.auth.x500.X500Principal;
 /**
  * {@link CertificateSource} based on a directory where certificates are stored as individual files
  * named after a hash of their SubjectName for more efficient lookups.
+ *
  * @hide
  */
 abstract class DirectoryCertificateSource implements CertificateSource {
@@ -194,10 +195,10 @@ abstract class DirectoryCertificateSource implements CertificateSource {
     }
 
     private static final char[] DIGITS = {
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
     private static String intToHexString(int i, int minWidth) {
-        int bufLen = 8;  // Max number of hex digits in an int
+        int bufLen = 8; // Max number of hex digits in an int
         char[] buf = new char[bufLen];
         int cursor = bufLen;
 

@@ -17,15 +17,15 @@
 package android.conscrypt.nsc;
 
 import android.util.ArraySet;
+
+import com.android.org.conscrypt.TrustedCertificateIndex;
+
 import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Set;
-
-import com.android.org.conscrypt.TrustedCertificateIndex;
 
 /**
  * {@link CertificateSource} which provides certificates from trusted certificate entries of a

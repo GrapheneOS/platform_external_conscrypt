@@ -20,6 +20,7 @@ import java.io.File;
 
 /**
  * {@link CertificateSource} based on the system WFA CA store.
+ *
  * @hide
  */
 public final class WfaCertificateSource extends DirectoryCertificateSource {

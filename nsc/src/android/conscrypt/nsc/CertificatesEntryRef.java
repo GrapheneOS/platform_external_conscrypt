@@ -27,8 +27,8 @@ public final class CertificatesEntryRef {
     private final boolean mOverridesPins;
     private final boolean mDisableCT;
 
-    public CertificatesEntryRef(CertificateSource source, boolean overridesPins,
-            boolean disableCT) {
+    public CertificatesEntryRef(
+            CertificateSource source, boolean overridesPins, boolean disableCT) {
         mSource = source;
         mOverridesPins = overridesPins;
         mDisableCT = disableCT;

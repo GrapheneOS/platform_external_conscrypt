@@ -22,14 +22,10 @@ import java.util.Locale;
 
 /** @hide */
 public final class Domain {
-    /**
-     * Lower case hostname for this domain rule.
-     */
+    /** Lower case hostname for this domain rule. */
     public final String hostname;
 
-    /**
-     * Whether this domain includes subdomains.
-     */
+    /** Whether this domain includes subdomains. */
     public final boolean subdomainsIncluded;
 
     public Domain(String hostname, boolean subdomainsIncluded) {
@@ -54,7 +50,7 @@ public final class Domain {
             return false;
         }
         Domain otherDomain = (Domain) other;
-        return otherDomain.subdomainsIncluded == this.subdomainsIncluded &&
-                otherDomain.hostname.equals(this.hostname);
+        return otherDomain.subdomainsIncluded == this.subdomainsIncluded
+                && otherDomain.hostname.equals(this.hostname);
     }
 }

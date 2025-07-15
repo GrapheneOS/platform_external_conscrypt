@@ -22,5 +22,6 @@ import java.util.Set;
 /** @hide */
 public interface ConfigSource {
     Set<Pair<Domain, NetworkSecurityConfig>> getPerDomainConfigs();
+
     NetworkSecurityConfig getDefaultConfig();
 }

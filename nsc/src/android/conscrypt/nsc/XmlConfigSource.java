@@ -102,7 +102,8 @@ public class XmlConfigSource implements ConfigSource {
             } catch (Resources.NotFoundException | XmlPullParserException | IOException
                     | ParserException e) {
                 throw new RuntimeException("Failed to parse XML configuration from "
-                        + mContext.getResources().getResourceEntryName(mResourceId), e);
+                                + mContext.getResources().getResourceEntryName(mResourceId),
+                        e);
             }
         }
     }
@@ -111,8 +112,8 @@ public class XmlConfigSource implements ConfigSource {
             throws IOException, XmlPullParserException, ParserException {
         String digestAlgorithm = parser.getAttributeValue(null, "digest");
         if (!Pin.isSupportedDigestAlgorithm(digestAlgorithm)) {
-            throw new ParserException(parser, "Unsupported pin digest algorithm: "
-                    + digestAlgorithm);
+            throw new ParserException(
+                    parser, "Unsupported pin digest algorithm: " + digestAlgorithm);
         }
         if (parser.next() != XmlPullParser.TEXT) {
             throw new ParserException(parser, "Missing pin digest");
@@ -126,9 +127,9 @@ public class XmlConfigSource implements ConfigSource {
         }
         int expectedLength = Pin.getDigestLength(digestAlgorithm);
         if (decodedDigest.length != expectedLength) {
-            throw new ParserException(parser, "digest length " + decodedDigest.length
-                    + " does not match expected length for " + digestAlgorithm + " of "
-                    + expectedLength);
+            throw new ParserException(parser,
+                    "digest length " + decodedDigest.length + " does not match expected length for "
+                            + digestAlgorithm + " of " + expectedLength);
         }
         if (parser.next() != XmlPullParser.END_TAG) {
             throw new ParserException(parser, "pin contains additional elements");
@@ -192,8 +193,8 @@ public class XmlConfigSource implements ConfigSource {
         return parser.getAttributeBooleanValue(null, "enabled", false);
     }
 
-    private CertificatesEntryRef parseCertificatesEntry(XmlResourceParser parser,
-            boolean defaultOverridePins)
+    private CertificatesEntryRef parseCertificatesEntry(
+            XmlResourceParser parser, boolean defaultOverridePins)
             throws IOException, XmlPullParserException, ParserException {
         boolean overridePins =
                 parser.getAttributeBooleanValue(null, "overridePins", defaultOverridePins);
@@ -216,15 +217,16 @@ public class XmlConfigSource implements ConfigSource {
         } else if ("wfa".equals(sourceString)) {
             source = WfaCertificateSource.getInstance();
         } else {
-            throw new ParserException(parser, "Unknown certificates src. "
-                    + "Should be one of system|user|@resourceVal");
+            throw new ParserException(parser,
+                    "Unknown certificates src. "
+                            + "Should be one of system|user|@resourceVal");
         }
         XmlUtils.skipCurrentTag(parser);
         return new CertificatesEntryRef(source, overridePins, disableCT);
     }
 
-    private Collection<CertificatesEntryRef> parseTrustAnchors(XmlResourceParser parser,
-            boolean defaultOverridePins)
+    private Collection<CertificatesEntryRef> parseTrustAnchors(
+            XmlResourceParser parser, boolean defaultOverridePins)
             throws IOException, XmlPullParserException, ParserException {
         int outerDepth = parser.getDepth();
         List<CertificatesEntryRef> anchors = new ArrayList<>();
@@ -259,13 +261,11 @@ public class XmlConfigSource implements ConfigSource {
         for (int i = 0; i < parser.getAttributeCount(); i++) {
             String name = parser.getAttributeName(i);
             if ("hstsEnforced".equals(name)) {
-                builder.setHstsEnforced(
-                        parser.getAttributeBooleanValue(i,
-                                NetworkSecurityConfig.DEFAULT_HSTS_ENFORCED));
+                builder.setHstsEnforced(parser.getAttributeBooleanValue(
+                        i, NetworkSecurityConfig.DEFAULT_HSTS_ENFORCED));
             } else if ("cleartextTrafficPermitted".equals(name)) {
-                builder.setCleartextTrafficPermitted(
-                        parser.getAttributeBooleanValue(i,
-                                NetworkSecurityConfig.DEFAULT_CLEARTEXT_TRAFFIC_PERMITTED));
+                builder.setCleartextTrafficPermitted(parser.getAttributeBooleanValue(
+                        i, NetworkSecurityConfig.DEFAULT_CLEARTEXT_TRAFFIC_PERMITTED));
             }
         }
         // Parse the config elements.
@@ -273,18 +273,16 @@ public class XmlConfigSource implements ConfigSource {
             String tagName = parser.getName();
             if ("domain".equals(tagName)) {
                 if (configType != CONFIG_DOMAIN) {
-                    throw new ParserException(parser,
-                            "domain element not allowed in " + getConfigString(configType));
+                    throw new ParserException(
+                            parser, "domain element not allowed in " + getConfigString(configType));
                 }
                 Domain domain = parseDomain(parser, seenDomains);
                 domains.add(domain);
             } else if ("trust-anchors".equals(tagName)) {
                 if (seenTrustAnchors) {
-                    throw new ParserException(parser,
-                            "Multiple trust-anchor elements not allowed");
+                    throw new ParserException(parser, "Multiple trust-anchor elements not allowed");
                 }
-                builder.addCertificatesEntryRefs(
-                        parseTrustAnchors(parser, defaultOverridePins));
+                builder.addCertificatesEntryRefs(parseTrustAnchors(parser, defaultOverridePins));
                 seenTrustAnchors = true;
             } else if ("pin-set".equals(tagName)) {
                 if (configType != CONFIG_DOMAIN) {
