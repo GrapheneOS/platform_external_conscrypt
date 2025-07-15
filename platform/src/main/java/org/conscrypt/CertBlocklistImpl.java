@@ -58,13 +58,6 @@ public final class CertBlocklistImpl implements CertBlocklist {
      */
     private static final int CACHE_SIZE = 64;
 
-    /**
-     * public for testing only.
-     */
-    public CertBlocklistImpl(Set<BigInteger> serialBlocklist, Set<ByteArray> sha1PubkeyBlocklist) {
-        this(serialBlocklist, sha1PubkeyBlocklist, Collections.emptySet());
-    }
-
     public CertBlocklistImpl(Set<BigInteger> serialBlocklist, Set<ByteArray> sha1PubkeyBlocklist,
             Set<ByteArray> sha256PubkeyBlocklist) {
         this.cache = Collections.synchronizedMap(new LinkedHashMap<ByteArray, Boolean>() {
