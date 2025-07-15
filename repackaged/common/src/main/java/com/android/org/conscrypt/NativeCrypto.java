@@ -270,7 +270,7 @@ public final class NativeCrypto {
     @FastNative static native void EVP_MD_CTX_cleanup(NativeRef.EVP_MD_CTX ctx);
 
     @android.compat.annotation.UnsupportedAppUsage
-    @CriticalNative
+    @FastNative
     static native void EVP_MD_CTX_destroy(long ctx);
 
     @FastNative

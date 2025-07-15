@@ -2623,7 +2623,8 @@ static void NativeCrypto_EVP_MD_CTX_cleanup(JNIEnv* env, jclass, jobject ctxRef)
     }
 }
 
-static void NativeCrypto_EVP_MD_CTX_destroy(CRITICAL_JNI_PARAMS_COMMA jlong ctxRef) {
+static void NativeCrypto_EVP_MD_CTX_destroy(JNIEnv* env, jclass, jlong ctxRef) {
+    CHECK_ERROR_QUEUE_ON_RETURN;
     EVP_MD_CTX* ctx = reinterpret_cast<EVP_MD_CTX*>(ctxRef);
     JNI_TRACE_MD("EVP_MD_CTX_destroy(%p)", ctx);
 
