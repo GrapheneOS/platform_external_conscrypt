@@ -783,28 +783,34 @@ public final class NativeCrypto {
 
     @android.compat.annotation.UnsupportedAppUsage
     @FastNative
-    static native String[] get_X509_REVOKED_ext_oids(long x509ctx, int critical, OpenSSLX509CRLEntry holder);
+    static native String[] get_X509_REVOKED_ext_oids(
+            long x509ctx, int critical, OpenSSLX509CRLEntry holder);
 
     @android.compat.annotation.UnsupportedAppUsage
     @FastNative
-    static native byte[] X509_REVOKED_get_ext_oid(long x509RevokedCtx, String oid, OpenSSLX509CRLEntry holder);
+    static native byte[] X509_REVOKED_get_ext_oid(
+            long x509RevokedCtx, String oid, OpenSSLX509CRLEntry holder);
 
     @android.compat.annotation.UnsupportedAppUsage
     @FastNative
-    static native byte[] X509_REVOKED_get_serialNumber(long x509RevokedCtx, OpenSSLX509CRLEntry holder);
+    static native byte[] X509_REVOKED_get_serialNumber(
+            long x509RevokedCtx, OpenSSLX509CRLEntry holder);
 
     @android.compat.annotation.UnsupportedAppUsage
     @FastNative
-    static native long X509_REVOKED_get_ext(long x509RevokedCtx, String oid, OpenSSLX509CRLEntry holder);
+    static native long X509_REVOKED_get_ext(
+            long x509RevokedCtx, String oid, OpenSSLX509CRLEntry holder);
 
     /** Returns ASN1_TIME reference. */
     @android.compat.annotation.UnsupportedAppUsage
     @FastNative
-    static native long get_X509_REVOKED_revocationDate(long x509RevokedCtx, OpenSSLX509CRLEntry holder);
+    static native long get_X509_REVOKED_revocationDate(
+            long x509RevokedCtx, OpenSSLX509CRLEntry holder);
 
     @android.compat.annotation.UnsupportedAppUsage
     @FastNative
-    static native void X509_REVOKED_print(long bioRef, long x509RevokedCtx, OpenSSLX509CRLEntry holder);
+    static native void X509_REVOKED_print(
+            long bioRef, long x509RevokedCtx, OpenSSLX509CRLEntry holder);
 
     @android.compat.annotation.UnsupportedAppUsage
     @FastNative
