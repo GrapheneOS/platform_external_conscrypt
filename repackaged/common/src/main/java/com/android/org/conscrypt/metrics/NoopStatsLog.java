@@ -16,6 +16,7 @@
  */
 package com.android.org.conscrypt.metrics;
 
+import com.android.org.conscrypt.CertBlocklistEntry;
 import com.android.org.conscrypt.Internal;
 import com.android.org.conscrypt.ct.LogStore;
 import com.android.org.conscrypt.ct.PolicyCompliance;
@@ -38,4 +39,6 @@ public class NoopStatsLog implements StatsLog {
 
     public void reportCTVerificationResult(LogStore logStore, VerificationResult result,
             PolicyCompliance compliance, CertificateTransparencyVerificationReason reason) {}
+
+    public void reportBlocklistHit(CertBlocklistEntry entry) {}
 }

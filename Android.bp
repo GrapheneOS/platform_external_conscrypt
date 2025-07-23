@@ -599,54 +599,6 @@ java_sdk_library {
     no_dist: true,
 }
 
-// Referenced implicitly from framework-conscrypt-nsc.
-filegroup {
-    name: "framework-conscrypt-nsc.api.combined.public.latest",
-    srcs: [
-        "nsc/api/last-api.txt",
-    ],
-}
-
-// Referenced implicitly from framework-conscrypt-nsc.
-filegroup {
-    name: "framework-conscrypt-nsc-removed.api.combined.public.latest",
-    srcs: [
-        "nsc/api/last-removed.txt",
-    ],
-}
-
-// Referenced implicitly from framework-conscrypt-nsc.
-filegroup {
-    name: "framework-conscrypt-nsc.api.combined.system.latest",
-    srcs: [
-        "nsc/api/system-last-api.txt",
-    ],
-}
-
-// Referenced implicitly from framework-conscrypt-nsc.
-filegroup {
-    name: "framework-conscrypt-nsc-removed.api.combined.system.latest",
-    srcs: [
-        "nsc/api/system-last-removed.txt",
-    ],
-}
-
-// Referenced implicitly from framework-conscrypt-nsc.
-filegroup {
-    name: "framework-conscrypt-nsc.api.combined.module-lib.latest",
-    srcs: [
-        "nsc/api/lib-last-api.txt",
-    ],
-}
-
-// Referenced implicitly from framework-conscrypt-nsc.
-filegroup {
-    name: "framework-conscrypt-nsc-removed.api.combined.module-lib.latest",
-    srcs: [
-        "nsc/api/lib-last-removed.txt",
-    ],
-}
-
 // A library containing the NSC code.
 java_sdk_library {
     name: "framework-conscrypt-nsc",
@@ -969,6 +921,7 @@ android_test {
         "bouncycastle-unbundled",
         "bouncycastle-bcpkix-unbundled",
         "bouncycastle-ocsp-unbundled",
+        "truth",
     ],
     java_version: "1.8",
     test_suites: ["general-tests"],
