@@ -17,15 +17,12 @@ package org.conscrypt;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.security.KeyManagementException;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
-
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -40,7 +37,6 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-
 import org.conscrypt.io.IoUtils;
 
 /**
@@ -138,171 +134,7 @@ public final class Conscrypt {
      * Indicates whether the given {@link Provider} was created by this distribution of Conscrypt.
      */
     public static boolean isConscrypt(Provider provider) {
-        if (provider instanceof OpenSSLProvider) {
-            return true;
-        }
-        try {
-            if (Class.forName("com.android.org.conscrypt.OpenSSLProvider").isInstance(provider)) {
-                return true;
-            }
-        } catch (ClassNotFoundException e) {
-        }
-        return false;
-    }
-
-    private static boolean isThisConscrypt(Provider provider) {
         return provider instanceof OpenSSLProvider;
-    }
-
-    private static OpenSSLProvider toConscrypt(Provider provider) {
-        return (OpenSSLProvider) provider;
-    }
-
-    /**
-     * Indicates whether the given {@link SSLContext} was created by this distribution of Conscrypt.
-     */
-    public static boolean isConscrypt(SSLContext context) {
-        if (context.getProvider() instanceof OpenSSLProvider) {
-            return true;
-        }
-        try {
-            if (Class.forName("com.android.org.conscrypt.OpenSSLProvider").isInstance(context.getProvider())) {
-                return true;
-            }
-        } catch (ClassNotFoundException e) {
-        }
-        return false;
-    }
-
-    private static boolean isThisConscrypt(SSLContext context) {
-        return context.getProvider() instanceof OpenSSLProvider; // isThisConscrypt(Provider) logic applies to context's provider
-    }
-
-    private static SSLContext toConscrypt(SSLContext context) {
-        return (SSLContext) context;
-    }
-
-    /**
-     * Indicates whether the given {@link SSLSocketFactory} was created by this distribution of
-     * Conscrypt.
-     */
-    public static boolean isConscrypt(SSLSocketFactory factory) {
-        if (factory instanceof OpenSSLSocketFactoryImpl) {
-            return true;
-        }
-        try {
-            if (Class.forName("com.android.org.conscrypt.OpenSSLSocketFactoryImpl").isInstance(factory)) {
-                return true;
-            }
-        } catch (ClassNotFoundException e) {
-        }
-        return false;
-    }
-
-    private static boolean isThisConscrypt(SSLSocketFactory factory) {
-        return factory instanceof OpenSSLSocketFactoryImpl;
-    }
-
-    private static OpenSSLSocketFactoryImpl toConscrypt(SSLSocketFactory factory) {
-        return (OpenSSLSocketFactoryImpl) factory;
-    }
-
-    /**
-     * Indicates whether the given {@link SSLServerSocketFactory} was created by this distribution
-     * of Conscrypt.
-     */
-    public static boolean isConscrypt(SSLServerSocketFactory factory) {
-        if (factory instanceof OpenSSLServerSocketFactoryImpl) {
-            return true;
-        }
-        try {
-            if (Class.forName("com.android.org.conscrypt.OpenSSLServerSocketFactoryImpl").isInstance(factory)) {
-                return true;
-            }
-        } catch (ClassNotFoundException e) {
-        }
-        return false;
-    }
-
-    private static boolean isThisConscrypt(SSLServerSocketFactory factory) {
-        return factory instanceof OpenSSLServerSocketFactoryImpl;
-    }
-
-    private static OpenSSLServerSocketFactoryImpl toConscrypt(SSLServerSocketFactory factory) {
-        return (OpenSSLServerSocketFactoryImpl) factory;
-    }
-
-    /**
-     * Indicates whether the given {@link SSLSocket} was created by this distribution of Conscrypt.
-     */
-    public static boolean isConscrypt(SSLSocket socket) {
-        if (socket instanceof AbstractConscryptSocket) {
-            return true;
-        }
-        try {
-            if (Class.forName("com.android.org.conscrypt.AbstractConscryptSocket").isInstance(socket)) {
-                return true;
-            }
-        } catch (ClassNotFoundException e) {
-        }
-        return false;
-    }
-
-    private static boolean isThisConscrypt(SSLSocket socket) {
-        return socket instanceof AbstractConscryptSocket;
-    }
-
-    private static AbstractConscryptSocket toConscrypt(SSLSocket socket) {
-        return (AbstractConscryptSocket) socket;
-    }
-
-    /**
-     * Indicates whether the given {@link SSLEngine} was created by this distribution of Conscrypt.
-     */
-    public static boolean isConscrypt(SSLEngine engine) {
-        if (engine instanceof AbstractConscryptEngine) {
-            return true;
-        }
-        try {
-            if (Class.forName("com.android.org.conscrypt.AbstractConscryptEngine").isInstance(engine)) {
-                return true;
-            }
-        } catch (ClassNotFoundException e) {
-        }
-        return false;
-    }
-
-    private static boolean isThisConscrypt(SSLEngine engine) {
-        return engine instanceof AbstractConscryptEngine;
-    }
-
-    private static AbstractConscryptEngine toConscrypt(SSLEngine engine) {
-        return (AbstractConscryptEngine) engine;
-    }
-
-    /**
-     * Indicates whether the given {@link TrustManager} was created by this distribution of
-     * Conscrypt.
-     */
-    public static boolean isConscrypt(TrustManager trustManager) {
-        if (trustManager instanceof TrustManagerImpl) {
-            return true;
-        }
-        try {
-            if (Class.forName("com.android.org.conscrypt.TrustManagerImpl").isInstance(trustManager)) {
-                return true;
-            }
-        } catch (ClassNotFoundException e) {
-        }
-        return false;
-    }
-
-    private static boolean isThisConscrypt(TrustManager trustManager) {
-        return trustManager instanceof TrustManagerImpl;
-    }
-
-    private static TrustManagerImpl toConscrypt(TrustManager trustManager) {
-        return (TrustManagerImpl) trustManager;
     }
 
     /**
@@ -409,6 +241,13 @@ public final class Conscrypt {
     }
 
     /**
+     * Indicates whether the given {@link SSLContext} was created by this distribution of Conscrypt.
+     */
+    public static boolean isConscrypt(SSLContext context) {
+        return context.getProvider() instanceof OpenSSLProvider;
+    }
+
+    /**
      * Constructs a new instance of the preferred {@link SSLContextSpi}.
      */
     public static SSLContextSpi newPreferredSSLContextSpi() {
@@ -420,36 +259,40 @@ public final class Conscrypt {
      * Sets the client-side persistent cache to be used by the context.
      */
     public static void setClientSessionCache(SSLContext context, SSLClientSessionCache cache) {
-        if (isThisConscrypt(context)) {
-            invokeConscryptMethod(context.getClientSessionContext(), "setPersistentCache",
-                                new Class<?>[]{ SSLClientSessionCache.class },
-                                new Object[]{ cache }, void.class);
-        } else if (!isConscrypt(context)) {
+        SSLSessionContext clientContext = context.getClientSessionContext();
+        if (!(clientContext instanceof ClientSessionContext)) {
             throw new IllegalArgumentException(
-                                "Not a conscrypt client context: " + context.getClass().getName());
-        } else {
-            invokeConscryptMethod(context.getClientSessionContext(), "setPersistentCache",
-                                new Class<?>[]{ SSLClientSessionCache.class },
-                                new Object[]{ cache }, void.class);
+                    "Not a conscrypt client context: " + clientContext.getClass().getName());
         }
+        ((ClientSessionContext) clientContext).setPersistentCache(cache);
     }
 
     /**
      * Sets the server-side persistent cache to be used by the context.
      */
     public static void setServerSessionCache(SSLContext context, SSLServerSessionCache cache) {
-        if (isThisConscrypt(context)) {
-            invokeConscryptMethod(context.getServerSessionContext(), "setPersistentCache",
-                                new Class<?>[]{ SSLServerSessionCache.class },
-                                new Object[]{ cache }, void.class);
-        } else if (!isConscrypt(context)) {
+        SSLSessionContext serverContext = context.getServerSessionContext();
+        if (!(serverContext instanceof ServerSessionContext)) {
             throw new IllegalArgumentException(
-                                "Not a conscrypt client context: " + context.getClass().getName());
-        } else {
-            invokeConscryptMethod(context.getServerSessionContext(), "setPersistentCache",
-                                new Class<?>[]{ SSLServerSessionCache.class },
-                                new Object[]{ cache }, void.class);
+                    "Not a conscrypt client context: " + serverContext.getClass().getName());
         }
+        ((ServerSessionContext) serverContext).setPersistentCache(cache);
+    }
+
+    /**
+     * Indicates whether the given {@link SSLSocketFactory} was created by this distribution of
+     * Conscrypt.
+     */
+    public static boolean isConscrypt(SSLSocketFactory factory) {
+        return factory instanceof OpenSSLSocketFactoryImpl;
+    }
+
+    private static OpenSSLSocketFactoryImpl toConscrypt(SSLSocketFactory factory) {
+        if (!isConscrypt(factory)) {
+            throw new IllegalArgumentException(
+                    "Not a conscrypt socket factory: " + factory.getClass().getName());
+        }
+        return (OpenSSLSocketFactoryImpl) factory;
     }
 
     /**
@@ -466,15 +309,23 @@ public final class Conscrypt {
      */
     @ExperimentalApi
     public static void setUseEngineSocket(SSLSocketFactory factory, boolean useEngineSocket) {
-        if (isThisConscrypt(factory)) {
-            toConscrypt(factory).setUseEngineSocket(useEngineSocket);
-        } else if (!isConscrypt(factory)) {
+        toConscrypt(factory).setUseEngineSocket(useEngineSocket);
+    }
+
+    /**
+     * Indicates whether the given {@link SSLServerSocketFactory} was created by this distribution
+     * of Conscrypt.
+     */
+    public static boolean isConscrypt(SSLServerSocketFactory factory) {
+        return factory instanceof OpenSSLServerSocketFactoryImpl;
+    }
+
+    private static OpenSSLServerSocketFactoryImpl toConscrypt(SSLServerSocketFactory factory) {
+        if (!isConscrypt(factory)) {
             throw new IllegalArgumentException(
-                                "Not a conscrypt socket factory: " + factory.getClass().getName());
-        } else {
-            invokeConscryptMethod(factory, "setUseEngineSocket", new Class<?>[]{ boolean.class },
-                                new Object[]{ useEngineSocket }, void.class);
+                    "Not a conscrypt server socket factory: " + factory.getClass().getName());
         }
+        return (OpenSSLServerSocketFactoryImpl) factory;
     }
 
     /**
@@ -482,15 +333,22 @@ public final class Conscrypt {
      */
     @ExperimentalApi
     public static void setUseEngineSocket(SSLServerSocketFactory factory, boolean useEngineSocket) {
-        if (isThisConscrypt(factory)) {
-            toConscrypt(factory).setUseEngineSocket(useEngineSocket);
-        } else if (!isConscrypt(factory)) {
+        toConscrypt(factory).setUseEngineSocket(useEngineSocket);
+    }
+
+    /**
+     * Indicates whether the given {@link SSLSocket} was created by this distribution of Conscrypt.
+     */
+    public static boolean isConscrypt(SSLSocket socket) {
+        return socket instanceof AbstractConscryptSocket;
+    }
+
+    private static AbstractConscryptSocket toConscrypt(SSLSocket socket) {
+        if (!isConscrypt(socket)) {
             throw new IllegalArgumentException(
-                                "Not a conscrypt server socket factory: " + factory.getClass().getName());
-        } else {
-            invokeConscryptMethod(factory, "setUseEngineSocket", new Class<?>[]{ boolean.class },
-                                new Object[]{ useEngineSocket }, void.class);
+                    "Not a conscrypt socket: " + socket.getClass().getName());
         }
+        return (AbstractConscryptSocket) socket;
     }
 
     /**
@@ -502,15 +360,7 @@ public final class Conscrypt {
      * @param hostname the desired SNI hostname, or null to disable
      */
     public static void setHostname(SSLSocket socket, String hostname) {
-        if (isThisConscrypt(socket)) {
-            toConscrypt(socket).setHostname(hostname);
-        } else if (!isConscrypt(socket)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt socket: " + socket.getClass().getName());
-        } else {
-            invokeConscryptMethod(socket, "setHostname", new Class<?>[] { String.class },
-                    new Object[] { hostname }, void.class);
-        }
+        toConscrypt(socket).setHostname(hostname);
     }
 
     /**
@@ -519,15 +369,7 @@ public final class Conscrypt {
      * returning the hostname.
      */
     public static String getHostname(SSLSocket socket) {
-        if (isThisConscrypt(socket)) {
-            return toConscrypt(socket).getHostname();
-        } else if (!isConscrypt(socket)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt socket: " + socket.getClass().getName());
-        } else {
-            return invokeConscryptMethod(socket, "getHostname", new Class<?>[] { },
-                    new Object[] { }, String.class);
-        }
+        return toConscrypt(socket).getHostname();
     }
 
     /**
@@ -535,15 +377,7 @@ public final class Conscrypt {
      * not perform a reverse DNS lookup. This is typically used during session creation.
      */
     public static String getHostnameOrIP(SSLSocket socket) {
-        if (isThisConscrypt(socket)) {
-            return toConscrypt(socket).getHostnameOrIP();
-        } else if (!isConscrypt(socket)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt socket: " + socket.getClass().getName());
-        } else {
-            return invokeConscryptMethod(socket, "getHostnameOrIP", new Class<?>[] { },
-                    new Object[] { }, String.class);
-        }
+        return toConscrypt(socket).getHostnameOrIP();
     }
 
     /**
@@ -553,15 +387,7 @@ public final class Conscrypt {
      * @param useSessionTickets True to enable session tickets
      */
     public static void setUseSessionTickets(SSLSocket socket, boolean useSessionTickets) {
-        if (isThisConscrypt(socket)) {
-            toConscrypt(socket).setUseSessionTickets(useSessionTickets);
-        } else if (!isConscrypt(socket)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt socket: " + socket.getClass().getName());
-        } else {
-            invokeConscryptMethod(socket, "setUseSessionTickets", new Class<?>[] { boolean.class },
-                    new Object[] { useSessionTickets }, void.class);
-        }
+        toConscrypt(socket).setUseSessionTickets(useSessionTickets);
     }
 
     /**
@@ -575,15 +401,7 @@ public final class Conscrypt {
      * started.
      */
     public static void setChannelIdEnabled(SSLSocket socket, boolean enabled) {
-        if (isThisConscrypt(socket)) {
-            toConscrypt(socket).setChannelIdEnabled(enabled);
-        } else if (!isConscrypt(socket)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt socket: " + socket.getClass().getName());
-        } else {
-            invokeConscryptMethod(socket, "setChannelIdEnabled", new Class<?>[] { boolean.class },
-                    new Object[] { enabled }, void.class);
-        }
+        toConscrypt(socket).setChannelIdEnabled(enabled);
     }
 
     /**
@@ -597,15 +415,7 @@ public final class Conscrypt {
      * @throws SSLException if channel ID is available but could not be obtained.
      */
     public static byte[] getChannelId(SSLSocket socket) throws SSLException {
-        if (isThisConscrypt(socket)) {
-            return toConscrypt(socket).getChannelId();
-        } else if (!isConscrypt(socket)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt socket: " + socket.getClass().getName());
-        } else {
-            return invokeConscryptMethod(socket, "getChannelId", new Class<?>[] { },
-                    new Object[] { }, byte[].class);
-        }
+        return toConscrypt(socket).getChannelId();
     }
 
     /**
@@ -623,15 +433,7 @@ public final class Conscrypt {
      * started.
      */
     public static void setChannelIdPrivateKey(SSLSocket socket, PrivateKey privateKey) {
-        if (isThisConscrypt(socket)) {
-            toConscrypt(socket).setChannelIdPrivateKey(privateKey);
-        } else if (!isConscrypt(socket)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt socket: " + socket.getClass().getName());
-        } else {
-            invokeConscryptMethod(socket, "setChannelIdPrivateKey", new Class<?>[] { PrivateKey.class },
-                    new Object[] { privateKey }, void.class);
-        }
+        toConscrypt(socket).setChannelIdPrivateKey(privateKey);
     }
 
     /**
@@ -641,15 +443,7 @@ public final class Conscrypt {
      * @return the selected protocol or {@code null} if no protocol was agreed upon.
      */
     public static String getApplicationProtocol(SSLSocket socket) {
-        if (isThisConscrypt(socket)) {
-            return toConscrypt(socket).getApplicationProtocol();
-        } else if (!isConscrypt(socket)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt socket: " + socket.getClass().getName());
-        } else {
-            return invokeConscryptMethod(socket, "getApplicationProtocol", new Class<?>[] { },
-                    new Object[] { }, String.class);
-        }
+        return toConscrypt(socket).getApplicationProtocol();
     }
 
     /**
@@ -660,16 +454,8 @@ public final class Conscrypt {
      * @param selector the ALPN protocol selector
      */
     public static void setApplicationProtocolSelector(SSLSocket socket,
-            ApplicationProtocolSelector selector) {
-        if (isThisConscrypt(socket)) {
-            toConscrypt(socket).setApplicationProtocolSelector(selector);
-        } else if (!isConscrypt(socket)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt socket: " + socket.getClass().getName());
-        } else {
-            invokeConscryptMethod(socket, "setApplicationProtocolSelector", new Class<?>[] { ApplicationProtocolSelector.class },
-                    new Object[] { selector }, void.class);
-        }
+        ApplicationProtocolSelector selector) {
+        toConscrypt(socket).setApplicationProtocolSelector(selector);
     }
 
     /**
@@ -682,15 +468,7 @@ public final class Conscrypt {
      * array is null or an empty (zero-length) string
      */
     public static void setApplicationProtocols(SSLSocket socket, String[] protocols) {
-        if (isThisConscrypt(socket)) {
-            toConscrypt(socket).setApplicationProtocols(protocols);
-        } else if (!isConscrypt(socket)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt socket: " + socket.getClass().getName());
-        } else {
-            invokeConscryptMethod(socket, "setApplicationProtocols", new Class<?>[] { String[].class },
-                    new Object[] { protocols }, void.class);
-        }
+        toConscrypt(socket).setApplicationProtocols(protocols);
     }
 
     /**
@@ -701,59 +479,49 @@ public final class Conscrypt {
      * indications are not being used. Always returns a new array.
      */
     public static String[] getApplicationProtocols(SSLSocket socket) {
-        if (isThisConscrypt(socket)) {
-            return toConscrypt(socket).getApplicationProtocols();
-        } else if (!isConscrypt(socket)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt socket: " + socket.getClass().getName());
-        } else {
-            return invokeConscryptMethod(socket, "getApplicationProtocols", new Class<?>[] { },
-                    new Object[] { }, String[].class);
-        }
+        return toConscrypt(socket).getApplicationProtocols();
     }
 
     /**
-     * Returns the tls-unique channel binding value for this connection, per RFC 5929. This
+     * Returns the tls-unique channel binding value for this connection, per RFC 5929.  This
      * will return {@code null} if there is no such value available, such as if the handshake
      * has not yet completed or this connection is closed.
      */
     public static byte[] getTlsUnique(SSLSocket socket) {
-        if (isThisConscrypt(socket)) {
-            return toConscrypt(socket).getTlsUnique();
-        } else if (!isConscrypt(socket)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt socket: " + socket.getClass().getName());
-        } else {
-            return invokeConscryptMethod(socket, "getTlsUnique", new Class<?>[] { },
-                    new Object[] { }, byte[].class);
-        }
+        return toConscrypt(socket).getTlsUnique();
     }
 
     /**
      * Exports a value derived from the TLS master secret as described in RFC 5705.
      *
-     * @param label the label to use in calculating the exported value. This must be
+     * @param label the label to use in calculating the exported value.  This must be
      * an ASCII-only string.
      * @param context the application-specific context value to use in calculating the
-     * exported value. This may be {@code null} to use no application context, which is
+     * exported value.  This may be {@code null} to use no application context, which is
      * treated differently than an empty byte array.
      * @param length the number of bytes of keying material to return.
      * @return a value of the specified length, or {@code null} if the handshake has not yet
-     * completed or the connection is closed.
+     * completed or the connection has been closed.
      * @throws SSLException if the value could not be exported.
      */
     public static byte[] exportKeyingMaterial(SSLSocket socket, String label, byte[] context,
             int length) throws SSLException {
-        if (isThisConscrypt(socket)) {
-            return toConscrypt(socket).exportKeyingMaterial(label, context, length);
-        } else if (!isConscrypt(socket)) {
+        return toConscrypt(socket).exportKeyingMaterial(label, context, length);
+    }
+
+    /**
+     * Indicates whether the given {@link SSLEngine} was created by this distribution of Conscrypt.
+     */
+    public static boolean isConscrypt(SSLEngine engine) {
+        return engine instanceof AbstractConscryptEngine;
+    }
+
+    private static AbstractConscryptEngine toConscrypt(SSLEngine engine) {
+        if (!isConscrypt(engine)) {
             throw new IllegalArgumentException(
-                                "Not a conscrypt socket: " + socket.getClass().getName());
-        } else {
-            return invokeConscryptMethod(socket, "exportKeyingMaterial",
-                    new Class<?>[] { String.class, byte[].class, int.class },
-                    new Object[] { label, context, length }, byte[].class);
+                    "Not a conscrypt engine: " + engine.getClass().getName());
         }
+        return (AbstractConscryptEngine) engine;
     }
 
     /**
@@ -763,38 +531,20 @@ public final class Conscrypt {
      */
     @ExperimentalApi
     public static void setBufferAllocator(SSLEngine engine, BufferAllocator bufferAllocator) {
-        if (isThisConscrypt(engine)) {
-            toConscrypt(engine).setBufferAllocator(bufferAllocator);
-        } else if (!isConscrypt(engine)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt engine: " + engine.getClass().getName());
-        } else {
-            invokeConscryptMethod(engine, "setBufferAllocator", new Class<?>[] { BufferAllocator.class },
-                    new Object[] { bufferAllocator }, void.class);
-        }
+        toConscrypt(engine).setBufferAllocator(bufferAllocator);
     }
 
     /**
-     * Provides the given socket with the provided bufferAllocator. If the given socket is a
+     * Provides the given socket with the provided bufferAllocator.  If the given socket is a
      * Conscrypt socket but does not use buffer allocators, this method does nothing.
      * @throws IllegalArgumentException if the provided socket is not a Conscrypt socket.
      * @throws IllegalStateException if the provided socket has already begun its handshake.
      */
     @ExperimentalApi
     public static void setBufferAllocator(SSLSocket socket, BufferAllocator bufferAllocator) {
-        // This method has special logic. The reflection should only happen if isThisConscrypt returns false.
-        if (isThisConscrypt(socket)) {
-            AbstractConscryptSocket s = toConscrypt(socket);
-            if (s instanceof ConscryptEngineSocket) {
-                ((ConscryptEngineSocket) s).setBufferAllocator(bufferAllocator);
-            }
-        } else if (!isConscrypt(socket)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt socket: " + socket.getClass().getName());
-        } else {
-            // Apply reflection fallback if not a Conscrypt socket
-            invokeConscryptMethod(socket, "setBufferAllocator", new Class<?>[] { BufferAllocator.class },
-                    new Object[] { bufferAllocator }, void.class);
+        AbstractConscryptSocket s = toConscrypt(socket);
+        if (s instanceof ConscryptEngineSocket) {
+            ((ConscryptEngineSocket) s).setBufferAllocator(bufferAllocator);
         }
     }
 
@@ -815,15 +565,7 @@ public final class Conscrypt {
      * @param hostname the desired SNI hostname, or {@code null} to disable
      */
     public static void setHostname(SSLEngine engine, String hostname) {
-        if (isThisConscrypt(engine)) {
-            toConscrypt(engine).setHostname(hostname);
-        } else if (!isConscrypt(engine)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt engine: " + engine.getClass().getName());
-        } else {
-            invokeConscryptMethod(engine, "setHostname", new Class<?>[] { String.class },
-                    new Object[] { hostname }, void.class);
-        }
+        toConscrypt(engine).setHostname(hostname);
     }
 
     /**
@@ -832,45 +574,21 @@ public final class Conscrypt {
      * returning the hostname.
      */
     public static String getHostname(SSLEngine engine) {
-        if (isThisConscrypt(engine)) {
-            return toConscrypt(engine).getHostname();
-        } else if (!isConscrypt(engine)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt engine: " + engine.getClass().getName());
-        } else {
-            return invokeConscryptMethod(engine, "getHostname", new Class<?>[] { },
-                    new Object[] { }, String.class);
-        }
+        return toConscrypt(engine).getHostname();
     }
 
     /**
      * Returns the maximum overhead, in bytes, of sealing a record with SSL.
      */
     public static int maxSealOverhead(SSLEngine engine) {
-        if (isThisConscrypt(engine)) {
-            return toConscrypt(engine).maxSealOverhead();
-        } else if (!isConscrypt(engine)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt engine: " + engine.getClass().getName());
-        } else {
-            return invokeConscryptMethod(engine, "maxSealOverhead", new Class<?>[] { },
-                    new Object[] { }, int.class);
-        }
+        return toConscrypt(engine).maxSealOverhead();
     }
 
     /**
      * Sets a listener on the given engine for completion of the TLS handshake
      */
     public static void setHandshakeListener(SSLEngine engine, HandshakeListener handshakeListener) {
-        if (isThisConscrypt(engine)) {
-            toConscrypt(engine).setHandshakeListener(handshakeListener);
-        } else if (!isConscrypt(engine)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt engine: " + engine.getClass().getName());
-        } else {
-            invokeConscryptMethod(engine, "setHandshakeListener", new Class<?>[] { HandshakeListener.class },
-                    new Object[] { handshakeListener }, void.class);
-        }
+        toConscrypt(engine).setHandshakeListener(handshakeListener);
     }
 
     /**
@@ -884,15 +602,7 @@ public final class Conscrypt {
      * started.
      */
     public static void setChannelIdEnabled(SSLEngine engine, boolean enabled) {
-        if (isThisConscrypt(engine)) {
-            toConscrypt(engine).setChannelIdEnabled(enabled);
-        } else if (!isConscrypt(engine)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt engine: " + engine.getClass().getName());
-        } else {
-            invokeConscryptMethod(engine, "setChannelIdEnabled", new Class<?>[] { boolean.class },
-                    new Object[] { enabled }, void.class);
-        }
+        toConscrypt(engine).setChannelIdEnabled(enabled);
     }
 
     /**
@@ -906,15 +616,7 @@ public final class Conscrypt {
      * @throws SSLException if channel ID is available but could not be obtained.
      */
     public static byte[] getChannelId(SSLEngine engine) throws SSLException {
-        if (isThisConscrypt(engine)) {
-            return toConscrypt(engine).getChannelId();
-        } else if (!isConscrypt(engine)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt engine: " + engine.getClass().getName());
-        } else {
-            return invokeConscryptMethod(engine, "getChannelId", new Class<?>[] { },
-                    new Object[] { }, byte[].class);
-        }
+        return toConscrypt(engine).getChannelId();
     }
 
     /**
@@ -926,21 +628,12 @@ public final class Conscrypt {
      * @param privateKey private key (enables TLS Channel ID) or {@code null} for no key
      * (disables TLS Channel ID).
      * The private key must be an Elliptic Curve (EC) key based on the NIST P-256 curve (aka
-     * SECG secp256r1 or ANSI
-     * X9.62 prime256v1).
+     * SECG secp256r1 or ANSI X9.62 prime256v1).
      * @throws IllegalStateException if this is a server engine or if the handshake has already
      * started.
      */
     public static void setChannelIdPrivateKey(SSLEngine engine, PrivateKey privateKey) {
-        if (isThisConscrypt(engine)) {
-            toConscrypt(engine).setChannelIdPrivateKey(privateKey);
-        } else if (!isConscrypt(engine)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt engine: " + engine.getClass().getName());
-        } else {
-            invokeConscryptMethod(engine, "setChannelIdPrivateKey", new Class<?>[] { PrivateKey.class },
-                    new Object[] { privateKey }, void.class);
-        }
+        toConscrypt(engine).setChannelIdPrivateKey(privateKey);
     }
 
     /**
@@ -954,16 +647,7 @@ public final class Conscrypt {
      */
     public static SSLEngineResult unwrap(SSLEngine engine, final ByteBuffer[] srcs,
             final ByteBuffer[] dsts) throws SSLException {
-        if (isThisConscrypt(engine)) {
-            return toConscrypt(engine).unwrap(srcs, dsts);
-        } else if (!isConscrypt(engine)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt engine: " + engine.getClass().getName());
-        } else {
-            return invokeConscryptMethod(engine, "unwrap",
-                    new Class<?>[] { ByteBuffer[].class, ByteBuffer[].class },
-                    new Object[] { srcs, dsts }, SSLEngineResult.class);
-        }
+        return toConscrypt(engine).unwrap(srcs, dsts);
     }
 
     /**
@@ -982,19 +666,8 @@ public final class Conscrypt {
     public static SSLEngineResult unwrap(SSLEngine engine, final ByteBuffer[] srcs, int srcsOffset,
             final int srcsLength, final ByteBuffer[] dsts, final int dstsOffset,
             final int dstsLength) throws SSLException {
-        if (isThisConscrypt(engine)) {
-            return toConscrypt(engine).unwrap(
-                    srcs, srcsOffset, srcsLength, dsts, dstsOffset, dstsLength);
-        } else if (!isConscrypt(engine)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt engine: " + engine.getClass().getName());
-        } else {
-            return invokeConscryptMethod(engine, "unwrap",
-                    new Class<?>[] { ByteBuffer[].class, int.class, int.class,
-                            ByteBuffer[].class, int.class, int.class },
-                    new Object[] { srcs, srcsOffset, srcsLength, dsts, dstsOffset, dstsLength },
-                    SSLEngineResult.class);
-        }
+        return toConscrypt(engine).unwrap(
+                srcs, srcsOffset, srcsLength, dsts, dstsOffset, dstsLength);
     }
 
     /**
@@ -1004,15 +677,7 @@ public final class Conscrypt {
      * @param useSessionTickets True to enable session tickets
      */
     public static void setUseSessionTickets(SSLEngine engine, boolean useSessionTickets) {
-        if (isThisConscrypt(engine)) {
-            toConscrypt(engine).setUseSessionTickets(useSessionTickets);
-        } else if (!isConscrypt(engine)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt engine: " + engine.getClass().getName());
-        } else {
-            invokeConscryptMethod(engine, "setUseSessionTickets", new Class<?>[] { boolean.class },
-                    new Object[] { useSessionTickets }, void.class);
-        }
+        toConscrypt(engine).setUseSessionTickets(useSessionTickets);
     }
 
     /**
@@ -1020,20 +685,12 @@ public final class Conscrypt {
      *
      * @param engine the engine being configured
      * @param protocols the protocols in descending order of preference. If empty, no protocol
-     * indications will be used. This array will be copied.
+     * indications will be used.  This array will be copied.
      * @throws IllegalArgumentException - if protocols is null, or if any element in a non-empty
      * array is null or an empty (zero-length) string
      */
     public static void setApplicationProtocols(SSLEngine engine, String[] protocols) {
-        if (isThisConscrypt(engine)) {
-            toConscrypt(engine).setApplicationProtocols(protocols);
-        } else if (!isConscrypt(engine)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt engine: " + engine.getClass().getName());
-        } else {
-            invokeConscryptMethod(engine, "setApplicationProtocols", new Class<?>[] { String[].class },
-                    new Object[] { protocols }, void.class);
-        }
+        toConscrypt(engine).setApplicationProtocols(protocols);
     }
 
     /**
@@ -1044,15 +701,7 @@ public final class Conscrypt {
      * indications are not being used. Always returns a new array.
      */
     public static String[] getApplicationProtocols(SSLEngine engine) {
-        if (isThisConscrypt(engine)) {
-            return toConscrypt(engine).getApplicationProtocols();
-        } else if (!isConscrypt(engine)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt engine: " + engine.getClass().getName());
-        } else {
-            return invokeConscryptMethod(engine, "getApplicationProtocols", new Class<?>[] { },
-                    new Object[] { }, String[].class);
-        }
+        return toConscrypt(engine).getApplicationProtocols();
     }
 
     /**
@@ -1063,17 +712,8 @@ public final class Conscrypt {
      * @param selector the ALPN protocol selector
      */
     public static void setApplicationProtocolSelector(SSLEngine engine,
-            ApplicationProtocolSelector selector) {
-        if (isThisConscrypt(engine)) {
-            toConscrypt(engine).setApplicationProtocolSelector(selector);
-        } else if (!isConscrypt(engine)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt engine: " + engine.getClass().getName());
-        } else {
-            invokeConscryptMethod(engine, "setApplicationProtocolSelector",
-                    new Class<?>[] { ApplicationProtocolSelector.class },
-                    new Object[] { selector }, void.class);
-        }
+        ApplicationProtocolSelector selector) {
+        toConscrypt(engine).setApplicationProtocolSelector(selector);
     }
 
     /**
@@ -1083,64 +723,55 @@ public final class Conscrypt {
      * @return the selected protocol or {@code null} if no protocol was agreed upon.
      */
     public static String getApplicationProtocol(SSLEngine engine) {
-        if (isThisConscrypt(engine)) {
-            return toConscrypt(engine).getApplicationProtocol();
-        } else if (!isConscrypt(engine)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt engine: " + engine.getClass().getName());
-        } else {
-            return invokeConscryptMethod(engine, "getApplicationProtocol", new Class<?>[] { },
-                    new Object[] { }, String.class);
-        }
+        return toConscrypt(engine).getApplicationProtocol();
     }
 
     /**
-     * Returns the tls-unique channel binding value for this connection, per RFC 5929. This
+     * Returns the tls-unique channel binding value for this connection, per RFC 5929.  This
      * will return {@code null} if there is no such value available, such as if the handshake
      * has not yet completed or this connection is closed.
      */
     public static byte[] getTlsUnique(SSLEngine engine) {
-        if (isThisConscrypt(engine)) {
-            return toConscrypt(engine).getTlsUnique();
-        } else if (!isConscrypt(engine)) {
-            throw new IllegalArgumentException(
-                                "Not a conscrypt engine: " + engine.getClass().getName());
-        } else {
-            return invokeConscryptMethod(engine, "getTlsUnique", new Class<?>[] { },
-                    new Object[] { }, byte[].class);
-        }
+        return toConscrypt(engine).getTlsUnique();
     }
 
     /**
      * Exports a value derived from the TLS master secret as described in RFC 5705.
      *
-     * @param label the label to use in calculating the exported value. This must be
+     * @param label the label to use in calculating the exported value.  This must be
      * an ASCII-only string.
      * @param context the application-specific context value to use in calculating the
-     * exported value. This may be {@code null} to use no application context, which is
+     * exported value.  This may be {@code null} to use no application context, which is
      * treated differently than an empty byte array.
      * @param length the number of bytes of keying material to return.
      * @return a value of the specified length, or {@code null} if the handshake has not yet
-     * completed or the connection is closed.
+     * completed or the connection has been closed.
      * @throws SSLException if the value could not be exported.
      */
     public static byte[] exportKeyingMaterial(SSLEngine engine, String label, byte[] context,
             int length) throws SSLException {
-        if (isThisConscrypt(engine)) {
-            return toConscrypt(engine).exportKeyingMaterial(label, context, length);
-        } else if (!isConscrypt(engine)) {
+        return toConscrypt(engine).exportKeyingMaterial(label, context, length);
+    }
+
+    /**
+     * Indicates whether the given {@link TrustManager} was created by this distribution of
+     * Conscrypt.
+     */
+    public static boolean isConscrypt(TrustManager trustManager) {
+        return trustManager instanceof TrustManagerImpl;
+    }
+
+    private static TrustManagerImpl toConscrypt(TrustManager trustManager) {
+        if (!isConscrypt(trustManager)) {
             throw new IllegalArgumentException(
-                                "Not a conscrypt engine: " + engine.getClass().getName());
-        } else {
-            return invokeConscryptMethod(engine, "exportKeyingMaterial",
-                    new Class<?>[] { String.class, byte[].class, int.class },
-                    new Object[] { label, context, length }, byte[].class);
+                "Not a Conscrypt trust manager: " + trustManager.getClass().getName());
         }
+        return (TrustManagerImpl) trustManager;
     }
 
     /**
      * Set the default hostname verifier that will be used for HTTPS endpoint identification by
-     * Conscrypt trust managers. If {@code null} (the default), endpoint identification will use
+     * Conscrypt trust managers.  If {@code null} (the default), endpoint identification will use
      * the default hostname verifier set in
      * {@link HttpsURLConnection#setDefaultHostnameVerifier(javax.net.ssl.HostnameVerifier)}.
      */
@@ -1154,35 +785,19 @@ public final class Conscrypt {
      * @see #setDefaultHostnameVerifier(ConscryptHostnameVerifier)
      */
     public synchronized static ConscryptHostnameVerifier getDefaultHostnameVerifier(TrustManager trustManager) {
-        if (isThisConscrypt(trustManager)) {
-            return toConscrypt(trustManager).getDefaultHostnameVerifier();
-        } else if (!isConscrypt(trustManager)) {
-            throw new IllegalArgumentException(
-                                "Not a Conscrypt trust manager: " + trustManager.getClass().getName());
-        } else {
-            return invokeConscryptMethod(trustManager, "getDefaultHostnameVerifier", new Class<?>[] { },
-                    new Object[] { }, ConscryptHostnameVerifier.class);
-        }
+        return TrustManagerImpl.getDefaultHostnameVerifier();
     }
 
     /**
      * Set the hostname verifier that will be used for HTTPS endpoint identification by the
-     * given trust manager. If {@code null} (the default), endpoint identification will use the
+     * given trust manager.  If {@code null} (the default), endpoint identification will use the
      * default hostname verifier set in {@link #setDefaultHostnameVerifier(ConscryptHostnameVerifier)}.
      *
      * @throws IllegalArgumentException if the provided trust manager is not a Conscrypt trust
      * manager per {@link #isConscrypt(TrustManager)}
      */
     public static void setHostnameVerifier(TrustManager trustManager, ConscryptHostnameVerifier verifier) {
-        if (isThisConscrypt(trustManager)) {
-            toConscrypt(trustManager).setHostnameVerifier(verifier);
-        } else if (!isConscrypt(trustManager)) {
-            throw new IllegalArgumentException(
-                                "Not a Conscrypt trust manager: " + trustManager.getClass().getName());
-        } else {
-            invokeConscryptMethod(trustManager, "setHostnameVerifier", new Class<?>[] { ConscryptHostnameVerifier.class },
-                    new Object[] { verifier }, void.class);
-        }
+        toConscrypt(trustManager).setHostnameVerifier(verifier);
     }
 
     /**
@@ -1194,71 +809,18 @@ public final class Conscrypt {
      * @see #setHostnameVerifier(TrustManager, ConscryptHostnameVerifier)
      */
     public static ConscryptHostnameVerifier getHostnameVerifier(TrustManager trustManager) {
-        if (isThisConscrypt(trustManager)) {
-            return toConscrypt(trustManager).getHostnameVerifier();
-        } else if (!isConscrypt(trustManager)) {
-            throw new IllegalArgumentException(
-                                "Not a Conscrypt trust manager: " + trustManager.getClass().getName());
-        } else {
-            return invokeConscryptMethod(trustManager, "getHostnameVerifier", new Class<?>[] { },
-                    new Object[] { }, ConscryptHostnameVerifier.class);
-        }
+        return toConscrypt(trustManager).getHostnameVerifier();
     }
 
     /**
      * Wraps the HttpsURLConnection.HostnameVerifier into a ConscryptHostnameVerifier
      */
     public static ConscryptHostnameVerifier wrapHostnameVerifier(final HostnameVerifier verifier) {
-        return new ConscryptHostnameVerifier() {
+        return  new ConscryptHostnameVerifier() {
             @Override
             public boolean verify(X509Certificate[] certificates, String hostname, SSLSession session) {
                 return verifier.verify(hostname, session);
             }
         };
-    }
-
-    /**
-     * Generic helper method for invoking methods on potentially non-Conscrypt SSLSocket/SSLEngine
-     * instances via reflection.
-     *
-     * @param instance The SSLSocket or SSLEngine instance.
-     * @param methodName The name of the method to invoke.
-     * @param paramTypes An array of Class objects representing the parameter types of the method.
-     * @param args An array of objects to be passed as arguments to the method.
-     * @param returnType The Class object representing the expected return type. Use `void.class` for void methods.
-     * @param <T> The generic type of the return value.
-     * @return The result of the method invocation, or null for void methods.
-     * @throws IllegalArgumentException if the invoked method throws a checked exception, a RuntimeException, Error, or if reflection fails.
-     */
-    private static <T> T invokeConscryptMethod(Object instance, String methodName, Class<?>[] paramTypes,
-            Object[] args, Class<T> returnType)
-            throws IllegalArgumentException {
-        try {
-            Method method = instance.getClass().getDeclaredMethod(methodName, paramTypes);
-            Object result = method.invoke(instance, args);
-            if (returnType == void.class) {
-                return null;
-            }
-            return returnType.cast(result);
-        } catch (InvocationTargetException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof SSLException || cause instanceof IOException || cause instanceof IllegalStateException) {
-                IllegalArgumentException wrapped = new IllegalArgumentException(
-                        "Reflected method '" + methodName + "' threw a checked exception: " + cause.getMessage(), cause);
-                throw wrapped;
-            } else if (cause instanceof RuntimeException) {
-                throw (RuntimeException) cause;
-            } else if (cause instanceof Error) {
-                throw (Error) cause;
-            } else {
-                IllegalArgumentException wrapped = new IllegalArgumentException(
-                        "Unexpected Throwable from reflected method '" + methodName + "': " + cause.getClass().getName() + ": " + cause.getMessage(), cause);
-                throw wrapped;
-            }
-        } catch (Exception e) {
-            IllegalArgumentException wrapped = new IllegalArgumentException(
-                    "Failed reflection fallback for method '" + methodName + "': " + e.getMessage(), e);
-            throw wrapped;
-        }
     }
 }
