@@ -16,6 +16,8 @@
 
 package android.conscrypt.nsc;
 
+import static com.android.org.conscrypt.net.flags.Flags.networkSecurityConfigLocalhost;
+
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.res.Resources;
@@ -56,6 +58,7 @@ public class XmlConfigSource implements ConfigSource {
 
     private boolean mInitialized;
     private NetworkSecurityConfig mDefaultConfig;
+    private NetworkSecurityConfig mLocalhostConfig;
     private Set<Pair<Domain, NetworkSecurityConfig>> mDomainMap;
     private Context mContext;
 
@@ -67,14 +70,22 @@ public class XmlConfigSource implements ConfigSource {
         mDebugBuild = (mApplicationInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
     }
 
+    @Override
     public Set<Pair<Domain, NetworkSecurityConfig>> getPerDomainConfigs() {
         ensureInitialized();
         return mDomainMap;
     }
 
+    @Override
     public NetworkSecurityConfig getDefaultConfig() {
         ensureInitialized();
         return mDefaultConfig;
+    }
+
+    @Override
+    public NetworkSecurityConfig getLocalhostConfig() {
+        ensureInitialized();
+        return mLocalhostConfig;
     }
 
     private static final String getConfigString(int configType) {
@@ -390,6 +401,7 @@ public class XmlConfigSource implements ConfigSource {
         // Build the per-domain config mapping.
         Set<Pair<Domain, NetworkSecurityConfig>> configs = new ArraySet<>();
 
+        boolean isLocalhostDefined = false;
         for (Pair<NetworkSecurityConfig.Builder, Set<Domain>> entry : builders) {
             NetworkSecurityConfig.Builder builder = entry.first;
             Set<Domain> domains = entry.second;
@@ -405,8 +417,18 @@ public class XmlConfigSource implements ConfigSource {
             addDebugAnchorsIfNeeded(debugConfigBuilder, builder);
             NetworkSecurityConfig config = builder.build();
             for (Domain domain : domains) {
+                if (domain.isLocalhost()) {
+                    isLocalhostDefined = true;
+                }
                 configs.add(new Pair<>(domain, config));
             }
+        }
+        if (networkSecurityConfigLocalhost() && !isLocalhostDefined) {
+            NetworkSecurityConfig.Builder localhostBuilder =
+                    NetworkSecurityConfig.getLocalhostBuilder();
+            addDebugAnchorsIfNeeded(debugConfigBuilder, localhostBuilder);
+            localhostBuilder.setParent(platformDefaultBuilder);
+            mLocalhostConfig = localhostBuilder.build();
         }
         mDefaultConfig = baseConfigBuilder.build();
         mDomainMap = configs;
