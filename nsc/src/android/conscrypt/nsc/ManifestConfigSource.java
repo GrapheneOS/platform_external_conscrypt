@@ -16,6 +16,8 @@
 
 package android.conscrypt.nsc;
 
+import static com.android.org.conscrypt.net.flags.Flags.networkSecurityConfigLocalhost;
+
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.util.Log;
@@ -48,6 +50,11 @@ public class ManifestConfigSource implements ConfigSource {
     @Override
     public NetworkSecurityConfig getDefaultConfig() {
         return getConfigSource().getDefaultConfig();
+    }
+
+    @Override
+    public NetworkSecurityConfig getLocalhostConfig() {
+        return getConfigSource().getLocalhostConfig();
     }
 
     private ConfigSource getConfigSource() {
@@ -91,17 +98,28 @@ public class ManifestConfigSource implements ConfigSource {
     private static final class DefaultConfigSource implements ConfigSource {
 
         private final NetworkSecurityConfig mDefaultConfig;
+        private final NetworkSecurityConfig mLocalhostConfig;
 
         DefaultConfigSource(boolean usesCleartextTraffic, ApplicationInfo info) {
             mDefaultConfig =
                     NetworkSecurityConfig.getDefaultBuilder(info)
                             .setCleartextTrafficPermitted(usesCleartextTraffic)
                             .build();
+            if (networkSecurityConfigLocalhost()) {
+                mLocalhostConfig = NetworkSecurityConfig.getLocalhostBuilder().build();
+            } else {
+                mLocalhostConfig = null;
+            }
         }
 
         @Override
         public NetworkSecurityConfig getDefaultConfig() {
             return mDefaultConfig;
+        }
+
+        @Override
+        public NetworkSecurityConfig getLocalhostConfig() {
+            return mLocalhostConfig;
         }
 
         @Override
