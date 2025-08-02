@@ -22,10 +22,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 
 import android.platform.test.annotations.RequiresFlagsEnabled;
-import android.platform.test.flag.junit.CheckFlagsRule;
-import android.platform.test.flag.junit.DeviceFlagsValueProvider;
 
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -35,9 +32,6 @@ import java.util.List;
 
 @RunWith(JUnit4.class)
 public class PakeClientKeyManagerParametersTest {
-    @Rule
-    public final CheckFlagsRule mCheckFlagsRule = DeviceFlagsValueProvider.createCheckFlagsRule();
-
     private static final byte[] PASSWORD = new byte[] {1, 2, 3};
     private static final byte[] CLIENT_ID = new byte[] {4, 5, 6};
     private static final byte[] SERVER_ID = new byte[] {7, 8, 9};
