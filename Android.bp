@@ -861,7 +861,6 @@ java_test {
     libs: [
         "conscrypt",
         "core-test-rules",
-        "flag-junit",
         "junit",
         "mockito-target-minus-junit4",
         "framework-statsd.stubs.module_lib",
