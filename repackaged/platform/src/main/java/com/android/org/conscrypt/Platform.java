@@ -494,9 +494,6 @@ final public class Platform {
                         hostname)) {
                 return true;
             }
-            if (com.android.org.conscrypt.net.flags.Flags.certificateTransparencyDryRun()) {
-                return true;
-            }
         }
         return false;
     }
@@ -508,8 +505,6 @@ final public class Platform {
         } else if (NetworkSecurityPolicy.getInstance()
                            .isCertificateTransparencyVerificationRequired(hostname)) {
             return CertificateTransparencyVerificationReason.DOMAIN_OPT_IN;
-        } else if (com.android.org.conscrypt.net.flags.Flags.certificateTransparencyDryRun()) {
-            return CertificateTransparencyVerificationReason.DRY_RUN;
         }
         return CertificateTransparencyVerificationReason.UNKNOWN;
     }
