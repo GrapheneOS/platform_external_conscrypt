@@ -153,7 +153,7 @@ public class OpenSSLX509CertificateFactory extends CertificateFactorySpi {
                         if (Arrays.equals(buffer, PEM_MARKER)) {
                             return fromX509PemInputStream(pbis);
                         }
-                        pbis.read();
+                        int unused = pbis.read();
                     }
                 }
                 throw new ParsingException("No certificate found");

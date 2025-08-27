@@ -59,7 +59,7 @@ public abstract class OpenSSLContextImpl extends SSLContextSpi {
 
     /** Allows outside callers to get the preferred SSLContext. */
     @android.compat.annotation.UnsupportedAppUsage
-    static OpenSSLContextImpl getPreferred() {
+    public static OpenSSLContextImpl getPreferred() {
         return new TLSv13();
     }
 
