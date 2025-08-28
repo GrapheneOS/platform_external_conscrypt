@@ -25,15 +25,6 @@ flag {
 }
 
 flag {
-    name: "certificate_transparency_dry_run"
-    namespace: "network_security"
-    description: "This flag controls whether Conscrypt will trigger a dry-run of the verification, even for apps that have not enabled CT"
-    bug: "401453445"
-    # APIs provided by a mainline module can only use a frozen flag.
-    is_fixed_read_only: true
-}
-
-flag {
     name: "network_security_config"
     namespace: "network_security"
     description: "This flag controls whether the NetworkSecurityConfig is provided by Conscrypt"
