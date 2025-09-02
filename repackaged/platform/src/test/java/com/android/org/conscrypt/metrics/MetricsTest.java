@@ -20,12 +20,14 @@ package com.android.org.conscrypt.metrics;
 import static org.junit.Assert.assertEquals;
 
 import android.util.StatsEvent;
+
 import com.android.org.conscrypt.Platform;
 import com.android.org.conscrypt.TestUtils;
+import com.android.org.conscrypt.metrics.OptionalMethod;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import com.android.org.conscrypt.metrics.OptionalMethod;
 
 /**
  * @hide This class is not part of the Android public SDK API

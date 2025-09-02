@@ -53,9 +53,6 @@ import com.android.org.conscrypt.tlswire.handshake.ServerNameHelloExtension;
 import com.android.org.conscrypt.tlswire.record.TlsProtocols;
 import com.android.org.conscrypt.tlswire.record.TlsRecord;
 
-import libcore.junit.util.SwitchTargetSdkVersionRule;
-import libcore.junit.util.SwitchTargetSdkVersionRule.TargetSdkVersion;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -498,15 +495,17 @@ public class SSLSocketVersionCompatibilityTest {
         test_SSLSocket_setUseClientMode(true, false);
     }
 
-    @Test(expected = SSLHandshakeException.class)
+    @Test
     public void testClientMode_reverse() throws Exception {
         // Client is server and server is client.
-        test_SSLSocket_setUseClientMode(false, true);
+        assertThrows(
+                SSLHandshakeException.class, () -> test_SSLSocket_setUseClientMode(false, true));
     }
 
-    @Test(expected = SSLHandshakeException.class)
+    @Test
     public void testClientMode_bothClient() throws Exception {
-        test_SSLSocket_setUseClientMode(true, true);
+        assertThrows(
+                SSLHandshakeException.class, () -> test_SSLSocket_setUseClientMode(true, true));
     }
 
     @Test
