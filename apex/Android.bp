@@ -87,7 +87,6 @@ apex {
         "com.android.conscrypt.ld.config.txt",
         "cacerts_apex",
     ],
-    min_sdk_version: "30",
     licenses: [
         "external_conscrypt_license",
         "opensourcerequest",
