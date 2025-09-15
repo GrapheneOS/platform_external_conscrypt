@@ -494,8 +494,27 @@ final public class Platform {
         return false;
     }
 
+    private static CertificateTransparencyVerificationReason plaformCtReasonToConscryptReason(
+            int platformReason) {
+        switch (platformReason) {
+            case NetworkSecurityPolicy.CERTIFICATE_TRANSPARENCY_REASON_APP_OPT_IN:
+                return CertificateTransparencyVerificationReason.APP_OPT_IN;
+            case NetworkSecurityPolicy.CERTIFICATE_TRANSPARENCY_REASON_DOMAIN_OPT_IN:
+                return CertificateTransparencyVerificationReason.DOMAIN_OPT_IN;
+            case NetworkSecurityPolicy.CERTIFICATE_TRANSPARENCY_REASON_SDK_TARGET_DEFAULT_ENABLED:
+                return CertificateTransparencyVerificationReason.SDK_TARGET_DEFAULT_ENABLED;
+            default:
+                return CertificateTransparencyVerificationReason.UNKNOWN;
+        }
+    }
+
     public static CertificateTransparencyVerificationReason reasonCTVerificationRequired(
             String hostname) {
+        if (isSdkGreater(33)
+                && com.android.libcore.Flags.networkSecurityPolicyReasonCtEnabledApi()) {
+            return plaformCtReasonToConscryptReason(NetworkSecurityPolicy.getInstance()
+                            .getCertificateTransparencyVerificationReason(hostname));
+        }
         if (NetworkSecurityPolicy.getInstance().isCertificateTransparencyVerificationRequired("")) {
             return CertificateTransparencyVerificationReason.APP_OPT_IN;
         } else if (NetworkSecurityPolicy.getInstance()
