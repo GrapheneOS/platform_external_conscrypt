@@ -24,7 +24,8 @@ import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLEngine;
 
 /**
- * @hide This class is not part of the Android public SDK API
+ * Provider of key material for Spake2Plus
+ * @hide  This class is not part of the Android public SDK API
  * @hide This class is not part of the Android public SDK API
  */
 @Internal
@@ -36,8 +37,8 @@ public class Spake2PlusKeyManager implements KeyManager {
     private final boolean isClient;
     private final int handshakeLimit;
 
-    Spake2PlusKeyManager(byte[] context, byte[] password, byte[] idProver,
-            byte[] idVerifier, boolean isClient, int handshakeLimit) {
+    Spake2PlusKeyManager(byte[] context, byte[] password, byte[] idProver, byte[] idVerifier,
+            boolean isClient, int handshakeLimit) {
         this.context = context == null ? new byte[0] : context;
         this.password = password;
         this.idProver = idProver == null ? new byte[0] : idProver;

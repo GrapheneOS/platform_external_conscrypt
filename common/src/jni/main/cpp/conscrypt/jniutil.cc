@@ -266,8 +266,7 @@ int throwIllegalBlockSizeException(JNIEnv* env, const char* message) {
 
 int throwIllegalStateException(JNIEnv* env, const char* message) {
     JNI_TRACE("throwIllegalStateException %s", message);
-    return conscrypt::jniutil::throwException(
-            env, "java/lang/IllegalStateException", message);
+    return conscrypt::jniutil::throwException(env, "java/lang/IllegalStateException", message);
 }
 
 int throwShortBufferException(JNIEnv* env, const char* message) {
@@ -413,7 +412,7 @@ int throwForX509Error(JNIEnv* env, int reason, const char* message,
 }
 
 int throwForCryptoError(JNIEnv* env, int reason, const char* message,
-                      int (*defaultThrow)(JNIEnv*, const char*)) {
+                        int (*defaultThrow)(JNIEnv*, const char*)) {
     switch (reason) {
         case ERR_R_INTERNAL_ERROR:
             return throwIOException(env, message);
@@ -425,7 +424,7 @@ int throwForCryptoError(JNIEnv* env, int reason, const char* message,
 }
 
 int throwForSslError(JNIEnv* env, int reason, const char* message,
-                      int (*defaultThrow)(JNIEnv*, const char*)) {
+                     int (*defaultThrow)(JNIEnv*, const char*)) {
     switch (reason) {
         case ERR_R_SHOULD_NOT_HAVE_BEEN_CALLED:
             return throwIllegalStateException(env, message);

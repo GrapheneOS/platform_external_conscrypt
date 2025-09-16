@@ -168,6 +168,12 @@ public class KeyPairGeneratorTest {
         putKeySize("EC", 384);
         putKeySize("EC", 521);
         putKeySize("XDH", 255);
+        putKeySize("EdDSA", 255);
+        putKeySize("ML-DSA", -1);
+        putKeySize("ML-DSA-44", -1);
+        putKeySize("ML-DSA-65", -1);
+        putKeySize("ML-DSA-87", -1);
+        putKeySize("SLH-DSA-SHA2-128S", -1);
     }
 
     /** Elliptic Curve Crypto named curves that should be supported. */
@@ -250,6 +256,12 @@ public class KeyPairGeneratorTest {
         if (StandardNames.IS_RI && expectedAlgorithm.equals("DIFFIEHELLMAN")) {
             expectedAlgorithm = "DH";
         }
+        if (expectedAlgorithm.startsWith("ML-DSA")) {
+            // In OpenJDK, KeyPairGenerator.getInstance("ML-DSA-65") returns a
+            // KeyPairGenerator with algorithm "ML-DSA-65". But the key it generates
+            // have algorithm "ML-DSA".
+            expectedAlgorithm = "ML-DSA";
+        }
         assertEquals(expectedAlgorithm, k.getAlgorithm().toUpperCase(Locale.ROOT));
         if (expectedAlgorithm.equals("DH")) {
             if (k instanceof DHPublicKey) {
@@ -266,6 +278,14 @@ public class KeyPairGeneratorTest {
                 && expectedAlgorithm.equals("RSA")) {
             // The SunMSCAPI RSA keys don't provide encoded versions at all, nor are they
             // serializable, so just skip them.
+            return;
+        }
+        if (expectedAlgorithm.equals("ML-DSA")) {
+            // ML-DSA keys are not yet serializable, so just skip them.
+            return;
+        }
+        if (expectedAlgorithm.equals("SLH-DSA-SHA2-128S")) {
+            // SLH-DSA keys are not yet serializable, so just skip them.
             return;
         }
         assertNotNull(k.getEncoded());

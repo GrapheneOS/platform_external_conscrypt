@@ -52,11 +52,12 @@ import javax.security.auth.x500.X500Principal;
 
 /**
  * Provides the Java side of our JNI glue for OpenSSL.
- *
- * <p>Note: Many methods in this class take a reference to a Java object that holds a native pointer
- * in the form of a long in addition to the long itself and don't use the Java object in the native
- * implementation. This is to prevent the Java object from becoming eligible for GC while the native
- * method is executing. See <a
+ * <p>
+ * Note: Many methods in this class take a reference to a Java object that holds a
+ * native pointer in the form of a long in addition to the long itself and don't use
+ * the Java object in the native implementation.  This is to prevent the Java object
+ * from becoming eligible for GC while the native method is executing.  See
+ * <a
  * href="https://github.com/google/error-prone/blob/master/docs/bugpattern/UnsafeFinalization.md">this</a>
  * for more details.
  * @hide This class is not part of the Android public SDK API
@@ -236,9 +237,41 @@ public final class NativeCrypto {
 
     @FastNative static native int ECDSA_size(NativeRef.EVP_PKEY pkey);
 
-    @FastNative static native int ECDSA_sign(byte[] data, byte[] sig, NativeRef.EVP_PKEY pkey);
+    @FastNative
+    static native int ECDSA_sign(byte[] data, int dataLen, byte[] sig, NativeRef.EVP_PKEY pkey);
 
-    @FastNative static native int ECDSA_verify(byte[] data, byte[] sig, NativeRef.EVP_PKEY pkey);
+    @FastNative
+    static native int ECDSA_verify(byte[] data, int dataLen, byte[] sig, NativeRef.EVP_PKEY pkey);
+
+    // --- MLDSA65 --------------------------------------------------------------
+
+    @FastNative static native byte[] MLDSA65_public_key_from_seed(byte[] privateKeySeed);
+
+    @FastNative static native byte[] MLDSA65_sign(byte[] data, int dataLen, byte[] privateKeySeed);
+
+    @FastNative
+    static native int MLDSA65_verify(byte[] data, int dataLen, byte[] sig, byte[] publicKey);
+
+    // --- MLDSA87 --------------------------------------------------------------
+
+    @FastNative static native byte[] MLDSA87_public_key_from_seed(byte[] privateKeySeed);
+
+    @FastNative static native byte[] MLDSA87_sign(byte[] data, int dataLen, byte[] privateKeySeed);
+
+    @FastNative
+    static native int MLDSA87_verify(byte[] data, int dataLen, byte[] sig, byte[] publicKey);
+
+    // --- SLHDSA_SHA2_128S --------------------------------------------------------------
+
+    @FastNative
+    static native void SLHDSA_SHA2_128S_generate_key(byte[] outPublicKey, byte[] outPrivateKey);
+
+    @FastNative
+    static native byte[] SLHDSA_SHA2_128S_sign(byte[] data, int dataLen, byte[] privateKey);
+
+    @FastNative
+    static native int SLHDSA_SHA2_128S_verify(
+            byte[] data, int dataLen, byte[] sig, byte[] publicKey);
 
     // --- Curve25519 --------------
 
@@ -812,7 +845,6 @@ public final class NativeCrypto {
     static native void X509_REVOKED_print(
             long bioRef, long x509RevokedCtx, OpenSSLX509CRLEntry holder);
 
-    @android.compat.annotation.UnsupportedAppUsage
     @FastNative
     static native void X509_REVOKED_free(long x509RevokedCtx, OpenSSLX509CRLEntry holder);
 
@@ -1429,7 +1461,7 @@ public final class NativeCrypto {
             }
             // Not sure if we need to do this for SPAKE, but the SPAKE cipher suite
             // not registered at the moment.
-            if (DEFAULT_SPAKE_CIPHER_SUITES[0] == cipherSuites[i]) {
+            if (DEFAULT_SPAKE_CIPHER_SUITES[0].equals(cipherSuites[i])) {
                 continue;
             }
 
@@ -1739,15 +1771,21 @@ public final class NativeCrypto {
     static native int ENGINE_SSL_write_direct(long ssl, NativeSsl ssl_holder, long address,
             int length, SSLHandshakeCallbacks shc) throws IOException;
 
-    /** Writes data from the given direct {@link java.nio.ByteBuffer} to the BIO. */
+    /**
+     * Writes data from the given direct {@link java.nio.ByteBuffer} to the BIO.
+     */
     static native int ENGINE_SSL_write_BIO_direct(long ssl, NativeSsl ssl_holder, long bioRef,
             long pos, int length, SSLHandshakeCallbacks shc) throws IOException;
 
-    /** Reads data from the given BIO into a direct {@link java.nio.ByteBuffer}. */
+    /**
+     * Reads data from the given BIO into a direct {@link java.nio.ByteBuffer}.
+     */
     static native int ENGINE_SSL_read_BIO_direct(long ssl, NativeSsl ssl_holder, long bioRef,
             long address, int len, SSLHandshakeCallbacks shc) throws IOException;
 
-    /** Forces the SSL object to process any data pending in the BIO. */
+    /**
+     * Forces the SSL object to process any data pending in the BIO.
+     */
     static native void ENGINE_SSL_force_read(
             long ssl, NativeSsl ssl_holder, SSLHandshakeCallbacks shc) throws IOException;
 
@@ -1758,7 +1796,9 @@ public final class NativeCrypto {
     static native void ENGINE_SSL_shutdown(
             long ssl, NativeSsl ssl_holder, SSLHandshakeCallbacks shc) throws IOException;
 
-    /** Generates a key from a password and salt using Scrypt. */
+    /**
+     * Generates a key from a password and salt using Scrypt.
+     */
     @FastNative
     static native byte[] Scrypt_generate_key(
             byte[] password, byte[] salt, int n, int r, int p, int key_len);

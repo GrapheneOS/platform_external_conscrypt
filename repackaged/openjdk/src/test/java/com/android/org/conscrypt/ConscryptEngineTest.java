@@ -27,6 +27,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.when;
@@ -215,15 +216,20 @@ public class ConscryptEngineTest {
         doMutualAuthHandshake(TestKeyStore.getClient(), TestKeyStore.getServer(), ClientAuth.NONE);
     }
 
-    @Test(expected = SSLHandshakeException.class)
+    @Test
     public void mutualAuthWithUntrustedServerShouldFail() throws Exception {
-        doMutualAuthHandshake(
-                TestKeyStore.getClientCA2(), TestKeyStore.getServer(), ClientAuth.NONE);
+        assertThrows(SSLHandshakeException.class,
+                ()
+                        -> doMutualAuthHandshake(TestKeyStore.getClientCA2(),
+                                TestKeyStore.getServer(), ClientAuth.NONE));
     }
 
-    @Test(expected = SSLHandshakeException.class)
+    @Test
     public void mutualAuthWithUntrustedClientShouldFail() throws Exception {
-        doMutualAuthHandshake(TestKeyStore.getClient(), TestKeyStore.getClient(), ClientAuth.NONE);
+        assertThrows(SSLHandshakeException.class,
+                ()
+                        -> doMutualAuthHandshake(TestKeyStore.getClient(), TestKeyStore.getClient(),
+                                ClientAuth.NONE));
     }
 
     @Test
@@ -232,10 +238,12 @@ public class ConscryptEngineTest {
                 TestKeyStore.getClient(), TestKeyStore.getServer(), ClientAuth.OPTIONAL);
     }
 
-    @Test(expected = SSLHandshakeException.class)
+    @Test
     public void optionalClientAuthShouldFail() throws Exception {
-        doMutualAuthHandshake(
-                TestKeyStore.getClient(), TestKeyStore.getClient(), ClientAuth.OPTIONAL);
+        assertThrows(SSLHandshakeException.class,
+                ()
+                        -> doMutualAuthHandshake(TestKeyStore.getClient(), TestKeyStore.getClient(),
+                                ClientAuth.OPTIONAL));
     }
 
     @Test
@@ -244,10 +252,12 @@ public class ConscryptEngineTest {
                 TestKeyStore.getServer(), TestKeyStore.getServer(), ClientAuth.REQUIRED);
     }
 
-    @Test(expected = SSLHandshakeException.class)
+    @Test
     public void requiredClientAuthShouldFail() throws Exception {
-        doMutualAuthHandshake(
-                TestKeyStore.getClient(), TestKeyStore.getClient(), ClientAuth.REQUIRED);
+        assertThrows(SSLHandshakeException.class,
+                ()
+                        -> doMutualAuthHandshake(TestKeyStore.getClient(), TestKeyStore.getClient(),
+                                ClientAuth.REQUIRED));
     }
 
     @Test

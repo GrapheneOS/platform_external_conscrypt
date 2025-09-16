@@ -45,6 +45,9 @@ import org.conscrypt.ct.LogStore;
 import org.conscrypt.ct.PolicyCompliance;
 import org.conscrypt.ct.VerificationResult;
 
+/**
+ * Implements logging for Conscrypt metrics.
+ */
 @Internal
 public final class StatsLogImpl implements StatsLog {
     private static final StatsLog INSTANCE = new StatsLogImpl();
@@ -175,15 +178,14 @@ public final class StatsLogImpl implements StatsLog {
             builder.usePooledBuffer();
             ReflexiveStatsLog.write(builder.build());
         } else {
-            ConscryptStatsLog.write(
-                atomId, success, protocol, cipherSuite, duration, source, uids);
+            ConscryptStatsLog.write(atomId, success, protocol, cipherSuite, duration, source, uids);
         }
     }
 
     private void write(int atomId, int status, int loadedCompatVersion,
             int minCompatVersionAvailable, int majorVersion, int minorVersion) {
-        ConscryptStatsLog.write(atomId, status, loadedCompatVersion,
-                minCompatVersionAvailable, majorVersion, minorVersion);
+        ConscryptStatsLog.write(atomId, status, loadedCompatVersion, minCompatVersionAvailable,
+                majorVersion, minorVersion);
     }
 
     private void write(int atomId, int verificationResult, int verificationReason,
