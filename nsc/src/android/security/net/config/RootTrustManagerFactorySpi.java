@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.conscrypt.nsc;
+package android.security.net.config;
 
 import com.android.internal.annotations.VisibleForTesting;
 
@@ -29,7 +29,6 @@ import javax.net.ssl.TrustManagerFactorySpi;
 /** @hide */
 public class RootTrustManagerFactorySpi extends TrustManagerFactorySpi {
     private ApplicationConfig mApplicationConfig;
-    private NetworkSecurityConfig mConfig;
 
     @Override
     public void engineInit(ManagerFactoryParameters spec)
@@ -61,7 +60,6 @@ public class RootTrustManagerFactorySpi extends TrustManagerFactorySpi {
     @VisibleForTesting
     public static final class ApplicationConfigParameters implements ManagerFactoryParameters {
         public final ApplicationConfig config;
-
         public ApplicationConfigParameters(ApplicationConfig config) {
             this.config = config;
         }

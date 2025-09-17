@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-package android.conscrypt.nsc;
+package android.security.net.config;
+
+import static libcore.net.NetworkSecurityPolicy.CERTIFICATE_TRANSPARENCY_REASON_APP_OPT_IN;
+import static libcore.net.NetworkSecurityPolicy.CERTIFICATE_TRANSPARENCY_REASON_DOMAIN_OPT_IN;
+import static libcore.net.NetworkSecurityPolicy.CERTIFICATE_TRANSPARENCY_REASON_SDK_TARGET_DEFAULT_ENABLED;
+import static libcore.net.NetworkSecurityPolicy.CERTIFICATE_TRANSPARENCY_REASON_UNKNOWN;
 
 import android.annotation.NonNull;
 import android.util.Pair;
@@ -29,7 +34,7 @@ import javax.net.ssl.X509TrustManager;
  * An application's network security configuration.
  *
  * <p>{@link #getConfigForHostname(String)} provides a means to obtain network security
- * configuration to be used for communicating with a specific hostname.
+ * configuration to be used for communicating with a specific hostname.</p>
  *
  * @hide
  */
@@ -51,23 +56,27 @@ public final class ApplicationConfig {
         mInitialized = false;
     }
 
+    /**
+     * @hide
+     */
     public boolean hasPerDomainConfigs() {
         ensureInitialized();
         return mConfigs != null && !mConfigs.isEmpty();
     }
 
     /**
-     * Get the {@link NetworkSecurityConfig} corresponding to the provided hostname. The most
-     * specific matching domain rule will be used. If no match exists and the hostname is considered
-     * to be localhost (according to {@link Domain#isLocalhost()}), the localhost configuration will
-     * be returned. Otherwise, the default configuration will be returned.
+     * Get the {@link NetworkSecurityConfig} corresponding to the provided hostname.
+     * The most specific matching domain rule will be used. If no match exists
+     * and the hostname is considered to be localhost (according to {@link
+     * Domain#isLocalhost()}), the localhost configuration will be returned.
+     * Otherwise, the default configuration will be returned.
      *
-     * <p>{@code NetworkSecurityConfig} objects returned by this method can be safely cached for
-     * {@code hostname}. Subsequent calls with the same hostname will always return the same {@code
-     * NetworkSecurityConfig}.
+     * {@code NetworkSecurityConfig} objects returned by this method can be safely cached for
+     * {@code hostname}. Subsequent calls with the same hostname will always return the same
+     * {@code NetworkSecurityConfig}.
      *
-     * @return {@link NetworkSecurityConfig} to be used to determine the network security
-     *     configuration for connections to {@code hostname}.
+     * @return {@link NetworkSecurityConfig} to be used to determine
+     * the network security configuration for connections to {@code hostname}.
      */
     public NetworkSecurityConfig getConfigForHostname(String hostname) {
         ensureInitialized();
@@ -130,8 +139,8 @@ public final class ApplicationConfig {
 
     /**
      * Returns {@code true} if cleartext traffic is permitted for this application, which is the
-     * case only if all configurations permit cleartext traffic. For finer-grained policy use {@link
-     * #isCleartextTrafficPermitted(String)}.
+     * case only if all configurations permit cleartext traffic. For finer-grained policy use
+     * {@link #isCleartextTrafficPermitted(String)}.
      */
     public boolean isCleartextTrafficPermitted() {
         ensureInitialized();
@@ -166,6 +175,26 @@ public final class ApplicationConfig {
      */
     public boolean isCertificateTransparencyVerificationRequired(@NonNull String hostname) {
         return getConfigForHostname(hostname).isCertificateTransparencyVerificationRequired();
+    }
+
+    /**
+     * @hide
+     */
+    public int getCertificateTransparencyVerificationReason(@NonNull String hostname) {
+        if (NetworkSecurityConfig.certificateTransparencyVerificationRequiredDefault()) {
+            return CERTIFICATE_TRANSPARENCY_REASON_SDK_TARGET_DEFAULT_ENABLED;
+        }
+        if (getConfigForHostname(null).isCertificateTransparencyVerificationRequired()) {
+            return CERTIFICATE_TRANSPARENCY_REASON_APP_OPT_IN;
+        }
+        if (getConfigForHostname(hostname).isCertificateTransparencyVerificationRequired()) {
+            return CERTIFICATE_TRANSPARENCY_REASON_DOMAIN_OPT_IN;
+        }
+        return CERTIFICATE_TRANSPARENCY_REASON_UNKNOWN;
+    }
+
+    int getDomainEncryptionMode(@NonNull String hostname) {
+        return getConfigForHostname(hostname).getDomainEncryptionMode();
     }
 
     public void handleTrustStorageUpdate() {

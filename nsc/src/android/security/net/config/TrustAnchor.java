@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package android.conscrypt.nsc;
+package android.security.net.config;
 
 import java.security.cert.X509Certificate;
-import java.util.Set;
 
 /** @hide */
-public interface CertificateSource {
-    Set<X509Certificate> getCertificates();
+public final class TrustAnchor {
+    public final X509Certificate certificate;
+    public final boolean overridesPins;
 
-    X509Certificate findBySubjectAndPublicKey(X509Certificate cert);
-
-    X509Certificate findByIssuerAndSignature(X509Certificate cert);
-
-    Set<X509Certificate> findAllByIssuerAndSignature(X509Certificate cert);
-
-    void handleTrustStorageUpdate();
+    public TrustAnchor(X509Certificate certificate, boolean overridesPins) {
+        if (certificate == null) {
+            throw new NullPointerException("certificate");
+        }
+        this.certificate = certificate;
+        this.overridesPins = overridesPins;
+    }
 }

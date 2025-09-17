@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.conscrypt.nsc;
+package android.security.net.config;
 
 import android.compat.annotation.UnsupportedAppUsage;
 
@@ -31,12 +31,13 @@ import javax.net.ssl.X509ExtendedTrustManager;
 /**
  * {@link X509ExtendedTrustManager} based on an {@link ApplicationConfig}.
  *
- * <p>This trust manager delegates to the specific trust manager for the hostname being used for the
- * connection (See {@link ApplicationConfig#getConfigForHostname(String)} and {@link
- * NetworkSecurityTrustManager}). Note that if the {@code ApplicationConfig} has per-domain
- * configurations the hostname aware {@link #checkServerTrusted(X509Certificate[], String String)}
- * must be used instead of the normal non-aware call.
+ * <p>This trust manager delegates to the specific trust manager for the hostname being used for
+ * the connection (See {@link ApplicationConfig#getConfigForHostname(String)} and
+ * {@link NetworkSecurityTrustManager}).</p>
  *
+ * Note that if the {@code ApplicationConfig} has per-domain configurations the hostname aware
+ * {@link #checkServerTrusted(X509Certificate[], String String)} must be used instead of the normal
+ * non-aware call.
  * @hide
  */
 public class RootTrustManager extends X509ExtendedTrustManager {
@@ -119,9 +120,9 @@ public class RootTrustManager extends X509ExtendedTrustManager {
     }
 
     /**
-     * Hostname aware version of {@link #checkServerTrusted(X509Certificate[], String)}. This
-     * interface is used by Conscrypt and android.net.http.X509TrustManagerExtensions do not modify
-     * without modifying those callers.
+     * Hostname aware version of {@link #checkServerTrusted(X509Certificate[], String)}.
+     * This interface is used by Conscrypt and android.net.http.X509TrustManagerExtensions do not
+     * modify without modifying those callers.
      */
     @UnsupportedAppUsage
     public List<X509Certificate> checkServerTrusted(
@@ -165,7 +166,7 @@ public class RootTrustManager extends X509ExtendedTrustManager {
      * <p>This is required by android.net.http.X509TrustManagerExtensions.
      */
     public boolean isSameTrustConfiguration(String hostname1, String hostname2) {
-        return mConfig.getConfigForHostname(hostname1)
-                .equals(mConfig.getConfigForHostname(hostname2));
+        return mConfig.getConfigForHostname(hostname1).equals(
+                mConfig.getConfigForHostname(hostname2));
     }
 }

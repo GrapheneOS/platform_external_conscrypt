@@ -622,6 +622,10 @@ java_sdk_library {
 java_sdk_library {
     name: "framework-conscrypt-nsc",
     defaults: ["framework-module-defaults"],
+
+    // TODO(b/397646538): replace this with "37". We don't want to ship this module
+    // to 36 or lower devices, because the NSConfig and NSCPolicy classes would clash
+    // with the ones with the same name in the platform.
     min_sdk_version: "36",
     sdk_version: "module_current",
 
@@ -629,15 +633,17 @@ java_sdk_library {
         "nsc/src/**/*.java",
     ],
     libs: [
-        "android.sdk.flags-aconfig-java",
-        "android.security.flags-aconfig-java-export",
         "app-compat-annotations",
         "framework-annotations-lib",
+        "framework-connectivity.stubs",
         "androidx.annotation_annotation",
         "unsupportedappusage",
         "conscrypt.module.platform.api.stubs",
         "modules-xml-utils",
         "networksecurity-aconfig-flags-lib",
+    ],
+    static_libs: [
+        "android.security.flags-aconfig-java-export",
     ],
 
     api_dir: "api/nsc",
@@ -647,7 +653,7 @@ java_sdk_library {
         "com.android.conscrypt",
     ],
     permitted_packages: [
-        "android.conscrypt.nsc",
+        "android.security",
         "com.android.org.conscrypt.net.flags",
     ],
     aconfig_declarations: [

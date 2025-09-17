@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.conscrypt.nsc;
+package android.security.net.config;
 
 import android.content.Context;
 import android.util.Log;
@@ -47,9 +47,10 @@ public final class NetworkSecurityConfigProvider extends Provider {
     }
 
     /**
-     * For a shared process, resolves conflicting values of usesCleartextTraffic. 1. Throws a
-     * RuntimeException if the shared process with conflicting usesCleartextTraffic values have per
-     * domain rules. 2. Sets the default instance to the least strict config.
+     * For a shared process, resolves conflicting values of usesCleartextTraffic.
+     * 1. Throws a RuntimeException if the shared process with conflicting
+     * usesCleartextTraffic values have per domain rules.
+     * 2. Sets the default instance to the least strict config.
      */
     public static void handleNewApplication(Context context) {
         ApplicationConfig config = new ApplicationConfig(new ManifestConfigSource(context));

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.conscrypt.nsc;
+package android.security.net.config;
 
 /**
  * {@link libcore.net.NetworkSecurityPolicy} based on an {@link ApplicationConfig}.
@@ -41,5 +41,15 @@ public class ConfigNetworkSecurityPolicy extends libcore.net.NetworkSecurityPoli
     @Override
     public boolean isCertificateTransparencyVerificationRequired(String hostname) {
         return mConfig.isCertificateTransparencyVerificationRequired(hostname);
+    }
+
+    @Override
+    public int getCertificateTransparencyVerificationReason(String hostname) {
+        return mConfig.getCertificateTransparencyVerificationReason(hostname);
+    }
+
+    @Override
+    public int getDomainEncryptionMode(@Nullable String hostname) {
+        return mConfig.getDomainEncryptionMode(hostname);
     }
 }

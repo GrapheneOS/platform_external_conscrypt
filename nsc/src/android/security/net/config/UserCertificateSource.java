@@ -14,28 +14,29 @@
  * limitations under the License.
  */
 
-package android.conscrypt.nsc;
+package android.security.net.config;
+
+import android.os.UserHandle;
 
 import java.io.File;
 
 /**
- * {@link CertificateSource} based on the system WFA CA store.
- *
+ * {@link CertificateSource} based on the user-installed trusted CA store.
  * @hide
  */
-public final class WfaCertificateSource extends DirectoryCertificateSource {
-    private static final String CACERTS_WFA_PATH =
-            "/apex/com.android.wifi/etc/security/cacerts_wfa";
-
+public final class UserCertificateSource extends DirectoryCertificateSource {
     private static class NoPreloadHolder {
-        private static final WfaCertificateSource INSTANCE = new WfaCertificateSource();
+        private static final UserCertificateSource INSTANCE = new UserCertificateSource();
     }
 
-    private WfaCertificateSource() {
-        super(new File(CACERTS_WFA_PATH));
+    private UserCertificateSource() {
+        // TODO(b/424086802): migrate to CE or DE directories.
+        super(new File(
+                new File(System.getenv("ANDROID_DATA") + "/misc/user" + UserHandle.myUserId()),
+                "cacerts-added"));
     }
 
-    public static WfaCertificateSource getInstance() {
+    public static UserCertificateSource getInstance() {
         return NoPreloadHolder.INSTANCE;
     }
 

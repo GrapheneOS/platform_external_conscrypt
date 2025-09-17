@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.conscrypt.nsc;
+package android.security.net.config;
 
 import android.content.Context;
 import android.util.ArraySet;
@@ -34,7 +34,6 @@ import java.util.Set;
 
 /**
  * {@link CertificateSource} based on certificates contained in an application resource file.
- *
  * @hide
  */
 public class ResourceCertificateSource implements CertificateSource {

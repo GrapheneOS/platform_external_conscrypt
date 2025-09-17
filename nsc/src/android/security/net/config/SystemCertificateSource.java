@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package android.conscrypt.nsc;
+package android.security.net.config;
 
+import android.os.Environment;
 import android.os.UserHandle;
 
 import com.android.internal.util.ArrayUtils;
@@ -24,7 +25,6 @@ import java.io.File;
 
 /**
  * {@link CertificateSource} based on the system trusted CA store.
- *
  * @hide
  */
 public final class SystemCertificateSource extends DirectoryCertificateSource {

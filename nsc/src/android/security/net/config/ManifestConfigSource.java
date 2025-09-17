@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.conscrypt.nsc;
+package android.security.net.config;
 
 import static com.android.org.conscrypt.net.flags.Flags.networkSecurityConfigLocalhost;
 
@@ -62,21 +62,18 @@ public class ManifestConfigSource implements ConfigSource {
             if (mConfigSource != null) {
                 return mConfigSource;
             }
-            int configResource =
-                    (android.security.Flags.conscryptNetworkSecurityConfig())
-                            ? mApplicationInfo.getNetworkSecurityConfigResourceId()
-                            : 0;
+            int configResource = (android.security.Flags.conscryptNetworkSecurityConfig())
+                    ? mApplicationInfo.getNetworkSecurityConfigResourceId()
+                    : 0;
             ConfigSource source;
             if (configResource != 0) {
                 boolean debugBuild =
                         (mApplicationInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
                 if (DBG) {
-                    Log.d(
-                            LOG_TAG,
+                    Log.d(LOG_TAG,
                             "Using Network Security Config from resource "
                                     + mContext.getResources().getResourceEntryName(configResource)
-                                    + " debugBuild: "
-                                    + debugBuild);
+                                    + " debugBuild: " + debugBuild);
                 }
                 source = new XmlConfigSource(mContext, configResource, mApplicationInfo);
             } else {
@@ -87,7 +84,7 @@ public class ManifestConfigSource implements ConfigSource {
                 // should use the network security config.
                 boolean usesCleartextTraffic =
                         (mApplicationInfo.flags & ApplicationInfo.FLAG_USES_CLEARTEXT_TRAFFIC) != 0
-                                && !mApplicationInfo.isInstantApp();
+                        && !mApplicationInfo.isInstantApp();
                 source = new DefaultConfigSource(usesCleartextTraffic, mApplicationInfo);
             }
             mConfigSource = source;
@@ -96,15 +93,13 @@ public class ManifestConfigSource implements ConfigSource {
     }
 
     private static final class DefaultConfigSource implements ConfigSource {
-
         private final NetworkSecurityConfig mDefaultConfig;
         private final NetworkSecurityConfig mLocalhostConfig;
 
         DefaultConfigSource(boolean usesCleartextTraffic, ApplicationInfo info) {
-            mDefaultConfig =
-                    NetworkSecurityConfig.getDefaultBuilder(info)
-                            .setCleartextTrafficPermitted(usesCleartextTraffic)
-                            .build();
+            mDefaultConfig = NetworkSecurityConfig.getDefaultBuilder(info)
+                                     .setCleartextTrafficPermitted(usesCleartextTraffic)
+                                     .build();
             if (networkSecurityConfigLocalhost()) {
                 mLocalhostConfig = NetworkSecurityConfig.getLocalhostBuilder().build();
             } else {

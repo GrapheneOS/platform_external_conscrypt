@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.conscrypt.nsc;
+package android.security.net.config;
 
 import static com.android.org.conscrypt.net.flags.Flags.networkSecurityConfigLocalhost;
 
@@ -201,7 +201,13 @@ public class XmlConfigSource implements ConfigSource {
 
     private boolean parseCertificateTransparency(XmlResourceParser parser)
             throws IOException, XmlPullParserException, ParserException {
-        return parser.getAttributeBooleanValue(null, "enabled", false);
+        return parser.getAttributeBooleanValue(
+                /* namespace= */ null, "enabled", /* defaultValue= */ false);
+    }
+
+    private String parseDomainEncryptionMode(XmlResourceParser parser)
+            throws IOException, XmlPullParserException, ParserException {
+        return parser.getAttributeValue(/* namespace= */ null, "mode");
     }
 
     private CertificatesEntryRef parseCertificatesEntry(
@@ -313,13 +319,18 @@ public class XmlConfigSource implements ConfigSource {
                 builders.addAll(parseConfigEntry(parser, seenDomains, builder, configType));
             } else if ("certificateTransparency".equals(tagName)) {
                 if (configType != CONFIG_BASE && configType != CONFIG_DOMAIN) {
-                    throw new ParserException(
-                            parser,
+                    throw new ParserException(parser,
                             "certificateTransparency not allowed in "
                                     + getConfigString(configType));
                 }
                 builder.setCertificateTransparencyVerificationRequired(
                         parseCertificateTransparency(parser));
+            } else if ("domainEncryption".equals(tagName)) {
+                if (configType != CONFIG_BASE && configType != CONFIG_DOMAIN) {
+                    throw new ParserException(parser,
+                            "domainEncryption not allowed in " + getConfigString(configType));
+                }
+                builder.setDomainEncryptionMode(parseDomainEncryptionMode(parser));
             } else {
                 XmlUtils.skipCurrentTag(parser);
             }
@@ -427,7 +438,7 @@ public class XmlConfigSource implements ConfigSource {
             NetworkSecurityConfig.Builder localhostBuilder =
                     NetworkSecurityConfig.getLocalhostBuilder();
             addDebugAnchorsIfNeeded(debugConfigBuilder, localhostBuilder);
-            localhostBuilder.setParent(platformDefaultBuilder);
+            localhostBuilder.setParent(baseConfigBuilder);
             mLocalhostConfig = localhostBuilder.build();
         }
         mDefaultConfig = baseConfigBuilder.build();
@@ -472,7 +483,6 @@ public class XmlConfigSource implements ConfigSource {
     }
 
     public static class ParserException extends Exception {
-
         public ParserException(XmlPullParser parser, String message, Throwable cause) {
             super(message + " at: " + parser.getPositionDescription(), cause);
         }

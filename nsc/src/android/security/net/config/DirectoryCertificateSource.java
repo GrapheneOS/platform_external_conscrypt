@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.conscrypt.nsc;
+package android.security.net.config;
 
 import android.util.ArraySet;
 import android.util.Log;
@@ -39,7 +39,6 @@ import javax.security.auth.x500.X500Principal;
 /**
  * {@link CertificateSource} based on a directory where certificates are stored as individual files
  * named after a hash of their SubjectName for more efficient lookups.
- *
  * @hide
  */
 abstract class DirectoryCertificateSource implements CertificateSource {
