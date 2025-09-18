@@ -32,7 +32,6 @@ import com.android.org.conscrypt.ct.Policy;
 import com.android.org.conscrypt.ct.PolicyImpl;
 import com.android.org.conscrypt.flags.Flags;
 import com.android.org.conscrypt.metrics.CertificateTransparencyVerificationReason;
-import com.android.org.conscrypt.metrics.NoopStatsLog;
 import com.android.org.conscrypt.metrics.OptionalMethod;
 import com.android.org.conscrypt.metrics.Source;
 import com.android.org.conscrypt.metrics.StatsLog;
@@ -45,8 +44,6 @@ import dalvik.system.VMRuntime;
 import libcore.net.NetworkSecurityPolicy;
 
 import java.io.FileDescriptor;
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.lang.System;
 import java.lang.reflect.Field;
@@ -95,7 +92,6 @@ final public class Platform {
     static boolean DEPRECATED_TLS_V1 = true;
     static boolean ENABLED_TLS_V1 = false;
     private static boolean FILTERED_TLS_V1 = true;
-    private static boolean RUNNING_IN_ZYGOTE = true;
 
     static {
         NativeCrypto.setTlsV1DeprecationStatus(DEPRECATED_TLS_V1, ENABLED_TLS_V1);
@@ -110,7 +106,6 @@ final public class Platform {
         FILTERED_TLS_V1 = !enabledTlsV1;
         NoPreloadHolder.MAPPER.ping();
         NativeCrypto.setTlsV1DeprecationStatus(DEPRECATED_TLS_V1, ENABLED_TLS_V1);
-        RUNNING_IN_ZYGOTE = inZygote();
     }
 
     /**
@@ -593,14 +588,7 @@ final public class Platform {
     }
 
     public static StatsLog getStatsLog() {
-        if (!RUNNING_IN_ZYGOTE) {
-            return StatsLogImpl.getInstance();
-        }
-        if (!inZygote()) {
-            RUNNING_IN_ZYGOTE = false;
-            return StatsLogImpl.getInstance();
-        }
-        return NoopStatsLog.getInstance();
+        return StatsLogImpl.getInstance();
     }
 
     public static Source getStatsSource() {
@@ -633,23 +621,6 @@ final public class Platform {
 
     public static boolean isPakeSupported() {
         return true;
-    }
-
-    static boolean inZygote() {
-        try {
-            Class<?> zygoteHooksClass = Class.forName("dalvik.system.ZygoteHooks");
-            Method inZygoteMethod = zygoteHooksClass.getDeclaredMethod("inZygote");
-            Object inZygote = inZygoteMethod.invoke(null);
-            if (inZygote == null) {
-                return true;
-            }
-            return (boolean) inZygote;
-        } catch (IllegalAccessException |
-          NullPointerException | InvocationTargetException e) {
-            return true;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     static Object getTargetSdkVersion() {

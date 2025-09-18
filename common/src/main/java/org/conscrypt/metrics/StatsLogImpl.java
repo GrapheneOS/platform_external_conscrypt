@@ -45,69 +45,15 @@ import org.conscrypt.ct.LogStore;
 import org.conscrypt.ct.PolicyCompliance;
 import org.conscrypt.ct.VerificationResult;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
 /**
  * Implements logging for Conscrypt metrics.
  */
 @Internal
 public final class StatsLogImpl implements StatsLog {
-    private final BlockingQueue<Runnable> logQueue;
-    private final ExecutorService writerThreadExecutor;
-    private boolean running = false;
-
-    private StatsLogImpl() {
-        this.logQueue = new LinkedBlockingQueue<>(100);
-        this.writerThreadExecutor = Executors.newSingleThreadExecutor(new LowPriorityThreadFactory());
-        startWriterThread();
-    }
+    private static final StatsLog INSTANCE = new StatsLogImpl();
+    private StatsLogImpl() {}
     public static StatsLog getInstance() {
-        return new StatsLogImpl();
-    }
-
-    public void stop() {
-        running = false;
-        writerThreadExecutor.shutdownNow();
-        try {
-            writerThreadExecutor.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
-
-    private void startWriterThread() {
-        writerThreadExecutor.execute(() -> {
-            while (running) {
-                try {
-                    // Blocks until a log task is available
-                    Runnable logTask = logQueue.take();
-                    logTask.run(); // Execute the specific ConscryptStatsLog.write() call
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    running = false;
-                }
-            }
-            // Process remaining logs
-            while (!logQueue.isEmpty()) {
-                Runnable logTask = logQueue.poll();
-                if (logTask != null) {
-                    logTask.run();
-                }
-            }
-        });
-    }
-
-    private static class LowPriorityThreadFactory implements ThreadFactory {
-        @Override
-        public Thread newThread(Runnable r) {
-            Thread thread = new Thread(r);
-            thread.setPriority(Thread.MIN_PRIORITY);
-            return thread;
-        }
+        return INSTANCE;
     }
 
     @Override
@@ -230,29 +176,26 @@ public final class StatsLogImpl implements StatsLog {
             builder.writeInt(source);
 
             builder.usePooledBuffer();
-            logQueue.offer(() -> ReflexiveStatsLog.write(builder.build()));
+            ReflexiveStatsLog.write(builder.build());
         } else {
-            logQueue.offer(() -> ConscryptStatsLog.write(
-                atomId, success, protocol, cipherSuite, duration, source, uids));
+            ConscryptStatsLog.write(atomId, success, protocol, cipherSuite, duration, source, uids);
         }
     }
 
     private void write(int atomId, int status, int loadedCompatVersion,
             int minCompatVersionAvailable, int majorVersion, int minorVersion) {
-        logQueue.offer(() -> ConscryptStatsLog.write(atomId, status, loadedCompatVersion,
-                minCompatVersionAvailable, majorVersion, minorVersion));    }
+        ConscryptStatsLog.write(atomId, status, loadedCompatVersion, minCompatVersionAvailable,
+                majorVersion, minorVersion);
+    }
 
     private void write(int atomId, int verificationResult, int verificationReason,
             int policyCompatVersion, int majorVersion, int minorVersion, int numEmbeddedScts,
             int numOcspScts, int numTlsScts, int uid) {
-        logQueue.offer(()
-                               -> ConscryptStatsLog.write(atomId, verificationResult,
-                                       verificationReason, policyCompatVersion, majorVersion,
-                                       minorVersion, numEmbeddedScts, numOcspScts, numTlsScts,
-                                       uid));
+        ConscryptStatsLog.write(atomId, verificationResult, verificationReason, policyCompatVersion,
+                majorVersion, minorVersion, numEmbeddedScts, numOcspScts, numTlsScts, uid);
     }
 
     private void write(int atomId, int origin, int index, int uid) {
-        logQueue.offer(() -> ConscryptStatsLog.write(atomId, origin, index, uid));
+        ConscryptStatsLog.write(atomId, origin, index, uid);
     }
 }
