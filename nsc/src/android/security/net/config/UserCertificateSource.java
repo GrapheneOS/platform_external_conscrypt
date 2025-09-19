@@ -16,6 +16,9 @@
 
 package android.security.net.config;
 
+import android.annotation.FlaggedApi;
+import android.annotation.NonNull;
+import android.annotation.SystemApi;
 import android.os.UserHandle;
 
 import java.io.File;
@@ -24,6 +27,8 @@ import java.io.File;
  * {@link CertificateSource} based on the user-installed trusted CA store.
  * @hide
  */
+@FlaggedApi(com.android.org.conscrypt.net.flags.Flags.FLAG_NETWORK_SECURITY_CONFIG)
+@SystemApi(client = SystemApi.Client.MODULE_LIBRARIES)
 public final class UserCertificateSource extends DirectoryCertificateSource {
     private static class NoPreloadHolder {
         private static final UserCertificateSource INSTANCE = new UserCertificateSource();
@@ -36,10 +41,19 @@ public final class UserCertificateSource extends DirectoryCertificateSource {
                 "cacerts-added"));
     }
 
+    /**
+     * Returns the {@code UserCertificateSource} for this user.
+     *
+     * @return The instance.
+     */
+    @NonNull
     public static UserCertificateSource getInstance() {
         return NoPreloadHolder.INSTANCE;
     }
 
+    /**
+     * @hide
+     */
     @Override
     protected boolean isCertMarkedAsRemoved(String caFile) {
         return false;

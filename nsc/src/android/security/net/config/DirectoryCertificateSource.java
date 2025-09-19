@@ -16,6 +16,8 @@
 
 package android.security.net.config;
 
+import android.annotation.NonNull;
+import android.annotation.Nullable;
 import android.util.ArraySet;
 import android.util.Log;
 
@@ -61,6 +63,7 @@ abstract class DirectoryCertificateSource implements CertificateSource {
     protected abstract boolean isCertMarkedAsRemoved(String caFile);
 
     @Override
+    @NonNull
     public Set<X509Certificate> getCertificates() {
         // TODO: loading all of these is wasteful, we should instead use a keystore style API.
         synchronized (mLock) {
@@ -86,7 +89,8 @@ abstract class DirectoryCertificateSource implements CertificateSource {
     }
 
     @Override
-    public X509Certificate findBySubjectAndPublicKey(final X509Certificate cert) {
+    @Nullable
+    public X509Certificate findBySubjectAndPublicKey(@NonNull final X509Certificate cert) {
         return findCert(cert.getSubjectX500Principal(), new CertSelector() {
             @Override
             public boolean match(X509Certificate ca) {
@@ -96,7 +100,8 @@ abstract class DirectoryCertificateSource implements CertificateSource {
     }
 
     @Override
-    public X509Certificate findByIssuerAndSignature(final X509Certificate cert) {
+    @Nullable
+    public X509Certificate findByIssuerAndSignature(@NonNull final X509Certificate cert) {
         return findCert(cert.getIssuerX500Principal(), new CertSelector() {
             @Override
             public boolean match(X509Certificate ca) {
@@ -111,7 +116,8 @@ abstract class DirectoryCertificateSource implements CertificateSource {
     }
 
     @Override
-    public Set<X509Certificate> findAllByIssuerAndSignature(final X509Certificate cert) {
+    @NonNull
+    public Set<X509Certificate> findAllByIssuerAndSignature(@NonNull final X509Certificate cert) {
         return findCerts(cert.getIssuerX500Principal(), new CertSelector() {
             @Override
             public boolean match(X509Certificate ca) {

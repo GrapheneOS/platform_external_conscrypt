@@ -1,1 +1,18 @@
 // Signature format: 2.0
+package android.security {
+
+  public class NetworkSecurityPolicy {
+    method @FlaggedApi("com.android.org.conscrypt.net.flags.encrypted_client_hello_platform") public int getDomainEncryptionMode(@NonNull String);
+    method @NonNull public static android.security.NetworkSecurityPolicy getInstance();
+    method public boolean isCertificateTransparencyVerificationRequired(@NonNull String);
+    method public boolean isCleartextTrafficPermitted();
+    method public boolean isCleartextTrafficPermitted(@Nullable String);
+    field @FlaggedApi("com.android.org.conscrypt.net.flags.encrypted_client_hello_platform") public static final int DOMAIN_ENCRYPTION_MODE_DISABLED = 1; // 0x1
+    field @FlaggedApi("com.android.org.conscrypt.net.flags.encrypted_client_hello_platform") public static final int DOMAIN_ENCRYPTION_MODE_ENABLED = 3; // 0x3
+    field @FlaggedApi("com.android.org.conscrypt.net.flags.encrypted_client_hello_platform") public static final int DOMAIN_ENCRYPTION_MODE_OPPORTUNISTIC = 2; // 0x2
+    field @FlaggedApi("com.android.org.conscrypt.net.flags.encrypted_client_hello_platform") public static final int DOMAIN_ENCRYPTION_MODE_REQUIRED = 4; // 0x4
+    field @FlaggedApi("com.android.org.conscrypt.net.flags.encrypted_client_hello_platform") public static final int DOMAIN_ENCRYPTION_MODE_UNKNOWN = 0; // 0x0
+  }
+
+}
+

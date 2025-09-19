@@ -21,8 +21,15 @@ import static libcore.net.NetworkSecurityPolicy.CERTIFICATE_TRANSPARENCY_REASON_
 import static libcore.net.NetworkSecurityPolicy.CERTIFICATE_TRANSPARENCY_REASON_SDK_TARGET_DEFAULT_ENABLED;
 import static libcore.net.NetworkSecurityPolicy.CERTIFICATE_TRANSPARENCY_REASON_UNKNOWN;
 
+import android.annotation.FlaggedApi;
 import android.annotation.NonNull;
+import android.annotation.Nullable;
+import android.annotation.SystemApi;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.util.Pair;
+
+import libcore.net.NetworkSecurityPolicy;
 
 import java.util.HashSet;
 import java.util.Locale;
@@ -38,6 +45,8 @@ import javax.net.ssl.X509TrustManager;
  *
  * @hide
  */
+@FlaggedApi(com.android.org.conscrypt.net.flags.Flags.FLAG_NETWORK_SECURITY_CONFIG)
+@SystemApi(client = SystemApi.Client.MODULE_LIBRARIES)
 public final class ApplicationConfig {
     private static ApplicationConfig sInstance;
     private static Object sLock = new Object();
@@ -51,17 +60,44 @@ public final class ApplicationConfig {
     private boolean mInitialized;
     private final Object mLock = new Object();
 
+    /**
+     * @hide
+     */
     public ApplicationConfig(ConfigSource configSource) {
         mConfigSource = configSource;
         mInitialized = false;
     }
 
-    /**
-     * @hide
-     */
     public boolean hasPerDomainConfigs() {
         ensureInitialized();
         return mConfigs != null && !mConfigs.isEmpty();
+    }
+
+    /**
+     * Returns an {@link ApplicationConfig} based on the configuration for {@code packageName}.
+     *
+     * @hide
+     */
+    @FlaggedApi(com.android.org.conscrypt.net.flags.Flags.FLAG_NETWORK_SECURITY_CONFIG)
+    @SystemApi(client = SystemApi.Client.MODULE_LIBRARIES)
+    @NonNull
+    public static ApplicationConfig createInstanceForPackage(@NonNull Context context,
+            @NonNull String packageName) throws PackageManager.NameNotFoundException {
+        Context appContext = context.createPackageContext(packageName, 0);
+        ManifestConfigSource source = new ManifestConfigSource(appContext);
+        return new ApplicationConfig(source);
+    }
+
+    /**
+     * Returns a {@link NetworkSecurityPolicy} based on this application config.
+     *
+     * @hide
+     */
+    @FlaggedApi(com.android.org.conscrypt.net.flags.Flags.FLAG_NETWORK_SECURITY_CONFIG)
+    @SystemApi(client = SystemApi.Client.MODULE_LIBRARIES)
+    @NonNull
+    public NetworkSecurityPolicy createNetworkSecurityPolicy() {
+        return new ConfigNetworkSecurityPolicy(this);
     }
 
     /**
@@ -77,6 +113,8 @@ public final class ApplicationConfig {
      *
      * @return {@link NetworkSecurityConfig} to be used to determine
      * the network security configuration for connections to {@code hostname}.
+     *
+     * @hide
      */
     public NetworkSecurityConfig getConfigForHostname(String hostname) {
         ensureInitialized();
@@ -132,6 +170,7 @@ public final class ApplicationConfig {
      * Returns the {@link X509TrustManager} that implements the checking of trust anchors and
      * certificate pinning based on this configuration.
      */
+    @NonNull
     public X509TrustManager getTrustManager() {
         ensureInitialized();
         return mTrustManager;
@@ -141,6 +180,8 @@ public final class ApplicationConfig {
      * Returns {@code true} if cleartext traffic is permitted for this application, which is the
      * case only if all configurations permit cleartext traffic. For finer-grained policy use
      * {@link #isCleartextTrafficPermitted(String)}.
+     *
+     * @hide
      */
     public boolean isCleartextTrafficPermitted() {
         ensureInitialized();
@@ -159,7 +200,7 @@ public final class ApplicationConfig {
      * Returns {@code true} if cleartext traffic is permitted for this application when connecting
      * to {@code hostname}.
      */
-    public boolean isCleartextTrafficPermitted(String hostname) {
+    public boolean isCleartextTrafficPermitted(@Nullable String hostname) {
         return getConfigForHostname(hostname).isCleartextTrafficPermitted();
     }
 
@@ -172,6 +213,8 @@ public final class ApplicationConfig {
      * @param hostname hostname to check whether certificate transparency verification is required
      * @return {@code true} if certificate transparency verification is required and {@code false}
      *     otherwise
+     *
+     * @hide
      */
     public boolean isCertificateTransparencyVerificationRequired(@NonNull String hostname) {
         return getConfigForHostname(hostname).isCertificateTransparencyVerificationRequired();
@@ -197,6 +240,9 @@ public final class ApplicationConfig {
         return getConfigForHostname(hostname).getDomainEncryptionMode();
     }
 
+    /**
+     * @hide
+     */
     public void handleTrustStorageUpdate() {
         synchronized (mLock) {
             // If the config is uninitialized then there is no work to be done to handle an update,
@@ -231,12 +277,18 @@ public final class ApplicationConfig {
         }
     }
 
+    /**
+     * @hide
+     */
     public static void setDefaultInstance(ApplicationConfig config) {
         synchronized (sLock) {
             sInstance = config;
         }
     }
 
+    /**
+     * @hide
+     */
     public static ApplicationConfig getDefaultInstance() {
         synchronized (sLock) {
             return sInstance;

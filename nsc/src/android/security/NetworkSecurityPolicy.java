@@ -15,13 +15,13 @@
  */
 
 package android.security;
+
+import android.annotation.FlaggedApi;
 import android.annotation.IntDef;
 import android.annotation.NonNull;
 import android.annotation.Nullable;
-import android.content.Context;
-import android.content.pm.PackageManager;
+import android.annotation.SystemApi;
 import android.security.net.config.ApplicationConfig;
-import android.security.net.config.ManifestConfigSource;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -31,9 +31,6 @@ import java.lang.annotation.RetentionPolicy;
  *
  * <p>Network stacks/components should honor this policy to make it possible to centrally control
  * the relevant aspects of network security behavior.
- *
- * TODO(b/397646538): remove hide keyword and add APIs to current.txt.
- * @hide
  */
 public class NetworkSecurityPolicy {
     private static final NetworkSecurityPolicy INSTANCE = new NetworkSecurityPolicy();
@@ -133,12 +130,14 @@ public class NetworkSecurityPolicy {
      * overridden. Network libraries should avoid performing any domain encryption and perform a
      * standard TLS handshake, equivalent to {@link #DOMAIN_ENCRYPTION_MODE_DISABLED}.
      */
+    @FlaggedApi(com.android.org.conscrypt.net.flags.Flags.FLAG_ENCRYPTED_CLIENT_HELLO_PLATFORM)
     public static final int DOMAIN_ENCRYPTION_MODE_UNKNOWN =
             libcore.net.NetworkSecurityPolicy.DOMAIN_ENCRYPTION_MODE_UNKNOWN;
 
     /**
      * Domain encryption is disabled for the app. ECH and GREASE should not be used.
      */
+    @FlaggedApi(com.android.org.conscrypt.net.flags.Flags.FLAG_ENCRYPTED_CLIENT_HELLO_PLATFORM)
     public static final int DOMAIN_ENCRYPTION_MODE_DISABLED =
             libcore.net.NetworkSecurityPolicy.DOMAIN_ENCRYPTION_MODE_DISABLED;
 
@@ -146,6 +145,7 @@ public class NetworkSecurityPolicy {
      * Domain encryption is in opportunistic mode for the app. ECH will only be enabled when there
      * is server support, and GREASE will not be used.
      */
+    @FlaggedApi(com.android.org.conscrypt.net.flags.Flags.FLAG_ENCRYPTED_CLIENT_HELLO_PLATFORM)
     public static final int DOMAIN_ENCRYPTION_MODE_OPPORTUNISTIC =
             libcore.net.NetworkSecurityPolicy.DOMAIN_ENCRYPTION_MODE_OPPORTUNISTIC;
 
@@ -153,6 +153,7 @@ public class NetworkSecurityPolicy {
      * Domain encryption is in fully enabled mode for the app. ECH will be enabled when there is
      * server support, otherwise GREASE will be used.
      */
+    @FlaggedApi(com.android.org.conscrypt.net.flags.Flags.FLAG_ENCRYPTED_CLIENT_HELLO_PLATFORM)
     public static final int DOMAIN_ENCRYPTION_MODE_ENABLED =
             libcore.net.NetworkSecurityPolicy.DOMAIN_ENCRYPTION_MODE_ENABLED;
 
@@ -160,6 +161,7 @@ public class NetworkSecurityPolicy {
      * Domain encryption is required for the app and should fail closed (i.e. if encryption cannot
      * be enabled for any reason, the connection will fail).
      */
+    @FlaggedApi(com.android.org.conscrypt.net.flags.Flags.FLAG_ENCRYPTED_CLIENT_HELLO_PLATFORM)
     public static final int DOMAIN_ENCRYPTION_MODE_REQUIRED =
             libcore.net.NetworkSecurityPolicy.DOMAIN_ENCRYPTION_MODE_REQUIRED;
 
@@ -170,31 +172,25 @@ public class NetworkSecurityPolicy {
      * @param hostname hostname to check what domain encryption mode has been chosen by the app
      * @return int representing the domain encryption mode.
      */
+    @FlaggedApi(com.android.org.conscrypt.net.flags.Flags.FLAG_ENCRYPTED_CLIENT_HELLO_PLATFORM)
     @DomainEncryptionMode
     public int getDomainEncryptionMode(@NonNull String hostname) {
         return libcore.net.NetworkSecurityPolicy.getInstance().getDomainEncryptionMode(hostname);
     }
 
     /**
-     * Handle an update to the system or user certificate stores.
+     * Handle an update to the system or user certificate stores. Triggered when the content of the
+     * certificate stores has changed, for example when a pre-installed CA is disabled or
+     * re-enabled, or a CA is added or removed from the trust store.
+     *
      * @hide
      */
+    @FlaggedApi(com.android.org.conscrypt.net.flags.Flags.FLAG_NETWORK_SECURITY_CONFIG)
+    @SystemApi(client = SystemApi.Client.MODULE_LIBRARIES)
     public void handleTrustStorageUpdate() {
         ApplicationConfig config = ApplicationConfig.getDefaultInstance();
         if (config != null) {
             config.handleTrustStorageUpdate();
         }
-    }
-
-    /**
-     * Returns an {@link ApplicationConfig} based on the configuration for {@code packageName}.
-     *
-     * @hide
-     */
-    public static ApplicationConfig getApplicationConfigForPackage(
-            Context context, String packageName) throws PackageManager.NameNotFoundException {
-        Context appContext = context.createPackageContext(packageName, 0);
-        ManifestConfigSource source = new ManifestConfigSource(appContext);
-        return new ApplicationConfig(source);
     }
 }

@@ -49,7 +49,7 @@ public class ConfigNetworkSecurityPolicy extends libcore.net.NetworkSecurityPoli
     }
 
     @Override
-    public int getDomainEncryptionMode(@Nullable String hostname) {
+    public int getDomainEncryptionMode(String hostname) {
         return mConfig.getDomainEncryptionMode(hostname);
     }
 }

@@ -652,7 +652,6 @@ java_sdk_library {
     ],
 
     api_dir: "api/nsc",
-    unsafe_ignore_missing_latest_api: true,
 
     apex_available: [
         "com.android.conscrypt",

@@ -1,1 +1,35 @@
 // Signature format: 2.0
+package android.security {
+
+  public class NetworkSecurityPolicy {
+    method @FlaggedApi("com.android.org.conscrypt.net.flags.network_security_config") public void handleTrustStorageUpdate();
+  }
+
+}
+
+package android.security.net.config {
+
+  @FlaggedApi("com.android.org.conscrypt.net.flags.network_security_config") public final class ApplicationConfig {
+    method @FlaggedApi("com.android.org.conscrypt.net.flags.network_security_config") @NonNull public static android.security.net.config.ApplicationConfig createInstanceForPackage(@NonNull android.content.Context, @NonNull String) throws android.content.pm.PackageManager.NameNotFoundException;
+    method @FlaggedApi("com.android.org.conscrypt.net.flags.network_security_config") @NonNull public libcore.net.NetworkSecurityPolicy createNetworkSecurityPolicy();
+    method @NonNull public javax.net.ssl.X509TrustManager getTrustManager();
+    method public boolean hasPerDomainConfigs();
+    method public boolean isCleartextTrafficPermitted(@Nullable String);
+  }
+
+  @FlaggedApi("com.android.org.conscrypt.net.flags.network_security_config") public final class NetworkSecurityConfigProvider extends java.security.Provider {
+    method public static void handleNewApplication(@NonNull android.content.Context);
+    method public static void install(@NonNull android.content.Context);
+  }
+
+  @FlaggedApi("com.android.org.conscrypt.net.flags.network_security_config") public final class UserCertificateSource {
+    method @NonNull public java.util.Set<java.security.cert.X509Certificate> findAllByIssuerAndSignature(@NonNull java.security.cert.X509Certificate);
+    method @Nullable public java.security.cert.X509Certificate findByIssuerAndSignature(@NonNull java.security.cert.X509Certificate);
+    method @Nullable public java.security.cert.X509Certificate findBySubjectAndPublicKey(@NonNull java.security.cert.X509Certificate);
+    method @NonNull public java.util.Set<java.security.cert.X509Certificate> getCertificates();
+    method @NonNull public static android.security.net.config.UserCertificateSource getInstance();
+    method public void handleTrustStorageUpdate();
+  }
+
+}
+

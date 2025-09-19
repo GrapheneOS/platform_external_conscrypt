@@ -1,0 +1,12 @@
+// Baseline format: 1.0
+
+UnflaggedApi: android.security.NetworkSecurityPolicy:
+    New API must be flagged with @FlaggedApi: class android.security.NetworkSecurityPolicy
+UnflaggedApi: android.security.NetworkSecurityPolicy#getInstance():
+    New API must be flagged with @FlaggedApi: method android.security.NetworkSecurityPolicy.getInstance()
+UnflaggedApi: android.security.NetworkSecurityPolicy#isCertificateTransparencyVerificationRequired(String):
+    New API must be flagged with @FlaggedApi: method android.security.NetworkSecurityPolicy.isCertificateTransparencyVerificationRequired(String)
+UnflaggedApi: android.security.NetworkSecurityPolicy#isCleartextTrafficPermitted():
+    New API must be flagged with @FlaggedApi: method android.security.NetworkSecurityPolicy.isCleartextTrafficPermitted()
+UnflaggedApi: android.security.NetworkSecurityPolicy#isCleartextTrafficPermitted(String):
+    New API must be flagged with @FlaggedApi: method android.security.NetworkSecurityPolicy.isCleartextTrafficPermitted(String)

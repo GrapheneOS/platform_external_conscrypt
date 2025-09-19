@@ -122,6 +122,7 @@ bootclasspath_fragment {
     core_platform_api: {
         stub_libs: [
             "conscrypt.module.platform.api",
+            "framework-conscrypt-nsc.stubs.module_lib",
         ],
     },
     // Additional hidden API flags that override the default flags derived
@@ -139,7 +140,7 @@ bootclasspath_fragment {
         // classes into an API surface, e.g. public, system, etc.. Doing so will
         // result in a build failure due to inconsistent flags.
         package_prefixes: [
-            "android.conscrypt.nsc",
+            "android.security",
             "android.net.ssl",
             "com.android.org.conscrypt",
         ],

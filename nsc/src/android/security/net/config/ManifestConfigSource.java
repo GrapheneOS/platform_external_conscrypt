@@ -42,16 +42,25 @@ public class ManifestConfigSource implements ConfigSource {
         mApplicationInfo = new ApplicationInfo(context.getApplicationInfo());
     }
 
+    /**
+     * @hide
+     */
     @Override
     public Set<Pair<Domain, NetworkSecurityConfig>> getPerDomainConfigs() {
         return getConfigSource().getPerDomainConfigs();
     }
 
+    /**
+     * @hide
+     */
     @Override
     public NetworkSecurityConfig getDefaultConfig() {
         return getConfigSource().getDefaultConfig();
     }
 
+    /**
+     * @hide
+     */
     @Override
     public NetworkSecurityConfig getLocalhostConfig() {
         return getConfigSource().getLocalhostConfig();
