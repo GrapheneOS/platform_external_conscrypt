@@ -51,11 +51,13 @@
 #include <openssl/slhdsa.h>
 #include <openssl/ssl.h>
 #include <openssl/x509v3.h>
+#include <openssl/xwing.h>
 
 #include <limits>
 #include <optional>
 #include <type_traits>
 #include <vector>
+
 #include "jni.h"
 
 using conscrypt::AppData;
@@ -821,14 +823,6 @@ void init_engine_globals() {
 #define THROW_SSLEXCEPTION (-2)
 #define THROW_SOCKETTIMEOUTEXCEPTION (-3)
 #define THROWN_EXCEPTION (-4)
-
-/**
- * Initialization phase for every OpenSSL job: Loads the Error strings, the
- * crypto algorithms and reset the OpenSSL library
- */
-static void NativeCrypto_clinit(JNIEnv*, jclass) {
-    CRYPTO_library_init();
-}
 
 /**
  * private static native int EVP_PKEY_new_RSA(byte[] n, byte[] e, byte[] d, byte[] p, byte[] q);
@@ -3038,6 +3032,50 @@ static void NativeCrypto_ED25519_keypair(JNIEnv* env, jclass, jbyteArray outPubl
     JNI_TRACE("ED25519_keypair(%p, %p) => success", outPublicArray, outPrivateArray);
 }
 
+static jbyteArray NativeCrypto_XWING_public_key_from_seed(JNIEnv* env, jclass,
+                                                          jbyteArray privateKeySeed) {
+    CHECK_ERROR_QUEUE_ON_RETURN;
+
+    ScopedByteArrayRO seedArray(env, privateKeySeed);
+    if (seedArray.get() == nullptr) {
+        JNI_TRACE("NativeCrypto_XWING_public_key_from_seed => privateKeySeed == null");
+        return nullptr;
+    }
+
+    if (seedArray.size() != XWING_PRIVATE_KEY_BYTES) {
+        conscrypt::jniutil::throwException(env, "java/lang/IllegalArgumentException",
+                                           "privateKeySeed length != 32");
+        return nullptr;
+    }
+
+    CBS cbs;
+    CBS_init(&cbs, reinterpret_cast<const uint8_t*>(seedArray.get()), seedArray.size());
+    XWING_private_key privateKey;
+    if (!XWING_parse_private_key(&privateKey, &cbs)) {
+        JNI_TRACE("XWING_parse_private_key failed");
+        conscrypt::jniutil::throwIllegalArgumentException(env, "XWING_parse_private_key failed");
+        return nullptr;
+    }
+
+    ScopedLocalRef<jbyteArray> publicKeyRef(
+            env, env->NewByteArray(static_cast<jsize>(XWING_PUBLIC_KEY_BYTES)));
+    if (publicKeyRef.get() == nullptr) {
+        return nullptr;
+    }
+    ScopedByteArrayRW publicKeyArray(env, publicKeyRef.get());
+    if (publicKeyArray.get() == nullptr) {
+        return nullptr;
+    }
+
+    if (!XWING_public_from_private(reinterpret_cast<uint8_t*>(publicKeyArray.get()), &privateKey)) {
+        JNI_TRACE("XWING_public_from_private failed");
+        conscrypt::jniutil::throwExceptionFromBoringSSLError(env, "XWING_public_from_private");
+        return nullptr;
+    }
+
+    return publicKeyRef.release();
+}
+
 static jlong NativeCrypto_EVP_MD_CTX_create(JNIEnv* env, jclass) {
     CHECK_ERROR_QUEUE_ON_RETURN;
     JNI_TRACE_MD("EVP_MD_CTX_create()");
@@ -4647,6 +4685,8 @@ const EVP_HPKE_KDF* getHpkeKdf(JNIEnv* env, jint kdfValue) {
 const EVP_HPKE_KEM* getHpkeKem(JNIEnv* env, jint kemValue) {
     if (kemValue == EVP_HPKE_DHKEM_X25519_HKDF_SHA256) {
         return EVP_hpke_x25519_hkdf_sha256();
+    } else if (kemValue == EVP_HPKE_XWING) {
+        return EVP_hpke_xwing();
     } else {
         conscrypt::jniutil::throwException(env, "java/lang/IllegalArgumentException",
                                            "KEM is not supported");
@@ -11802,7 +11842,6 @@ static jlong NativeCrypto_SSL_get1_session(JNIEnv* env, jclass, jlong ssl_addres
 #define REF_SSL "L" TO_STRING(JNI_JARJAR_PREFIX) "org/conscrypt/NativeSsl;"
 #define REF_SSL_CTX "L" TO_STRING(JNI_JARJAR_PREFIX) "org/conscrypt/AbstractSessionContext;"
 static JNINativeMethod sNativeCryptoMethods[] = {
-        CONSCRYPT_NATIVE_METHOD(clinit, "()V"),
         CONSCRYPT_NATIVE_METHOD(CMAC_CTX_new, "()J"),
         CONSCRYPT_NATIVE_METHOD(CMAC_CTX_free, "(J)V"),
         CONSCRYPT_NATIVE_METHOD(CMAC_Init, "(" REF_CMAC_CTX "[B)V"),
@@ -11873,6 +11912,7 @@ static JNINativeMethod sNativeCryptoMethods[] = {
         CONSCRYPT_NATIVE_METHOD(X25519, "([B[B[B)Z"),
         CONSCRYPT_NATIVE_METHOD(X25519_keypair, "([B[B)V"),
         CONSCRYPT_NATIVE_METHOD(ED25519_keypair, "([B[B)V"),
+        CONSCRYPT_NATIVE_METHOD(XWING_public_key_from_seed, "([B)[B"),
         CONSCRYPT_NATIVE_METHOD(EVP_MD_CTX_create, "()J"),
         CONSCRYPT_NATIVE_METHOD(EVP_MD_CTX_cleanup, "(" REF_EVP_MD_CTX ")V"),
         CONSCRYPT_NATIVE_METHOD(EVP_MD_CTX_destroy, "(J)V"),

@@ -71,7 +71,6 @@ public final class NativeCrypto {
         UnsatisfiedLinkError error = null;
         try {
             NativeCryptoJni.init();
-            clinit();
         } catch (UnsatisfiedLinkError t) {
             // Don't rethrow the error, so that we can later on interrogate the
             // value of loadError.
@@ -80,8 +79,6 @@ public final class NativeCrypto {
         loadError = error;
         setTlsV1DeprecationStatus(Platform.isTlsV1Deprecated(), Platform.isTlsV1Supported());
     }
-
-    @FastNative private static native void clinit();
 
     /**
      * Checks to see whether or not the native library was successfully loaded. If not, throws the
@@ -282,6 +279,10 @@ public final class NativeCrypto {
     @FastNative static native void X25519_keypair(byte[] outPublicKey, byte[] outPrivateKey);
 
     @FastNative static native void ED25519_keypair(byte[] outPublicKey, byte[] outPrivateKey);
+
+    // --- X-Wing --------------
+
+    static native byte[] XWING_public_key_from_seed(byte[] privateKeySeed);
 
     // --- Message digest functions --------------
 
@@ -845,6 +846,7 @@ public final class NativeCrypto {
     static native void X509_REVOKED_print(
             long bioRef, long x509RevokedCtx, OpenSSLX509CRLEntry holder);
 
+    @android.compat.annotation.UnsupportedAppUsage
     @FastNative
     static native void X509_REVOKED_free(long x509RevokedCtx, OpenSSLX509CRLEntry holder);
 
