@@ -134,7 +134,6 @@ public final class NativeCrypto {
     static native long getECPrivateKeyWrapper(PrivateKey key, NativeRef.EC_GROUP ecGroupRef);
 
     @android.compat.annotation.UnsupportedAppUsage
-    @FastNative
     static native long RSA_generate_key_ex(int modulusBits, byte[] publicExponent);
 
     @FastNative static native int RSA_size(NativeRef.EVP_PKEY pkey);
@@ -218,7 +217,7 @@ public final class NativeCrypto {
     static native void EC_POINT_set_affine_coordinates(
             NativeRef.EC_GROUP groupRef, NativeRef.EC_POINT pointRef, byte[] x, byte[] y);
 
-    @FastNative static native long EC_KEY_generate_key(NativeRef.EC_GROUP groupRef);
+    static native long EC_KEY_generate_key(NativeRef.EC_GROUP groupRef);
 
     @FastNative static native long EC_KEY_get1_group(NativeRef.EVP_PKEY pkeyRef);
 
@@ -263,7 +262,6 @@ public final class NativeCrypto {
 
     // --- SLHDSA_SHA2_128S --------------------------------------------------------------
 
-    @FastNative
     static native void SLHDSA_SHA2_128S_generate_key(byte[] outPublicKey, byte[] outPrivateKey);
 
     @FastNative
@@ -518,7 +516,7 @@ public final class NativeCrypto {
     static native byte[] EVP_HPKE_CTX_export(
             NativeRef.EVP_HPKE_CTX ctx, byte[] exporterCtx, int length);
 
-    @FastNative static native void EVP_HPKE_CTX_free(long ctx);
+    static native void EVP_HPKE_CTX_free(long ctx);
 
     @FastNative
     static native byte[] EVP_HPKE_CTX_open(
@@ -624,7 +622,7 @@ public final class NativeCrypto {
     @FastNative
     static native long[] ASN1_seq_unpack_X509_bio(long bioRef) throws ParsingException;
 
-    @FastNative static native void X509_free(long x509ctx, OpenSSLX509Certificate holder);
+    static native void X509_free(long x509ctx, OpenSSLX509Certificate holder);
 
     @FastNative
     static native int X509_cmp(long x509ctx1, OpenSSLX509Certificate holder, long x509ctx2,
@@ -1799,7 +1797,6 @@ public final class NativeCrypto {
     /**
      * Generates a key from a password and salt using Scrypt.
      */
-    @FastNative
     static native byte[] Scrypt_generate_key(
             byte[] password, byte[] salt, int n, int r, int p, int key_len);
 
