@@ -17,6 +17,8 @@
 
 package com.android.org.conscrypt;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.security.PublicKey;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
@@ -115,5 +117,12 @@ public class OpenSslEdDsaPublicKey implements PublicKey {
             throw new IllegalStateException("key is destroyed");
         }
         return Arrays.hashCode(publicKeyBytes);
+    }
+
+    private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+        stream.defaultReadObject();
+        if (publicKeyBytes.length != ED25519_PUBLIC_KEY_SIZE_BYTES) {
+            throw new IllegalArgumentException("Invalid key size");
+        }
     }
 }
