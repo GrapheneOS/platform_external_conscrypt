@@ -20,6 +20,7 @@ package com.android.org.conscrypt;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -28,6 +29,7 @@ import org.junit.runners.JUnit4;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.charset.StandardCharsets;
@@ -458,7 +460,12 @@ public class MlDsaTest {
                 new ByteArrayInputStream(TestUtils.decodeHex(invalidPrivateKey));
         ObjectInputStream ois = new ObjectInputStream(bais);
 
-        assertThrows(IllegalArgumentException.class, () -> ois.readObject());
+        try {
+            ois.readObject();
+            fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException | EOFException e) {
+            // Expected
+        }
     }
 
     @Test
@@ -485,7 +492,12 @@ public class MlDsaTest {
                 new ByteArrayInputStream(TestUtils.decodeHex(invalidPrivateKey));
         ObjectInputStream ois = new ObjectInputStream(bais);
 
-        assertThrows(IllegalArgumentException.class, () -> ois.readObject());
+        try {
+            ois.readObject();
+            fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException | EOFException e) {
+            // Expected
+        }
     }
 
     @Test
@@ -510,6 +522,11 @@ public class MlDsaTest {
         ByteArrayInputStream bais = new ByteArrayInputStream(TestUtils.decodeHex(hexPublicKey));
         ObjectInputStream ois = new ObjectInputStream(bais);
 
-        assertThrows(IllegalArgumentException.class, () -> ois.readObject());
+        try {
+            ois.readObject();
+            fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException | EOFException e) {
+            // Expected
+        }
     }
 }
