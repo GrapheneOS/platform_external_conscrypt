@@ -18,6 +18,7 @@
 package com.android.org.conscrypt.ct;
 
 import com.android.org.conscrypt.Internal;
+import com.android.org.conscrypt.NetworkSecurityPolicy;
 import com.android.org.conscrypt.Platform;
 import com.android.org.conscrypt.metrics.CertificateTransparencyVerificationReason;
 import com.android.org.conscrypt.metrics.StatsLog;
@@ -26,6 +27,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * Certificate Transparency subsystem. The implementation contains references
@@ -38,9 +40,10 @@ public class CertificateTransparency {
     private Verifier verifier;
     private Policy policy;
     private StatsLog statsLog;
+    private Supplier<NetworkSecurityPolicy> policySupplier;
 
-    public CertificateTransparency(
-            LogStore logStore, Policy policy, Verifier verifier, StatsLog statsLog) {
+    public CertificateTransparency(LogStore logStore, Policy policy, Verifier verifier,
+            StatsLog statsLog, Supplier<NetworkSecurityPolicy> policySupplier) {
         Objects.requireNonNull(logStore);
         Objects.requireNonNull(policy);
         Objects.requireNonNull(verifier);
@@ -50,14 +53,11 @@ public class CertificateTransparency {
         this.policy = policy;
         this.verifier = verifier;
         this.statsLog = statsLog;
+        this.policySupplier = policySupplier;
     }
 
-    public boolean isCTVerificationRequired(String host) {
-        return Platform.isCTVerificationRequired(host);
-    }
-
-    public CertificateTransparencyVerificationReason reasonCTVerificationRequired(String host) {
-        return Platform.reasonCTVerificationRequired(host);
+    public CertificateTransparencyVerificationReason getVerificationReason(String host) {
+        return policySupplier.get().getCertificateTransparencyVerificationReason(host);
     }
 
     public void checkCT(List<X509Certificate> chain, byte[] ocspData, byte[] tlsData, String host)
@@ -68,7 +68,7 @@ public class CertificateTransparency {
              * is too old (according to the policy). */
             statsLog.reportCTVerificationResult(logStore,
                     /* VerificationResult */ null,
-                    /* PolicyCompliance */ null, reasonCTVerificationRequired(host));
+                    /* PolicyCompliance */ null, getVerificationReason(host));
             return;
         }
         VerificationResult result =
@@ -77,7 +77,7 @@ public class CertificateTransparency {
         X509Certificate leaf = chain.get(0);
         PolicyCompliance compliance = policy.doesResultConformToPolicy(result, leaf);
         statsLog.reportCTVerificationResult(
-                logStore, result, compliance, reasonCTVerificationRequired(host));
+                logStore, result, compliance, getVerificationReason(host));
         if (compliance != PolicyCompliance.COMPLY) {
             throw new CertificateException(
                     "Certificate chain does not conform to required transparency policy: "

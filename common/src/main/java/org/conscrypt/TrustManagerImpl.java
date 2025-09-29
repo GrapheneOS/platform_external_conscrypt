@@ -61,6 +61,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -104,6 +105,15 @@ public final class TrustManagerImpl
      * The CertPinManager, which validates the chain against a host-to-pin mapping
      */
     private final CertPinManager pinManager;
+
+    /**
+     * The ConscryptNetworkSecurityPolicy associated with this TrustManager.
+     *
+     * The policy is used to decide if various mechanisms should be enabled,
+     * mostly based on the process configuration and the hostname queried. The
+     * policy is aligned with Android's libcore NetworkSecurityPolicy.
+     */
+    private ConscryptNetworkSecurityPolicy policy;
 
     /**
      * The backing store for the AndroidCAStore if non-null. This will
@@ -154,14 +164,8 @@ public final class TrustManagerImpl
         this(keyStore, manager, null);
     }
 
-    public TrustManagerImpl(KeyStore keyStore, CertPinManager manager,
-            ConscryptCertStore certStore) {
-        this(keyStore, manager, certStore, null, null);
-    }
-
-    private TrustManagerImpl(KeyStore keyStore, CertPinManager manager,
-            ConscryptCertStore certStore, CertBlocklist blocklist,
-            org.conscrypt.ct.CertificateTransparency ct) {
+    public TrustManagerImpl(
+            KeyStore keyStore, CertPinManager manager, ConscryptCertStore certStore) {
         CertPathValidator validatorLocal = null;
         CertificateFactory factoryLocal = null;
         KeyStore rootKeyStoreLocal = null;
@@ -191,13 +195,6 @@ public final class TrustManagerImpl
             errLocal = e;
         }
 
-        if (ct == null) {
-            ct = Platform.newDefaultCertificateTransparency();
-        }
-        if (blocklist == null) {
-            blocklist = Platform.newDefaultBlocklist();
-        }
-
         this.pinManager = manager;
         this.rootKeyStore = rootKeyStoreLocal;
         this.trustedCertificateStore = trustedCertificateStoreLocal;
@@ -207,8 +204,25 @@ public final class TrustManagerImpl
         this.intermediateIndex = new TrustedCertificateIndex();
         this.acceptedIssuers = acceptedIssuersLocal;
         this.err = errLocal;
-        this.blocklist = blocklist;
-        this.ct = ct;
+        this.policy = ConscryptNetworkSecurityPolicy.getDefault();
+        this.blocklist = Platform.newDefaultBlocklist();
+        this.ct = Platform.newDefaultCertificateTransparency(new Supplier<NetworkSecurityPolicy>() {
+            @Override
+            public NetworkSecurityPolicy get() {
+                return policy;
+            }
+        });
+    }
+
+    /**
+     * Attach a ConscryptNetworkSecurityPolicy to this TrustManager.
+     */
+    public void setNetworkSecurityPolicy(ConscryptNetworkSecurityPolicy policy) {
+        this.policy = policy;
+    }
+
+    public ConscryptNetworkSecurityPolicy getNetworkSecurityPolicy() {
+        return policy;
     }
 
     @SuppressWarnings("JdkObsolete")  // KeyStore#aliases is the only API available
@@ -667,7 +681,8 @@ public final class TrustManagerImpl
             }
 
             // Check Certificate Transparency (if required).
-            if (!clientAuth && host != null && ct != null && ct.isCTVerificationRequired(host)) {
+            if (!clientAuth && host != null && ct != null
+                    && policy.isCertificateTransparencyVerificationRequired(host)) {
                 ct.checkCT(wholeChain, ocspData, tlsSctData, host);
             }
 

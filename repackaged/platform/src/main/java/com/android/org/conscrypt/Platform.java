@@ -30,8 +30,6 @@ import com.android.org.conscrypt.ct.LogStore;
 import com.android.org.conscrypt.ct.LogStoreImpl;
 import com.android.org.conscrypt.ct.Policy;
 import com.android.org.conscrypt.ct.PolicyImpl;
-import com.android.org.conscrypt.flags.Flags;
-import com.android.org.conscrypt.metrics.CertificateTransparencyVerificationReason;
 import com.android.org.conscrypt.metrics.OptionalMethod;
 import com.android.org.conscrypt.metrics.Source;
 import com.android.org.conscrypt.metrics.StatsLog;
@@ -40,8 +38,6 @@ import com.android.org.conscrypt.metrics.StatsLogImpl;
 import dalvik.system.BlockGuard;
 import dalvik.system.CloseGuard;
 import dalvik.system.VMRuntime;
-
-import libcore.net.NetworkSecurityPolicy;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -67,6 +63,7 @@ import java.security.spec.InvalidParameterSpecException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 import javax.crypto.spec.GCMParameterSpec;
 import javax.net.ssl.HttpsURLConnection;
@@ -488,46 +485,6 @@ final public class Platform {
         return true;
     }
 
-    public static boolean isCTVerificationRequired(String hostname) {
-        if (Flags.certificateTransparencyPlatform()) {
-            if (NetworkSecurityPolicy.getInstance().isCertificateTransparencyVerificationRequired(
-                        hostname)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static CertificateTransparencyVerificationReason plaformCtReasonToConscryptReason(
-            int platformReason) {
-        switch (platformReason) {
-            case NetworkSecurityPolicy.CERTIFICATE_TRANSPARENCY_REASON_APP_OPT_IN:
-                return CertificateTransparencyVerificationReason.APP_OPT_IN;
-            case NetworkSecurityPolicy.CERTIFICATE_TRANSPARENCY_REASON_DOMAIN_OPT_IN:
-                return CertificateTransparencyVerificationReason.DOMAIN_OPT_IN;
-            case NetworkSecurityPolicy.CERTIFICATE_TRANSPARENCY_REASON_SDK_TARGET_DEFAULT_ENABLED:
-                return CertificateTransparencyVerificationReason.SDK_TARGET_DEFAULT_ENABLED;
-            default:
-                return CertificateTransparencyVerificationReason.UNKNOWN;
-        }
-    }
-
-    public static CertificateTransparencyVerificationReason reasonCTVerificationRequired(
-            String hostname) {
-        if (isSdkGreater(33)
-                && com.android.libcore.Flags.networkSecurityPolicyReasonCtEnabledApi()) {
-            return plaformCtReasonToConscryptReason(NetworkSecurityPolicy.getInstance()
-                            .getCertificateTransparencyVerificationReason(hostname));
-        }
-        if (NetworkSecurityPolicy.getInstance().isCertificateTransparencyVerificationRequired("")) {
-            return CertificateTransparencyVerificationReason.APP_OPT_IN;
-        } else if (NetworkSecurityPolicy.getInstance()
-                           .isCertificateTransparencyVerificationRequired(hostname)) {
-            return CertificateTransparencyVerificationReason.DOMAIN_OPT_IN;
-        }
-        return CertificateTransparencyVerificationReason.UNKNOWN;
-    }
-
     static boolean supportsConscryptCertStore() {
         return true;
     }
@@ -550,13 +507,15 @@ final public class Platform {
         return CertBlocklistImpl.getDefault();
     }
 
-    static CertificateTransparency newDefaultCertificateTransparency() {
+    static CertificateTransparency newDefaultCertificateTransparency(
+            Supplier<NetworkSecurityPolicy> policySupplier) {
         com.android.org.conscrypt.ct.Policy policy = new com.android.org.conscrypt.ct.PolicyImpl();
         com.android.org.conscrypt.ct.LogStore logStore =
                 new com.android.org.conscrypt.ct.LogStoreImpl(policy);
         com.android.org.conscrypt.ct.Verifier verifier =
                 new com.android.org.conscrypt.ct.Verifier(logStore);
-        return new CertificateTransparency(logStore, policy, verifier, getStatsLog());
+        return new CertificateTransparency(
+                logStore, policy, verifier, getStatsLog(), policySupplier);
     }
 
     static boolean serverNamePermitted(SSLParametersImpl parameters, String serverName) {

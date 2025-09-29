@@ -34,5 +34,21 @@
   {
     "@location": "type:com.android.org.conscrypt.TrustManagerImpl",
     "value": "com.android.org.conscrypt.net.flags.Flags.FLAG_CONSCRYPTX509TRUSTMANAGER"
+  },
+  {
+    "@location": "method:com.android.org.conscrypt.TrustManagerImpl#getNetworkSecurityPolicy()",
+    "value": "com.android.org.conscrypt.net.flags.Flags.FLAG_CERTIFICATE_TRANSPARENCY_DEFAULT_ENABLED"
+  },
+  {
+    "@location": "method:com.android.org.conscrypt.TrustManagerImpl#setNetworkSecurityPolicy(ConscryptNetworkSecurityPolicy)",
+    "value": "com.android.org.conscrypt.net.flags.Flags.FLAG_CERTIFICATE_TRANSPARENCY_DEFAULT_ENABLED"
+  },
+  {
+    "@location": "method:com.android.org.conscrypt.ConscryptNetworkSecurityPolicy#ConscryptNetworkSecurityPolicy(libcore.net.NetworkSecurityPolicy)",
+    "value": "com.android.org.conscrypt.net.flags.Flags.FLAG_CERTIFICATE_TRANSPARENCY_DEFAULT_ENABLED"
+  },
+  {
+    "@location": "type:com.android.org.conscrypt.ConscryptNetworkSecurityPolicy",
+    "value": "com.android.org.conscrypt.net.flags.Flags.FLAG_CERTIFICATE_TRANSPARENCY_DEFAULT_ENABLED"
   }
 ]
