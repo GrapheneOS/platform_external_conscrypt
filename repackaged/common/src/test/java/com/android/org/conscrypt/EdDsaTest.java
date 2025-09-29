@@ -336,7 +336,8 @@ public class EdDsaTest {
 
         String classNameHex = TestUtils.encodeHex(
                 privateKey.getClass().getName().getBytes(StandardCharsets.UTF_8));
-        String expectedHexEncoding = "aced0005737200" + Integer.toHexString(classNameHex.length())
+        String expectedHexEncoding = "aced0005737200"
+                + Integer.toHexString(privateKey.getClass().getName().length())
                 + classNameHex
                 + "d479f95a133abadc" // serialVersionUID
                 + "0200015b000f"
@@ -366,7 +367,8 @@ public class EdDsaTest {
 
         String classNameHex = TestUtils.encodeHex(
                 publicKey.getClass().getName().getBytes(StandardCharsets.UTF_8));
-        String expectedHexEncoding = "aced0005737200" + Integer.toHexString(classNameHex.length())
+        String expectedHexEncoding = "aced0005737200"
+                + Integer.toHexString(publicKey.getClass().getName().length())
                 + classNameHex
                 + "064c7113d078e42d" // serialVersionUID
                 + "0200015b000e"
