@@ -35,6 +35,15 @@ flag {
 }
 
 flag {
+    namespace: "network_security"
+    name: "encrypted_client_hello_platform"
+    description: "This flag controls whether Conscrypt will interpret the NetworkSecurityConfig for Encrypted Client Hello"
+    bug: "419020719"
+    # APIs provided by a mainline module can only use a frozen flag.
+    is_fixed_read_only: true
+}
+
+flag {
     namespace: "core_libraries"
     name: "spake2plus_api"
     description: "This flag controls whether SPAKE2+ is exposed by Conscrypt"
