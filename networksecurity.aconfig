@@ -41,3 +41,12 @@ flag {
     is_fixed_read_only: true
     is_exported: true
 }
+
+flag {
+    namespace: "network_security"
+    name: "encrypted_client_hello_platform"
+    description: "This flag controls whether Conscrypt will interpret the NetworkSecurityConfig for Encrypted Client Hello"
+    bug: "419020719"
+    # APIs provided by a mainline module can only use a frozen flag.
+    is_fixed_read_only: true
+}
