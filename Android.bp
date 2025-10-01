@@ -809,6 +809,7 @@ java_library {
         "bouncycastle-bcpkix-unbundled",
         "bouncycastle-ocsp-unbundled",
     ],
+    java_version: "1.8",
 }
 
 filegroup {
