@@ -450,7 +450,7 @@ public final class Conscrypt {
             return toConscrypt(socket).getApplicationProtocol();
         }
         try {
-            if (!Class.forName("com.android.org.conscrypt.AbstractConscryptSocket").isInstance(socket)) {
+            if (!Class.forName("org.conscrypt.AbstractConscryptSocket").isInstance(socket)) {
                 throw new IllegalArgumentException(
                         "Not a conscrypt socket: " + socket.getClass().getName());
             }
@@ -743,7 +743,7 @@ public final class Conscrypt {
             return toConscrypt(engine).getApplicationProtocol();
         }
         try {
-            if (!Class.forName("com.android.org.conscrypt.AbstractConscryptEngine").isInstance(engine)) {
+            if (!Class.forName("org.conscrypt.AbstractConscryptEngine").isInstance(engine)) {
                 throw new IllegalArgumentException(
                         "Not a conscrypt engine: " + engine.getClass().getName());
             }
