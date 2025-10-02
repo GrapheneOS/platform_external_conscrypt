@@ -34,7 +34,10 @@ public class AndroidHpkeSpiTest {
     private static final String[] HPKE_NAMES = new String[]{
             "DHKEM_X25519_HKDF_SHA256/HKDF_SHA256/AES_128_GCM",
             "DHKEM_X25519_HKDF_SHA256/HKDF_SHA256/AES_256_GCM",
-            "DHKEM_X25519_HKDF_SHA256/HKDF_SHA256/CHACHA20POLY1305"
+            "DHKEM_X25519_HKDF_SHA256/HKDF_SHA256/CHACHA20POLY1305",
+            "XWING/HKDF_SHA256/AES_128_GCM",
+            "XWING/HKDF_SHA256/AES_256_GCM",
+            "XWING/HKDF_SHA256/CHACHA20POLY1305"
     };
 
     // This only needs to test the wrapper functionality as the implementation and client

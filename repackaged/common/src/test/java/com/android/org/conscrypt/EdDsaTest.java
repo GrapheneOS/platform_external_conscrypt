@@ -64,8 +64,10 @@ public class EdDsaTest {
         TestUtils.assumeAllowsUnsignedCrypto();
     }
 
-    /** Implements a KeySpec that contains the raw bytes of a key.
-     * @hide This class is not part of the Android public SDK API*/
+    /**
+     * Implements a KeySpec that contains the raw bytes of a key.
+     * @hide This class is not part of the Android public SDK API
+     */
     public static final class RawKeySpec extends EncodedKeySpec {
         public RawKeySpec(byte[] encoded) {
             super(encoded);

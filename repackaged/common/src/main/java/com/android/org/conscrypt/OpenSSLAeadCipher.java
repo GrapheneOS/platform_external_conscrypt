@@ -403,8 +403,10 @@ public abstract class OpenSSLAeadCipher extends OpenSSLCipher {
             if (inputLen == 0 && input == null) {
                 in = EmptyArray.BYTE; // input can be null when inputLen == 0
                 inOffset = inputOffset;
-            } else if (input == output && ((inputOffset + inputLen > outputOffset && inputOffset <= outputOffset)
-                           || (inputOffset >= outputOffset && outputOffset + inputLen + tagLengthInBytes > inputOffset))) {
+            } else if (input == output
+                    && ((inputOffset + inputLen > outputOffset && inputOffset <= outputOffset)
+                            || (inputOffset >= outputOffset
+                                    && outputOffset + inputLen + tagLengthInBytes > inputOffset))) {
                 // BoringSSL requires that input and output do not overlap. To be on the safe side,
                 // we copy the input to a new array.
                 in = Arrays.copyOfRange(input, inputOffset, inputOffset + inputLen);

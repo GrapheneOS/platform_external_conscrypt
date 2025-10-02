@@ -90,9 +90,15 @@ public final class Conscrypt {
             this.patch = patch;
         }
 
-        public int major() { return major; }
-        public int minor() { return minor; }
-        public int patch() { return patch; }
+        public int major() {
+            return major;
+        }
+        public int minor() {
+            return minor;
+        }
+        public int patch() {
+            return patch;
+        }
     }
 
     private static final Version VERSION;
@@ -228,8 +234,8 @@ public final class Conscrypt {
         }
 
         public Provider build() {
-            return new OpenSSLProvider(name, provideTrustManager,
-                defaultTlsProtocol, deprecatedTlsV1, enabledTlsV1);
+            return new OpenSSLProvider(
+                    name, provideTrustManager, defaultTlsProtocol, deprecatedTlsV1, enabledTlsV1);
         }
     }
 
@@ -462,7 +468,8 @@ public final class Conscrypt {
             return toConscrypt(socket).getApplicationProtocol();
         }
         try {
-            if (!Class.forName("com.android.org.conscrypt.AbstractConscryptSocket").isInstance(socket)) {
+            if (!Class.forName("org.conscrypt.AbstractConscryptSocket")
+                            .isInstance(socket)) {
                 throw new IllegalArgumentException(
                         "Not a conscrypt socket: " + socket.getClass().getName());
             }
@@ -480,8 +487,8 @@ public final class Conscrypt {
      * @param socket the socket
      * @param selector the ALPN protocol selector
      */
-    public static void setApplicationProtocolSelector(SSLSocket socket,
-        ApplicationProtocolSelector selector) {
+    public static void setApplicationProtocolSelector(
+            SSLSocket socket, ApplicationProtocolSelector selector) {
         toConscrypt(socket).setApplicationProtocolSelector(selector);
     }
 
@@ -531,8 +538,8 @@ public final class Conscrypt {
      * completed or the connection has been closed.
      * @throws SSLException if the value could not be exported.
      */
-    public static byte[] exportKeyingMaterial(SSLSocket socket, String label, byte[] context,
-            int length) throws SSLException {
+    public static byte[] exportKeyingMaterial(
+            SSLSocket socket, String label, byte[] context, int length) throws SSLException {
         return toConscrypt(socket).exportKeyingMaterial(label, context, length);
     }
 
@@ -738,8 +745,8 @@ public final class Conscrypt {
      * @param engine the engine
      * @param selector the ALPN protocol selector
      */
-    public static void setApplicationProtocolSelector(SSLEngine engine,
-        ApplicationProtocolSelector selector) {
+    public static void setApplicationProtocolSelector(
+            SSLEngine engine, ApplicationProtocolSelector selector) {
         toConscrypt(engine).setApplicationProtocolSelector(selector);
     }
 
@@ -755,7 +762,8 @@ public final class Conscrypt {
             return toConscrypt(engine).getApplicationProtocol();
         }
         try {
-            if (!Class.forName("com.android.org.conscrypt.AbstractConscryptEngine").isInstance(engine)) {
+            if (!Class.forName("org.conscrypt.AbstractConscryptEngine")
+                            .isInstance(engine)) {
                 throw new IllegalArgumentException(
                         "Not a conscrypt engine: " + engine.getClass().getName());
             }
@@ -788,8 +796,8 @@ public final class Conscrypt {
      * completed or the connection has been closed.
      * @throws SSLException if the value could not be exported.
      */
-    public static byte[] exportKeyingMaterial(SSLEngine engine, String label, byte[] context,
-            int length) throws SSLException {
+    public static byte[] exportKeyingMaterial(
+            SSLEngine engine, String label, byte[] context, int length) throws SSLException {
         return toConscrypt(engine).exportKeyingMaterial(label, context, length);
     }
 
@@ -875,7 +883,8 @@ public final class Conscrypt {
      * @param instance The SSLSocket or SSLEngine instance.
      * @param methodName The name of the method to invoke.
      * @return String.
-     * @throws IllegalArgumentException if the method cannot be invoked or throws a checked exception.
+     * @throws IllegalArgumentException if the method cannot be invoked or throws a checked
+     *         exception.
      * @throws IllegalStateException if the method throws an IllegalStateException.
      * @throws RuntimeException if the method throws a RuntimeException.
      * @throws Error if the method throws an Error.
@@ -888,14 +897,9 @@ public final class Conscrypt {
             return (String) result;
         } catch (InvocationTargetException e) {
             Throwable cause = e.getCause();
-            if (cause instanceof SSLException
-                    || cause instanceof IOException) {
-                IllegalArgumentException wrapped =
-                    new IllegalArgumentException(
-                        "Reflected method '"
-                            + methodName
-                            + "' threw a checked exception.",
-                        cause);
+            if (cause instanceof SSLException || cause instanceof IOException) {
+                IllegalArgumentException wrapped = new IllegalArgumentException(
+                        "Reflected method '" + methodName + "' threw a checked exception.", cause);
                 throw wrapped;
             } else if (cause instanceof IllegalStateException) {
                 throw (IllegalStateException) cause;
@@ -905,18 +909,14 @@ public final class Conscrypt {
                 throw (Error) cause;
             } else {
                 throw new RuntimeException(
-                        "Reflected method '" + methodName + "' threw an unexpected exception", cause);
+                        "Reflected method '" + methodName + "' threw an unexpected exception",
+                        cause);
             }
         } catch (Exception e) {
             String className = instance.getClass().getName();
-            IllegalArgumentException wrapped =
-                new IllegalArgumentException(
-                    "Failed reflection fallback for method '"
-                        + methodName
-                        + "' on class '"
-                        + className
-                        + ", message: "
-                        + e.getMessage(),
+            IllegalArgumentException wrapped = new IllegalArgumentException(
+                    "Failed reflection fallback for method '" + methodName + "' on class '"
+                            + className + ", message: " + e.getMessage(),
                     e);
             throw wrapped;
         }
