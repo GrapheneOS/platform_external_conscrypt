@@ -1687,6 +1687,11 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
     }
 
     @Override
+    void setEchConfigList(byte[] echConfigList) {
+        sslParameters.setEchConfigList(echConfigList);
+    }
+
+    @Override
     String[] getApplicationProtocols() {
         return sslParameters.getApplicationProtocols();
     }

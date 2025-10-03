@@ -119,6 +119,8 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
     public abstract void
     setUseSessionTickets(boolean useSessionTickets);
 
+    @Override public abstract void setEchConfigList(byte[] echConfigList);
+
     @android.compat.annotation.UnsupportedAppUsage(maxTargetSdk = 30, trackingBug = 170729553)
     @Override
     public abstract void setChannelIdEnabled(boolean enabled);

@@ -16,11 +16,15 @@
 
 package android.net.ssl;
 
+import android.annotation.FlaggedApi;
+
 import com.android.org.conscrypt.Conscrypt;
-import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLException;
+
 import libcore.util.NonNull;
 import libcore.util.Nullable;
+
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLException;
 
 /**
  * Static utility methods for accessing additional functionality of supported instances of
@@ -56,6 +60,22 @@ public class SSLEngines {
     public static void setUseSessionTickets(@NonNull SSLEngine engine, boolean useSessionTickets) {
         checkSupported(engine);
         Conscrypt.setUseSessionTickets(engine, useSessionTickets);
+    }
+
+    /**
+     * Sets an EchConfigList to be used to establish ECH on the TLS handshake.
+     *
+     * <p>This function must be called before the handshake is started or it will have no effect.
+     *
+     * @param engine the engine
+     * @param echConfigList the ECH config data to be used in the handshake
+     * @throws IllegalArgumentException if the given engine is not a platform engine
+     */
+    @FlaggedApi(com.android.org.conscrypt.net.flags.Flags.FLAG_ENCRYPTED_CLIENT_HELLO_PLATFORM)
+    public static void setEchConfigList(
+            @NonNull SSLEngine engine, @NonNull EchConfigList echConfigList) {
+        checkSupported(engine);
+        Conscrypt.setEchConfigList(engine, echConfigList.toBytes());
     }
 
     /**
