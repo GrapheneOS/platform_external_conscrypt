@@ -32,7 +32,7 @@ public final class UserCertificateSource extends DirectoryCertificateSource {
     private UserCertificateSource() {
         // TODO(b/424086802): migrate to CE or DE directories.
         super(new File(
-                new File(System.getenv("ANDROID_DATA") + "/misc/user" + UserHandle.myUserId()),
+                new File(System.getenv("ANDROID_DATA") + "/misc/user/" + UserHandle.myUserId()),
                 "cacerts-added"));
     }
 
