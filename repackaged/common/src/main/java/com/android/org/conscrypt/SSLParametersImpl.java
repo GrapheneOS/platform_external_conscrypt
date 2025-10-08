@@ -109,6 +109,7 @@ final class SSLParametersImpl implements Cloneable {
     byte[] applicationProtocols = EmptyArray.BYTE;
     ApplicationProtocolSelectorAdapter applicationProtocolSelector;
     boolean useSessionTickets;
+    byte[] echConfigList;
     private Boolean useSni;
 
     /**
@@ -234,6 +235,7 @@ final class SSLParametersImpl implements Cloneable {
                 : sslParams.applicationProtocols.clone();
         this.applicationProtocolSelector = sslParams.applicationProtocolSelector;
         this.useSessionTickets = sslParams.useSessionTickets;
+        this.echConfigList = sslParams.echConfigList;
         this.useSni = sslParams.useSni;
         this.channelIdEnabled = sslParams.channelIdEnabled;
     }
@@ -460,6 +462,10 @@ final class SSLParametersImpl implements Cloneable {
 
     void setUseSessionTickets(boolean useSessionTickets) {
         this.useSessionTickets = useSessionTickets;
+    }
+
+    void setEchConfigList(byte[] echConfigList) {
+        this.echConfigList = echConfigList;
     }
 
     /*

@@ -16,11 +16,15 @@
 
 package android.net.ssl;
 
+import android.annotation.FlaggedApi;
+
 import com.android.org.conscrypt.Conscrypt;
-import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLSocket;
+
 import libcore.util.NonNull;
 import libcore.util.Nullable;
+
+import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLSocket;
 
 /**
  * Static utility methods for accessing additional functionality of supported instances of
@@ -56,6 +60,22 @@ public class SSLSockets {
     public static void setUseSessionTickets(@NonNull SSLSocket socket, boolean useSessionTickets) {
         checkSupported(socket);
         Conscrypt.setUseSessionTickets(socket, useSessionTickets);
+    }
+
+    /**
+     * Sets an EchConfigList to be used to establish ECH on the TLS handshake.
+     *
+     * <p>This function must be called before the handshake is started or it will have no effect.
+     *
+     * @param socket the socket
+     * @param echConfigList the ECH config data to be used in the handshake
+     * @throws IllegalArgumentException if the given socket is not a platform socket
+     */
+    @FlaggedApi(com.android.org.conscrypt.net.flags.Flags.FLAG_ENCRYPTED_CLIENT_HELLO_PLATFORM)
+    public static void setEchConfigList(
+            @NonNull SSLSocket socket, @NonNull EchConfigList echConfigList) {
+        checkSupported(socket);
+        Conscrypt.setEchConfigList(socket, echConfigList.toBytes());
     }
 
     /**

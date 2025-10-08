@@ -1,15 +1,26 @@
 // Signature format: 2.0
 package android.net.ssl {
 
+  @FlaggedApi("com.android.org.conscrypt.net.flags.encrypted_client_hello_platform") public class EchConfigList {
+    method @NonNull public static android.net.ssl.EchConfigList fromBytes(@NonNull byte[]) throws android.net.ssl.InvalidEchDataException;
+    method @NonNull public byte[] toBytes();
+  }
+
+  @FlaggedApi("com.android.org.conscrypt.net.flags.encrypted_client_hello_platform") public class InvalidEchDataException extends java.lang.Exception {
+    ctor public InvalidEchDataException(@Nullable String);
+  }
+
   public class SSLEngines {
     method @Nullable public static byte[] exportKeyingMaterial(@NonNull javax.net.ssl.SSLEngine, @NonNull String, @Nullable byte[], int) throws javax.net.ssl.SSLException;
     method public static boolean isSupportedEngine(@NonNull javax.net.ssl.SSLEngine);
+    method @FlaggedApi("com.android.org.conscrypt.net.flags.encrypted_client_hello_platform") public static void setEchConfigList(@NonNull javax.net.ssl.SSLEngine, @NonNull android.net.ssl.EchConfigList);
     method public static void setUseSessionTickets(@NonNull javax.net.ssl.SSLEngine, boolean);
   }
 
   public class SSLSockets {
     method @Nullable public static byte[] exportKeyingMaterial(@NonNull javax.net.ssl.SSLSocket, @NonNull String, @Nullable byte[], int) throws javax.net.ssl.SSLException;
     method public static boolean isSupportedSocket(@NonNull javax.net.ssl.SSLSocket);
+    method @FlaggedApi("com.android.org.conscrypt.net.flags.encrypted_client_hello_platform") public static void setEchConfigList(@NonNull javax.net.ssl.SSLSocket, @NonNull android.net.ssl.EchConfigList);
     method public static void setUseSessionTickets(@NonNull javax.net.ssl.SSLSocket, boolean);
   }
 
