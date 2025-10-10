@@ -233,7 +233,8 @@ final class SSLParametersImpl implements Cloneable {
                 : sslParams.applicationProtocols.clone();
         this.applicationProtocolSelector = sslParams.applicationProtocolSelector;
         this.useSessionTickets = sslParams.useSessionTickets;
-        this.echConfigList = sslParams.echConfigList;
+        this.echConfigList =
+                (sslParams.echConfigList == null) ? null : sslParams.echConfigList.clone();
         this.useSni = sslParams.useSni;
         this.channelIdEnabled = sslParams.channelIdEnabled;
     }
