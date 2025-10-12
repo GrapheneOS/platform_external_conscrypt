@@ -74,15 +74,19 @@ import javax.net.ssl.X509ExtendedTrustManager;
 /**
  *
  * TrustManager implementation. The implementation is based on CertPathValidator
- * PKIX and CertificateFactory X509 implementations. This implementations should
+ * PKIX and CertificateFactory X509 implementations. These implementations should
  * be provided by some certification provider.
  *
  * @see javax.net.ssl.X509ExtendedTrustManager
+ * @see com.android.org.conscrypt.ConscryptX509TrustManager
  * @hide This class is not part of the Android public SDK API
  */
+@android.annotation.
+FlaggedApi(com.android.org.conscrypt.net.flags.Flags.FLAG_CONSCRYPTX509TRUSTMANAGER)
 @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
 @Internal
-public final class TrustManagerImpl extends X509ExtendedTrustManager {
+public final class TrustManagerImpl
+        extends X509ExtendedTrustManager implements ConscryptX509TrustManager {
     private static final Logger logger = Logger.getLogger(TrustManagerImpl.class.getName());
 
     /**
@@ -309,6 +313,7 @@ public final class TrustManagerImpl extends X509ExtendedTrustManager {
      */
     @android.compat.annotation.UnsupportedAppUsage
     @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
+    @Override
     public List<X509Certificate> checkServerTrusted(
             X509Certificate[] chain, String authType, String hostname) throws CertificateException {
         return checkTrusted(chain, null /* ocspData */, null /* tlsSctData */, authType, hostname,
@@ -322,6 +327,7 @@ public final class TrustManagerImpl extends X509ExtendedTrustManager {
     @android.annotation.FlaggedApi(com.android.org.conscrypt.flags.Flags
                     .FLAG_CERTIFICATE_TRANSPARENCY_CHECKSERVERTRUSTED_API)
     @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
+    @Override
     public List<X509Certificate>
     checkServerTrusted(X509Certificate[] chain, byte[] ocspData, byte[] tlsSctData, String authType,
             String hostname) throws CertificateException {

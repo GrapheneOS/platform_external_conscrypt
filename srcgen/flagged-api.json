@@ -18,5 +18,21 @@
   {
     "@location": "method:com.android.org.conscrypt.AbstractConscryptSocket#setEchConfigList(byte[])",
     "value": "com.android.org.conscrypt.net.flags.Flags.FLAG_ENCRYPTED_CLIENT_HELLO_PLATFORM"
+  },
+  {
+    "@location": "method:com.android.org.conscrypt.ConscryptX509TrustManager#checkServerTrusted(X509Certificate[],String,String)",
+    "value": "com.android.org.conscrypt.net.flags.Flags.FLAG_CONSCRYPTX509TRUSTMANAGER"
+  },
+  {
+    "@location": "method:com.android.org.conscrypt.ConscryptX509TrustManager#checkServerTrusted(X509Certificate[],byte[],byte[],String,String)",
+    "value": "com.android.org.conscrypt.net.flags.Flags.FLAG_CONSCRYPTX509TRUSTMANAGER"
+  },
+  {
+    "@location": "type:com.android.org.conscrypt.ConscryptX509TrustManager",
+    "value": "com.android.org.conscrypt.net.flags.Flags.FLAG_CONSCRYPTX509TRUSTMANAGER"
+  },
+  {
+    "@location": "type:com.android.org.conscrypt.TrustManagerImpl",
+    "value": "com.android.org.conscrypt.net.flags.Flags.FLAG_CONSCRYPTX509TRUSTMANAGER"
   }
 ]

@@ -48,6 +48,11 @@ package com.android.org.conscrypt {
   public interface ConscryptCertStore {
   }
 
+  @FlaggedApi("com.android.org.conscrypt.net.flags.conscryptx509trustmanager") public interface ConscryptX509TrustManager {
+    method @FlaggedApi("com.android.org.conscrypt.net.flags.conscryptx509trustmanager") public java.util.List<java.security.cert.X509Certificate> checkServerTrusted(java.security.cert.X509Certificate[], String, String) throws java.security.cert.CertificateException;
+    method @FlaggedApi("com.android.org.conscrypt.net.flags.conscryptx509trustmanager") public java.util.List<java.security.cert.X509Certificate> checkServerTrusted(java.security.cert.X509Certificate[], byte[], byte[], String, String) throws java.security.cert.CertificateException;
+  }
+
   public final class FileClientSessionCache {
     method public static com.android.org.conscrypt.SSLClientSessionCache usingDirectory(java.io.File) throws java.io.IOException;
   }
@@ -82,7 +87,7 @@ package com.android.org.conscrypt {
   public interface SSLClientSessionCache {
   }
 
-  public final class TrustManagerImpl extends javax.net.ssl.X509ExtendedTrustManager {
+  @FlaggedApi("com.android.org.conscrypt.net.flags.conscryptx509trustmanager") public final class TrustManagerImpl extends javax.net.ssl.X509ExtendedTrustManager implements com.android.org.conscrypt.ConscryptX509TrustManager {
     ctor public TrustManagerImpl(java.security.KeyStore);
     ctor public TrustManagerImpl(java.security.KeyStore, com.android.org.conscrypt.CertPinManager, com.android.org.conscrypt.ConscryptCertStore);
     method public void checkClientTrusted(java.security.cert.X509Certificate[], String) throws java.security.cert.CertificateException;
