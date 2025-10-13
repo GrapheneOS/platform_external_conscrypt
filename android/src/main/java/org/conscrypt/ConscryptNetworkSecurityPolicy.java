@@ -37,4 +37,9 @@ public class ConscryptNetworkSecurityPolicy implements NetworkSecurityPolicy {
             String hostname) {
         return CertificateTransparencyVerificationReason.UNKNOWN;
     }
+
+    @Override
+    public DomainEncryptionMode getDomainEncryptionMode(String hostname) {
+        return DomainEncryptionMode.UNKNOWN;
+    }
 }

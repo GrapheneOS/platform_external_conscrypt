@@ -36,6 +36,7 @@ import javax.crypto.SecretKey;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SNIMatcher;
+import javax.net.ssl.SSLException;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509KeyManager;
@@ -822,6 +823,24 @@ final class SSLParametersImpl implements Cloneable {
         }
     }
 
+    private NetworkSecurityPolicy getPolicy() {
+        // If the TrustManager has a security policy attached, use it. We are using reflection here.
+        // The Android framework may provide a high-level TrustManager (e.g., RootTrustManager or
+        // NetworkSecurityTrustManager), which we need to query.
+        if (getNetworkSecurityPolicy != null) {
+            try {
+                Object objPolicy = getNetworkSecurityPolicy.invoke(x509TrustManager);
+                if (objPolicy instanceof NetworkSecurityPolicy) {
+                    return (NetworkSecurityPolicy) objPolicy;
+                }
+            } catch (IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException ignored) {
+            }
+        }
+        // Otherwise, rely on the global platform policy.
+        return ConscryptNetworkSecurityPolicy.getDefault();
+    }
+
     /*
      * Checks whether SCT verification is enforced for a given hostname. This
      * will be used to decide if the TLS extension should be sent.
@@ -836,24 +855,25 @@ final class SSLParametersImpl implements Cloneable {
             return true;
         }
 
-        // If the TrustManager has a security policy attached, use it. We are using reflection here.
-        // The Android framework may provide a high-level TrustManager (e.g., RootTrustManager or
-        // NetworkSecurityTrustManager), which we need to query.
-        if (getNetworkSecurityPolicy != null) {
-            try {
-                Object objPolicy = getNetworkSecurityPolicy.invoke(x509TrustManager);
-                if (objPolicy instanceof NetworkSecurityPolicy) {
-                    NetworkSecurityPolicy policy = (NetworkSecurityPolicy) objPolicy;
-                    return policy.isCertificateTransparencyVerificationRequired(hostname);
-                }
-            } catch (IllegalAccessException | IllegalArgumentException
-                    | InvocationTargetException ignored) {
-            }
-        }
+        return getPolicy().isCertificateTransparencyVerificationRequired(hostname);
+    }
 
-        // Otherwise, rely on the global platform policy.
-        return ConscryptNetworkSecurityPolicy.getDefault()
-                .isCertificateTransparencyVerificationRequired(hostname);
+    EchOptions getEchOptions(String hostname) throws SSLException {
+        switch (getPolicy().getDomainEncryptionMode(hostname)) {
+            case DISABLED:
+                return null;
+            case OPPORTUNISTIC:
+                return new EchOptions(echConfigList, /* enableGrease= */ false);
+            case ENABLED:
+                return new EchOptions(echConfigList, /* enableGrease= */ true);
+            case REQUIRED:
+                if (echConfigList == null) {
+                    throw new SSLException("No ECH config provided when required");
+                }
+                return new EchOptions(echConfigList, /* enableGrease= */ false);
+            default:
+                return null;
+        }
     }
 
     boolean isSpake() {

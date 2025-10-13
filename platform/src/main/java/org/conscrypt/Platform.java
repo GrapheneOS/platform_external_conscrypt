@@ -70,6 +70,7 @@ import javax.net.ssl.SNIHostName;
 import javax.net.ssl.SNIMatcher;
 import javax.net.ssl.SNIServerName;
 import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
@@ -479,6 +480,10 @@ final public class Platform {
     // The platform always has X509ExtendedTrustManager
     static boolean supportsX509ExtendedTrustManager() {
         return true;
+    }
+
+    static SSLException wrapInvalidEchDataException(SSLException e) {
+        return new android.net.ssl.InvalidEchDataException(e.getMessage());
     }
 
     static boolean supportsConscryptCertStore() {
