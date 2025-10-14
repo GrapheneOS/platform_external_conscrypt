@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+  <base-config>
+      <!-- Don't specify a domainEncryption mode to rely on the default-->
+  </base-config>
+  <domain-config>
+    <domainEncryption mode="foobar" />
+    <domain>android.com</domain>
+  </domain-config>
+  <domain-config>
+    <domainEncryption mode="   enabled   " />
+    <domain>whitespace.android.com</domain>
+  </domain-config>
+  <domain-config>
+      <domainEncryption mode="DiSaBlEd" />
+    <domain>capitalized.android.com</domain>
+  </domain-config>
+</network-security-config>
