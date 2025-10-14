@@ -19,14 +19,13 @@ package android.net.ssl;
 import android.annotation.FlaggedApi;
 import android.annotation.Nullable;
 
-import java.io.ObjectStreamClass;
-import java.lang.Exception;
+import javax.net.ssl.SSLException;
 
 /**
  * Exception thrown when the ECH (Encrypted Client Hello) data is empty or invalid.
  */
 @FlaggedApi(com.android.org.conscrypt.net.flags.Flags.FLAG_ENCRYPTED_CLIENT_HELLO_PLATFORM)
-public class InvalidEchDataException extends Exception {
+public class InvalidEchDataException extends SSLException {
     public InvalidEchDataException(@Nullable String message) {
         super(message);
     }
