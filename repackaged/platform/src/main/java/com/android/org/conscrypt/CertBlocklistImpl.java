@@ -22,7 +22,6 @@ import static com.android.org.conscrypt.CertBlocklistEntry.Origin;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.android.org.conscrypt.Platform;
-import com.android.org.conscrypt.flags.Flags;
 import com.android.org.conscrypt.metrics.StatsLog;
 
 import java.io.ByteArrayOutputStream;
@@ -268,72 +267,6 @@ public final class CertBlocklistImpl implements CertBlocklist {
           (byte) 0x82, (byte) 0x58, (byte) 0x65, (byte) 0xe9, (byte) 0x3d,
     };
 
-    static final byte[][] SHA1_DEPRECATED_BUILTINS = {
-        // "410f36363258f30b347d12ce4863e433437806a8"
-        {
-            (byte) 0x41, (byte) 0x0f, (byte) 0x36, (byte) 0x36, (byte) 0x32,
-            (byte) 0x58, (byte) 0xf3, (byte) 0x0b, (byte) 0x34, (byte) 0x7d,
-            (byte) 0x12, (byte) 0xce, (byte) 0x48, (byte) 0x63, (byte) 0xe4,
-            (byte) 0x33, (byte) 0x43, (byte) 0x78, (byte) 0x06, (byte) 0xa8,
-        },
-        // "ba3e7bd38cd7e1e6b9cd4c219962e59d7a2f4e37"
-        {
-            (byte) 0xba, (byte) 0x3e, (byte) 0x7b, (byte) 0xd3, (byte) 0x8c,
-            (byte) 0xd7, (byte) 0xe1, (byte) 0xe6, (byte) 0xb9, (byte) 0xcd,
-            (byte) 0x4c, (byte) 0x21, (byte) 0x99, (byte) 0x62, (byte) 0xe5,
-            (byte) 0x9d, (byte) 0x7a, (byte) 0x2f, (byte) 0x4e, (byte) 0x37,
-        },
-        // "e23b8d105f87710a68d9248050ebefc627be4ca6"
-        {
-            (byte) 0xe2, (byte) 0x3b, (byte) 0x8d, (byte) 0x10, (byte) 0x5f,
-            (byte) 0x87, (byte) 0x71, (byte) 0x0a, (byte) 0x68, (byte) 0xd9,
-            (byte) 0x24, (byte) 0x80, (byte) 0x50, (byte) 0xeb, (byte) 0xef,
-            (byte) 0xc6, (byte) 0x27, (byte) 0xbe, (byte) 0x4c, (byte) 0xa6,
-        },
-        // "7b2e16bc39bcd72b456e9f055d1de615b74945db"
-        {
-            (byte) 0x7b, (byte) 0x2e, (byte) 0x16, (byte) 0xbc, (byte) 0x39,
-            (byte) 0xbc, (byte) 0xd7, (byte) 0x2b, (byte) 0x45, (byte) 0x6e,
-            (byte) 0x9f, (byte) 0x05, (byte) 0x5d, (byte) 0x1d, (byte) 0xe6,
-            (byte) 0x15, (byte) 0xb7, (byte) 0x49, (byte) 0x45, (byte) 0xdb,
-        },
-        // "e8f91200c65cee16e039b9f883841661635f81c5"
-        {
-            (byte) 0xe8, (byte) 0xf9, (byte) 0x12, (byte) 0x00, (byte) 0xc6,
-            (byte) 0x5c, (byte) 0xee, (byte) 0x16, (byte) 0xe0, (byte) 0x39,
-            (byte) 0xb9, (byte) 0xf8, (byte) 0x83, (byte) 0x84, (byte) 0x16,
-            (byte) 0x61, (byte) 0x63, (byte) 0x5f, (byte) 0x81, (byte) 0xc5,
-        },
-        // "0129bcd5b448ae8d2496d1c3e19723919088e152"
-        {
-            (byte) 0x01, (byte) 0x29, (byte) 0xbc, (byte) 0xd5, (byte) 0xb4,
-            (byte) 0x48, (byte) 0xae, (byte) 0x8d, (byte) 0x24, (byte) 0x96,
-            (byte) 0xd1, (byte) 0xc3, (byte) 0xe1, (byte) 0x97, (byte) 0x23,
-            (byte) 0x91, (byte) 0x90, (byte) 0x88, (byte) 0xe1, (byte) 0x52,
-        },
-        // "5f3ab33d55007054bc5e3e5553cd8d8465d77c61"
-        {
-            (byte) 0x5f, (byte) 0x3a, (byte) 0xb3, (byte) 0x3d, (byte) 0x55,
-            (byte) 0x00, (byte) 0x70, (byte) 0x54, (byte) 0xbc, (byte) 0x5e,
-            (byte) 0x3e, (byte) 0x55, (byte) 0x53, (byte) 0xcd, (byte) 0x8d,
-            (byte) 0x84, (byte) 0x65, (byte) 0xd7, (byte) 0x7c, (byte) 0x61,
-        },
-        // "783333c9687df63377efceddd82efa9101913e8e"
-        {
-            (byte) 0x78, (byte) 0x33, (byte) 0x33, (byte) 0xc9, (byte) 0x68,
-            (byte) 0x7d, (byte) 0xf6, (byte) 0x33, (byte) 0x77, (byte) 0xef,
-            (byte) 0xce, (byte) 0xdd, (byte) 0xd8, (byte) 0x2e, (byte) 0xfa,
-            (byte) 0x91, (byte) 0x01, (byte) 0x91, (byte) 0x3e, (byte) 0x8e,
-        },
-        // "3ecf4bbbe46096d514bb539bb913d77aa4ef31bf"
-        {
-            (byte) 0x3e, (byte) 0xcf, (byte) 0x4b, (byte) 0xbb, (byte) 0xe4,
-            (byte) 0x60, (byte) 0x96, (byte) 0xd5, (byte) 0x14, (byte) 0xbb,
-            (byte) 0x53, (byte) 0x9b, (byte) 0xb9, (byte) 0x13, (byte) 0xd7,
-            (byte) 0x7a, (byte) 0xa4, (byte) 0xef, (byte) 0x31, (byte) 0xbf,
-        },
-    };
-
     static final byte[] SHA256_TEST = {
             // Blocklist test cert for CTS. The cert and key can be found in
             // src/test/resources/blocklist_test_ca2.pem and
@@ -355,21 +288,13 @@ public final class CertBlocklistImpl implements CertBlocklist {
         switch (hashType) {
             case DIGEST_SHA1:
                 bl.put(new ByteArray(SHA1_TEST), new Entry(Origin.SHA1_TEST, /* index= */ 0));
-                if (!Flags.useChromiumCertBlocklist()) {
-                    for (int i = 0; i < SHA1_DEPRECATED_BUILTINS.length; i++) {
-                        bl.put(new ByteArray(SHA1_DEPRECATED_BUILTINS[i]),
-                                new Entry(Origin.SHA1_BUILT_IN, /* index= */ i));
-                    }
-                }
                 break;
             case DIGEST_SHA256:
                 bl.put(new ByteArray(SHA256_TEST), new Entry(Origin.SHA256_TEST, /* index= */ 0));
-                if (Flags.useChromiumCertBlocklist()) {
-                    // Blocklist statically included in Conscrypt. See constants/.
-                    for (int i = 0; i < StaticBlocklist.PUBLIC_KEYS.length; i++) {
-                        bl.put(new ByteArray(StaticBlocklist.PUBLIC_KEYS[i]),
-                                new Entry(Origin.SHA256_BUILT_IN, /* index= */ i));
-                    }
+                // Blocklist statically included in Conscrypt. See constants/.
+                for (int i = 0; i < StaticBlocklist.PUBLIC_KEYS.length; i++) {
+                    bl.put(new ByteArray(StaticBlocklist.PUBLIC_KEYS[i]),
+                            new Entry(Origin.SHA256_BUILT_IN, /* index= */ i));
                 }
                 break;
             default:
