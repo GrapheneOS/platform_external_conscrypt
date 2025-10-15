@@ -82,7 +82,7 @@ public class ConscryptEngineTest {
         HEAP_NO_ALLOCATOR(null) {
             @Override
             ByteBuffer newBuffer(int size) {
-                return ByteBuffer.allocate(size);
+                return ByteBuffer.allocateDirect(size);
             }
         },
         DIRECT(null) {
