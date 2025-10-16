@@ -6,7 +6,13 @@ package android.net.ssl {
     method @NonNull public byte[] toBytes();
   }
 
-  @FlaggedApi("com.android.org.conscrypt.net.flags.encrypted_client_hello_platform") public class InvalidEchDataException extends java.lang.Exception {
+  @FlaggedApi("com.android.org.conscrypt.net.flags.encrypted_client_hello_platform") public class EchConfigMismatchException extends javax.net.ssl.SSLException {
+    ctor public EchConfigMismatchException(@Nullable String, @Nullable android.net.ssl.EchConfigList);
+    method @Nullable public android.net.ssl.EchConfigList getRetryConfigList();
+    method public boolean hasRetryConfigList();
+  }
+
+  @FlaggedApi("com.android.org.conscrypt.net.flags.encrypted_client_hello_platform") public class InvalidEchDataException extends javax.net.ssl.SSLException {
     ctor public InvalidEchDataException(@Nullable String);
   }
 
