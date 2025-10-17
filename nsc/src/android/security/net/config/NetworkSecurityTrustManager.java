@@ -18,6 +18,7 @@ package android.security.net.config;
 
 import android.util.ArrayMap;
 
+import com.android.org.conscrypt.ConscryptNetworkSecurityPolicy;
 import com.android.org.conscrypt.TrustManagerImpl;
 
 import java.io.IOException;
@@ -126,6 +127,18 @@ public class NetworkSecurityTrustManager extends X509ExtendedTrustManager {
                 mDelegate.checkServerTrusted(certs, ocspData, tlsSctData, authType, host);
         checkPins(trustedChain);
         return trustedChain;
+    }
+
+    /** Sets the policy attached to this TrustManager */
+    public void setNetworkSecurityPolicy(ConscryptNetworkSecurityPolicy policy) {
+        mDelegate.setNetworkSecurityPolicy(policy);
+    }
+
+    /**
+     * This interface is used by Conscrypt, do not modify without modifying those callers.
+     */
+    public ConscryptNetworkSecurityPolicy getNetworkSecurityPolicy() {
+        return mDelegate.getNetworkSecurityPolicy();
     }
 
     private void checkPins(List<X509Certificate> chain) throws CertificateException {

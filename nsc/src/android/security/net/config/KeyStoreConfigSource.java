@@ -29,13 +29,11 @@ class KeyStoreConfigSource implements ConfigSource {
     private final NetworkSecurityConfig mConfig;
 
     public KeyStoreConfigSource(KeyStore ks) {
-        mConfig = new NetworkSecurityConfig.Builder()
-                          .addCertificatesEntryRef(
-                                  // Use the KeyStore and do not override pins (of which there are
-                                  // none).
-                                  new CertificatesEntryRef(
-                                          new KeyStoreCertificateSource(ks), false, false))
-                          .build();
+        CertificatesEntryRef entry = new CertificatesEntryRef(new KeyStoreCertificateSource(ks),
+                /* overridesPins= */ false,
+                /* disableCT= */ true);
+
+        mConfig = new NetworkSecurityConfig.Builder().addCertificatesEntryRef(entry).build();
     }
 
     @Override

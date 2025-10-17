@@ -31,6 +31,8 @@ import android.os.Build;
 import android.util.ArrayMap;
 import android.util.ArraySet;
 
+import com.android.org.conscrypt.ConscryptNetworkSecurityPolicy;
+
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -161,6 +163,13 @@ public final class NetworkSecurityConfig {
                 mTrustManager = new NetworkSecurityTrustManager(this);
             }
             return mTrustManager;
+        }
+    }
+
+    /** Sets the NetworkSecurityPolicy for the associated TrustManager */
+    void setNetworkSecurityPolicy(libcore.net.NetworkSecurityPolicy policy) {
+        if (certificateTransparencyDefaultEnabled()) {
+            getTrustManager().setNetworkSecurityPolicy(new ConscryptNetworkSecurityPolicy(policy));
         }
     }
 
