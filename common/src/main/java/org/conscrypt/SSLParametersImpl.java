@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.crypto.SecretKey;
 import javax.net.ssl.KeyManager;
@@ -52,6 +53,7 @@ import javax.security.auth.x500.X500Principal;
  * socket or not.
  */
 final class SSLParametersImpl implements Cloneable {
+    private static final Logger logger = Logger.getLogger(SSLParametersImpl.class.getName());
 
     // default source of X.509 certificate based authentication keys
     private static volatile X509KeyManager defaultX509KeyManager;
@@ -833,8 +835,17 @@ final class SSLParametersImpl implements Cloneable {
                 if (objPolicy instanceof NetworkSecurityPolicy) {
                     return (NetworkSecurityPolicy) objPolicy;
                 }
-            } catch (IllegalAccessException | IllegalArgumentException
-                    | InvocationTargetException ignored) {
+            } catch (IllegalAccessException | IllegalArgumentException e) {
+                // This is the unlikely scenario where an external TrustManager is being used and it
+                // defines a getNetworkSecurityPolicy method which does not match our expectations.
+                logger.warning("Unable to call getNetworkSecurityPolicy on TrustManager: "
+                        + e.getMessage());
+            } catch (InvocationTargetException e) {
+                // getNetworkSecurityPolicy raised an exception. Unwrap it.
+                throw new RuntimeException(
+                        "Unable to retrieve the NetworkSecurityPolicy associated "
+                                + "with the TrustManager",
+                        e.getCause());
             }
         }
         // Otherwise, rely on the global platform policy.
