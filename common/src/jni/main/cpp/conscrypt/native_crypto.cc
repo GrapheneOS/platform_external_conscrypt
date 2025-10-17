@@ -7834,12 +7834,7 @@ static int sslSelect(JNIEnv* env, int type, jobject fdObject, AppData* appData,
         if (fds[1].revents & POLLIN) {
             char token;
             do {
-                // TEMP - fixes build error
-                int foo = 0;
-                foo = read(appData->fdsEmergency[0], &token, 1);
-                if (foo > 0) {
-                    CONSCRYPT_LOG_VERBOSE("FOO: %d", foo);
-                }
+                CONSCRYPT_UNUSED int n = read(appData->fdsEmergency[0], &token, 1);
             } while (errno == EINTR);
         }
     }
@@ -7870,12 +7865,7 @@ static void sslNotify(AppData* appData) {
     char token = '*';
     do {
         errno = 0;
-        // TEMP - fixes build error
-        int foo = 0;
-        foo = write(appData->fdsEmergency[1], &token, 1);
-        if (foo > 0) {
-            CONSCRYPT_LOG_VERBOSE("FOO: %d", foo);
-        }
+        CONSCRYPT_UNUSED int n = write(appData->fdsEmergency[1], &token, 1);
     } while (errno == EINTR);
     errno = errnoBackup;
 #endif
@@ -11864,7 +11854,7 @@ static jboolean NativeCrypto_SSL_set1_ech_config_list(JNIEnv* env, jclass, jlong
     int ret = SSL_set1_ech_config_list(ssl, reinterpret_cast<const uint8_t*>(configBytes.get()),
                                        configBytes.size());
     if (!ret) {
-        conscrypt::jniutil::throwParsingException(env, "Error parsing ECH config");
+        conscrypt::jniutil::throwSSLExceptionStr(env, "Error parsing ECH config");
         ERR_clear_error();
         JNI_TRACE("ssl=%p NativeCrypto_SSL_set1_ech_config_list(%p) => threw exception", ssl,
                   configJavaBytes);
@@ -11962,8 +11952,6 @@ static jboolean NativeCrypto_SSL_ech_accepted(JNIEnv* env, jclass, jlong ssl_add
     JNI_TRACE("ssl=%p NativeCrypto_SSL_ech_accepted", ssl);
 
     if (!SSL_ech_accepted(ssl)) {
-        conscrypt::jniutil::throwParsingException(env, "Invalid ECH config list");
-        ERR_clear_error();
         JNI_TRACE("ssl=%p NativeCrypto_SSL_ech_accepted => threw exception", ssl);
         return JNI_FALSE;
     }

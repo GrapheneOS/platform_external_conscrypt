@@ -211,7 +211,7 @@ public abstract class HpkeImpl implements HpkeSpi {
             super(new HpkeSuite(KEM_DHKEM_X25519_HKDF_SHA256, KDF_HKDF_SHA256, AEAD_AES_256_GCM));
         }
     }
-    
+
     /** Implementation of X25519/HKDF_SHA256/CHACHA20_POLY1305. */
     public static class X25519_CHACHA20 extends HpkeX25519Impl {
         public X25519_CHACHA20() {
