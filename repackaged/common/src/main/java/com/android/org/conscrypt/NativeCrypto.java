@@ -52,11 +52,12 @@ import javax.security.auth.x500.X500Principal;
 
 /**
  * Provides the Java side of our JNI glue for OpenSSL.
- *
- * <p>Note: Many methods in this class take a reference to a Java object that holds a native pointer
- * in the form of a long in addition to the long itself and don't use the Java object in the native
- * implementation. This is to prevent the Java object from becoming eligible for GC while the native
- * method is executing. See <a
+ * <p>
+ * Note: Many methods in this class take a reference to a Java object that holds a
+ * native pointer in the form of a long in addition to the long itself and don't use
+ * the Java object in the native implementation.  This is to prevent the Java object
+ * from becoming eligible for GC while the native method is executing.  See
+ * <a
  * href="https://github.com/google/error-prone/blob/master/docs/bugpattern/UnsafeFinalization.md">this</a>
  * for more details.
  * @hide This class is not part of the Android public SDK API
@@ -70,7 +71,6 @@ public final class NativeCrypto {
         UnsatisfiedLinkError error = null;
         try {
             NativeCryptoJni.init();
-            clinit();
         } catch (UnsatisfiedLinkError t) {
             // Don't rethrow the error, so that we can later on interrogate the
             // value of loadError.
@@ -79,8 +79,6 @@ public final class NativeCrypto {
         loadError = error;
         setTlsV1DeprecationStatus(Platform.isTlsV1Deprecated(), Platform.isTlsV1Supported());
     }
-
-    @FastNative private static native void clinit();
 
     /**
      * Checks to see whether or not the native library was successfully loaded. If not, throws the
@@ -133,7 +131,6 @@ public final class NativeCrypto {
     static native long getECPrivateKeyWrapper(PrivateKey key, NativeRef.EC_GROUP ecGroupRef);
 
     @android.compat.annotation.UnsupportedAppUsage
-    @FastNative
     static native long RSA_generate_key_ex(int modulusBits, byte[] publicExponent);
 
     @FastNative static native int RSA_size(NativeRef.EVP_PKEY pkey);
@@ -217,7 +214,7 @@ public final class NativeCrypto {
     static native void EC_POINT_set_affine_coordinates(
             NativeRef.EC_GROUP groupRef, NativeRef.EC_POINT pointRef, byte[] x, byte[] y);
 
-    @FastNative static native long EC_KEY_generate_key(NativeRef.EC_GROUP groupRef);
+    static native long EC_KEY_generate_key(NativeRef.EC_GROUP groupRef);
 
     @FastNative static native long EC_KEY_get1_group(NativeRef.EVP_PKEY pkeyRef);
 
@@ -236,9 +233,40 @@ public final class NativeCrypto {
 
     @FastNative static native int ECDSA_size(NativeRef.EVP_PKEY pkey);
 
-    @FastNative static native int ECDSA_sign(byte[] data, byte[] sig, NativeRef.EVP_PKEY pkey);
+    @FastNative
+    static native int ECDSA_sign(byte[] data, int dataLen, byte[] sig, NativeRef.EVP_PKEY pkey);
 
-    @FastNative static native int ECDSA_verify(byte[] data, byte[] sig, NativeRef.EVP_PKEY pkey);
+    @FastNative
+    static native int ECDSA_verify(byte[] data, int dataLen, byte[] sig, NativeRef.EVP_PKEY pkey);
+
+    // --- MLDSA65 --------------------------------------------------------------
+
+    @FastNative static native byte[] MLDSA65_public_key_from_seed(byte[] privateKeySeed);
+
+    @FastNative static native byte[] MLDSA65_sign(byte[] data, int dataLen, byte[] privateKeySeed);
+
+    @FastNative
+    static native int MLDSA65_verify(byte[] data, int dataLen, byte[] sig, byte[] publicKey);
+
+    // --- MLDSA87 --------------------------------------------------------------
+
+    @FastNative static native byte[] MLDSA87_public_key_from_seed(byte[] privateKeySeed);
+
+    @FastNative static native byte[] MLDSA87_sign(byte[] data, int dataLen, byte[] privateKeySeed);
+
+    @FastNative
+    static native int MLDSA87_verify(byte[] data, int dataLen, byte[] sig, byte[] publicKey);
+
+    // --- SLHDSA_SHA2_128S --------------------------------------------------------------
+
+    static native void SLHDSA_SHA2_128S_generate_key(byte[] outPublicKey, byte[] outPrivateKey);
+
+    @FastNative
+    static native byte[] SLHDSA_SHA2_128S_sign(byte[] data, int dataLen, byte[] privateKey);
+
+    @FastNative
+    static native int SLHDSA_SHA2_128S_verify(
+            byte[] data, int dataLen, byte[] sig, byte[] publicKey);
 
     // --- Curve25519 --------------
 
@@ -249,6 +277,10 @@ public final class NativeCrypto {
     @FastNative static native void X25519_keypair(byte[] outPublicKey, byte[] outPrivateKey);
 
     @FastNative static native void ED25519_keypair(byte[] outPublicKey, byte[] outPrivateKey);
+
+    // --- X-Wing --------------
+
+    static native byte[] XWING_public_key_from_seed(byte[] privateKeySeed);
 
     // --- Message digest functions --------------
 
@@ -485,7 +517,7 @@ public final class NativeCrypto {
     static native byte[] EVP_HPKE_CTX_export(
             NativeRef.EVP_HPKE_CTX ctx, byte[] exporterCtx, int length);
 
-    @FastNative static native void EVP_HPKE_CTX_free(long ctx);
+    static native void EVP_HPKE_CTX_free(long ctx);
 
     @FastNative
     static native byte[] EVP_HPKE_CTX_open(
@@ -591,7 +623,7 @@ public final class NativeCrypto {
     @FastNative
     static native long[] ASN1_seq_unpack_X509_bio(long bioRef) throws ParsingException;
 
-    @FastNative static native void X509_free(long x509ctx, OpenSSLX509Certificate holder);
+    static native void X509_free(long x509ctx, OpenSSLX509Certificate holder);
 
     @FastNative
     static native int X509_cmp(long x509ctx1, OpenSSLX509Certificate holder, long x509ctx2,
@@ -1429,7 +1461,7 @@ public final class NativeCrypto {
             }
             // Not sure if we need to do this for SPAKE, but the SPAKE cipher suite
             // not registered at the moment.
-            if (DEFAULT_SPAKE_CIPHER_SUITES[0] == cipherSuites[i]) {
+            if (DEFAULT_SPAKE_CIPHER_SUITES[0].equals(cipherSuites[i])) {
                 continue;
             }
 
@@ -1739,15 +1771,21 @@ public final class NativeCrypto {
     static native int ENGINE_SSL_write_direct(long ssl, NativeSsl ssl_holder, long address,
             int length, SSLHandshakeCallbacks shc) throws IOException;
 
-    /** Writes data from the given direct {@link java.nio.ByteBuffer} to the BIO. */
+    /**
+     * Writes data from the given direct {@link java.nio.ByteBuffer} to the BIO.
+     */
     static native int ENGINE_SSL_write_BIO_direct(long ssl, NativeSsl ssl_holder, long bioRef,
             long pos, int length, SSLHandshakeCallbacks shc) throws IOException;
 
-    /** Reads data from the given BIO into a direct {@link java.nio.ByteBuffer}. */
+    /**
+     * Reads data from the given BIO into a direct {@link java.nio.ByteBuffer}.
+     */
     static native int ENGINE_SSL_read_BIO_direct(long ssl, NativeSsl ssl_holder, long bioRef,
             long address, int len, SSLHandshakeCallbacks shc) throws IOException;
 
-    /** Forces the SSL object to process any data pending in the BIO. */
+    /**
+     * Forces the SSL object to process any data pending in the BIO.
+     */
     static native void ENGINE_SSL_force_read(
             long ssl, NativeSsl ssl_holder, SSLHandshakeCallbacks shc) throws IOException;
 
@@ -1758,15 +1796,44 @@ public final class NativeCrypto {
     static native void ENGINE_SSL_shutdown(
             long ssl, NativeSsl ssl_holder, SSLHandshakeCallbacks shc) throws IOException;
 
-    /** Generates a key from a password and salt using Scrypt. */
-    @FastNative
+    /**
+     * Generates a key from a password and salt using Scrypt.
+     */
     static native byte[] Scrypt_generate_key(
             byte[] password, byte[] salt, int n, int r, int p, int key_len);
 
     /** Return {@code true} if BoringSSL has been built in FIPS mode. */
     @CriticalNative static native boolean usesBoringSsl_FIPS_mode();
 
-    /** Used for testing only. */
+    /* ECH */
+
+    static native void SSL_set_enable_ech_grease(long ssl, NativeSsl ssl_holder, boolean enable);
+
+    static native boolean SSL_set1_ech_config_list(
+            long ssl, NativeSsl ssl_holder, byte[] echConfig);
+
+    static native String SSL_get0_ech_name_override(long ssl, NativeSsl ssl_holder);
+
+    static native byte[] SSL_get0_ech_retry_configs(long ssl, NativeSsl ssl_holder);
+
+    static native byte[] SSL_marshal_ech_config(short configId, byte[] key, String publicName);
+
+    static native long SSL_ECH_KEYS_new();
+
+    static native void SSL_ECH_KEYS_up_ref(long sslEchKeys);
+
+    static native void SSL_ECH_KEYS_free(long sslEchKeys);
+
+    static native byte[] SSL_ECH_KEYS_marshal_retry_configs(byte[] key);
+
+    static native boolean SSL_ech_accepted(long ssl, NativeSsl ssl_holder);
+
+    static native boolean SSL_CTX_ech_enable_server(
+            long sslCtx, AbstractSessionContext holder, byte[] key, byte[] config);
+
+    /**
+     * Used for testing only.
+     */
     @FastNative static native int BIO_read(long bioRef, byte[] buffer) throws IOException;
 
     @FastNative

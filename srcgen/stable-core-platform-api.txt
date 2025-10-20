@@ -1,5 +1,8 @@
 method:com.android.org.conscrypt.ClientSessionContext#setPersistentCache(SSLClientSessionCache)
 method:com.android.org.conscrypt.Conscrypt#getDefaultX509TrustManager()
+method:com.android.org.conscrypt.ConscryptNetworkSecurityPolicy#ConscryptNetworkSecurityPolicy(libcore.net.NetworkSecurityPolicy)
+method:com.android.org.conscrypt.ConscryptX509TrustManager#checkServerTrusted(X509Certificate[],String,String)
+method:com.android.org.conscrypt.ConscryptX509TrustManager#checkServerTrusted(X509Certificate[],byte[],byte[],String,String)
 method:com.android.org.conscrypt.FileClientSessionCache#usingDirectory(File)
 method:com.android.org.conscrypt.OpenSSLProvider#OpenSSLProvider()
 method:com.android.org.conscrypt.OpenSSLSocketImpl#getAlpnSelectedProtocol()
@@ -43,6 +46,8 @@ method:com.android.org.conscrypt.TrustManagerImpl#checkServerTrusted(X509Certifi
 method:com.android.org.conscrypt.TrustManagerImpl#checkServerTrusted(X509Certificate[],byte[],byte[],String,String)
 method:com.android.org.conscrypt.TrustManagerImpl#getTrustedChainForServer(X509Certificate[],String,Socket)
 method:com.android.org.conscrypt.TrustManagerImpl#getTrustedChainForServer(X509Certificate[],String,SSLEngine)
+method:com.android.org.conscrypt.TrustManagerImpl#getNetworkSecurityPolicy()
+method:com.android.org.conscrypt.TrustManagerImpl#setNetworkSecurityPolicy(ConscryptNetworkSecurityPolicy)
 method:com.android.org.conscrypt.TrustManagerImpl#handleTrustStorageUpdate()
 method:com.android.org.conscrypt.TrustManagerImpl#TrustManagerImpl(KeyStore)
 method:com.android.org.conscrypt.TrustManagerImpl#TrustManagerImpl(KeyStore,CertPinManager,ConscryptCertStore)
@@ -50,6 +55,8 @@ type:com.android.org.conscrypt.CertPinManager
 type:com.android.org.conscrypt.ClientSessionContext
 type:com.android.org.conscrypt.Conscrypt
 type:com.android.org.conscrypt.ConscryptCertStore
+type:com.android.org.conscrypt.ConscryptNetworkSecurityPolicy
+type:com.android.org.conscrypt.ConscryptX509TrustManager
 type:com.android.org.conscrypt.FileClientSessionCache
 type:com.android.org.conscrypt.OpenSSLProvider
 type:com.android.org.conscrypt.OpenSSLSocketImpl

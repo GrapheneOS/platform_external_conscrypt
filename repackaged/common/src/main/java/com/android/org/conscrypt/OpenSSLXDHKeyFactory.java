@@ -110,7 +110,7 @@ public final class OpenSSLXDHKeyFactory extends KeyFactorySpi {
                 @SuppressWarnings("unchecked") T result = (T) new XdhKeySpec(conscryptKey.getU());
                 return result;
             } else if (EncodedKeySpec.class.isAssignableFrom(keySpec)) {
-                return makeRawKeySpec(conscryptKey.getU(), keySpec);
+                return KeySpecUtil.makeRawKeySpec(conscryptKey.getU(), keySpec);
             }
         } else if (key instanceof OpenSSLX25519PrivateKey) {
             OpenSSLX25519PrivateKey conscryptKey = (OpenSSLX25519PrivateKey) key;
@@ -126,28 +126,11 @@ public final class OpenSSLXDHKeyFactory extends KeyFactorySpi {
                 @SuppressWarnings("unchecked") T result = (T) new XdhKeySpec(conscryptKey.getU());
                 return result;
             } else if (EncodedKeySpec.class.isAssignableFrom(keySpec)) {
-                return makeRawKeySpec(conscryptKey.getU(), keySpec);
+                return KeySpecUtil.makeRawKeySpec(conscryptKey.getU(), keySpec);
             }
         }
         throw new InvalidKeySpecException("Unsupported key type and key spec combination; key="
                 + key.getClass().getName() + ", keySpec=" + keySpec.getName());
-    }
-
-    private <T extends KeySpec> T makeRawKeySpec(byte[] bytes, Class<T> keySpecClass)
-            throws InvalidKeySpecException {
-        try {
-            Constructor<T> constructor = keySpecClass.getConstructor(byte[].class);
-            T instance = constructor.newInstance((Object) bytes);
-            EncodedKeySpec spec = (EncodedKeySpec) instance;
-            if (!spec.getFormat().equalsIgnoreCase("raw")) {
-                throw new InvalidKeySpecException("EncodedKeySpec class must be raw format");
-            }
-            return instance;
-        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException
-                | IllegalAccessException e) {
-            throw new InvalidKeySpecException(
-                    "Can't process KeySpec class " + keySpecClass.getName(), e);
-        }
     }
 
     @Override
@@ -229,6 +212,13 @@ public final class OpenSSLXDHKeyFactory extends KeyFactorySpi {
         }
     }
 
+    // See https://datatracker.ietf.org/doc/html/rfc7748#section-5.
+    private BigInteger uToBigInteger(byte[] u) {
+        byte[] reversedU = ArrayUtils.reverse(u);
+        reversedU[0] &= 0x7f; // (1 << (255 % 8)) - 1 = 0x7f
+        return new BigInteger(1, reversedU);
+    }
+
     private KeySpec constructJavaXecPublicKeySpec(OpenSSLX25519PublicKey publicKey)
             throws InvalidKeySpecException {
         if (OpenSSLXDHKeyFactory.javaXecPublicKeySpec == null) {
@@ -238,8 +228,8 @@ public final class OpenSSLXDHKeyFactory extends KeyFactorySpi {
             Constructor<?> c = OpenSSLXDHKeyFactory.javaXecPublicKeySpec.getConstructor(
                     AlgorithmParameterSpec.class, BigInteger.class);
             @SuppressWarnings("unchecked")
-            KeySpec result = (KeySpec) c.newInstance(javaX25519AlgorithmSpec,
-                    new BigInteger(1, ArrayUtils.reverse(publicKey.getU())));
+            KeySpec result = (KeySpec) c.newInstance(
+                    javaX25519AlgorithmSpec, uToBigInteger(publicKey.getU()));
             return result;
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException
                 | InvocationTargetException e) {

@@ -18,6 +18,8 @@
 
 package com.android.org.conscrypt;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.security.AlgorithmConstraints;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
@@ -75,6 +77,8 @@ final class SSLParametersImpl implements Cloneable {
     private final Spake2PlusTrustManager spake2PlusTrustManager;
     // source of Spake authentication or null if not provided
     private final Spake2PlusKeyManager spake2PlusKeyManager;
+    // getNetworkSecurityPolicy reflected method for x509TrustManager
+    private final Method getNetworkSecurityPolicy;
 
     // protocols enabled for SSL connection
     String[] enabledProtocols;
@@ -109,6 +113,7 @@ final class SSLParametersImpl implements Cloneable {
     byte[] applicationProtocols = EmptyArray.BYTE;
     ApplicationProtocolSelectorAdapter applicationProtocolSelector;
     boolean useSessionTickets;
+    byte[] echConfigList;
     private Boolean useSni;
 
     /**
@@ -168,6 +173,8 @@ final class SSLParametersImpl implements Cloneable {
                     "Spake2PlusTrustManager and Spake2PlusKeyManager should be set together");
         }
 
+        getNetworkSecurityPolicy = getNetworkSecurityPolicyMethod(x509TrustManager);
+
         // initialize the list of cipher suites and protocols enabled by default
         if (isSpake()) {
             enabledProtocols = new String[] {NativeCrypto.SUPPORTED_PROTOCOL_TLSV1_3};
@@ -209,6 +216,7 @@ final class SSLParametersImpl implements Cloneable {
         this.x509KeyManager = x509KeyManager;
         this.pskKeyManager = pskKeyManager;
         this.x509TrustManager = x509TrustManager;
+        this.getNetworkSecurityPolicy = getNetworkSecurityPolicyMethod(x509TrustManager);
         this.spake2PlusKeyManager = spake2PlusKeyManager;
         this.spake2PlusTrustManager = spake2PlusTrustManager;
 
@@ -234,6 +242,8 @@ final class SSLParametersImpl implements Cloneable {
                 : sslParams.applicationProtocols.clone();
         this.applicationProtocolSelector = sslParams.applicationProtocolSelector;
         this.useSessionTickets = sslParams.useSessionTickets;
+        this.echConfigList =
+                (sslParams.echConfigList == null) ? null : sslParams.echConfigList.clone();
         this.useSni = sslParams.useSni;
         this.channelIdEnabled = sslParams.channelIdEnabled;
     }
@@ -246,6 +256,17 @@ final class SSLParametersImpl implements Cloneable {
             getSessionContext().initSpake(this);
         } catch (Exception e) {
             throw new KeyManagementException("Spake initialization failed " + e.getMessage());
+        }
+    }
+
+    private Method getNetworkSecurityPolicyMethod(X509TrustManager tm) {
+        if (tm == null) {
+            return null;
+        }
+        try {
+            return tm.getClass().getMethod("getNetworkSecurityPolicy");
+        } catch (NoSuchMethodException ignored) {
+            return null;
         }
     }
 
@@ -460,6 +481,10 @@ final class SSLParametersImpl implements Cloneable {
 
     void setUseSessionTickets(boolean useSessionTickets) {
         this.useSessionTickets = useSessionTickets;
+    }
+
+    void setEchConfigList(byte[] echConfigList) {
+        this.echConfigList = echConfigList;
     }
 
     /*
@@ -803,7 +828,8 @@ final class SSLParametersImpl implements Cloneable {
     }
 
     /*
-     * Checks whether SCT verification is enforced for a given hostname.
+     * Checks whether SCT verification is enforced for a given hostname. This
+     * will be used to decide if the TLS extension should be sent.
      */
     boolean isCTVerificationEnabled(String hostname) {
         if (hostname == null) {
@@ -814,7 +840,25 @@ final class SSLParametersImpl implements Cloneable {
         if (ctVerificationEnabled) {
             return true;
         }
-        return Platform.isCTVerificationRequired(hostname);
+
+        // If the TrustManager has a security policy attached, use it. We are using reflection here.
+        // The Android framework may provide a high-level TrustManager (e.g., RootTrustManager or
+        // NetworkSecurityTrustManager), which we need to query.
+        if (getNetworkSecurityPolicy != null) {
+            try {
+                Object objPolicy = getNetworkSecurityPolicy.invoke(x509TrustManager);
+                if (objPolicy instanceof NetworkSecurityPolicy) {
+                    NetworkSecurityPolicy policy = (NetworkSecurityPolicy) objPolicy;
+                    return policy.isCertificateTransparencyVerificationRequired(hostname);
+                }
+            } catch (IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException ignored) {
+            }
+        }
+
+        // Otherwise, rely on the global platform policy.
+        return ConscryptNetworkSecurityPolicy.getDefault()
+                .isCertificateTransparencyVerificationRequired(hostname);
     }
 
     boolean isSpake() {

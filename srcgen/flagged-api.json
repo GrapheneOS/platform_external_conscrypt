@@ -2,5 +2,53 @@
   {
     "@location": "method:com.android.org.conscrypt.TrustManagerImpl#checkServerTrusted(X509Certificate[],byte[],byte[],String,String)",
     "value": "com.android.org.conscrypt.flags.Flags.FLAG_CERTIFICATE_TRANSPARENCY_CHECKSERVERTRUSTED_API"
+  },
+  {
+    "@location": "method:com.android.org.conscrypt.Conscrypt#setEchConfigList(SSLSocket,byte[])",
+    "value": "com.android.org.conscrypt.net.flags.Flags.FLAG_ENCRYPTED_CLIENT_HELLO_PLATFORM"
+  },
+  {
+    "@location": "method:com.android.org.conscrypt.Conscrypt#setEchConfigList(SSLEngine,byte[])",
+    "value": "com.android.org.conscrypt.net.flags.Flags.FLAG_ENCRYPTED_CLIENT_HELLO_PLATFORM"
+  },
+  {
+    "@location": "method:com.android.org.conscrypt.AbstractConscryptEngine#setEchConfigList(byte[])",
+    "value": "com.android.org.conscrypt.net.flags.Flags.FLAG_ENCRYPTED_CLIENT_HELLO_PLATFORM"
+  },
+  {
+    "@location": "method:com.android.org.conscrypt.AbstractConscryptSocket#setEchConfigList(byte[])",
+    "value": "com.android.org.conscrypt.net.flags.Flags.FLAG_ENCRYPTED_CLIENT_HELLO_PLATFORM"
+  },
+  {
+    "@location": "method:com.android.org.conscrypt.ConscryptX509TrustManager#checkServerTrusted(X509Certificate[],String,String)",
+    "value": "com.android.org.conscrypt.net.flags.Flags.FLAG_CONSCRYPTX509TRUSTMANAGER"
+  },
+  {
+    "@location": "method:com.android.org.conscrypt.ConscryptX509TrustManager#checkServerTrusted(X509Certificate[],byte[],byte[],String,String)",
+    "value": "com.android.org.conscrypt.net.flags.Flags.FLAG_CONSCRYPTX509TRUSTMANAGER"
+  },
+  {
+    "@location": "type:com.android.org.conscrypt.ConscryptX509TrustManager",
+    "value": "com.android.org.conscrypt.net.flags.Flags.FLAG_CONSCRYPTX509TRUSTMANAGER"
+  },
+  {
+    "@location": "type:com.android.org.conscrypt.TrustManagerImpl",
+    "value": "com.android.org.conscrypt.net.flags.Flags.FLAG_CONSCRYPTX509TRUSTMANAGER"
+  },
+  {
+    "@location": "method:com.android.org.conscrypt.TrustManagerImpl#getNetworkSecurityPolicy()",
+    "value": "com.android.org.conscrypt.net.flags.Flags.FLAG_CERTIFICATE_TRANSPARENCY_DEFAULT_ENABLED"
+  },
+  {
+    "@location": "method:com.android.org.conscrypt.TrustManagerImpl#setNetworkSecurityPolicy(ConscryptNetworkSecurityPolicy)",
+    "value": "com.android.org.conscrypt.net.flags.Flags.FLAG_CERTIFICATE_TRANSPARENCY_DEFAULT_ENABLED"
+  },
+  {
+    "@location": "method:com.android.org.conscrypt.ConscryptNetworkSecurityPolicy#ConscryptNetworkSecurityPolicy(libcore.net.NetworkSecurityPolicy)",
+    "value": "com.android.org.conscrypt.net.flags.Flags.FLAG_CERTIFICATE_TRANSPARENCY_DEFAULT_ENABLED"
+  },
+  {
+    "@location": "type:com.android.org.conscrypt.ConscryptNetworkSecurityPolicy",
+    "value": "com.android.org.conscrypt.net.flags.Flags.FLAG_CERTIFICATE_TRANSPARENCY_DEFAULT_ENABLED"
   }
 ]

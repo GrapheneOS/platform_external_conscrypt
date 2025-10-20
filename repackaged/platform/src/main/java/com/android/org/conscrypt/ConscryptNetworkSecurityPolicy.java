@@ -1,0 +1,85 @@
+/* GENERATED SOURCE. DO NOT MODIFY. */
+/*
+ * Copyright (C) 2025 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.android.org.conscrypt;
+
+import com.android.org.conscrypt.flags.Flags;
+import com.android.org.conscrypt.metrics.CertificateTransparencyVerificationReason;
+
+/**
+ * ConscryptNetworkSecurityPolicy for the platform (mainline).
+ *
+ * The Conscrypt-internal interface NetworkSecurityPolicy is ignored when exporting the API.
+ * @hide This class is not part of the Android public SDK API
+ */
+@android.annotation.
+FlaggedApi(com.android.org.conscrypt.net.flags.Flags.FLAG_CERTIFICATE_TRANSPARENCY_DEFAULT_ENABLED)
+@libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
+@SuppressWarnings("HiddenSuperclass")
+public class ConscryptNetworkSecurityPolicy implements NetworkSecurityPolicy {
+    private final libcore.net.NetworkSecurityPolicy policy;
+
+    public static ConscryptNetworkSecurityPolicy getDefault() {
+        return new ConscryptNetworkSecurityPolicy(libcore.net.NetworkSecurityPolicy.getInstance());
+    }
+
+    @android.annotation.FlaggedApi(
+            com.android.org.conscrypt.net.flags.Flags.FLAG_CERTIFICATE_TRANSPARENCY_DEFAULT_ENABLED)
+    @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
+    public ConscryptNetworkSecurityPolicy(libcore.net.NetworkSecurityPolicy policy) {
+        this.policy = policy;
+    }
+
+    @Override
+    public boolean isCertificateTransparencyVerificationRequired(String hostname) {
+        if (Flags.certificateTransparencyPlatform()) {
+            return policy.isCertificateTransparencyVerificationRequired(hostname);
+        }
+        return false;
+    }
+
+    @Override
+    public CertificateTransparencyVerificationReason getCertificateTransparencyVerificationReason(
+            String hostname) {
+        if (Platform.isSdkGreater(33)
+                && com.android.libcore.Flags.networkSecurityPolicyReasonCtEnabledApi()) {
+            return plaformCtReasonToConscryptReason(
+                    policy.getCertificateTransparencyVerificationReason(hostname));
+        }
+        if (policy.isCertificateTransparencyVerificationRequired("")) {
+            return CertificateTransparencyVerificationReason.APP_OPT_IN;
+        } else if (policy.isCertificateTransparencyVerificationRequired(hostname)) {
+            return CertificateTransparencyVerificationReason.DOMAIN_OPT_IN;
+        }
+        return CertificateTransparencyVerificationReason.UNKNOWN;
+    }
+
+    private static CertificateTransparencyVerificationReason plaformCtReasonToConscryptReason(
+            int platformReason) {
+        switch (platformReason) {
+            case libcore.net.NetworkSecurityPolicy.CERTIFICATE_TRANSPARENCY_REASON_APP_OPT_IN:
+                return CertificateTransparencyVerificationReason.APP_OPT_IN;
+            case libcore.net.NetworkSecurityPolicy.CERTIFICATE_TRANSPARENCY_REASON_DOMAIN_OPT_IN:
+                return CertificateTransparencyVerificationReason.DOMAIN_OPT_IN;
+            case libcore.net.NetworkSecurityPolicy
+                    .CERTIFICATE_TRANSPARENCY_REASON_SDK_TARGET_DEFAULT_ENABLED:
+                return CertificateTransparencyVerificationReason.SDK_TARGET_DEFAULT_ENABLED;
+            default:
+                return CertificateTransparencyVerificationReason.UNKNOWN;
+        }
+    }
+}

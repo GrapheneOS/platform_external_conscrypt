@@ -113,7 +113,7 @@ public final class StandardNames {
     private static final HashMap<String, String[]> SSL_CONTEXT_PROTOCOLS_ENABLED =
             new HashMap<String, String[]>();
 
-    private static void provideCipherModes(String algorithm, String newModes[]) {
+    private static void provideCipherModes(String algorithm, String[] newModes) {
         HashSet<String> modes = CIPHER_MODES.get(algorithm);
         if (modes == null) {
             modes = new HashSet<String>();
@@ -121,7 +121,7 @@ public final class StandardNames {
         }
         modes.addAll(Arrays.asList(newModes));
     }
-    private static void provideCipherPaddings(String algorithm, String newPaddings[]) {
+    private static void provideCipherPaddings(String algorithm, String[] newPaddings) {
         HashSet<String> paddings = CIPHER_PADDINGS.get(algorithm);
         if (paddings == null) {
             paddings = new HashSet<String>();
@@ -374,7 +374,7 @@ public final class StandardNames {
             "TLS_PSK_WITH_AES_256_CBC_SHA");
 
     // Should be updated to match BoringSSL's defaults when they change.
-    // https://boringssl.googlesource.com/boringssl/+/master/ssl/t1_lib.cc#289
+    // https://boringssl.googlesource.com/boringssl/+/main/ssl/extensions.cc#215
     private static final List<String> ELLIPTIC_CURVES_DEFAULT =
             Arrays.asList("x25519 (29)", "secp256r1 (23)", "secp384r1 (24)");
 

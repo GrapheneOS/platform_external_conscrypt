@@ -449,6 +449,11 @@ class ConscryptEngineSocket extends OpenSSLSocketImpl implements SSLParametersIm
     }
 
     @Override
+    public final void setEchConfigList(byte[] echConfigList) {
+        engine.setEchConfigList(echConfigList);
+    }
+
+    @Override
     public final void setChannelIdEnabled(boolean enabled) {
         engine.setChannelIdEnabled(enabled);
     }

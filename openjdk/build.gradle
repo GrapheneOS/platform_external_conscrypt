@@ -1,4 +1,9 @@
 plugins {
+    id 'conventions.common'
+    id 'conventions.versionprops'
+    id 'conventions.boringssl'
+    id 'conventions.jvm'
+    id 'conventions.cpp'
     alias libs.plugins.bnd
     alias libs.plugins.shadow
 }
@@ -126,6 +131,10 @@ ext {
     preferredSourceSet = buildToTest.mavenClassifier()
     preferredNativeFileDir = buildToTest.nativeResourcesDir()
 }
+
+// Since we're not taking a direct dependency on the constants module, we need to add an
+// explicit task dependency to make sure the code is generated.
+evaluationDependsOn(':conscrypt-constants')
 
 sourceSets {
     main {
@@ -341,6 +350,15 @@ def testInterop = tasks.register("testInterop", Test) {
 }
 check.dependsOn testInterop
 
+// Added to see results of new ECH tests when running tests from the command line
+tasks.withType(Test).configureEach {
+    testLogging {
+        exceptionFormat "full"
+        events "started", "skipped", "passed", "failed"
+        showStandardStreams true
+    }
+}
+
 jacocoTestReport {
     additionalSourceDirs.from files("$rootDir/openjdk/src/test/java", "$rootDir/common/src/main/java")
     executionData tasks.withType(Test)
@@ -425,8 +443,8 @@ model {
                         linker.args "-O3",
                                 "-fvisibility=hidden",
                                 "-lpthread",
-                                libPath + "/ssl/libssl.a",
-                                libPath + "/crypto/libcrypto.a"
+                                libPath + "/libssl.a",
+                                libPath + "/libcrypto.a"
                         if (targetPlatform.operatingSystem.isLinux()) {
                             // Static link libstdc++ and libgcc because
                             // they are not available in some restrictive Linux
@@ -478,8 +496,8 @@ model {
                         linker.args "-WX",
                                 "ws2_32.lib",
                                 "advapi32.lib",
-                                "${libPath}\\ssl\\ssl.lib",
-                                "${libPath}\\crypto\\crypto.lib"
+                                "${libPath}\\ssl.lib",
+                                "${libPath}\\crypto.lib"
                     }
                 }
 

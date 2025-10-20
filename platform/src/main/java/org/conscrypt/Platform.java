@@ -27,16 +27,12 @@ import dalvik.system.BlockGuard;
 import dalvik.system.CloseGuard;
 import dalvik.system.VMRuntime;
 
-import libcore.net.NetworkSecurityPolicy;
-
 import org.conscrypt.NativeCrypto;
 import org.conscrypt.ct.CertificateTransparency;
 import org.conscrypt.ct.LogStore;
 import org.conscrypt.ct.LogStoreImpl;
 import org.conscrypt.ct.Policy;
 import org.conscrypt.ct.PolicyImpl;
-import org.conscrypt.flags.Flags;
-import org.conscrypt.metrics.CertificateTransparencyVerificationReason;
 import org.conscrypt.metrics.OptionalMethod;
 import org.conscrypt.metrics.Source;
 import org.conscrypt.metrics.StatsLog;
@@ -66,6 +62,7 @@ import java.security.spec.InvalidParameterSpecException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 import javax.crypto.spec.GCMParameterSpec;
 import javax.net.ssl.HttpsURLConnection;
@@ -484,32 +481,6 @@ final public class Platform {
         return true;
     }
 
-    public static boolean isCTVerificationRequired(String hostname) {
-        if (Flags.certificateTransparencyPlatform()) {
-            if (NetworkSecurityPolicy.getInstance().isCertificateTransparencyVerificationRequired(
-                        hostname)) {
-                return true;
-            }
-            if (org.conscrypt.net.flags.Flags.certificateTransparencyDryRun()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static CertificateTransparencyVerificationReason reasonCTVerificationRequired(
-            String hostname) {
-        if (NetworkSecurityPolicy.getInstance().isCertificateTransparencyVerificationRequired("")) {
-            return CertificateTransparencyVerificationReason.APP_OPT_IN;
-        } else if (NetworkSecurityPolicy.getInstance()
-                           .isCertificateTransparencyVerificationRequired(hostname)) {
-            return CertificateTransparencyVerificationReason.DOMAIN_OPT_IN;
-        } else if (org.conscrypt.net.flags.Flags.certificateTransparencyDryRun()) {
-            return CertificateTransparencyVerificationReason.DRY_RUN;
-        }
-        return CertificateTransparencyVerificationReason.UNKNOWN;
-    }
-
     static boolean supportsConscryptCertStore() {
         return true;
     }
@@ -532,11 +503,13 @@ final public class Platform {
         return CertBlocklistImpl.getDefault();
     }
 
-    static CertificateTransparency newDefaultCertificateTransparency() {
+    static CertificateTransparency newDefaultCertificateTransparency(
+            Supplier<NetworkSecurityPolicy> policySupplier) {
         org.conscrypt.ct.Policy policy = new org.conscrypt.ct.PolicyImpl();
         org.conscrypt.ct.LogStore logStore = new org.conscrypt.ct.LogStoreImpl(policy);
         org.conscrypt.ct.Verifier verifier = new org.conscrypt.ct.Verifier(logStore);
-        return new CertificateTransparency(logStore, policy, verifier, getStatsLog());
+        return new CertificateTransparency(
+                logStore, policy, verifier, getStatsLog(), policySupplier);
     }
 
     static boolean serverNamePermitted(SSLParametersImpl parameters, String serverName) {
@@ -623,13 +596,12 @@ final public class Platform {
         try {
             Class<?> vmRuntimeClass = Class.forName("dalvik.system.VMRuntime");
             Method getRuntimeMethod = vmRuntimeClass.getDeclaredMethod("getRuntime");
-            Method getSdkVersionMethod =
-                        vmRuntimeClass.getDeclaredMethod("getSdkVersion");
+            Method getSdkVersionMethod = vmRuntimeClass.getDeclaredMethod("getSdkVersion");
             Object vmRuntime = getRuntimeMethod.invoke(null);
             Object sdkVersion = getSdkVersionMethod.invoke(vmRuntime);
             return (sdkVersion != null) && ((int) sdkVersion > sdk);
-        } catch (IllegalAccessException |
-          NullPointerException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (IllegalAccessException | NullPointerException | InvocationTargetException
+                | NoSuchMethodException e) {
             return false;
         } catch (Exception e) {
             throw new RuntimeException(e);

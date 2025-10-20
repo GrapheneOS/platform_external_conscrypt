@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyManagementException;
 import java.security.SecureRandom;
+
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContextSpi;
 import javax.net.ssl.SSLEngine;
@@ -59,7 +60,7 @@ public abstract class OpenSSLContextImpl extends SSLContextSpi {
 
     /** Allows outside callers to get the preferred SSLContext. */
     @android.compat.annotation.UnsupportedAppUsage
-    static OpenSSLContextImpl getPreferred() {
+    public static OpenSSLContextImpl getPreferred() {
         return new TLSv13();
     }
 

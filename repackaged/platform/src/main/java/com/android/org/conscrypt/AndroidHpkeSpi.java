@@ -114,4 +114,31 @@ public class AndroidHpkeSpi
             super(new HpkeImpl.X25519_CHACHA20());
         }
     }
+
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
+    public static class XwingHkdfSha256Aes128Gcm extends AndroidHpkeSpi {
+        public XwingHkdfSha256Aes128Gcm() {
+            super(new HpkeImpl.XwingHkdfSha256Aes128Gcm());
+        }
+    }
+
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
+    public static class XwingHkdfSha256Aes256Gcm extends AndroidHpkeSpi {
+        public XwingHkdfSha256Aes256Gcm() {
+            super(new HpkeImpl.XwingHkdfSha256Aes256Gcm());
+        }
+    }
+
+    /**
+     * @hide This class is not part of the Android public SDK API
+     */
+    public static class XwingHkdfSha256ChaCha20Poly1305 extends AndroidHpkeSpi {
+        public XwingHkdfSha256ChaCha20Poly1305() {
+            super(new HpkeImpl.XwingHkdfSha256ChaCha20Poly1305());
+        }
+    }
 }

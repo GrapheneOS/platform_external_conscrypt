@@ -21,6 +21,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.junit.AfterClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -33,10 +38,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.junit.AfterClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RunWith(JUnit4.class)
 public class NativeCryptoArgTest {
@@ -240,14 +242,14 @@ public class NativeCryptoArgTest {
     @Test
     public void spake2Methods() throws Throwable {
         markTestRun();
-        expectNPE("SSL_CTX_set_spake_credential",
-                null, new byte[0], new byte[0], new byte[0], false, 1, NOT_NULL, null);
-        expectNPE("SSL_CTX_set_spake_credential",
-                new byte[0], null, new byte[0], new byte[0], false, 1, NOT_NULL, null);
-        expectNPE("SSL_CTX_set_spake_credential",
-                new byte[0], new byte[0], null, new byte[0], false, 1, NOT_NULL, null);
-        expectNPE("SSL_CTX_set_spake_credential",
-                new byte[0], new byte[0], new byte[0], null, false, 1, NOT_NULL, null);
+        expectNPE("SSL_CTX_set_spake_credential", null, new byte[0], new byte[0], new byte[0],
+                false, 1, NOT_NULL, null);
+        expectNPE("SSL_CTX_set_spake_credential", new byte[0], null, new byte[0], new byte[0],
+                false, 1, NOT_NULL, null);
+        expectNPE("SSL_CTX_set_spake_credential", new byte[0], new byte[0], null, new byte[0],
+                false, 1, NOT_NULL, null);
+        expectNPE("SSL_CTX_set_spake_credential", new byte[0], new byte[0], new byte[0], null,
+                false, 1, NOT_NULL, null);
         checkMethodsTested();
     }
 

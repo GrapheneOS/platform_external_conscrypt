@@ -47,6 +47,7 @@ import com.android.org.conscrypt.ct.PolicyCompliance;
 import com.android.org.conscrypt.ct.VerificationResult;
 
 /**
+ * Implements logging for Conscrypt metrics.
  * @hide This class is not part of the Android public SDK API
  */
 @Internal

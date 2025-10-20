@@ -102,9 +102,9 @@ import javax.security.auth.x500.X500Principal;
 /**
  * Implements the {@link SSLEngine} API using OpenSSL's non-blocking interfaces.
  */
-final class ConscryptEngine extends AbstractConscryptEngine implements NativeCrypto.SSLHandshakeCallbacks,
-                                                         SSLParametersImpl.AliasChooser,
-                                                         SSLParametersImpl.PSKCallbacks {
+final class ConscryptEngine extends AbstractConscryptEngine
+        implements NativeCrypto.SSLHandshakeCallbacks, SSLParametersImpl.AliasChooser,
+                   SSLParametersImpl.PSKCallbacks {
     private static final SSLEngineResult NEED_UNWRAP_OK =
             new SSLEngineResult(OK, NEED_UNWRAP, 0, 0);
     private static final SSLEngineResult NEED_UNWRAP_CLOSED =
@@ -263,8 +263,8 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
                 throw new IllegalStateException("Not allowed in client mode");
             }
             if (isHandshakeStarted()) {
-                throw new IllegalStateException(
-                        "Could not enable/disable Channel ID after the initial handshake has begun.");
+                throw new IllegalStateException("Could not enable/disable Channel ID after the "
+                        + "initial handshake has begun.");
             }
             sslParameters.channelIdEnabled = enabled;
         }
@@ -616,7 +616,7 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
     private ConscryptSession provideHandshakeSession() {
         synchronized (ssl) {
             return state == STATE_HANDSHAKE_STARTED ? activeSession
-                : SSLNullSession.getNullSession();
+                                                    : SSLNullSession.getNullSession();
         }
     }
 
@@ -889,8 +889,8 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
                                     // inbound direction as closed and shut down the SSL object
                                     closeAll();
                                     return new SSLEngineResult(Status.CLOSED,
-                                            pendingOutboundEncryptedBytes() > 0
-                                                    ? NEED_WRAP : NOT_HANDSHAKING,
+                                            pendingOutboundEncryptedBytes() > 0 ? NEED_WRAP
+                                                                                : NOT_HANDSHAKING,
                                             bytesConsumed, bytesProduced);
                                 }
                                 default: {
@@ -1433,7 +1433,7 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
             int dataLength = (int) min(BufferUtils.remaining(srcs), SSL3_RT_MAX_PLAIN_LENGTH);
             if (dst.remaining() < calculateOutNetBufSize(dataLength)) {
                 return new SSLEngineResult(
-                    Status.BUFFER_OVERFLOW, getHandshakeStatusInternal(), 0, 0);
+                        Status.BUFFER_OVERFLOW, getHandshakeStatusInternal(), 0, 0);
             }
 
             int bytesProduced = 0;
@@ -1646,8 +1646,7 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
 
     @Override
     public void clientCertificateRequested(byte[] keyTypeBytes, int[] signatureAlgs,
-            byte[][] asn1DerEncodedPrincipals)
-            throws CertificateEncodingException, SSLException {
+            byte[][] asn1DerEncodedPrincipals) throws CertificateEncodingException, SSLException {
         ssl.chooseClientCertificate(keyTypeBytes, signatureAlgs, asn1DerEncodedPrincipals);
     }
 
@@ -1733,6 +1732,11 @@ final class ConscryptEngine extends AbstractConscryptEngine implements NativeCry
     @Override
     void setUseSessionTickets(boolean useSessionTickets) {
         sslParameters.setUseSessionTickets(useSessionTickets);
+    }
+
+    @Override
+    void setEchConfigList(byte[] echConfigList) {
+        sslParameters.setEchConfigList(echConfigList);
     }
 
     @Override
