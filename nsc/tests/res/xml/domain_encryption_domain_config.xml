@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+  <base-config>
+      <domainEncryption mode="disabled" />
+  </base-config>
+  <domain-config>
+    <domainEncryption mode="opportunistic" />
+    <domain>android.com</domain>
+  </domain-config>
+  <domain-config>
+    <domainEncryption mode="enabled" />
+    <domain>enabled.android.com</domain>
+  </domain-config>
+  <domain-config>
+    <domainEncryption mode="required" />
+    <domain>required.android.com</domain>
+  </domain-config>
+</network-security-config>
