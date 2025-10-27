@@ -101,6 +101,22 @@ public final class ApplicationConfig {
     }
 
     /**
+     * Overwrite the NetworkSecurityPolicy associated with this ApplicationConfig.
+     *
+     * The policy should only be updated for custom TrustManager instances that
+     * have been created via KeyStoreConfigSource.
+     */
+    void setNetworkSecurityPolicy(@NonNull libcore.net.NetworkSecurityPolicy policy) {
+        ensureInitialized();
+        if (hasPerDomainConfigs()) {
+            throw new IllegalStateException(
+                    "setNetworkSecurityPolicy cannot be called when per-domain "
+                    + "configs are present");
+        }
+        mDefaultConfig.setNetworkSecurityPolicy(policy);
+    }
+
+    /**
      * Get the {@link NetworkSecurityConfig} corresponding to the provided hostname.
      * The most specific matching domain rule will be used. If no match exists
      * and the hostname is considered to be localhost (according to {@link

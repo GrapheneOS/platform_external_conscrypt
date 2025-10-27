@@ -258,7 +258,7 @@ java_aconfig_library {
     visibility: [
         "//cts/tests/tests/networksecurityconfig:__subpackages__",
         "//frameworks/base",
-        "//frameworks/base/packages/NetworkSecurityConfig/tests",
+        "//external/conscrypt/nsc/tests",
     ],
 }
 
@@ -430,7 +430,7 @@ java_sdk_library {
     visibility: [
         "//build/soong/java/core-libraries",
         "//external/wycheproof",
-        "//frameworks/base/packages/NetworkSecurityConfig/tests",
+        "//external/conscrypt/nsc/tests",
         // Visibility for prebuilt conscrypt-module-sdk from the prebuilt of
         // this module.
         // TODO(b/155921753): Restrict this when prebuilts are in their proper
@@ -493,6 +493,7 @@ java_sdk_library {
         "//frameworks/base",
         "//frameworks/base/api",
         "//packages/modules/common/sdk",
+        "//packages/modules/Connectivity/framework",
         // TODO(b/165823103): Remove visiblity for IPsec once CorePlatformApi is available
         "//packages/modules/IPsec",
         // Visibility for prebuilt art-module-host-exports from the prebuilt of
@@ -625,7 +626,7 @@ java_sdk_library {
     name: "framework-conscrypt-nsc",
     defaults: ["framework-module-defaults"],
     impl_library_visibility: [
-        "//frameworks/base/packages/NetworkSecurityConfig/tests",
+        "//external/conscrypt/nsc/tests",
     ],
 
     // TODO(b/397646538): replace this with "37". We don't want to ship this module
