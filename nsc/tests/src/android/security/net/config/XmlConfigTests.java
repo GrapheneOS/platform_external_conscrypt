@@ -20,7 +20,7 @@ import static android.security.NetworkSecurityPolicy.DOMAIN_ENCRYPTION_MODE_DISA
 import static android.security.NetworkSecurityPolicy.DOMAIN_ENCRYPTION_MODE_ENABLED;
 import static android.security.NetworkSecurityPolicy.DOMAIN_ENCRYPTION_MODE_OPPORTUNISTIC;
 import static android.security.NetworkSecurityPolicy.DOMAIN_ENCRYPTION_MODE_REQUIRED;
-import static android.security.net.config.NetworkSecurityConfig.DEFAULT_DOMAIN_ENCRYPTION_MODE;
+import static android.security.net.config.NetworkSecurityConfig.defaultDomainEncryptionMode;
 
 import static com.android.org.conscrypt.net.flags.Flags.FLAG_CERTIFICATE_TRANSPARENCY_DEFAULT_ENABLED;
 import static com.android.org.conscrypt.net.flags.Flags.FLAG_ENCRYPTED_CLIENT_HELLO_PLATFORM;
@@ -636,7 +636,7 @@ public class XmlConfigTests {
 
     @Test
     @RequiresFlagsEnabled(FLAG_ENCRYPTED_CLIENT_HELLO_PLATFORM)
-    public void testDomainEncryptionBaseConfig() throws Exception {
+    public void testDomainEncryptionBaseConfig_returnsSpecifiedValue() throws Exception {
         XmlConfigSource source = new XmlConfigSource(
                 mContext, R.xml.domain_encryption_base_config, TestUtils.makeApplicationInfo());
         ApplicationConfig appConfig = new ApplicationConfig(source);
@@ -649,7 +649,7 @@ public class XmlConfigTests {
 
     @Test
     @RequiresFlagsEnabled(FLAG_ENCRYPTED_CLIENT_HELLO_PLATFORM)
-    public void testDomainEncryptionDomainConfig() throws Exception {
+    public void testDomainEncryptionDomainConfig_returnsSpecifiedValues() throws Exception {
         XmlConfigSource source = new XmlConfigSource(
                 mContext, R.xml.domain_encryption_domain_config, TestUtils.makeApplicationInfo());
         ApplicationConfig appConfig = new ApplicationConfig(source);
@@ -673,7 +673,8 @@ public class XmlConfigTests {
 
     @Test
     @RequiresFlagsEnabled(FLAG_ENCRYPTED_CLIENT_HELLO_PLATFORM)
-    public void testDomainEncryptionInvalidValues() throws Exception {
+    public void testDomainEncryptionInvalidValues_returnsDefaultDomainEncryptionMode()
+            throws Exception {
         XmlConfigSource source = new XmlConfigSource(
                 mContext, R.xml.domain_encryption_invalid, TestUtils.makeApplicationInfo());
         ApplicationConfig appConfig = new ApplicationConfig(source);
@@ -682,16 +683,16 @@ public class XmlConfigTests {
         assertNotNull(config);
 
         // Assert default base config setting
-        assertEquals(DEFAULT_DOMAIN_ENCRYPTION_MODE, config.getDomainEncryptionMode());
+        assertEquals(defaultDomainEncryptionMode(), config.getDomainEncryptionMode());
 
         // Assert domain config settings
         config = appConfig.getConfigForHostname("android.com");
-        assertEquals(DEFAULT_DOMAIN_ENCRYPTION_MODE, config.getDomainEncryptionMode());
+        assertEquals(defaultDomainEncryptionMode(), config.getDomainEncryptionMode());
 
         config = appConfig.getConfigForHostname("whitespace.android.com");
-        assertEquals(DEFAULT_DOMAIN_ENCRYPTION_MODE, config.getDomainEncryptionMode());
+        assertEquals(defaultDomainEncryptionMode(), config.getDomainEncryptionMode());
 
         config = appConfig.getConfigForHostname("capitalized.android.com");
-        assertEquals(DEFAULT_DOMAIN_ENCRYPTION_MODE, config.getDomainEncryptionMode());
+        assertEquals(defaultDomainEncryptionMode(), config.getDomainEncryptionMode());
     }
 }
