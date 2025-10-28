@@ -16,7 +16,6 @@
 
 package org.conscrypt;
 
-import org.conscrypt.flags.Flags;
 import org.conscrypt.metrics.CertificateTransparencyVerificationReason;
 
 /**
@@ -38,10 +37,7 @@ public class ConscryptNetworkSecurityPolicy implements NetworkSecurityPolicy {
 
     @Override
     public boolean isCertificateTransparencyVerificationRequired(String hostname) {
-        if (Flags.certificateTransparencyPlatform()) {
-            return policy.isCertificateTransparencyVerificationRequired(hostname);
-        }
-        return false;
+        return policy.isCertificateTransparencyVerificationRequired(hostname);
     }
 
     @Override

@@ -17,15 +17,6 @@ container: "com.android.conscrypt"
 
 flag {
     namespace: "core_libraries"
-    name: "certificate_transparency_platform"
-    description: "This flag controls whether conscrypt will interpret the NetworkSecurityConfig for Certificate Transparency"
-    bug: "319829948"
-    # APIs provided by a mainline module can only use a frozen flag.
-    is_fixed_read_only: true
-}
-
-flag {
-    namespace: "core_libraries"
     name: "certificate_transparency_checkservertrusted_api"
     description: "This flag controls whether TrustManagerImpl exposes a checkServerTrusted method for CT verification with OCSP and TLS SCT data"
     bug: "319829948"

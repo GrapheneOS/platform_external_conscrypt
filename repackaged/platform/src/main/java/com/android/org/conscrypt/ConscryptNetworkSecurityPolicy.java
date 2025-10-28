@@ -17,7 +17,6 @@
 
 package com.android.org.conscrypt;
 
-import com.android.org.conscrypt.flags.Flags;
 import com.android.org.conscrypt.metrics.CertificateTransparencyVerificationReason;
 
 /**
@@ -46,10 +45,7 @@ public class ConscryptNetworkSecurityPolicy implements NetworkSecurityPolicy {
 
     @Override
     public boolean isCertificateTransparencyVerificationRequired(String hostname) {
-        if (Flags.certificateTransparencyPlatform()) {
-            return policy.isCertificateTransparencyVerificationRequired(hostname);
-        }
-        return false;
+        return policy.isCertificateTransparencyVerificationRequired(hostname);
     }
 
     @Override
