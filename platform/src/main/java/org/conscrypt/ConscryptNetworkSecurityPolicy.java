@@ -74,4 +74,27 @@ public class ConscryptNetworkSecurityPolicy implements NetworkSecurityPolicy {
                 return CertificateTransparencyVerificationReason.UNKNOWN;
         }
     }
+
+    @Override
+    public DomainEncryptionMode getDomainEncryptionMode(String hostname) {
+        if (org.conscrypt.net.flags.Flags.encryptedClientHelloPlatform()) {
+            return platformToConscryptEncryptionMode(policy.getDomainEncryptionMode(hostname));
+        }
+        return DomainEncryptionMode.UNKNOWN;
+    }
+
+    private static DomainEncryptionMode platformToConscryptEncryptionMode(int platformMode) {
+        switch (platformMode) {
+            case libcore.net.NetworkSecurityPolicy.DOMAIN_ENCRYPTION_MODE_DISABLED:
+                return DomainEncryptionMode.DISABLED;
+            case libcore.net.NetworkSecurityPolicy.DOMAIN_ENCRYPTION_MODE_OPPORTUNISTIC:
+                return DomainEncryptionMode.OPPORTUNISTIC;
+            case libcore.net.NetworkSecurityPolicy.DOMAIN_ENCRYPTION_MODE_ENABLED:
+                return DomainEncryptionMode.ENABLED;
+            case libcore.net.NetworkSecurityPolicy.DOMAIN_ENCRYPTION_MODE_REQUIRED:
+                return DomainEncryptionMode.REQUIRED;
+            default:
+                return DomainEncryptionMode.UNKNOWN;
+        }
+    }
 }

@@ -31,4 +31,6 @@ public interface NetworkSecurityPolicy {
 
     CertificateTransparencyVerificationReason getCertificateTransparencyVerificationReason(
             String hostname);
+
+    DomainEncryptionMode getDomainEncryptionMode(String hostname);
 }

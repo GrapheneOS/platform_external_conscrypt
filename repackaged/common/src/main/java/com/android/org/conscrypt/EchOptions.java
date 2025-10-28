@@ -1,3 +1,4 @@
+/* GENERATED SOURCE. DO NOT MODIFY. */
 /*
  * Copyright (C) 2025 The Android Open Source Project
  *
@@ -14,21 +15,23 @@
  * limitations under the License.
  */
 
-package org.conscrypt;
+package com.android.org.conscrypt;
 
-import org.conscrypt.metrics.CertificateTransparencyVerificationReason;
-
-/**
- * A policy provided by the platform to decide on the behaviour of TrustManagerImpl.
- *
- * See the platform-specific implementations in PlatformNetworkSecurityPolicy.
- */
 @Internal
-public interface NetworkSecurityPolicy {
-    boolean isCertificateTransparencyVerificationRequired(String hostname);
+class EchOptions {
+    private final byte[] configList;
+    private final boolean enableGrease;
 
-    CertificateTransparencyVerificationReason getCertificateTransparencyVerificationReason(
-            String hostname);
+    EchOptions(byte[] configList, boolean enableGrease) {
+        this.configList = configList;
+        this.enableGrease = enableGrease;
+    }
 
-    DomainEncryptionMode getDomainEncryptionMode(String hostname);
+    byte[] getConfigList() {
+        return configList;
+    }
+
+    boolean isGreaseEnabled() {
+        return enableGrease;
+    }
 }

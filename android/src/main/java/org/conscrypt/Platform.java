@@ -67,6 +67,7 @@ import javax.net.ssl.SNIHostName;
 import javax.net.ssl.SNIMatcher;
 import javax.net.ssl.SNIServerName;
 import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
@@ -823,6 +824,10 @@ final public class Platform {
     // X509ExtendedTrustManager was added in API 24
     static boolean supportsX509ExtendedTrustManager() {
         return Build.VERSION.SDK_INT > 23;
+    }
+
+    static SSLException wrapInvalidEchDataException(SSLException e) {
+        return e;
     }
 
     static boolean supportsConscryptCertStore() {
