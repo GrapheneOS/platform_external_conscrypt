@@ -3,6 +3,7 @@ package android.security {
 
   public class NetworkSecurityPolicy {
     method @FlaggedApi("com.android.org.conscrypt.net.flags.network_security_config") public void handleTrustStorageUpdate();
+    method @FlaggedApi("com.android.org.conscrypt.net.flags.network_security_config") public void setCleartextTrafficPermitted(boolean);
   }
 
 }
