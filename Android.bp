@@ -651,6 +651,7 @@ java_sdk_library {
     static_libs: [
         "android.security.flags-aconfig-java-export",
     ],
+    jarjar_rules: "conscrypt-nsc-jarjar-rules.txt",
 
     api_dir: "api/nsc",
 
