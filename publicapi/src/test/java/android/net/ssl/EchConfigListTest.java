@@ -19,14 +19,25 @@ package android.net.ssl;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertThrows;
 
+import android.platform.test.annotations.RequiresFlagsEnabled;
+import android.platform.test.flag.junit.CheckFlagsRule;
+import android.platform.test.flag.junit.DeviceFlagsValueProvider;
+
+import com.android.org.conscrypt.net.flags.Flags;
+
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+@RequiresFlagsEnabled(Flags.FLAG_ENCRYPTED_CLIENT_HELLO_PLATFORM)
 @RunWith(JUnit4.class)
 public class EchConfigListTest {
+    @Rule
+    public final CheckFlagsRule mCheckFlagsRule = DeviceFlagsValueProvider.createCheckFlagsRule();
+
     // Actual EchConfigList in the cloudflare-ech.com HTTPS DNS record
     // Explicit byte casting required to prevent lossy conversion errors
     private static final byte[] VALID_ECH_CONFIG_LIST = new byte[] {0x00, 0x45, (byte) 0xfe, 0x0d,
