@@ -66,7 +66,7 @@ public final class NetworkSecurityConfig {
      * Apps can still opt-out via their Network Security Config.
      */
     @ChangeId
-    @EnabledAfter(targetSdkVersion = Build.VERSION_CODES.CINNAMON_BUN)
+    @EnabledAfter(targetSdkVersion = Build.VERSION_CODES.BAKLAVA)
     static final long ENABLE_DEFAULT_ENCRYPTED_CLIENT_HELLO = 419020719L;
 
     private static final AtomicReference<Boolean>
