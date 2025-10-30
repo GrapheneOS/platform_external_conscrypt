@@ -19,9 +19,11 @@ package android.security.net.config;
 import android.os.Environment;
 import android.os.UserHandle;
 
-import com.android.internal.util.ArrayUtils;
-
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * {@link CertificateSource} based on the system trusted CA store.
@@ -48,8 +50,14 @@ public final class SystemCertificateSource extends DirectoryCertificateSource {
             return new File(System.getenv("ANDROID_ROOT") + "/etc/security/cacerts");
         }
         File updatable_dir = new File("/apex/com.android.conscrypt/cacerts");
-        if (updatable_dir.exists() && !(ArrayUtils.isEmpty(updatable_dir.list()))) {
-            return updatable_dir;
+        if (updatable_dir.exists()) {
+            try (DirectoryStream<Path> stream = Files.newDirectoryStream(updatable_dir.toPath())) {
+                if (stream.iterator().hasNext()) {
+                    return updatable_dir;
+                }
+            } catch (IOException e) {
+                // Fallthrough and use the old path.
+            }
         }
         return new File(System.getenv("ANDROID_ROOT") + "/etc/security/cacerts");
     }
