@@ -241,6 +241,8 @@ aconfig_declarations {
     exportable: true,
     visibility: [
         "//frameworks/base",
+        // Needed for ECH
+        "//packages/modules/Connectivity:__subpackages__",
     ],
 }
 
