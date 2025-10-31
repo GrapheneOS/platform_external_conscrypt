@@ -35,6 +35,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import libcore.junit.util.compat.CoreCompatChangeRule.DisableCompatChanges;
+import libcore.junit.util.compat.CoreCompatChangeRule.EnableCompatChanges;
+
+import android.compat.testing.PlatformCompatChangeRule;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.platform.test.annotations.RequiresFlagsDisabled;
@@ -48,6 +52,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
@@ -69,6 +74,9 @@ public class XmlConfigTests {
 
     @Rule
     public final CheckFlagsRule mCheckFlagsRule = DeviceFlagsValueProvider.createCheckFlagsRule();
+
+    @Rule
+    public TestRule compatChangeRule = new PlatformCompatChangeRule();
 
     @Before
     public void setUp() throws Exception {
@@ -673,7 +681,8 @@ public class XmlConfigTests {
 
     @Test
     @RequiresFlagsEnabled(FLAG_ENCRYPTED_CLIENT_HELLO_PLATFORM)
-    public void testDomainEncryptionInvalidValues_returnsDefaultDomainEncryptionMode()
+    @EnableCompatChanges({NetworkSecurityConfig.ENABLE_DEFAULT_ENCRYPTED_CLIENT_HELLO})
+    public void testDomainEncryptionInvalidValues_enabledAppCompat_returnsDefaultOpportunisticMode()
             throws Exception {
         XmlConfigSource source = new XmlConfigSource(
                 mContext, R.xml.domain_encryption_invalid, TestUtils.makeApplicationInfo());
@@ -683,16 +692,42 @@ public class XmlConfigTests {
         assertNotNull(config);
 
         // Assert default base config setting
-        assertEquals(defaultDomainEncryptionMode(), config.getDomainEncryptionMode());
+        assertEquals(DOMAIN_ENCRYPTION_MODE_OPPORTUNISTIC, config.getDomainEncryptionMode());
 
         // Assert domain config settings
         config = appConfig.getConfigForHostname("android.com");
-        assertEquals(defaultDomainEncryptionMode(), config.getDomainEncryptionMode());
+        assertEquals(DOMAIN_ENCRYPTION_MODE_OPPORTUNISTIC, config.getDomainEncryptionMode());
 
         config = appConfig.getConfigForHostname("whitespace.android.com");
-        assertEquals(defaultDomainEncryptionMode(), config.getDomainEncryptionMode());
+        assertEquals(DOMAIN_ENCRYPTION_MODE_OPPORTUNISTIC, config.getDomainEncryptionMode());
 
         config = appConfig.getConfigForHostname("capitalized.android.com");
-        assertEquals(defaultDomainEncryptionMode(), config.getDomainEncryptionMode());
+        assertEquals(DOMAIN_ENCRYPTION_MODE_OPPORTUNISTIC, config.getDomainEncryptionMode());
+    }
+
+    @Test
+    @RequiresFlagsEnabled(FLAG_ENCRYPTED_CLIENT_HELLO_PLATFORM)
+    @DisableCompatChanges({NetworkSecurityConfig.ENABLE_DEFAULT_ENCRYPTED_CLIENT_HELLO})
+    public void testDomainEncryptionInvalidValues_disabledAppCompat_returnsDefaultDisabledMode()
+            throws Exception {
+        XmlConfigSource source = new XmlConfigSource(
+                mContext, R.xml.domain_encryption_invalid, TestUtils.makeApplicationInfo());
+        ApplicationConfig appConfig = new ApplicationConfig(source);
+        assertTrue(appConfig.hasPerDomainConfigs());
+        NetworkSecurityConfig config = appConfig.getConfigForHostname(/* hostname= */ "");
+        assertNotNull(config);
+
+        // Assert default base config setting
+        assertEquals(DOMAIN_ENCRYPTION_MODE_DISABLED, config.getDomainEncryptionMode());
+
+        // Assert domain config settings
+        config = appConfig.getConfigForHostname("android.com");
+        assertEquals(DOMAIN_ENCRYPTION_MODE_DISABLED, config.getDomainEncryptionMode());
+
+        config = appConfig.getConfigForHostname("whitespace.android.com");
+        assertEquals(DOMAIN_ENCRYPTION_MODE_DISABLED, config.getDomainEncryptionMode());
+
+        config = appConfig.getConfigForHostname("capitalized.android.com");
+        assertEquals(DOMAIN_ENCRYPTION_MODE_DISABLED, config.getDomainEncryptionMode());
     }
 }
