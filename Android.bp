@@ -904,7 +904,10 @@ java_test {
         "bouncycastle-unbundled",
         "bouncycastle-bcpkix-unbundled",
         "bouncycastle-ocsp-unbundled",
+        "flag-junit",
+        "networksecurity-aconfig-flags-lib",
     ],
+    jarjar_rules: "test-support/aconfig-flags-repackage-for-test-jarjar-rules.txt",
     javacflags: [
         "-Xmaxwarns 9999999",
         //"-Xlint:all",
