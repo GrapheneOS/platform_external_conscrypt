@@ -81,6 +81,7 @@ import java.util.function.Supplier;
 
 import javax.crypto.spec.GCMParameterSpec;
 import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
@@ -634,6 +635,10 @@ final public class Platform {
     // OpenJDK always has X509ExtendedTrustManager
     static boolean supportsX509ExtendedTrustManager() {
         return true;
+    }
+
+    static SSLException wrapInvalidEchDataException(SSLException e) {
+        return e;
     }
 
     static boolean supportsConscryptCertStore() {

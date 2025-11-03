@@ -1,0 +1,4 @@
+# Repackage generated aconfig flag classes for tests
+# to use the flag classes statically linked in the test and avoid using the ones
+# in the boot classpath. See go/flag-value-annotations
+rule com.android.org.conscrypt.net.flags.** com.android.org.conscrypt.net.test.flags.@1

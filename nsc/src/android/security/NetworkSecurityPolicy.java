@@ -90,6 +90,8 @@ public class NetworkSecurityPolicy {
      *
      * @hide
      */
+    @FlaggedApi(com.android.org.conscrypt.net.flags.Flags.FLAG_NETWORK_SECURITY_CONFIG)
+    @SystemApi(client = SystemApi.Client.MODULE_LIBRARIES)
     public void setCleartextTrafficPermitted(boolean permitted) {
         libcore.net.NetworkSecurityPolicy currentPolicy =
                 libcore.net.NetworkSecurityPolicy.getInstance();

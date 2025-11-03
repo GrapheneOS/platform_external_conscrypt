@@ -1,3 +1,4 @@
+/* GENERATED SOURCE. DO NOT MODIFY. */
 /*
  * Copyright (C) 2025 The Android Open Source Project
  *
@@ -14,21 +15,6 @@
  * limitations under the License.
  */
 
-package org.conscrypt;
+package com.android.org.conscrypt;
 
-import org.conscrypt.metrics.CertificateTransparencyVerificationReason;
-
-/**
- * A policy provided by the platform to decide on the behaviour of TrustManagerImpl.
- *
- * See the platform-specific implementations in PlatformNetworkSecurityPolicy.
- */
-@Internal
-public interface NetworkSecurityPolicy {
-    boolean isCertificateTransparencyVerificationRequired(String hostname);
-
-    CertificateTransparencyVerificationReason getCertificateTransparencyVerificationReason(
-            String hostname);
-
-    DomainEncryptionMode getDomainEncryptionMode(String hostname);
-}
+@Internal enum DomainEncryptionMode { UNKNOWN, DISABLED, OPPORTUNISTIC, ENABLED, REQUIRED }

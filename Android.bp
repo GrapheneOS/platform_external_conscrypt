@@ -241,6 +241,8 @@ aconfig_declarations {
     exportable: true,
     visibility: [
         "//frameworks/base",
+        // Needed for ECH
+        "//packages/modules/Connectivity:__subpackages__",
     ],
 }
 
@@ -493,7 +495,7 @@ java_sdk_library {
         "//frameworks/base",
         "//frameworks/base/api",
         "//packages/modules/common/sdk",
-        "//packages/modules/Connectivity/framework",
+        "//packages/modules/Connectivity:__subpackages__",
         // TODO(b/165823103): Remove visiblity for IPsec once CorePlatformApi is available
         "//packages/modules/IPsec",
         // Visibility for prebuilt art-module-host-exports from the prebuilt of
@@ -651,6 +653,7 @@ java_sdk_library {
     static_libs: [
         "android.security.flags-aconfig-java-export",
     ],
+    jarjar_rules: "conscrypt-nsc-jarjar-rules.txt",
 
     api_dir: "api/nsc",
 
@@ -901,7 +904,10 @@ java_test {
         "bouncycastle-unbundled",
         "bouncycastle-bcpkix-unbundled",
         "bouncycastle-ocsp-unbundled",
+        "flag-junit",
+        "networksecurity-aconfig-flags-lib",
     ],
+    jarjar_rules: "test-support/aconfig-flags-repackage-for-test-jarjar-rules.txt",
     javacflags: [
         "-Xmaxwarns 9999999",
         //"-Xlint:all",

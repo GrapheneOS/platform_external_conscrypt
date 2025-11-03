@@ -1,0 +1,6 @@
+# Repackage classes from the android security aconfig flags
+rule android.security.CustomFeatureFlags android.security.conscrypt.internal.CustomFeatureFlags
+rule android.security.FakeFeatureFlagsImpl android.security.conscrypt.internal.FakeFeatureFlagsImpl
+rule android.security.FeatureFlags android.security.conscrypt.internal.FeatureFlags
+rule android.security.FeatureFlagsImpl android.security.conscrypt.internal.FeatureFlagsImpl
+rule android.security.Flags android.security.conscrypt.internal.Flags
