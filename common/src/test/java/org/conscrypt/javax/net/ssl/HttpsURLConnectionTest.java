@@ -21,8 +21,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
@@ -184,6 +186,8 @@ public class HttpsURLConnectionTest {
                 fail("Unexpected connection to unroutable address");
             } catch (SocketTimeoutException e) {
                 // Expected
+            } catch (ConnectException e) {
+                assumeTrue("Skipping test. Connection not available", false);
             }
             return null;
         });
