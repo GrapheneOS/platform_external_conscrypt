@@ -27,6 +27,12 @@ apex_defaults {
     androidManifest: ":com.android.conscrypt-androidManifest",
     compile_multilib: "both",
     bootclasspath_fragments: ["com.android.conscrypt-bootclasspath-fragment"],
+    compat_configs: select(release_flag("RELEASE_CONSCRYPT_NSC"), {
+        true: [
+            "framework-conscrypt-nsc-compat-config",
+        ],
+        default: [],
+    }),
     jni_libs: ["libjavacrypto"],
     prebuilts: ["current_sdkinfo"],
     multilib: {
@@ -120,10 +126,15 @@ bootclasspath_fragment {
     },
     // The core platform APIs provided by this fragment.
     core_platform_api: {
-        stub_libs: [
-            "conscrypt.module.platform.api",
-            "framework-conscrypt-nsc.stubs.module_lib",
-        ],
+        stub_libs: select(release_flag("RELEASE_CONSCRYPT_NSC"), {
+            true: [
+                "conscrypt.module.platform.api",
+                "framework-conscrypt-nsc.stubs.module_lib",
+            ],
+            default: [
+                "conscrypt.module.platform.api",
+            ],
+        }),
     },
     // Additional hidden API flags that override the default flags derived
     // from the api stub libraries.
