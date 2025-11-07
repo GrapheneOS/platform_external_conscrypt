@@ -669,6 +669,17 @@ java_sdk_library {
     ],
 }
 
+platform_compat_config {
+    name: "framework-conscrypt-nsc-compat-config",
+    src: ":framework-conscrypt-nsc",
+
+    // Disable when NSC implementation in Conscrypt is not active.
+    enabled: select(release_flag("RELEASE_CONSCRYPT_NSC"), {
+        true: true,
+        default: false,
+    }),
+}
+
 // Platform conscrypt crypto JNI library
 cc_defaults {
     name: "libjavacrypto-defaults",
