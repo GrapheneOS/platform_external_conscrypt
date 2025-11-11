@@ -264,6 +264,23 @@ java_aconfig_library {
     ],
 }
 
+java_aconfig_library {
+    name: "conscrypt-exported-networksecurity-aconfig-flags-lib",
+    defaults: ["framework-minus-apex-aconfig-java-defaults"],
+    aconfig_declarations: "networksecurity-aconfig-flags",
+    apex_available: [
+        "//apex_available:platform",
+        "com.android.tethering",
+        "com.android.wifi",
+    ],
+    installable: false,
+    mode: "exported",
+    min_sdk_version: "30",
+    visibility: [
+        "//packages/modules/Connectivity:__subpackages__",
+    ],
+}
+
 cc_binary_host {
     name: "conscrypt_generate_constants",
     srcs: ["constants/src/gen/cpp/generate_constants.cc"],
