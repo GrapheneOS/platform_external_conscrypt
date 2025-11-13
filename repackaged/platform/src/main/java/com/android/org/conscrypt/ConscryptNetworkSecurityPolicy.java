@@ -88,7 +88,10 @@ public class ConscryptNetworkSecurityPolicy implements NetworkSecurityPolicy {
 
     @Override
     public DomainEncryptionMode getDomainEncryptionMode(String hostname) {
-        if (com.android.org.conscrypt.net.flags.Flags.encryptedClientHelloPlatform()) {
+        // Domain encryption is enabled if it is supported by the platform AND
+        // the API is available in libcore.
+        if (com.android.org.conscrypt.net.flags.Flags.encryptedClientHelloPlatform()
+                && com.android.libcore.Flags.networkSecurityPolicyEchApi()) {
             return platformToConscryptEncryptionMode(policy.getDomainEncryptionMode(hostname));
         }
         return DomainEncryptionMode.UNKNOWN;
