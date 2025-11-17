@@ -54,6 +54,8 @@ import javax.crypto.interfaces.DHPrivateKey;
 import javax.crypto.interfaces.DHPublicKey;
 import javax.crypto.spec.DHParameterSpec;
 import libcore.junit.util.EnableDeprecatedBouncyCastleAlgorithmsRule;
+import libcore.test.annotation.NonCts;
+import libcore.test.reasons.NonCtsReasons;
 import org.conscrypt.TestUtils;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -74,6 +76,7 @@ public class KeyPairGeneratorTest {
     // END Android-Added: Allow access to deprecated BC algorithms.
 
     @Test
+    @NonCts(reason = NonCtsReasons.INTERNAL_APIS)
     public void test_getInstance() throws Exception {
         ServiceTester.test("KeyPairGenerator")
             // Do not test AndroidKeyStore Provider. It does not accept vanilla public keys for
