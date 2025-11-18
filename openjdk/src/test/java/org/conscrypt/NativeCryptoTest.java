@@ -631,7 +631,6 @@ public class NativeCryptoTest {
 
         byte[] badConfigList = {
                 0x00, 0x05, (byte) 0xfe, 0x0d, (byte) 0xff, (byte) 0xff, (byte) 0xff};
-        boolean set = false;
         assertThrows(SSLException.class,
                 () -> NativeCrypto.SSL_set1_ech_config_list(s, null, badConfigList));
         NativeCrypto.SSL_free(s, null);
@@ -3094,6 +3093,38 @@ public class NativeCryptoTest {
         byte[] privateKeyBytes = new byte[32];
         assertThrows(IllegalArgumentException.class,
                 () -> NativeCrypto.ED25519_keypair(publicKeyBytes, privateKeyBytes));
+    }
+
+    @Test
+    public void mldsaPrivateKey_fromAndToSeed_works() throws Exception {
+        for (int keyType : new int[] {
+                     NativeConstants.EVP_PKEY_ML_DSA_65, NativeConstants.EVP_PKEY_ML_DSA_87}) {
+            byte[] seed = new byte[32];
+            NativeCrypto.RAND_bytes(seed);
+            NativeRef.EVP_PKEY privateKey =
+                    new NativeRef.EVP_PKEY(NativeCrypto.EVP_PKEY_from_private_seed(keyType, seed));
+            assertEquals(keyType, NativeCrypto.EVP_PKEY_type(privateKey));
+
+            byte[] output = NativeCrypto.EVP_PKEY_get_private_seed(privateKey);
+            assertArrayEquals(seed, output);
+        }
+    }
+
+    @Test
+    public void evpKeyFromPrivateSeed_invalidSeedLength_throws() throws Exception {
+        for (int keyType : new int[] {
+                     NativeConstants.EVP_PKEY_ML_DSA_65, NativeConstants.EVP_PKEY_ML_DSA_87}) {
+            final byte[] shortSeed = new byte[31];
+            assertThrows(ParsingException.class,
+                    ()
+                            -> new NativeRef.EVP_PKEY(
+                                    NativeCrypto.EVP_PKEY_from_private_seed(keyType, shortSeed)));
+            final byte[] longSeed = new byte[33];
+            assertThrows(ParsingException.class,
+                    ()
+                            -> new NativeRef.EVP_PKEY(
+                                    NativeCrypto.EVP_PKEY_from_private_seed(keyType, longSeed)));
+        }
     }
 
     @Test
