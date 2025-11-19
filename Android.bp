@@ -652,7 +652,7 @@ java_sdk_library {
     // TODO(b/397646538): replace this with "37". We don't want to ship this module
     // to 36 or lower devices, because the NSConfig and NSCPolicy classes would clash
     // with the ones with the same name in the platform.
-    min_sdk_version: "36",
+    min_sdk_version: "current",
     sdk_version: "module_current",
 
     srcs: [
