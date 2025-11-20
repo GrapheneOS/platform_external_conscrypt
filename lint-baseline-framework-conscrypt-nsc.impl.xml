@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues
+    type="baseline"
+    client=""
+    dependencies="true"
+    name=""
+    variant=""
+    version="">
+    <issue
+        id="NewApi"
+        message="Call requires API level CUR_DEVELOPMENT/10000 (current min is 36): `libcore.net.NetworkSecurityPolicy#getDomainEncryptionMode`"
+        errorLine1="        return libcore.net.NetworkSecurityPolicy.getInstance().getDomainEncryptionMode(hostname);"
+        errorLine2="                                                               ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="external/conscrypt/nsc/src/android/security/NetworkSecurityPolicy.java"
+            line="180"
+            column="64"/>
+    </issue>
+
+</issues>

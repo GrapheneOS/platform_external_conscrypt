@@ -392,6 +392,9 @@ java_library {
         "android.net.ssl",
         "com.android.org.conscrypt",
     ],
+    lint: {
+        baseline_filename: "lint-baseline-conscrypt.xml",
+    },
 }
 
 // Java library for use on host, e.g. by robolectric.
@@ -685,6 +688,9 @@ java_sdk_library {
     aconfig_declarations: [
         "networksecurity-aconfig-flags",
     ],
+    lint: {
+        baseline_filename: "lint-baseline-framework-conscrypt-nsc.impl.xml",
+    },
 }
 
 platform_compat_config {

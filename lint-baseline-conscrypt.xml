@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues
+    type="baseline"
+    client=""
+    dependencies="true"
+    name=""
+    variant=""
+    version="">
+    <issue
+        id="NewApi"
+        message="Field requires API level CUR_DEVELOPMENT/10000 (current min is 30): `android.net.ssl.EchConfigList#rawData`"
+        errorLine1="        this.rawData = rawData.clone();"
+        errorLine2="        ~~~~~~~~~~~~">
+        <location
+            file="external/conscrypt/publicapi/src/main/java/android/net/ssl/EchConfigList.java"
+            line="49"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Field requires API level CUR_DEVELOPMENT/10000 (current min is 30): `android.net.ssl.EchConfigList#rawData`"
+        errorLine1="        return rawData.clone();"
+        errorLine2="               ~~~~~~~">
+        <location
+            file="external/conscrypt/publicapi/src/main/java/android/net/ssl/EchConfigList.java"
+            line="87"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Field requires API level CUR_DEVELOPMENT/10000 (current min is 30): `android.net.ssl.EchConfigMismatchException#echRetryConfigList`"
+        errorLine1="        return echRetryConfigList;"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="external/conscrypt/publicapi/src/main/java/android/net/ssl/EchConfigMismatchException.java"
+            line="40"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Field requires API level CUR_DEVELOPMENT/10000 (current min is 30): `android.net.ssl.EchConfigMismatchException#echRetryConfigList`"
+        errorLine1="        return echRetryConfigList != null;"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="external/conscrypt/publicapi/src/main/java/android/net/ssl/EchConfigMismatchException.java"
+            line="47"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Field requires API level CUR_DEVELOPMENT/10000 (current min is 30): `android.net.ssl.EchConfigMismatchException#echRetryConfigList`"
+        errorLine1="        this.echRetryConfigList = echRetryConfigList;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="external/conscrypt/publicapi/src/main/java/android/net/ssl/EchConfigMismatchException.java"
+            line="53"
+            column="9"/>
+    </issue>
+
+</issues>
