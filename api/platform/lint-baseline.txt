@@ -3,6 +3,40 @@ AcronymName: com.android.org.conscrypt.OpenSSLSocketImpl#getOOBInline():
     Acronyms should not be capitalized in method names: was `getOOBInline`, should this be `getOobInline`?
 
 
+ArrayReturn: com.android.org.conscrypt.ConscryptX509TrustManager#checkServerTrusted(java.security.cert.X509Certificate[], String, String) parameter #0:
+    Method parameter should be Collection<X509Certificate> (or subclass) instead of raw array; was `java.security.cert.X509Certificate[]`
+ArrayReturn: com.android.org.conscrypt.ConscryptX509TrustManager#checkServerTrusted(java.security.cert.X509Certificate[], byte[], byte[], String, String) parameter #0:
+    Method parameter should be Collection<X509Certificate> (or subclass) instead of raw array; was `java.security.cert.X509Certificate[]`
+
+
+InternalClasses: com.android.org.conscrypt.ConscryptNetworkSecurityPolicy:
+    Internal classes must not be exposed
+InternalClasses: com.android.org.conscrypt.ConscryptX509TrustManager:
+    Internal classes must not be exposed
+
+
+MissingNullability: com.android.org.conscrypt.ConscryptNetworkSecurityPolicy#ConscryptNetworkSecurityPolicy(libcore.net.NetworkSecurityPolicy) parameter #0:
+    Missing nullability on parameter `policy` in method `ConscryptNetworkSecurityPolicy`
+MissingNullability: com.android.org.conscrypt.ConscryptX509TrustManager#checkServerTrusted(java.security.cert.X509Certificate[], String, String):
+    Missing nullability on method `checkServerTrusted` return
+MissingNullability: com.android.org.conscrypt.ConscryptX509TrustManager#checkServerTrusted(java.security.cert.X509Certificate[], String, String) parameter #0:
+    Missing nullability on parameter `chain` in method `checkServerTrusted`
+MissingNullability: com.android.org.conscrypt.ConscryptX509TrustManager#checkServerTrusted(java.security.cert.X509Certificate[], String, String) parameter #1:
+    Missing nullability on parameter `authType` in method `checkServerTrusted`
+MissingNullability: com.android.org.conscrypt.ConscryptX509TrustManager#checkServerTrusted(java.security.cert.X509Certificate[], String, String) parameter #2:
+    Missing nullability on parameter `hostname` in method `checkServerTrusted`
+MissingNullability: com.android.org.conscrypt.ConscryptX509TrustManager#checkServerTrusted(java.security.cert.X509Certificate[], byte[], byte[], String, String):
+    Missing nullability on method `checkServerTrusted` return
+MissingNullability: com.android.org.conscrypt.ConscryptX509TrustManager#checkServerTrusted(java.security.cert.X509Certificate[], byte[], byte[], String, String) parameter #0:
+    Missing nullability on parameter `chain` in method `checkServerTrusted`
+MissingNullability: com.android.org.conscrypt.ConscryptX509TrustManager#checkServerTrusted(java.security.cert.X509Certificate[], byte[], byte[], String, String) parameter #1:
+    Missing nullability on parameter `ocspData` in method `checkServerTrusted`
+MissingNullability: com.android.org.conscrypt.ConscryptX509TrustManager#checkServerTrusted(java.security.cert.X509Certificate[], byte[], byte[], String, String) parameter #2:
+    Missing nullability on parameter `tlsSctData` in method `checkServerTrusted`
+MissingNullability: com.android.org.conscrypt.ConscryptX509TrustManager#checkServerTrusted(java.security.cert.X509Certificate[], byte[], byte[], String, String) parameter #3:
+    Missing nullability on parameter `authType` in method `checkServerTrusted`
+MissingNullability: com.android.org.conscrypt.ConscryptX509TrustManager#checkServerTrusted(java.security.cert.X509Certificate[], byte[], byte[], String, String) parameter #4:
+    Missing nullability on parameter `hostname` in method `checkServerTrusted`
 MissingNullability: com.android.org.conscrypt.OpenSSLSocketImpl#bind(java.net.SocketAddress) parameter #0:
     Missing nullability on parameter `bindpoint` in method `bind`
 MissingNullability: com.android.org.conscrypt.OpenSSLSocketImpl#getChannel():
@@ -19,3 +53,7 @@ MissingNullability: com.android.org.conscrypt.OpenSSLSocketImpl#getOutputStream(
     Missing nullability on method `getOutputStream` return
 MissingNullability: com.android.org.conscrypt.OpenSSLSocketImpl#getRemoteSocketAddress():
     Missing nullability on method `getRemoteSocketAddress` return
+MissingNullability: com.android.org.conscrypt.TrustManagerImpl#getNetworkSecurityPolicy():
+    Missing nullability on method `getNetworkSecurityPolicy` return
+MissingNullability: com.android.org.conscrypt.TrustManagerImpl#setNetworkSecurityPolicy(com.android.org.conscrypt.ConscryptNetworkSecurityPolicy) parameter #0:
+    Missing nullability on parameter `policy` in method `setNetworkSecurityPolicy`
