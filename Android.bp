@@ -475,8 +475,6 @@ java_sdk_library {
 
     dist_group: "android",
     dist_stem: "conscrypt-coreplatform",
-    // TODO: remove this when Conscrypt's @CorePlatformApi has been migrated to @SystemApi
-    unsafe_ignore_missing_latest_api: true,
     libs: [
         "libcore-exported-aconfig-flags-lib",
         "conscrypt-aconfig-flags-lib",
