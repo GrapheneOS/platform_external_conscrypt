@@ -413,6 +413,30 @@ java_library {
     system_modules: "none",
 }
 
+// Referenced implicitly from conscrypt.module.platform.api.
+filegroup {
+    name: "conscrypt.module.platform.api.api.combined.public.latest",
+    srcs: [
+        "api/platform/last-api.txt",
+    ],
+}
+
+// Referenced implicitly from conscrypt.module.platform.api.
+filegroup {
+    name: "conscrypt.module.platform.api-removed.api.combined.public.latest",
+    srcs: [
+        "api/platform/last-removed.txt",
+    ],
+}
+
+// Referenced implicitly from conscrypt.module.platform.api.
+filegroup {
+    name: "conscrypt.module.platform.api-incompatibilities.api.public.latest",
+    srcs: [
+        "api/platform/last-incompatibilities.txt",
+    ],
+}
+
 // A library containing the core platform API stubs of the Conscrypt module.
 //
 // Core platform APIs are only intended for use of other parts of the platform, not the
@@ -475,6 +499,8 @@ java_sdk_library {
 
     dist_group: "android",
     dist_stem: "conscrypt-coreplatform",
+    // TODO: remove this when Conscrypt's @CorePlatformApi has been migrated to @SystemApi
+    unsafe_ignore_missing_latest_api: true,
     libs: [
         "libcore-exported-aconfig-flags-lib",
         "conscrypt-aconfig-flags-lib",
