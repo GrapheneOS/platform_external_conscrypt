@@ -48,7 +48,6 @@ public class ManifestConfigSource implements ConfigSource {
      * cleartext traffic via their Network Security Config.
      */
     @ChangeId
-    @Overridable
     @Disabled
     static final long DEPRECATE_USES_CLEARTEXT_TRAFFIC = 415007211L;
 

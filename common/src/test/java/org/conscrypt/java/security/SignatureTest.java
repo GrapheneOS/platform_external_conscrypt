@@ -68,6 +68,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import libcore.junit.util.EnableDeprecatedBouncyCastleAlgorithmsRule;
+import libcore.test.annotation.NonCts;
+import libcore.test.reasons.NonCtsReasons;
 
 import org.junit.ClassRule;
 import org.junit.rules.TestRule;
@@ -89,6 +91,7 @@ public class SignatureTest {
     private final byte[] EMPTY_DATA = new byte[20];
 
     @Test
+    @NonCts(reason = NonCtsReasons.INTERNAL_APIS)
     public void test_getInstance() throws Exception {
         ServiceTester
                 .test("Signature")

@@ -16,7 +16,6 @@
 
 package org.conscrypt;
 
-import org.conscrypt.flags.Flags;
 import org.conscrypt.metrics.CertificateTransparencyVerificationReason;
 
 /**
@@ -38,10 +37,7 @@ public class ConscryptNetworkSecurityPolicy implements NetworkSecurityPolicy {
 
     @Override
     public boolean isCertificateTransparencyVerificationRequired(String hostname) {
-        if (Flags.certificateTransparencyPlatform()) {
-            return policy.isCertificateTransparencyVerificationRequired(hostname);
-        }
-        return false;
+        return policy.isCertificateTransparencyVerificationRequired(hostname);
     }
 
     @Override
@@ -80,7 +76,10 @@ public class ConscryptNetworkSecurityPolicy implements NetworkSecurityPolicy {
 
     @Override
     public DomainEncryptionMode getDomainEncryptionMode(String hostname) {
-        if (org.conscrypt.net.flags.Flags.encryptedClientHelloPlatform()) {
+        // Domain encryption is enabled if it is supported by the platform AND
+        // the API is available in libcore.
+        if (org.conscrypt.net.flags.Flags.encryptedClientHelloPlatform()
+                && com.android.libcore.Flags.networkSecurityPolicyEchApi()) {
             return platformToConscryptEncryptionMode(policy.getDomainEncryptionMode(hostname));
         }
         return DomainEncryptionMode.UNKNOWN;

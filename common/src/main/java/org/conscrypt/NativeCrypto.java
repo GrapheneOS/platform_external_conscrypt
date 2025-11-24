@@ -109,6 +109,10 @@ public final class NativeCrypto {
 
     @FastNative static native byte[] EVP_marshal_public_key(NativeRef.EVP_PKEY pkey);
 
+    static native long EVP_PKEY_from_private_seed(int type, byte[] seed) throws ParsingException;
+
+    static native byte[] EVP_PKEY_get_private_seed(NativeRef.EVP_PKEY pkey);
+
     @FastNative
     static native byte[] EVP_raw_X25519_private_key(byte[] data)
             throws ParsingException, InvalidKeyException;
@@ -1405,6 +1409,8 @@ public final class NativeCrypto {
     @FastNative public static native String SSL_get_current_cipher(long ssl, NativeSsl ssl_holder);
 
     @FastNative public static native String SSL_get_version(long ssl, NativeSsl ssl_holder);
+
+    public static native String SSL_get_curve_name(long ssl, NativeSsl sslHolder);
 
     /** Returns the peer certificate chain. */
     @FastNative static native byte[][] SSL_get0_peer_certificates(long ssl, NativeSsl ssl_holder);

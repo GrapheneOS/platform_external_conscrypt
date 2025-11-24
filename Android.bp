@@ -228,6 +228,7 @@ java_aconfig_library {
     apex_available: [
         "com.android.conscrypt",
     ],
+    jarjar_prefix: "com.android.org.conscrypt.internal",
     min_sdk_version: "30",
     installable: false,
     mode: "exported",
@@ -360,12 +361,12 @@ java_library {
     libs: [
         "framework-annotations-lib",
         "unsupportedappusage",
-        "libcore-exported-aconfig-flags-lib",
     ],
     static_libs: [
         "conscrypt-aconfig-flags-lib",
         "conscrypt-statslog-java",
         "networksecurity-aconfig-flags-lib",
+        "libcore-exported-aconfig-flags-lib",
     ],
 
     // Conscrypt can be updated independently from the other core libraries so it must only depend
@@ -391,6 +392,9 @@ java_library {
         "android.net.ssl",
         "com.android.org.conscrypt",
     ],
+    lint: {
+        baseline_filename: "lint-baseline-conscrypt.xml",
+    },
 }
 
 // Java library for use on host, e.g. by robolectric.
@@ -651,7 +655,7 @@ java_sdk_library {
     // TODO(b/397646538): replace this with "37". We don't want to ship this module
     // to 36 or lower devices, because the NSConfig and NSCPolicy classes would clash
     // with the ones with the same name in the platform.
-    min_sdk_version: "36",
+    min_sdk_version: "current",
     sdk_version: "module_current",
 
     srcs: [
@@ -684,6 +688,9 @@ java_sdk_library {
     aconfig_declarations: [
         "networksecurity-aconfig-flags",
     ],
+    lint: {
+        baseline_filename: "lint-baseline-framework-conscrypt-nsc.impl.xml",
+    },
 }
 
 platform_compat_config {

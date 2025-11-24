@@ -30,6 +30,8 @@ import com.android.org.conscrypt.testing.BrokenProvider;
 import com.android.org.conscrypt.testing.OpaqueProvider;
 
 import libcore.junit.util.EnableDeprecatedBouncyCastleAlgorithmsRule;
+import libcore.test.annotation.NonCts;
+import libcore.test.reasons.NonCtsReasons;
 
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -93,6 +95,7 @@ public class SignatureTest {
     private final byte[] EMPTY_DATA = new byte[20];
 
     @Test
+    @NonCts(reason = NonCtsReasons.INTERNAL_APIS)
     public void test_getInstance() throws Exception {
         ServiceTester
                 .test("Signature")
