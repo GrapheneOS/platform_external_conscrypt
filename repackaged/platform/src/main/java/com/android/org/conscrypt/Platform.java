@@ -30,6 +30,9 @@ import com.android.org.conscrypt.ct.LogStore;
 import com.android.org.conscrypt.ct.LogStoreImpl;
 import com.android.org.conscrypt.ct.Policy;
 import com.android.org.conscrypt.ct.PolicyImpl;
+import com.android.org.conscrypt.flags.Flags;
+import com.android.org.conscrypt.metrics.CertificateTransparencyVerificationReason;
+import com.android.org.conscrypt.metrics.NoopStatsLog;
 import com.android.org.conscrypt.metrics.OptionalMethod;
 import com.android.org.conscrypt.metrics.Source;
 import com.android.org.conscrypt.metrics.StatsLog;
@@ -38,8 +41,11 @@ import com.android.org.conscrypt.metrics.StatsLogImpl;
 import dalvik.system.BlockGuard;
 import dalvik.system.CloseGuard;
 import dalvik.system.VMRuntime;
+import dalvik.system.ZygoteHooks;
 
 import java.io.FileDescriptor;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.lang.System;
 import java.lang.reflect.Field;
@@ -90,8 +96,13 @@ final public class Platform {
     static boolean DEPRECATED_TLS_V1 = true;
     static boolean ENABLED_TLS_V1 = false;
     private static boolean FILTERED_TLS_V1 = true;
+    private static boolean RUNNING_IN_ZYGOTE = true;
+    private static final boolean canProbeZygote;
+    private static final boolean canCallZygoteMethod;
 
     static {
+        canProbeZygote = isSdkGreater(32);
+        canCallZygoteMethod = isSdkGreater(36);
         NativeCrypto.setTlsV1DeprecationStatus(DEPRECATED_TLS_V1, ENABLED_TLS_V1);
     }
 
@@ -104,6 +115,7 @@ final public class Platform {
         FILTERED_TLS_V1 = !enabledTlsV1;
         NoPreloadHolder.MAPPER.ping();
         NativeCrypto.setTlsV1DeprecationStatus(DEPRECATED_TLS_V1, ENABLED_TLS_V1);
+        RUNNING_IN_ZYGOTE = inZygote();
     }
 
     /**
@@ -552,7 +564,14 @@ final public class Platform {
     }
 
     public static StatsLog getStatsLog() {
-        return StatsLogImpl.getInstance();
+        if (!RUNNING_IN_ZYGOTE) {
+            return StatsLogImpl.getInstance();
+        }
+        if (!inZygote()) {
+            RUNNING_IN_ZYGOTE = false;
+            return StatsLogImpl.getInstance();
+        }
+        return NoopStatsLog.getInstance();
     }
 
     public static Source getStatsSource() {
@@ -585,6 +604,32 @@ final public class Platform {
 
     public static boolean isPakeSupported() {
         return true;
+    }
+
+    private static boolean inZygote() {
+        if (canCallZygoteMethod) {
+            return ZygoteHooks.isInZygote();
+        }
+        if (canProbeZygote) {
+            try {
+                Class<?> zygoteHooksClass = Class.forName("dalvik.system.ZygoteHooks");
+                Method inZygoteMethod = zygoteHooksClass.getDeclaredMethod("inZygote");
+                Object inZygote = inZygoteMethod.invoke(null);
+                if (inZygote == null) {
+                    return true;
+                }
+                return (boolean) inZygote;
+            } catch (IllegalAccessException |
+                NullPointerException | InvocationTargetException |
+                ClassNotFoundException | NoSuchMethodException e) {
+                return true;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        // For previous releases, we have no mechanism to test if we are in Zygote.
+        // Assume we are not, to conserve the existing behaviour.
+        return false;
     }
 
     static Object getTargetSdkVersion() {

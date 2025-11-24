@@ -46,16 +46,71 @@ import com.android.org.conscrypt.ct.LogStore;
 import com.android.org.conscrypt.ct.PolicyCompliance;
 import com.android.org.conscrypt.ct.VerificationResult;
 
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+
 /**
  * Implements logging for Conscrypt metrics.
  * @hide This class is not part of the Android public SDK API
  */
 @Internal
 public final class StatsLogImpl implements StatsLog {
-    private static final StatsLog INSTANCE = new StatsLogImpl();
-    private StatsLogImpl() {}
+    private final BlockingQueue<Runnable> logQueue;
+    private final ExecutorService writerThreadExecutor;
+    private boolean running = false;
+
+    private StatsLogImpl() {
+        this.logQueue = new LinkedBlockingQueue<>(100);
+        this.writerThreadExecutor =
+                Executors.newSingleThreadExecutor(new LowPriorityThreadFactory());
+        startWriterThread();
+    }
     public static StatsLog getInstance() {
-        return INSTANCE;
+        return new StatsLogImpl();
+    }
+
+    public void stop() {
+        running = false;
+        writerThreadExecutor.shutdownNow();
+        try {
+            writerThreadExecutor.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    private void startWriterThread() {
+        writerThreadExecutor.execute(() -> {
+            while (running) {
+                try {
+                    // Blocks until a log task is available
+                    Runnable logTask = logQueue.take();
+                    logTask.run(); // Execute the specific ConscryptStatsLog.write() call
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    running = false;
+                }
+            }
+            // Process remaining logs
+            while (!logQueue.isEmpty()) {
+                Runnable logTask = logQueue.poll();
+                if (logTask != null) {
+                    logTask.run();
+                }
+            }
+        });
+    }
+
+    private static class LowPriorityThreadFactory implements ThreadFactory {
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread thread = new Thread(r);
+            thread.setPriority(Thread.MIN_PRIORITY);
+            return thread;
+        }
     }
 
     @Override
@@ -180,21 +235,25 @@ public final class StatsLogImpl implements StatsLog {
             builder.usePooledBuffer();
             ReflexiveStatsLog.write(builder.build());
         } else {
-            ConscryptStatsLog.write(atomId, success, protocol, cipherSuite, duration, source, uids);
+            logQueue.offer(()
+                                   -> ConscryptStatsLog.write(atomId, success, protocol,
+                                           cipherSuite, duration, source, uids));
         }
     }
 
     private void write(int atomId, int status, int loadedCompatVersion,
             int minCompatVersionAvailable, int majorVersion, int minorVersion) {
-        ConscryptStatsLog.write(atomId, status, loadedCompatVersion, minCompatVersionAvailable,
-                majorVersion, minorVersion);
+        ConscryptStatsLog.write(atomId, status, loadedCompatVersion,
+                                       minCompatVersionAvailable, majorVersion, minorVersion);
     }
 
     private void write(int atomId, int verificationResult, int verificationReason,
             int policyCompatVersion, int majorVersion, int minorVersion, int numEmbeddedScts,
             int numOcspScts, int numTlsScts, int uid) {
-        ConscryptStatsLog.write(atomId, verificationResult, verificationReason, policyCompatVersion,
-                majorVersion, minorVersion, numEmbeddedScts, numOcspScts, numTlsScts, uid);
+        ConscryptStatsLog.write(atomId, verificationResult,
+                                       verificationReason, policyCompatVersion, majorVersion,
+                                       minorVersion, numEmbeddedScts, numOcspScts, numTlsScts,
+                                       uid);
     }
 
     private void write(int atomId, int origin, int index, int uid) {
