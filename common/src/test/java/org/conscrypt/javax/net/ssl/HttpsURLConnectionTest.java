@@ -21,7 +21,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.Assume.assumeFalse;
+
+import org.conscrypt.TestUtils;
+import org.conscrypt.VeryBasicHttpServer;
+import org.junit.After;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -34,16 +41,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
-import org.conscrypt.TestUtils;
-import org.conscrypt.VeryBasicHttpServer;
-import org.junit.After;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
 public class HttpsURLConnectionTest {
@@ -180,18 +182,23 @@ public class HttpsURLConnectionTest {
         connection.setConnectTimeout(timeoutMillis);
         connection.setReadTimeout(0);
 
-        Future<Void> future = executor.submit(() -> {
+        Future<Throwable> future = executor.submit(() -> {
             try {
                 connection.getResponseCode();
-                fail("Unexpected connection to unroutable address");
-            } catch (SocketTimeoutException e) {
-                // Expected
-            } catch (ConnectException e) {
-                assumeTrue("Skipping test. Connection not available", false);
+                return null;
+            } catch (Throwable t) {
+                return t;
             }
-            return null;
         });
-        future.get(2 * timeoutMillis, TimeUnit.MILLISECONDS);
+
+        Throwable result = future.get(2 * timeoutMillis, TimeUnit.MILLISECONDS);
+        assertNotNull("Unexpected connection to unroutable address", result);
+        // ConnectException gets thrown if there is no connectivity available. In that case the
+        // attempt will fail straight away, rather than at the timeout, so skip this test because we
+        // cannot control network availability.
+        assumeFalse("Skipping test. Connection not available", result instanceof ConnectException);
+        assertTrue("Connection failure other than timeout received",
+                result instanceof SocketTimeoutException);
     }
 
     @Test
