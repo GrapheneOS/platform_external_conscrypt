@@ -303,7 +303,7 @@ public class XmlConfigTests {
         NetworkSecurityConfig config = appConfig.getConfigForHostname("android.com");
         assertFalse(config.isCleartextTrafficPermitted());
         assertFalse(config.isHstsEnforced());
-        assertEquals(1, config.getTrustAnchors().size());
+        assertEquals(2, config.getTrustAnchors().size());
         // Try connections.
         SSLContext context = TestUtils.getSSLContext(source);
         TestUtils.assertConnectionSucceeds(context, "android.com", 443);
@@ -321,7 +321,7 @@ public class XmlConfigTests {
         NetworkSecurityConfig config = appConfig.getConfigForHostname("android.com");
         assertFalse(config.isCleartextTrafficPermitted());
         assertFalse(config.isHstsEnforced());
-        assertEquals(1, config.getTrustAnchors().size());
+        assertEquals(2, config.getTrustAnchors().size());
         // Try connections.
         SSLContext context = TestUtils.getSSLContext(source);
         TestUtils.assertConnectionSucceeds(context, "android.com", 443);

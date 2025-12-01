@@ -44,9 +44,12 @@ import javax.net.ssl.SSLContext;
 
 @RunWith(AndroidJUnit4.class)
 public class NetworkSecurityConfigTests {
-    // SHA-256 of the GTS intermediate CA (CN = WR2) for android.com (as of 01/2025).
-    private static final byte[] GTS_INTERMEDIATE_SPKI_SHA256 =
+    // SHA-256 of the GTS R1 intermediate CA (CN = WR2) for android.com (as of 01/2025).
+    private static final byte[] GTS_R1_INTERMEDIATE_SPKI_SHA256 =
             hexToBytes("60fb4769fb4bc3aff4be773606734a185e78c62080dbc58571c723900e32a423");
+    // SHA-256 of the GTS R4 intermediate CA (CN = WE2) for android.com (as of 11/2025).
+    private static final byte[] GTS_R4_INTERMEDIATE_SPKI_SHA256 =
+            hexToBytes("be1efc292835472e0d6aa183575d30fdc4dbf551f7050519a0258d6bddd6fc46");
 
     private static final byte[] TEST_CA_BYTES =
             hexToBytes("3082036130820249a003020102020900bd54597d6750ea62300d06092a86"
@@ -161,7 +164,8 @@ public class NetworkSecurityConfigTests {
     @Test
     public void testGoodPin() throws Exception {
         ArraySet<Pin> pins = new ArraySet<Pin>();
-        pins.add(new Pin("SHA-256", GTS_INTERMEDIATE_SPKI_SHA256));
+        pins.add(new Pin("SHA-256", GTS_R1_INTERMEDIATE_SPKI_SHA256));
+        pins.add(new Pin("SHA-256", GTS_R4_INTERMEDIATE_SPKI_SHA256));
         NetworkSecurityConfig domain =
                 new NetworkSecurityConfig.Builder()
                         .setPinSet(new PinSet(pins, Long.MAX_VALUE))
@@ -255,7 +259,8 @@ public class NetworkSecurityConfigTests {
     @Test
     public void testWithUrlConnection() throws Exception {
         ArraySet<Pin> pins = new ArraySet<Pin>();
-        pins.add(new Pin("SHA-256", GTS_INTERMEDIATE_SPKI_SHA256));
+        pins.add(new Pin("SHA-256", GTS_R1_INTERMEDIATE_SPKI_SHA256));
+        pins.add(new Pin("SHA-256", GTS_R4_INTERMEDIATE_SPKI_SHA256));
         NetworkSecurityConfig domain =
                 new NetworkSecurityConfig.Builder()
                         .setPinSet(new PinSet(pins, Long.MAX_VALUE))
