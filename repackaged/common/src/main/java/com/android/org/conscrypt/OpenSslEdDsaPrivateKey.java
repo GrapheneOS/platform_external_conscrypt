@@ -24,7 +24,7 @@ import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 
-/** An OpenSSL EdDSA private key. 
+/** An OpenSSL EdDSA private key.
  * @hide This class is not part of the Android public SDK API*/
 public class OpenSslEdDsaPrivateKey implements PrivateKey {
     private static final long serialVersionUID = -3136201500221850916L;
@@ -68,9 +68,15 @@ public class OpenSslEdDsaPrivateKey implements PrivateKey {
         this.privateKeyBytes = privateKeyBytes.clone();
     }
 
+    // This intentionally diverges from the OpenJDK implementation and JEP 339 (which return
+    // "EdDSA") to achieve backwards compatibility with the "AndroidKeyStore" provider, which
+    // supported generation of Ed25519 keys before Conscrypt did. Conscrypt's `getSigAlgName()`
+    // method returns the OID if there is no mapping to an algorithm name and the "AndroidKeyStore"
+    // provider therefore expects the OID as the algorithm name, even if Conscrypt now supports
+    // Ed25519 key generation (which otherwise aligns with JEP 339).
     @Override
     public String getAlgorithm() {
-        return "EdDSA";
+        return "1.3.101.112";
     }
 
     @Override
