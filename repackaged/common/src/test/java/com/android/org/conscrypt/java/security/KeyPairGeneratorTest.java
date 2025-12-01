@@ -269,7 +269,7 @@ public class KeyPairGeneratorTest {
             // have algorithm "ML-DSA".
             expectedAlgorithm = "ML-DSA";
         }
-        if (expectedAlgorithm.startsWith("EdDSA")) {
+        if (expectedAlgorithm.startsWith("EDDSA")) {
             // This intentionally diverges from the OpenJDK implementation and JEP 339 (which return
             // "EdDSA") to achieve backwards compatibility with the "AndroidKeyStore" provider,
             // which supported generation of Ed25519 keys before Conscrypt did.
