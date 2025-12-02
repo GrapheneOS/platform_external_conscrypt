@@ -654,6 +654,11 @@ final public class Platform {
         return e;
     }
 
+    static SSLException wrapEchRejectedException(EchRejectedException e, String hostname,
+                                                 byte[] retryConfigs) {
+        return e;
+    }
+
     static boolean supportsConscryptCertStore() {
         return false;
     }

@@ -513,6 +513,12 @@ int throwSSLProtocolExceptionStr(JNIEnv* env, const char* message) {
     return conscrypt::jniutil::throwException(env, "javax/net/ssl/SSLProtocolException", message);
 }
 
+int throwEchRejectedException(JNIEnv* env, const char* message) {
+    JNI_TRACE("throwEchRejectedException %s", message);
+    return conscrypt::jniutil::throwException(
+            env, TO_STRING(JNI_JARJAR_PREFIX) "org/conscrypt/EchRejectedException", message);
+}
+
 int throwSSLExceptionWithSslErrors(JNIEnv* env, SSL* ssl, int sslErrorCode, const char* message,
                                    int (*actualThrow)(JNIEnv*, const char*)) {
     if (message == nullptr) {
@@ -568,6 +574,7 @@ int throwSSLExceptionWithSslErrors(JNIEnv* env, SSL* ssl, int sslErrorCode, cons
     }
 
     char* allocStr = str;
+    unsigned long first_err = 0;
 
     // For protocol errors, SSL might have more information.
     if (sslErrorCode == SSL_ERROR_NONE || sslErrorCode == SSL_ERROR_SSL) {
@@ -580,6 +587,9 @@ int throwSSLExceptionWithSslErrors(JNIEnv* env, SSL* ssl, int sslErrorCode, cons
             int flags;
             // NOLINTNEXTLINE(runtime/int)
             unsigned long err = ERR_get_error_line_data(&file, &line, &data, &flags);
+            if (first_err == 0) {
+                first_err = err;
+            }
             if (err == 0) {
                 break;
             }
@@ -613,7 +623,12 @@ int throwSSLExceptionWithSslErrors(JNIEnv* env, SSL* ssl, int sslErrorCode, cons
 
     int ret;
     if (sslErrorCode == SSL_ERROR_SSL) {
-        ret = throwSSLProtocolExceptionStr(env, allocStr);
+        if (first_err != 0 && ERR_GET_LIB(first_err) == ERR_LIB_SSL &&
+            ERR_GET_REASON(first_err) == SSL_R_ECH_REJECTED) {
+            ret = throwEchRejectedException(env, allocStr);
+        } else {
+            ret = throwSSLProtocolExceptionStr(env, allocStr);
+        }
     } else {
         ret = actualThrow(env, allocStr);
     }

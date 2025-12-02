@@ -558,6 +558,18 @@ final public class Platform {
         return new android.net.ssl.InvalidEchDataException(e.getMessage());
     }
 
+    static SSLException wrapEchRejectedException(EchRejectedException exception, String hostname,
+                                                 byte[] retryConfigs) {
+        android.net.ssl.EchConfigList configs;
+        try {
+            configs = android.net.ssl.EchConfigList.fromBytes(retryConfigs);
+        } catch (Exception e) {
+            configs = null;
+        }
+        return new android.net.ssl.EchConfigMismatchException(
+                "The ECH configuration has been rejected by the server", hostname, configs);
+    }
+
     static boolean supportsConscryptCertStore() {
         return true;
     }

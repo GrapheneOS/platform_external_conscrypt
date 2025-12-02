@@ -1031,6 +1031,10 @@ final class ConscryptEngine extends AbstractConscryptEngine
 
     private SSLException convertException(Throwable e) {
         if (e instanceof SSLHandshakeException || !handshakeFinished) {
+            if (e instanceof EchRejectedException) {
+                return SSLUtils.toEchRejectedException(e, ssl.getEchNameOverride(),
+                                                       ssl.getEchRetryConfigs());
+            }
             return SSLUtils.toSSLHandshakeException(e);
         }
         return SSLUtils.toSSLException(e);
