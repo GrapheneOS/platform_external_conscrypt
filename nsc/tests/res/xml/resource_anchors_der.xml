@@ -7,7 +7,8 @@
   <domain-config>
     <domain>android.com</domain>
     <trust-anchors>
-      <certificates src="@raw/ca_certs_der" />
+      <certificates src="@raw/ca_certs_der1" />
+      <certificates src="@raw/ca_certs_der2" />
     </trust-anchors>
   </domain-config>
 </network-security-config>

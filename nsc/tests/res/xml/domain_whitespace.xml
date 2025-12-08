@@ -6,6 +6,7 @@
     <domain>   developer.android.com    </domain>
     <pin-set>
       <pin digest="SHA-256"> YPtHaftLw6/0vnc2BnNKGF54xiCA28WFcccjkA4ypCM=  </pin>
+      <pin digest="SHA-256">     mEflZT5enoR1FuXLgYYGqnVEoZvmf9c2bVBpiOjYQ0c=   </pin>
     </pin-set>
   </domain-config>
 </network-security-config>
