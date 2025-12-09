@@ -142,7 +142,12 @@ bootclasspath_fragment {
         max_target_o_low_priority: ["hiddenapi/hiddenapi-max-target-o-low-priority.txt"],
 
         // This module does not contain any split packages.
-        split_packages: [],
+        split_packages: select(release_flag("RELEASE_CONSCRYPT_NSC"), {
+            true: [
+                "android.security",
+            ],
+            default: [],
+        }),
 
         // The following packages and all their subpackages currently only
         // contain classes from this bootclasspath_fragment. Listing a package
@@ -151,9 +156,14 @@ bootclasspath_fragment {
         // classes into an API surface, e.g. public, system, etc.. Doing so will
         // result in a build failure due to inconsistent flags.
         package_prefixes: [
-            "android.security",
             "android.net.ssl",
             "com.android.org.conscrypt",
-        ],
+        ] + select(release_flag("RELEASE_CONSCRYPT_NSC"), {
+            true: [
+                "android.security.conscrypt",
+                "android.security.net.config",
+            ],
+            default: [],
+        }),
     },
 }
