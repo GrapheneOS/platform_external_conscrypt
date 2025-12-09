@@ -7,7 +7,8 @@ package android.net.ssl {
   }
 
   @FlaggedApi("com.android.org.conscrypt.net.flags.encrypted_client_hello_platform") public class EchConfigMismatchException extends javax.net.ssl.SSLException {
-    ctor public EchConfigMismatchException(@Nullable String, @Nullable android.net.ssl.EchConfigList);
+    ctor public EchConfigMismatchException(@Nullable String, @Nullable String, @Nullable android.net.ssl.EchConfigList);
+    method @Nullable public String getPublicHostname();
     method @Nullable public android.net.ssl.EchConfigList getRetryConfigList();
     method public boolean hasRetryConfigList();
   }
