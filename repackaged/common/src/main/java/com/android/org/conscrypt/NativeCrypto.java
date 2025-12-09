@@ -115,6 +115,20 @@ public final class NativeCrypto {
 
     @FastNative static native byte[] EVP_marshal_public_key(NativeRef.EVP_PKEY pkey);
 
+    static native long EVP_PKEY_from_private_key_info(byte[] data, int[] algs)
+            throws ParsingException;
+
+    static native long EVP_PKEY_from_subject_public_key_info(byte[] data, int[] algs)
+            throws ParsingException;
+
+    static native long EVP_PKEY_from_raw_private_key(int type, byte[] data) throws ParsingException;
+
+    static native byte[] EVP_PKEY_get_raw_private_key(NativeRef.EVP_PKEY pkey);
+
+    static native long EVP_PKEY_from_raw_public_key(int type, byte[] data) throws ParsingException;
+
+    static native byte[] EVP_PKEY_get_raw_public_key(NativeRef.EVP_PKEY pkey);
+
     static native long EVP_PKEY_from_private_seed(int type, byte[] seed) throws ParsingException;
 
     static native byte[] EVP_PKEY_get_private_seed(NativeRef.EVP_PKEY pkey);
@@ -247,19 +261,9 @@ public final class NativeCrypto {
 
     @FastNative static native byte[] MLDSA65_public_key_from_seed(byte[] privateKeySeed);
 
-    @FastNative static native byte[] MLDSA65_sign(byte[] data, int dataLen, byte[] privateKeySeed);
-
-    @FastNative
-    static native int MLDSA65_verify(byte[] data, int dataLen, byte[] sig, byte[] publicKey);
-
     // --- MLDSA87 --------------------------------------------------------------
 
     @FastNative static native byte[] MLDSA87_public_key_from_seed(byte[] privateKeySeed);
-
-    @FastNative static native byte[] MLDSA87_sign(byte[] data, int dataLen, byte[] privateKeySeed);
-
-    @FastNative
-    static native int MLDSA87_verify(byte[] data, int dataLen, byte[] sig, byte[] publicKey);
 
     // --- SLHDSA_SHA2_128S --------------------------------------------------------------
 

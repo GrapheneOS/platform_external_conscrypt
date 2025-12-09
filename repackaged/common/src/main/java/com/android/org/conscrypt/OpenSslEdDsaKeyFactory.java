@@ -28,8 +28,10 @@ import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
-/** An implementation of a {@link KeyFactorySpi} for EdDSA keys based on BoringSSL.
- * @hide This class is not part of the Android public SDK API*/
+/**
+ * An implementation of a {@link KeyFactorySpi} for EdDSA keys based on BoringSSL.
+ * @hide This class is not part of the Android public SDK API
+ */
 @Internal
 public final class OpenSslEdDsaKeyFactory extends KeyFactorySpi {
     public OpenSslEdDsaKeyFactory() {}
