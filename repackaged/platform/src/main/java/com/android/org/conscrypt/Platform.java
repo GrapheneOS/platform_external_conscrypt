@@ -43,8 +43,8 @@ import dalvik.system.CloseGuard;
 import dalvik.system.VMRuntime;
 import dalvik.system.ZygoteHooks;
 
-import java.io.FileDescriptor;
 import java.io.BufferedReader;
+import java.io.FileDescriptor;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.System;
