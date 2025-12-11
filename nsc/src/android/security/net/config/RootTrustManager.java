@@ -125,6 +125,7 @@ public class RootTrustManager
     }
 
     @Override
+    @UnsupportedAppUsage
     public List<X509Certificate> checkServerTrusted(
             X509Certificate[] certs, String authType, String hostname) throws CertificateException {
         if (hostname == null && mConfig.hasPerDomainConfigs()) {
