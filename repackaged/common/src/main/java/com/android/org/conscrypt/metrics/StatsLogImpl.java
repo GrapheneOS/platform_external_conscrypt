@@ -243,8 +243,8 @@ public final class StatsLogImpl implements StatsLog {
 
     private void write(int atomId, int status, int loadedCompatVersion,
             int minCompatVersionAvailable, int majorVersion, int minorVersion) {
-        ConscryptStatsLog.write(atomId, status, loadedCompatVersion,
-                                       minCompatVersionAvailable, majorVersion, minorVersion);
+        ConscryptStatsLog.write(atomId, status, loadedCompatVersion, minCompatVersionAvailable,
+                majorVersion, minorVersion);
     }
 
     private void write(int atomId, int verificationResult, int verificationReason,
