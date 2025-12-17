@@ -44,6 +44,7 @@ import javax.net.ssl.SSLSocket;
  */
 @RunWith(JUnit4.class)
 public class TlsDeprecationTest {
+    // android-add: test rule for switching target SDK version to 36.
     @Rule
     public final TestRule switchTargetSdkVersionRule = SwitchTargetSdkVersionRule.getInstance();
 
