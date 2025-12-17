@@ -959,6 +959,7 @@ android_test {
     ],
 
     platform_apis: true,
+    sdk_version: "test_current",
     manifest: "AndroidManifest-private.xml",
     test_config: "AndroidTest-private.xml",
     libs: [
@@ -975,6 +976,8 @@ android_test {
         "bouncycastle-unbundled",
         "bouncycastle-bcpkix-unbundled",
         "bouncycastle-ocsp-unbundled",
+        "networksecurity-aconfig-flags-lib",
+        "flag-junit",
         "truth",
     ],
     java_version: "1.8",

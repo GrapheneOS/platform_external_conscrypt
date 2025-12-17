@@ -16,13 +16,20 @@
 
 package org.conscrypt.ct;
 
+import static com.android.org.conscrypt.net.flags.Flags.FLAG_CT_COMPAT_VERSION_3;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import android.platform.test.annotations.RequiresFlagsDisabled;
+import android.platform.test.flag.junit.CheckFlagsRule;
+import android.platform.test.flag.junit.DeviceFlagsValueProvider;
+
 import org.conscrypt.java.security.cert.FakeX509Certificate;
 import org.junit.Assume;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -82,6 +89,9 @@ public class PolicyImplTest {
             return "";
         }
     }
+
+    @Rule
+    public final CheckFlagsRule mCheckFlagsRule = DeviceFlagsValueProvider.createCheckFlagsRule();
 
     @BeforeClass
     public static void setUp() {
@@ -441,11 +451,13 @@ public class PolicyImplTest {
     }
 
     @Test
+    @RequiresFlagsDisabled(FLAG_CT_COMPAT_VERSION_3)
     public void invalidEmbeddedTwoSctsAllStaticsVerificationResult() throws Exception {
         invalidTwoSctsAllStatic(embeddedSCT);
     }
 
     @Test
+    @RequiresFlagsDisabled(FLAG_CT_COMPAT_VERSION_3)
     public void invalidOCSPTwoSctsAllStaticsVerificationResult() throws Exception {
         invalidTwoSctsAllStatic(ocspSCT);
     }
