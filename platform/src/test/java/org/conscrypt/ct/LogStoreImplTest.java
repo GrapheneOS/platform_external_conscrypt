@@ -212,7 +212,6 @@ public class LogStoreImplTest {
         LogInfo log1 =
                 new LogInfo.Builder()
                         .setPublicKey(OpenSSLKey.fromPublicKeyPemInputStream(is).getPublicKey())
-                        .setDescription("Operator 1 'Test2024' log")
                         .setType(LogInfo.TYPE_RFC6962)
                         .setState(LogInfo.STATE_USABLE, 1667328840000L)
                         .setOperator("Operator 1")
