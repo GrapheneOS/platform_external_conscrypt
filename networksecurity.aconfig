@@ -58,5 +58,4 @@ flag {
     description: "This flag controls whether ConscryptX509TrustManager is available"
     bug: "450136572"
     is_fixed_read_only: true
-    #is_exported: true
 }
