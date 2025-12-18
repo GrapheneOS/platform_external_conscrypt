@@ -51,7 +51,6 @@ public class VerifierTest {
 
         final LogInfo log = new LogInfo.Builder()
                                     .setPublicKey(key)
-                                    .setDescription("Test Log")
                                     .setType(LogInfo.TYPE_RFC6962)
                                     .setOperator("LogOperator")
                                     .setState(LogInfo.STATE_USABLE, 1643709600000L)

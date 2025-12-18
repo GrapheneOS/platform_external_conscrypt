@@ -28,7 +28,7 @@ import org.conscrypt.Internal;
 
 /**
  * Properties about a Certificate Transparency Log.
- * This object stores information about a CT log, its public key, description and URL.
+ * This object stores information about a CT log, its public key and URL.
  * It allows verification of SCTs against the log's public key.
  */
 @Internal
@@ -49,7 +49,6 @@ public class LogInfo {
     private final PublicKey publicKey;
     private final int state;
     private final long stateTimestamp;
-    private final String description;
     private final String operator;
     private final int type;
 
@@ -65,7 +64,6 @@ public class LogInfo {
         this.publicKey = builder.publicKey;
         this.state = builder.state;
         this.stateTimestamp = builder.stateTimestamp;
-        this.description = builder.description;
         this.operator = builder.operator;
         this.type = builder.type;
     }
@@ -75,7 +73,6 @@ public class LogInfo {
         private PublicKey publicKey;
         private int state;
         private long stateTimestamp;
-        private String description;
         private String operator;
         private int type;
 
@@ -97,12 +94,6 @@ public class LogInfo {
             }
             this.state = state;
             this.stateTimestamp = timestamp;
-            return this;
-        }
-
-        public Builder setDescription(String description) {
-            Objects.requireNonNull(description);
-            this.description = description;
             return this;
         }
 
@@ -134,10 +125,6 @@ public class LogInfo {
 
     public PublicKey getPublicKey() {
         return publicKey;
-    }
-
-    public String getDescription() {
-        return description;
     }
 
     public int getState() {
@@ -173,15 +160,14 @@ public class LogInfo {
         }
 
         LogInfo that = (LogInfo) other;
-        return this.state == that.state && this.description.equals(that.description)
-                && this.operator.equals(that.operator) && this.stateTimestamp == that.stateTimestamp
-                && this.type == that.type && Arrays.equals(this.logId, that.logId);
+        return this.state == that.state && this.operator.equals(that.operator)
+                && this.stateTimestamp == that.stateTimestamp && this.type == that.type
+                && Arrays.equals(this.logId, that.logId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(
-                Arrays.hashCode(logId), description, state, stateTimestamp, operator, type);
+        return Objects.hash(Arrays.hashCode(logId), state, stateTimestamp, operator, type);
     }
 
     /**

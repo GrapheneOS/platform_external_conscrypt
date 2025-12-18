@@ -37,6 +37,7 @@ import static org.junit.Assume.assumeFalse;
 
 @RunWith(JUnit4.class)
 public class TlsDeprecationTest {
+    // android-add: test rule for switching target SDK version to 36.
     @Rule
     public final TestRule switchTargetSdkVersionRule = SwitchTargetSdkVersionRule.getInstance();
 

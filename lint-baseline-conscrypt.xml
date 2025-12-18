@@ -61,4 +61,37 @@
             column="9"/>
     </issue>
 
+    <issue
+        id="NewApi"
+        message="Field requires API level CUR_DEVELOPMENT/10000 (current min is 30): `android.net.ssl.EchConfigMismatchException#publicName`"
+        errorLine1="        if (publicName == null) {"
+        errorLine2="            ~~~~~~~~~~">
+        <location
+            file="external/conscrypt/publicapi/src/main/java/android/net/ssl/EchConfigMismatchException.java"
+            line="49"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Field requires API level CUR_DEVELOPMENT/10000 (current min is 30): `android.net.ssl.EchConfigMismatchException#publicName`"
+        errorLine1="        return publicName;"
+        errorLine2="               ~~~~~~~~~~">
+        <location
+            file="external/conscrypt/publicapi/src/main/java/android/net/ssl/EchConfigMismatchException.java"
+            line="65"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Field requires API level CUR_DEVELOPMENT/10000 (current min is 30): `android.net.ssl.EchConfigMismatchException#publicName`"
+        errorLine1="        this.publicName = publicName;"
+        errorLine2="        ~~~~~~~~~~~~~~~">
+        <location
+            file="external/conscrypt/publicapi/src/main/java/android/net/ssl/EchConfigMismatchException.java"
+            line="78"
+            column="9"/>
+    </issue>
+
 </issues>

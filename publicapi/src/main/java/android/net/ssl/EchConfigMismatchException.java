@@ -24,20 +24,45 @@ import javax.net.ssl.SSLException;
 /**
  * Exception thrown when the provided ECH (Encrypted Client Hello) config does not match the server.
  *
- * <p>Clients should attempt to establish a new connection, using the provided retry
- * {@link EchConfigList}, if available. A retry {@link EchConfigList} may not be available if the
- * server has not provided any.
+ * <p>Before accessing the retry configuration, clients <b>must</b> call {@link getPublicHostname()}
+ * and verify that the hostname matches the connection hostname (using their preferred {@link
+ * javax.net.ssl.HostnameVerifier}). If the returned hostname is {@code null}, any provided retry
+ * configuration must be ignored.
+ *
+ * <p>Clients can then attempt to establish a new connection, using the provided retry {@link
+ * EchConfigList}, if available. A retry {@link EchConfigList} may not be available if the server
+ * has not provided any.
  */
 @FlaggedApi(com.android.org.conscrypt.net.flags.Flags.FLAG_ENCRYPTED_CLIENT_HELLO_PLATFORM)
 public class EchConfigMismatchException extends SSLException {
+    private final String publicName;
     private final EchConfigList echRetryConfigList;
 
     /**
      * Returns the {@link EchConfigList} provided by the server for retrying the connection, or
      * {@code null} if no retry configuration was set by the server.
+     *
+     * Prior to reading this value, the client <b>must</b> verify that the certificate is valid for
+     * the name returned by {@link #getPublicHostname()}.
      */
     public @Nullable EchConfigList getRetryConfigList() {
+        if (publicName == null) {
+            return null;
+        }
         return echRetryConfigList;
+    }
+
+    /**
+     * Returns the hostname that should be used for verification.
+     *
+     * This method must be called before interpreting the retry config list, returned by {@link
+     * #getRetryConfigList()}.
+     *
+     * For more details see section 6.1.7 "Authenticating for the Public Name" in RFC TLS Encrypted
+     * Client Hello (draft-ietf-tls-esni-25).
+     */
+    public @Nullable String getPublicHostname() {
+        return publicName;
     }
 
     /**
@@ -47,9 +72,19 @@ public class EchConfigMismatchException extends SSLException {
         return echRetryConfigList != null;
     }
 
-    public EchConfigMismatchException(
-            @Nullable String message, @Nullable EchConfigList echRetryConfigList) {
+    /**
+     * Constructs a new {@code EchConfigMismatchException}.
+     *
+     * @param message the detail message.
+     * @param publicName the hostname that must be used for verification, or {@code null} if the
+     *        server did not provide a valid public name.
+     * @param echRetryConfigList the {@link EchConfigList} provided by the server for retrying the
+     *        connection, or {@code null} if no retry configuration was set by the server.
+     */
+    public EchConfigMismatchException(@Nullable String message, @Nullable String publicName,
+            @Nullable EchConfigList echRetryConfigList) {
         super(message);
+        this.publicName = publicName;
         this.echRetryConfigList = echRetryConfigList;
     }
 }

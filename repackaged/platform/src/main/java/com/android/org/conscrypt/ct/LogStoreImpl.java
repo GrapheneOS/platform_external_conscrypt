@@ -264,7 +264,6 @@ public class LogStoreImpl implements LogStore {
         for (int j = 0; j < logs.length(); j++) {
             JSONObject log = logs.getJSONObject(j);
             LogInfo.Builder builder = new LogInfo.Builder()
-                                              .setDescription(log.getString("description"))
                                               .setPublicKey(parsePubKey(log.getString("key")))
                                               .setType(logType)
                                               .setOperator(operatorName);
