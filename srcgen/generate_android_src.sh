@@ -25,8 +25,6 @@ PACKAGE_TRANSFORMATIONS="\
 "
 
 MODULE_DIRS="\
-    benchmark-android \
-    benchmark-base \
     common \
     openjdk \
     platform \

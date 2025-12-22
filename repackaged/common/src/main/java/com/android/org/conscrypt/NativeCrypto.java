@@ -1206,8 +1206,7 @@ public final class NativeCrypto {
     @CriticalNative
     static native int EVP_has_aes_hardware();
 
-    @android.compat.annotation.UnsupportedAppUsage @FastNative
-    static native long SSL_CTX_new();
+    @android.compat.annotation.UnsupportedAppUsage @FastNative static native long SSL_CTX_new();
 
     // IMPLEMENTATION NOTE: The default list of cipher suites is a trade-off between what we'd like
     // to use and what servers currently support. We strive to be secure enough by default. We thus
