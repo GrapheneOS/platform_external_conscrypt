@@ -27,7 +27,8 @@ import android.system.StructTimeval;
 import com.android.org.conscrypt.NativeCrypto;
 import com.android.org.conscrypt.ct.CertificateTransparency;
 import com.android.org.conscrypt.ct.LogStore;
-import com.android.org.conscrypt.ct.LogStoreImpl;
+import com.android.org.conscrypt.ct.LogStoreImplv2;
+import com.android.org.conscrypt.ct.LogStoreImplv3;
 import com.android.org.conscrypt.ct.Policy;
 import com.android.org.conscrypt.ct.PolicyImpl;
 import com.android.org.conscrypt.flags.Flags;
@@ -527,8 +528,12 @@ final public class Platform {
     static CertificateTransparency newDefaultCertificateTransparency(
             Supplier<NetworkSecurityPolicy> policySupplier) {
         com.android.org.conscrypt.ct.Policy policy = new com.android.org.conscrypt.ct.PolicyImpl();
-        com.android.org.conscrypt.ct.LogStore logStore =
-                new com.android.org.conscrypt.ct.LogStoreImpl(policy);
+        com.android.org.conscrypt.ct.LogStore logStore;
+        if (com.android.org.conscrypt.net.flags.Flags.ctCompatVersion3()) {
+            logStore = new com.android.org.conscrypt.ct.LogStoreImplv3(policy);
+        } else {
+            logStore = new com.android.org.conscrypt.ct.LogStoreImplv2(policy);
+        }
         com.android.org.conscrypt.ct.Verifier verifier =
                 new com.android.org.conscrypt.ct.Verifier(logStore);
         return new CertificateTransparency(
