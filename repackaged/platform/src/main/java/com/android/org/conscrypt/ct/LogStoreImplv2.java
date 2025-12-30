@@ -145,7 +145,7 @@ public class LogStoreImplv2 implements LogStore {
     }
 
     @Override
-    public LogInfo getKnownLog(byte[] logId) {
+    public LogInfo getKnownLog(byte[] logId) throws LogStore.InvalidLogException {
         if (logId == null) {
             return null;
         }

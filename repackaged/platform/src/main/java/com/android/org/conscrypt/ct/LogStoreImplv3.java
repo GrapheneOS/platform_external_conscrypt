@@ -187,7 +187,7 @@ public class LogStoreImplv3 implements LogStore {
     }
 
     @Override
-    public LogInfo getKnownLog(byte[] logId) {
+    public LogInfo getKnownLog(byte[] logId) throws LogStore.InvalidLogException {
         if (logId == null) {
             return null;
         }
@@ -301,7 +301,7 @@ public class LogStoreImplv3 implements LogStore {
         return State.LOADED;
     }
 
-    private synchronized LogInfo cacheLogEntry(byte[] logId) {
+    private synchronized LogInfo cacheLogEntry(byte[] logId) throws LogStore.InvalidLogException {
         String encodedLogId = Base64.getEncoder().encodeToString(logId);
         Log log = logList.logsByKey(encodedLogId);
         if (log == null) {
@@ -335,11 +335,14 @@ public class LogStoreImplv3 implements LogStore {
 
             logCache.put(new ByteArray(logId), logInfo);
             return logInfo;
-
-        } catch (IllegalArgumentException e) {
-            // There is something wrong with that log entry. Ignore it.
+        } catch (Exception e) {
+            // There is something wrong with that log entry. Assume that the log list is corrupted.
+            // We throw a InvalidLogException here to fail-open in the CertificateTransparency
+            // class.
             logger.log(Level.WARNING, "Unable to parse log entry", e);
-            return null;
+            state = State.MALFORMED;
+            metrics.updateCTLogListStatusChanged(this);
+            throw new LogStore.InvalidLogException(e);
         }
     }
 
