@@ -403,6 +403,19 @@ java_library {
     lint: {
         baseline_filename: "lint-baseline-conscrypt.xml",
     },
+    optimize: {
+        enabled: select(release_flag("RELEASE_CONSCRYPT_R8"), {
+            true: true,
+            default: false,
+        }),
+        ignore_warnings: false,
+        shrink: true,
+        optimize: false,
+        obfuscate: false,
+        protect_api_surface: true,
+        include: "r8_include_list.txt",
+        proguard_compatibility: false,
+    },
 }
 
 // Java library for use on host, e.g. by robolectric.
