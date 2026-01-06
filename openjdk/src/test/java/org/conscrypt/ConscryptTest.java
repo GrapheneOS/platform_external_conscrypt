@@ -38,6 +38,7 @@ public class ConscryptTest {
      * This confirms that the version machinery is working.
      */
     @Test
+    // g3-add: @Ignore("Failing on google3. TODO(b/309186591)")
     public void testVersionIsSensible() {
         Conscrypt.Version version = Conscrypt.version();
         assertNotNull(version);

@@ -70,12 +70,10 @@ public abstract class OpenSSLContextImpl extends SSLContextSpi {
         serverSessionContext = new ServerSessionContext();
     }
 
-    // BEGIN Android-added: Restore missing constructor that is used by apps
     @android.compat.annotation.UnsupportedAppUsage
     private OpenSSLContextImpl() throws GeneralSecurityException, IOException {
         this(NativeCrypto.TLSV13_PROTOCOLS, true);
     }
-    // END Android-added: Restore missing constructor that is used by apps
 
     /**
      * Constructor for the DefaultSSLContextImpl.  The unused boolean parameter is solely to

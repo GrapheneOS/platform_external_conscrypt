@@ -1615,9 +1615,11 @@ public final class NativeCrypto {
             SSLHandshakeCallbacks shc, int timeoutMillis)
             throws SSLException, SocketTimeoutException, CertificateException;
 
-    @FastNative public static native String SSL_get_current_cipher(long ssl, NativeSsl ssl_holder);
+    @FastNative
+    public static native String SSL_get_current_cipher(long ssl, NativeSsl ssl_holder);
 
-    @FastNative public static native String SSL_get_version(long ssl, NativeSsl ssl_holder);
+    @FastNative
+    public static native String SSL_get_version(long ssl, NativeSsl ssl_holder);
 
     public static native String SSL_get_curve_name(long ssl, NativeSsl sslHolder);
 

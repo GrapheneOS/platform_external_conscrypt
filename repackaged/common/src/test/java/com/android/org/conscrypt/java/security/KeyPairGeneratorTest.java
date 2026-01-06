@@ -326,6 +326,7 @@ public class KeyPairGeneratorTest {
         test_KeyWithAllKeyFactories(k);
     }
 
+    // g3-add: @SuppressWarnings("InsecureCryptoUsage")
     private void test_KeyWithAllKeyFactories(Key k) throws Exception {
         byte[] encoded = k.getEncoded();
 
@@ -470,6 +471,7 @@ public class KeyPairGeneratorTest {
     });
 
     @Test
+    // g3-add: @SuppressWarnings("InsecureCryptoUsage")
     public void testDSAGeneratorWithParams() throws Exception {
         final DSAParameterSpec dsaSpec = new DSAParameterSpec(DSA_P, DSA_Q, DSA_G);
 
