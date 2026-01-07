@@ -104,7 +104,7 @@ public final class StatsLogImpl implements StatsLog {
     private static class LowPriorityThreadFactory implements ThreadFactory {
         @Override
         public Thread newThread(Runnable r) {
-            Thread thread = new Thread(r);
+            Thread thread = new Thread(r, "ConscryptStatsLogWriter");
             thread.setPriority(Thread.MIN_PRIORITY);
             return thread;
         }
