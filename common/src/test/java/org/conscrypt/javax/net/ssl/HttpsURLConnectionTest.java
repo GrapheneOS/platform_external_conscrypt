@@ -20,8 +20,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeFalse;
+import static org.junit.Assert.fail;
 
 import org.conscrypt.TestUtils;
 import org.conscrypt.VeryBasicHttpServer;
@@ -37,6 +37,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+// g3-add: import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -122,6 +123,7 @@ public class HttpsURLConnectionTest {
         Future<Void> future = executor.submit(server.run(op));
 
         HttpsURLConnection connection = server.tlsConnection("/file");
+        // g3-add: broken HTTPS hostname verification
         int response = connection.getResponseCode();
         assertEquals(404, response);
 
@@ -137,6 +139,7 @@ public class HttpsURLConnectionTest {
         Future<Void> future = executor.submit(server.run(op));
 
         HttpsURLConnection connection = server.tlsConnection("/file");
+        // g3-add: broken HTTPS hostname verification
         int response = connection.getResponseCode();
         assertEquals(200, response);
 
