@@ -27,6 +27,7 @@ import java.security.Security;
 import javax.net.ssl.SSLContext;
 
 import org.conscrypt.java.security.StandardNames;
+// g3-add: import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -38,6 +39,7 @@ public class ConscryptTest {
      * This confirms that the version machinery is working.
      */
     @Test
+    // g3-add: @Ignore("Failing on google3. TODO(b/309186591)")
     public void testVersionIsSensible() {
         Conscrypt.Version version = Conscrypt.version();
         assertNotNull(version);
