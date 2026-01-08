@@ -98,6 +98,7 @@ public class KeyPairGeneratorTest {
             .skipProvider("SunPKCS11-NSS")
             .run(new ServiceTester.Test() {
                 @Override
+                // g3-add: @SuppressWarnings("InsecureCryptoUsage")
                 public void test(Provider provider, String algorithm) throws Exception {
                     AlgorithmParameterSpec params = null;
 
@@ -167,6 +168,10 @@ public class KeyPairGeneratorTest {
         putKeySize("EC", 521);
         putKeySize("XDH", 255);
         putKeySize("EdDSA", 255);
+        putKeySize("ML-KEM", -1);
+        putKeySize("ML-KEM-512", -1);
+        putKeySize("ML-KEM-768", -1);
+        putKeySize("ML-KEM-1024", -1);
         putKeySize("ML-DSA", -1);
         putKeySize("ML-DSA-44", -1);
         putKeySize("ML-DSA-65", -1);
@@ -199,6 +204,11 @@ public class KeyPairGeneratorTest {
 
         List<Integer> keySizes = getKeySizes(algorithm);
         for (int keySize : keySizes) {
+            if (algorithm.equals("ML-KEM")) {
+                // The generic ML-KEM generator in SunJCE doesn't support initialize(keySize).
+                // The specific named variants like "ML-KEM-512" are tested separately.
+                continue;
+            }
             // TODO(flooey): Remove when we don't support Java 6 anymore
             if ("DSA".equals(algorithm)
                     && ("SUN".equalsIgnoreCase(kpg.getProvider().getName())
@@ -267,6 +277,11 @@ public class KeyPairGeneratorTest {
             // which supported generation of Ed25519 keys before Conscrypt did.
             expectedAlgorithm = "1.3.101.112";
         }
+        if (expectedAlgorithm.startsWith("ML-KEM")) {
+            // The KeyPairGenerator might be "ML-KEM-512", but the key it generates
+            // has the algorithm "ML-KEM".
+            expectedAlgorithm = "ML-KEM";
+        }
         assertEquals(expectedAlgorithm, k.getAlgorithm().toUpperCase(Locale.ROOT));
         if (expectedAlgorithm.equals("DH")) {
             if (k instanceof DHPublicKey) {
@@ -287,6 +302,10 @@ public class KeyPairGeneratorTest {
         }
         if (expectedAlgorithm.equals("ML-DSA")) {
             // ML-DSA keys are not yet serializable, so just skip them.
+            return;
+        }
+        if (expectedAlgorithm.equals("ML-KEM")) {
+            // ML-KEM keys are not yet serializable, so just skip them.
             return;
         }
         if (expectedAlgorithm.equals("SLH-DSA-SHA2-128S")) {
