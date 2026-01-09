@@ -440,7 +440,7 @@ class ConscryptEngineSocket extends OpenSSLSocketImpl implements SSLParametersIm
     }
 
     @Override
-    final String getCurveNameForTesting() {
+    public final String getCurveNameForTesting() {
         return engine.getCurveNameForTesting();
     }
 

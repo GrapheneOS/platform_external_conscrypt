@@ -17,14 +17,19 @@
 
 package com.android.org.conscrypt;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.security.PublicKey;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 
-/** An SLH-DSA public key. 
+/** An SLH-DSA public key.
  * @hide This class is not part of the Android public SDK API*/
 public class OpenSslSlhDsaPublicKey implements PublicKey {
+    private static final long serialVersionUID = 0x4589aa00e279d127L;
+
     static final int PUBLIC_KEY_SIZE_BYTES = 32;
 
     private final byte[] raw;
@@ -92,5 +97,16 @@ public class OpenSslSlhDsaPublicKey implements PublicKey {
             throw new IllegalStateException("key is destroyed");
         }
         return Arrays.hashCode(raw);
+    }
+
+    private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+        stream.defaultReadObject(); // reads "raw"
+        if (raw.length != PUBLIC_KEY_SIZE_BYTES) {
+            throw new IOException("Invalid key size");
+        }
+    }
+
+    private void writeObject(ObjectOutputStream stream) throws IOException {
+        stream.defaultWriteObject(); // writes "raw"
     }
 }
