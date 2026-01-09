@@ -198,4 +198,6 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
     setAlpnProtocols(byte[] protocols) {
         setApplicationProtocols(SSLUtils.decodeProtocols(protocols == null ? EmptyArray.BYTE : protocols));
     }
+
+    @Override public abstract String getCurveNameForTesting();
 }

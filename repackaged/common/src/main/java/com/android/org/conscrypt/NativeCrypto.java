@@ -1621,6 +1621,8 @@ public final class NativeCrypto {
     @FastNative
     public static native String SSL_get_version(long ssl, NativeSsl ssl_holder);
 
+    public static native void SSL_set1_groups(long ssl, NativeSsl sslHolder, int[] groups);
+
     public static native String SSL_get_curve_name(long ssl, NativeSsl sslHolder);
 
     /** Returns the peer certificate chain. */
