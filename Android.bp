@@ -956,6 +956,7 @@ android_test {
         // Resource directories do not need repackaging.
         "openjdk/src/test/resources",
         "common/src/test/resources",
+        "platform/src/test/resources",
     ],
 
     platform_apis: true,
