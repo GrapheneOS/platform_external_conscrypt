@@ -88,15 +88,8 @@ public class LogStoreImpl implements LogStore {
     }
 
     public LogStoreImpl(Policy policy) {
-        this(policy, getPathForCompatVersion(COMPAT_VERSION));
-    }
-
-    public LogStoreImpl(Policy policy, Path logList) {
-        this(policy, logList, Platform.getStatsLog());
-    }
-
-    public LogStoreImpl(Policy policy, Path logList, StatsLog metrics) {
-        this(policy, logList, metrics, new SystemTimeSupplier());
+        this(policy, getPathForCompatVersion(COMPAT_VERSION), Platform.getStatsLog(),
+                new SystemTimeSupplier());
     }
 
     public LogStoreImpl(Policy policy, Path logList, StatsLog metrics, Supplier<Long> clock) {
