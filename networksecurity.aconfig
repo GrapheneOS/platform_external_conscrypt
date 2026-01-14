@@ -59,3 +59,11 @@ flag {
     bug: "450136572"
     is_fixed_read_only: true
 }
+
+flag {
+    namespace: "network_security"
+    name: "ct_compat_version_3"
+    description: "This flag controls the rollout of the compatibility version 3"
+    bug: "456392970"
+    is_fixed_read_only: true
+}

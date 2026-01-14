@@ -1096,3 +1096,15 @@ genrule {
     cmd: "$(location stats-log-api-gen) --java $(out) --module conscrypt --javaPackage com.android.org.conscrypt.metrics --javaClass ConscryptStatsLog",
     out: ["repackaged/common/src/main/java/com/android/org/conscrypt/metrics/ConscryptStatsLog.java"],
 }
+
+genrule {
+    name: "conscrypt_generated_flatbuffers",
+    tools: [
+        "flatc",
+        "soong_zip",
+    ],
+    srcs: ["platform/src/**/*.fbs"],
+    out: ["conscrypt_fbs.srcjar"],
+    cmd: "$(location flatc) -o $(genDir) --java $(in) " +
+        "&& $(location soong_zip) -o $(out) -C $(genDir) -D $(genDir)",
+}
