@@ -111,6 +111,9 @@ bootclasspath_fragment {
         default: ["conscrypt"],
     }),
     apex_available: ["com.android.conscrypt"],
+    dex_preopt: {
+        profile: "external/conscrypt/apex/boot-image-profile.txt",
+    },
     // The bootclasspath_fragments that provide APIs on which this depends.
     fragments: [
         {
