@@ -27,7 +27,6 @@ import android.util.Log;
 import dalvik.system.BlockGuard;
 import dalvik.system.CloseGuard;
 
-import org.conscrypt.NativeCrypto;
 import org.conscrypt.ct.CertificateTransparency;
 import org.conscrypt.metrics.CertificateTransparencyVerificationReason;
 import org.conscrypt.metrics.NoopStatsLog;
@@ -50,7 +49,6 @@ import java.security.AlgorithmParameters;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
 import java.security.Security;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -78,6 +76,7 @@ import javax.net.ssl.X509TrustManager;
  * Platform-specific methods for unbundled Android.
  */
 @Internal
+@SuppressLint("DiscouragedPrivateApi")
 final public class Platform {
     private static final String TAG = "Conscrypt";
     private static boolean DEPRECATED_TLS_V1 = true;
@@ -791,6 +790,7 @@ final public class Platform {
         return sslSession;
     }
 
+    @SuppressWarnings("SoonBlockedPrivateApi")
     public static String getOriginalHostNameFromInetAddress(InetAddress addr) {
         if (Build.VERSION.SDK_INT > 27) {
             try {
