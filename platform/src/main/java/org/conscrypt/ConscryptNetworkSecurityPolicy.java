@@ -93,8 +93,6 @@ public class ConscryptNetworkSecurityPolicy implements NetworkSecurityPolicy {
                 return DomainEncryptionMode.OPPORTUNISTIC;
             case libcore.net.NetworkSecurityPolicy.DOMAIN_ENCRYPTION_MODE_ENABLED:
                 return DomainEncryptionMode.ENABLED;
-            case libcore.net.NetworkSecurityPolicy.DOMAIN_ENCRYPTION_MODE_REQUIRED:
-                return DomainEncryptionMode.REQUIRED;
             default:
                 return DomainEncryptionMode.UNKNOWN;
         }
