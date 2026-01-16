@@ -31,7 +31,8 @@ import dalvik.system.ZygoteHooks;
 import org.conscrypt.NativeCrypto;
 import org.conscrypt.ct.CertificateTransparency;
 import org.conscrypt.ct.LogStore;
-import org.conscrypt.ct.LogStoreImpl;
+import org.conscrypt.ct.LogStoreImplv2;
+import org.conscrypt.ct.LogStoreImplv3;
 import org.conscrypt.ct.Policy;
 import org.conscrypt.ct.PolicyImpl;
 import org.conscrypt.flags.Flags;
@@ -42,8 +43,8 @@ import org.conscrypt.metrics.Source;
 import org.conscrypt.metrics.StatsLog;
 import org.conscrypt.metrics.StatsLogImpl;
 
-import java.io.FileDescriptor;
 import java.io.BufferedReader;
+import java.io.FileDescriptor;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.System;
@@ -561,7 +562,12 @@ final public class Platform {
     static CertificateTransparency newDefaultCertificateTransparency(
             Supplier<NetworkSecurityPolicy> policySupplier) {
         org.conscrypt.ct.Policy policy = new org.conscrypt.ct.PolicyImpl();
-        org.conscrypt.ct.LogStore logStore = new org.conscrypt.ct.LogStoreImpl(policy);
+        org.conscrypt.ct.LogStore logStore;
+        if (com.android.org.conscrypt.net.flags.Flags.ctCompatVersion3()) {
+            logStore = new org.conscrypt.ct.LogStoreImplv3(policy);
+        } else {
+            logStore = new org.conscrypt.ct.LogStoreImplv2(policy);
+        }
         org.conscrypt.ct.Verifier verifier = new org.conscrypt.ct.Verifier(logStore);
         return new CertificateTransparency(
                 logStore, policy, verifier, getStatsLog(), policySupplier);

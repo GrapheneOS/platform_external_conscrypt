@@ -350,6 +350,7 @@ java_library {
         "com.android.conscrypt",
         "test_com.android.conscrypt",
     ],
+    jarjar_rules: "flatbuffers-jarjar-rules.txt",
     // Conscrypt should support R
     min_sdk_version: "30",
 
@@ -361,6 +362,7 @@ java_library {
     srcs: [
         ":conscrypt_java_files",
         ":conscrypt_public_api_files",
+        ":conscrypt_generated_flatbuffers",
     ],
 
     libs: [
@@ -368,6 +370,7 @@ java_library {
         "unsupportedappusage",
     ],
     static_libs: [
+        "flatbuffers-java",
         "conscrypt-aconfig-flags-lib",
         "conscrypt-statslog-java",
         "networksecurity-aconfig-flags-lib",

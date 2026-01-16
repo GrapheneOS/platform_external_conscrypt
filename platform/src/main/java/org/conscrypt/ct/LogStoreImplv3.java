@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 The Android Open Source Project
+ * Copyright (C) 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,16 @@ package org.conscrypt.ct;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import com.google.flatbuffers.FlatBufferBuilder;
+
 import org.conscrypt.ByteArray;
 import org.conscrypt.Internal;
 import org.conscrypt.OpenSSLKey;
 import org.conscrypt.Platform;
+import org.conscrypt.ct.fbs.Log;
+import org.conscrypt.ct.fbs.LogList;
+import org.conscrypt.ct.fbs.LogState;
+import org.conscrypt.ct.fbs.LogType;
 import org.conscrypt.metrics.StatsLog;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,6 +36,8 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
@@ -40,7 +48,6 @@ import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -48,31 +55,60 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Internal
-public class LogStoreImpl implements LogStore {
-    private static final Logger logger = Logger.getLogger(LogStoreImpl.class.getName());
-    private static final int COMPAT_VERSION = 2;
+public class LogStoreImplv3 implements LogStore {
+    private static final Logger logger = Logger.getLogger(LogStoreImplv3.class.getName());
+    private static final int COMPAT_VERSION = 3;
     private static final Path logListPrefix;
     private static final Path logListSuffix;
+    private static final Path logListDeprecatedJsonSuffix;
     private static final long LOG_LIST_CHECK_INTERVAL_IN_MS = 10L * 60 * 1_000; // 10 minutes
 
     static {
         String androidData = System.getenv("ANDROID_DATA");
         // /data/misc/keychain/ct/v1/current/log_list.json
         logListPrefix = Paths.get(androidData, "misc", "keychain", "ct");
-        logListSuffix = Paths.get("current", "log_list.json");
+        logListSuffix = Paths.get("current", "log_list.fbs");
+        logListDeprecatedJsonSuffix = Paths.get("current", "log_list.json");
     }
 
-    private final Path logList;
+    /** The path to the log list on the filesystem */
+    private final Path logPath;
+
+    /** Metrics subsystem. A message is sent there whenever the log state changes */
     private StatsLog metrics;
+
+    /** The current state of this store: UNINITIALIZED, LOADED, COMPLIANT, ... */
     private State state;
+
+    /** The log policy. Used to set the status of this store */
     private Policy policy;
+
+    /** The major version of the log list */
     private int majorVersion;
+
+    /** The minor version of the log list */
     private int minorVersion;
+
+    /** The timestamp of the log list */
     private long timestamp;
-    private Map<ByteArray, LogInfo> logs;
+
+    /** The time at which the log list file was last modified */
     private long logListLastModified;
+
+    /** Clock. Faked in testing. */
     private Supplier<Long> clock;
+
+    /** The last time the log list file was checked for modification */
     private long logListLastChecked;
+
+    /** The memory-mapped flat buffer */
+    private MappedByteBuffer map;
+
+    /** The flatbuffer root */
+    private LogList logList;
+
+    /** Cache of LogInfo already seen */
+    private Map<ByteArray, LogInfo> logCache;
 
     /* We do not have access to InstantSource. Implement a similar pattern using Supplier. */
     static class SystemTimeSupplier implements Supplier<Long> {
@@ -84,20 +120,24 @@ public class LogStoreImpl implements LogStore {
 
     private static Path getPathForCompatVersion(int compatVersion) {
         String version = String.format("v%d", compatVersion);
-        return logListPrefix.resolve(version).resolve(logListSuffix);
+        if (compatVersion > 2) {
+            return logListPrefix.resolve(version).resolve(logListSuffix);
+        }
+        return logListPrefix.resolve(version).resolve(logListDeprecatedJsonSuffix);
     }
 
-    public LogStoreImpl(Policy policy) {
+    public LogStoreImplv3(Policy policy) {
         this(policy, getPathForCompatVersion(COMPAT_VERSION), Platform.getStatsLog(),
                 new SystemTimeSupplier());
     }
 
-    public LogStoreImpl(Policy policy, Path logList, StatsLog metrics, Supplier<Long> clock) {
+    public LogStoreImplv3(Policy policy, Path logPath, StatsLog metrics, Supplier<Long> clock) {
         this.state = State.UNINITIALIZED;
         this.policy = policy;
-        this.logList = logList;
+        this.logPath = logPath;
         this.metrics = metrics;
         this.clock = clock;
+        this.logCache = Collections.synchronizedMap(new HashMap<ByteArray, LogInfo>());
     }
 
     @Override
@@ -133,8 +173,10 @@ public class LogStoreImpl implements LogStore {
 
     @Override
     public int getMinCompatVersionAvailable() {
-        if (Files.exists(getPathForCompatVersion(1))) {
-            return 1;
+        for (int i = 1; i < COMPAT_VERSION; i++) {
+            if (Files.exists(getPathForCompatVersion(i))) {
+                return i;
+            }
         }
         return getCompatVersion();
     }
@@ -147,10 +189,23 @@ public class LogStoreImpl implements LogStore {
         if (!ensureLogListIsLoaded()) {
             return null;
         }
+
         ByteArray buf = new ByteArray(logId);
-        LogInfo log = logs.get(buf);
+        LogInfo log = logCache.get(buf);
         if (log != null) {
             return log;
+        }
+        synchronized (this) {
+            // Double-check.
+            log = logCache.get(buf);
+            if (log != null) {
+                return log;
+            }
+
+            log = cacheLogEntry(logId);
+            if (log != null) {
+                return log;
+            }
         }
         return null;
     }
@@ -181,7 +236,7 @@ public class LogStoreImpl implements LogStore {
         }
         this.logListLastChecked = now;
         try {
-            long lastModified = Files.getLastModifiedTime(logList).toMillis();
+            long lastModified = Files.getLastModifiedTime(logPath).toMillis();
             if (this.logListLastModified == lastModified) {
                 // The log list has the same last modified timestamp. Keep our
                 // current cached value.
@@ -195,77 +250,72 @@ public class LogStoreImpl implements LogStore {
             }
         }
         this.state = State.UNINITIALIZED;
-        this.logs = null;
         this.timestamp = 0;
         this.majorVersion = 0;
         this.minorVersion = 0;
+        this.logCache.clear();
     }
 
     private State loadLogList() {
-        byte[] content;
+        FileChannel channel;
         long lastModified;
         try {
-            content = Files.readAllBytes(logList);
-            lastModified = Files.getLastModifiedTime(logList).toMillis();
+            lastModified = Files.getLastModifiedTime(logPath).toMillis();
+            channel = FileChannel.open(logPath);
+            map = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
         } catch (IOException e) {
             return State.NOT_FOUND;
         }
-        if (content == null) {
-            return State.NOT_FOUND;
-        }
-        JSONObject json;
+        LogList logList;
         try {
-            json = new JSONObject(new String(content, UTF_8));
-        } catch (JSONException e) {
-            logger.log(Level.WARNING, "Unable to parse log list", e);
+            logList = LogList.getRootAsLogList(map);
+        } catch (IndexOutOfBoundsException e) {
             return State.MALFORMED;
         }
-        HashMap<ByteArray, LogInfo> logsMap = new HashMap<>();
+        if (logList == null) {
+            return State.MALFORMED;
+        }
         try {
-            majorVersion = parseMajorVersion(json.getString("version"));
-            minorVersion = parseMinorVersion(json.getString("version"));
-            timestamp = json.getLong("log_list_timestamp");
-            JSONArray operators = json.getJSONArray("operators");
-            for (int i = 0; i < operators.length(); i++) {
-                JSONObject operator = operators.getJSONObject(i);
-                String operatorName = operator.getString("name");
+            this.majorVersion = Math.toIntExact(logList.versionMajor());
+            this.minorVersion = Math.toIntExact(logList.versionMinor());
+            this.timestamp = logList.timestamp();
 
-                JSONArray logs = operator.getJSONArray("logs");
-                addLogsToMap(logs, operatorName, LogInfo.TYPE_RFC6962, logsMap);
-
-                JSONArray tiledLogs = operator.optJSONArray("tiled_logs");
-                if (tiledLogs != null) {
-                    addLogsToMap(tiledLogs, operatorName, LogInfo.TYPE_STATIC_CT_API, logsMap);
-                }
+            //  Verify that the list timestamp is in the past. This might fail
+            //  if there is an issue with the device's clock which can cause
+            //  false positives when validating SCTs.
+            if (clock.get() < this.timestamp) {
+                return State.MALFORMED;
             }
-        } catch (JSONException | IllegalArgumentException e) {
+
+        } catch (ArithmeticException e) {
             logger.log(Level.WARNING, "Unable to parse log list", e);
             return State.MALFORMED;
         }
-        this.logs = Collections.unmodifiableMap(logsMap);
+        this.logList = logList;
         this.logListLastModified = lastModified;
         return State.LOADED;
     }
 
-    private void addLogsToMap(JSONArray logs, String operatorName, int logType,
-            Map<ByteArray, LogInfo> logsMap) throws JSONException {
-        for (int j = 0; j < logs.length(); j++) {
-            JSONObject log = logs.getJSONObject(j);
-            LogInfo.Builder builder = new LogInfo.Builder()
-                                              .setPublicKey(parsePubKey(log.getString("key")))
-                                              .setType(logType)
-                                              .setOperator(operatorName);
-            JSONObject stateObject = log.optJSONObject("state");
-            if (stateObject != null) {
-                String state = stateObject.keys().next();
-                long stateTimestamp = stateObject.getJSONObject(state).getLong("timestamp");
-                builder.setState(parseState(state), stateTimestamp);
-            }
+    private synchronized LogInfo cacheLogEntry(byte[] logId) {
+        String encodedLogId = Base64.getEncoder().encodeToString(logId);
+        Log log = logList.logsByKey(encodedLogId);
+        if (log == null) {
+            return null;
+        }
+
+        try {
+            byte[] pubKey = new byte[log.publicKeyLength()];
+            log.publicKeyAsByteBuffer().get(pubKey);
+            LogInfo.Builder builder =
+                    new LogInfo.Builder()
+                            .setType(parseType(log.type()))
+                            .setOperator(log.operator())
+                            .setPublicKey(parsePubKey(pubKey))
+                            .setState(parseState(log.state()), log.stateTimestamp());
+
             LogInfo logInfo = builder.build();
 
-            String logIdFromList = log.getString("log_id");
             // The logId computed using the public key should match the log_id field.
-            byte[] logId = Base64.getDecoder().decode(logIdFromList);
             if (!Arrays.equals(logInfo.getID(), logId)) {
                 throw new IllegalArgumentException("logId does not match publicKey");
             }
@@ -275,58 +325,53 @@ public class LogStoreImpl implements LogStore {
             //  positives when validating SCTs.
             if (logInfo.getStateAt(clock.get()) == LogInfo.STATE_UNKNOWN) {
                 throw new IllegalArgumentException("Log current state is "
-                        + "unknown, logId: " + logIdFromList);
+                        + "unknown, logId: " + encodedLogId);
             }
 
-            logsMap.put(new ByteArray(logId), logInfo);
+            logCache.put(new ByteArray(logId), logInfo);
+            return logInfo;
+
+        } catch (IllegalArgumentException e) {
+            // There is something wrong with that log entry. Ignore it.
+            logger.log(Level.WARNING, "Unable to parse log entry", e);
+            return null;
         }
     }
 
-    private static int parseMajorVersion(String version) {
-        int pos = version.indexOf(".");
-        if (pos == -1) {
-            pos = version.length();
-        }
-        try {
-            return Integer.parseInt(version.substring(0, pos));
-        } catch (IndexOutOfBoundsException | NumberFormatException e) {
-            return 0;
-        }
-    }
-
-    private static int parseMinorVersion(String version) {
-        int pos = version.indexOf(".");
-        if (pos != -1 && pos < version.length()) {
-            try {
-                return Integer.parseInt(version.substring(pos + 1, version.length()));
-            } catch (IndexOutOfBoundsException | NumberFormatException e) {
-                return 0;
-            }
-        }
-        return 0;
-    }
-
-    private static int parseState(String state) {
+    private static int parseState(byte state) {
         switch (state) {
-            case "pending":
+            case LogState.Pending:
                 return LogInfo.STATE_PENDING;
-            case "qualified":
+            case LogState.Qualified:
                 return LogInfo.STATE_QUALIFIED;
-            case "usable":
+            case LogState.Usable:
                 return LogInfo.STATE_USABLE;
-            case "readonly":
+            case LogState.Readonly:
                 return LogInfo.STATE_READONLY;
-            case "retired":
+            case LogState.Retired:
                 return LogInfo.STATE_RETIRED;
-            case "rejected":
+            case LogState.Rejected:
                 return LogInfo.STATE_REJECTED;
             default:
                 throw new IllegalArgumentException("Unknown log state: " + state);
         }
     }
 
-    private static PublicKey parsePubKey(String key) {
-        byte[] pem = ("-----BEGIN PUBLIC KEY-----\n" + key + "\n-----END PUBLIC KEY-----")
+    private static int parseType(byte logType) {
+        switch (logType) {
+            case LogType.Rfc6962:
+                return LogInfo.TYPE_RFC6962;
+            case LogType.Static:
+                return LogInfo.TYPE_STATIC_CT_API;
+            default:
+                throw new IllegalArgumentException("Unknown log type: " + logType);
+        }
+    }
+
+    private static PublicKey parsePubKey(byte[] key) {
+        // TODO(tweek): Replace with NativeCrypto.EVP_PKEY_from_subject_public_key_info
+        byte[] pem = ("-----BEGIN PUBLIC KEY-----\n" + Base64.getEncoder().encodeToString(key)
+                + "\n-----END PUBLIC KEY-----")
                              .getBytes(US_ASCII);
         PublicKey pubkey;
         try {
