@@ -25,8 +25,10 @@ import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 
-/** A SLH-DSA private key.
- * @hide This class is not part of the Android public SDK API*/
+/**
+ * A SLH-DSA private key.
+ * @hide This class is not part of the Android public SDK API
+ */
 public class OpenSslSlhDsaPrivateKey implements PrivateKey {
     private static final long serialVersionUID = 0x87e8776a4491fecbL;
 

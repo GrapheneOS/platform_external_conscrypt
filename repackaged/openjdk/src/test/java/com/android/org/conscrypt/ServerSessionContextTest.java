@@ -43,7 +43,7 @@ public class ServerSessionContextTest extends AbstractSessionContextTest<ServerS
         int count = 0;
         Enumeration<byte[]> ids = context.getIds();
         while (ids.hasMoreElements()) {
-            ids.nextElement();
+            Object unused = ids.nextElement();
             count++;
         }
         return count;

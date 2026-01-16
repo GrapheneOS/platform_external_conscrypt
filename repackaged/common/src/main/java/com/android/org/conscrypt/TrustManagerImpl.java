@@ -73,7 +73,6 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.X509ExtendedTrustManager;
 
 /**
- *
  * TrustManager implementation. The implementation is based on CertPathValidator
  * PKIX and CertificateFactory X509 implementations. These implementations should
  * be provided by some certification provider.
@@ -86,6 +85,7 @@ import javax.net.ssl.X509ExtendedTrustManager;
 FlaggedApi(com.android.org.conscrypt.net.flags.Flags.FLAG_CONSCRYPTX509TRUSTMANAGER)
 @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
 @Internal
+@SuppressWarnings("CustomX509TrustManager")
 public final class TrustManagerImpl
         extends X509ExtendedTrustManager implements ConscryptX509TrustManager {
     private static final Logger logger = Logger.getLogger(TrustManagerImpl.class.getName());
@@ -484,7 +484,8 @@ public final class TrustManagerImpl
 
         byte[] data = null;
         try {
-            Method m_getTlsSctData = session.getClass().getDeclaredMethod("getPeerSignedCertificateTimestamp");
+            Method m_getTlsSctData =
+                    session.getClass().getDeclaredMethod("getPeerSignedCertificateTimestamp");
             m_getTlsSctData.setAccessible(true);
             Object rawData = m_getTlsSctData.invoke(session);
             if (rawData instanceof byte[]) {

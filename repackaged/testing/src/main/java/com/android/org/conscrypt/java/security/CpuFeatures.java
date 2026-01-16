@@ -114,6 +114,7 @@ public class CpuFeatures {
         return Arrays.asList(features.split("\\s"));
     }
 
+    @SuppressWarnings("RuntimeExec")
     private static List<String> getCpuFeaturesMac() {
         try {
             StringBuilder output = new StringBuilder();
