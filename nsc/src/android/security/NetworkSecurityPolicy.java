@@ -121,8 +121,7 @@ public class NetworkSecurityPolicy {
     @Retention(RetentionPolicy.SOURCE)
     @IntDef(prefix = {"DOMAIN_ENCRYPTION_MODE_"},
             value = {DOMAIN_ENCRYPTION_MODE_UNKNOWN, DOMAIN_ENCRYPTION_MODE_DISABLED,
-                    DOMAIN_ENCRYPTION_MODE_OPPORTUNISTIC, DOMAIN_ENCRYPTION_MODE_ENABLED,
-                    DOMAIN_ENCRYPTION_MODE_REQUIRED})
+                    DOMAIN_ENCRYPTION_MODE_OPPORTUNISTIC, DOMAIN_ENCRYPTION_MODE_ENABLED})
     public @interface DomainEncryptionMode {}
 
     /**
@@ -158,14 +157,6 @@ public class NetworkSecurityPolicy {
     @FlaggedApi(com.android.org.conscrypt.net.flags.Flags.FLAG_ENCRYPTED_CLIENT_HELLO_PLATFORM)
     public static final int DOMAIN_ENCRYPTION_MODE_ENABLED =
             libcore.net.NetworkSecurityPolicy.DOMAIN_ENCRYPTION_MODE_ENABLED;
-
-    /**
-     * Domain encryption is required for the app and should fail closed (i.e. if encryption cannot
-     * be enabled for any reason, the connection will fail).
-     */
-    @FlaggedApi(com.android.org.conscrypt.net.flags.Flags.FLAG_ENCRYPTED_CLIENT_HELLO_PLATFORM)
-    public static final int DOMAIN_ENCRYPTION_MODE_REQUIRED =
-            libcore.net.NetworkSecurityPolicy.DOMAIN_ENCRYPTION_MODE_REQUIRED;
 
     /**
      * Returns the domain encryption mode the app has chosen for the given {@code hostname},

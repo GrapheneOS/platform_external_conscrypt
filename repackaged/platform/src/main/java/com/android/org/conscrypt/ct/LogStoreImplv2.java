@@ -53,8 +53,8 @@ import java.util.logging.Logger;
  * @hide This class is not part of the Android public SDK API
  */
 @Internal
-public class LogStoreImpl implements LogStore {
-    private static final Logger logger = Logger.getLogger(LogStoreImpl.class.getName());
+public class LogStoreImplv2 implements LogStore {
+    private static final Logger logger = Logger.getLogger(LogStoreImplv2.class.getName());
     private static final int COMPAT_VERSION = 2;
     private static final Path logListPrefix;
     private static final Path logListSuffix;
@@ -92,12 +92,12 @@ public class LogStoreImpl implements LogStore {
         return logListPrefix.resolve(version).resolve(logListSuffix);
     }
 
-    public LogStoreImpl(Policy policy) {
+    public LogStoreImplv2(Policy policy) {
         this(policy, getPathForCompatVersion(COMPAT_VERSION), Platform.getStatsLog(),
                 new SystemTimeSupplier());
     }
 
-    public LogStoreImpl(Policy policy, Path logList, StatsLog metrics, Supplier<Long> clock) {
+    public LogStoreImplv2(Policy policy, Path logList, StatsLog metrics, Supplier<Long> clock) {
         this.state = State.UNINITIALIZED;
         this.policy = policy;
         this.logList = logList;

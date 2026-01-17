@@ -19,7 +19,6 @@ package android.security.net.config;
 import static android.security.NetworkSecurityPolicy.DOMAIN_ENCRYPTION_MODE_DISABLED;
 import static android.security.NetworkSecurityPolicy.DOMAIN_ENCRYPTION_MODE_ENABLED;
 import static android.security.NetworkSecurityPolicy.DOMAIN_ENCRYPTION_MODE_OPPORTUNISTIC;
-import static android.security.NetworkSecurityPolicy.DOMAIN_ENCRYPTION_MODE_REQUIRED;
 import static android.security.net.config.NetworkSecurityConfig.defaultDomainEncryptionMode;
 
 import static com.android.org.conscrypt.net.flags.Flags.FLAG_CERTIFICATE_TRANSPARENCY_DEFAULT_ENABLED;
@@ -675,8 +674,10 @@ public class XmlConfigTests {
         config = appConfig.getConfigForHostname("enabled.android.com");
         assertEquals(DOMAIN_ENCRYPTION_MODE_ENABLED, config.getDomainEncryptionMode());
 
+        // TODO(b/476104302): update this assert once we have added back in support for required.
+        // Ensure that even with "required" set, we fall back to opportunistic at this point.
         config = appConfig.getConfigForHostname("required.android.com");
-        assertEquals(DOMAIN_ENCRYPTION_MODE_REQUIRED, config.getDomainEncryptionMode());
+        assertEquals(DOMAIN_ENCRYPTION_MODE_OPPORTUNISTIC, config.getDomainEncryptionMode());
     }
 
     @Test
