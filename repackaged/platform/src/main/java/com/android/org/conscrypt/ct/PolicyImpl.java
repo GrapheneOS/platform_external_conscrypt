@@ -194,18 +194,20 @@ public class PolicyImpl implements Policy {
             return PolicyCompliance.NOT_ENOUGH_DIVERSE_SCTS;
         }
 
-        /* 4. Among the SCTs satisfying requirement 2, at least one SCT must be
-         * issued from a log recognized by Chrome as being RFC6962-compliant.
-         */
-        boolean foundRfc6962Log = false;
-        for (LogInfo logInfo : validLogs) {
-            if (logInfo.getType() == LogInfo.TYPE_RFC6962) {
-                foundRfc6962Log = true;
-                break;
+        if (!com.android.org.conscrypt.net.flags.Flags.ctCompatVersion3()) {
+            /* 4. Among the SCTs satisfying requirement 2, at least one SCT must be
+             * issued from a log recognized by Chrome as being RFC6962-compliant.
+             */
+            boolean foundRfc6962Log = false;
+            for (LogInfo logInfo : validLogs) {
+                if (logInfo.getType() == LogInfo.TYPE_RFC6962) {
+                    foundRfc6962Log = true;
+                    break;
+                }
             }
-        }
-        if (!foundRfc6962Log) {
-            return PolicyCompliance.NO_RFC6962_LOG;
+            if (!foundRfc6962Log) {
+                return PolicyCompliance.NO_RFC6962_LOG;
+            }
         }
 
         return PolicyCompliance.COMPLY;
@@ -241,18 +243,20 @@ public class PolicyImpl implements Policy {
             return PolicyCompliance.NOT_ENOUGH_DIVERSE_SCTS;
         }
 
-        /* 3. Among the SCTs satisfying requirement 1, at least one SCT must be
-         * issued from a log recognized by Chrome as being RFC6962-compliant.
-         */
-        boolean foundRfc6962Log = false;
-        for (LogInfo logInfo : validLogs) {
-            if (logInfo.getType() == LogInfo.TYPE_RFC6962) {
-                foundRfc6962Log = true;
-                break;
+        if (!com.android.org.conscrypt.net.flags.Flags.ctCompatVersion3()) {
+            /* 3. Among the SCTs satisfying requirement 1, at least one SCT must be
+             * issued from a log recognized by Chrome as being RFC6962-compliant.
+             */
+            boolean foundRfc6962Log = false;
+            for (LogInfo logInfo : validLogs) {
+                if (logInfo.getType() == LogInfo.TYPE_RFC6962) {
+                    foundRfc6962Log = true;
+                    break;
+                }
             }
-        }
-        if (!foundRfc6962Log) {
-            return PolicyCompliance.NO_RFC6962_LOG;
+            if (!foundRfc6962Log) {
+                return PolicyCompliance.NO_RFC6962_LOG;
+            }
         }
 
         return PolicyCompliance.COMPLY;
