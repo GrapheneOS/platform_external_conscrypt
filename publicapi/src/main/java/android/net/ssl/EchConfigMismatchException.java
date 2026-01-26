@@ -82,7 +82,7 @@ public class EchConfigMismatchException extends SSLException {
      *        connection, or {@code null} if no retry configuration was set by the server.
      */
     public EchConfigMismatchException(@Nullable String message, @Nullable String publicName,
-            @Nullable EchConfigList echRetryConfigList) {
+                                      @Nullable EchConfigList echRetryConfigList) {
         super(message);
         this.publicName = publicName;
         this.echRetryConfigList = echRetryConfigList;

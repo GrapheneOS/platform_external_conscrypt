@@ -88,8 +88,7 @@ final class OpenSSLX509CRL extends X509CRL {
         }
     }
 
-    static List<OpenSSLX509CRL> fromPkcs7DerInputStream(InputStream is)
-            throws ParsingException {
+    static List<OpenSSLX509CRL> fromPkcs7DerInputStream(InputStream is) throws ParsingException {
         OpenSSLBIOInputStream bis = new OpenSSLBIOInputStream(is, true);
 
         final long[] certRefs;
@@ -127,14 +126,13 @@ final class OpenSSLX509CRL extends X509CRL {
         }
     }
 
-    static List<OpenSSLX509CRL> fromPkcs7PemInputStream(InputStream is)
-            throws ParsingException {
+    static List<OpenSSLX509CRL> fromPkcs7PemInputStream(InputStream is) throws ParsingException {
         OpenSSLBIOInputStream bis = new OpenSSLBIOInputStream(is, true);
 
         final long[] certRefs;
         try {
-            certRefs = NativeCrypto.PEM_read_bio_PKCS7(bis.getBioContext(),
-                    NativeCrypto.PKCS7_CRLS);
+            certRefs =
+                    NativeCrypto.PEM_read_bio_PKCS7(bis.getBioContext(), NativeCrypto.PKCS7_CRLS);
         } catch (Exception e) {
             throw new ParsingException(e);
         } finally {
@@ -153,8 +151,8 @@ final class OpenSSLX509CRL extends X509CRL {
 
     @Override
     public Set<String> getCriticalExtensionOIDs() {
-        String[] critOids =
-                NativeCrypto.get_X509_CRL_ext_oids(mContext, this, NativeCrypto.EXTENSION_TYPE_CRITICAL);
+        String[] critOids = NativeCrypto.get_X509_CRL_ext_oids(
+                mContext, this, NativeCrypto.EXTENSION_TYPE_CRITICAL);
 
         /*
          * This API has a special case that if there are no extensions, we
@@ -162,8 +160,11 @@ final class OpenSSLX509CRL extends X509CRL {
          * non-critical extensions.
          */
         if ((critOids.length == 0)
-                && (NativeCrypto.get_X509_CRL_ext_oids(mContext, this,
-                        NativeCrypto.EXTENSION_TYPE_NON_CRITICAL).length == 0)) {
+            && (NativeCrypto
+                        .get_X509_CRL_ext_oids(mContext, this,
+                                               NativeCrypto.EXTENSION_TYPE_NON_CRITICAL)
+                        .length
+                == 0)) {
             return null;
         }
 
@@ -177,9 +178,8 @@ final class OpenSSLX509CRL extends X509CRL {
 
     @Override
     public Set<String> getNonCriticalExtensionOIDs() {
-        String[] nonCritOids =
-                NativeCrypto.get_X509_CRL_ext_oids(mContext, this,
-                        NativeCrypto.EXTENSION_TYPE_NON_CRITICAL);
+        String[] nonCritOids = NativeCrypto.get_X509_CRL_ext_oids(
+                mContext, this, NativeCrypto.EXTENSION_TYPE_NON_CRITICAL);
 
         /*
          * This API has a special case that if there are no extensions, we
@@ -187,8 +187,10 @@ final class OpenSSLX509CRL extends X509CRL {
          * check critical extensions.
          */
         if ((nonCritOids.length == 0)
-                && (NativeCrypto.get_X509_CRL_ext_oids(mContext, this,
-                        NativeCrypto.EXTENSION_TYPE_CRITICAL).length == 0)) {
+            && (NativeCrypto
+                        .get_X509_CRL_ext_oids(mContext, this, NativeCrypto.EXTENSION_TYPE_CRITICAL)
+                        .length
+                == 0)) {
             return null;
         }
 
@@ -197,8 +199,8 @@ final class OpenSSLX509CRL extends X509CRL {
 
     @Override
     public boolean hasUnsupportedCriticalExtension() {
-        final String[] criticalOids =
-                NativeCrypto.get_X509_CRL_ext_oids(mContext, this, NativeCrypto.EXTENSION_TYPE_CRITICAL);
+        final String[] criticalOids = NativeCrypto.get_X509_CRL_ext_oids(
+                mContext, this, NativeCrypto.EXTENSION_TYPE_CRITICAL);
         for (String oid : criticalOids) {
             final long extensionRef = NativeCrypto.X509_CRL_get_ext(mContext, this, oid);
             if (NativeCrypto.X509_supported_extension(extensionRef) != 1) {
@@ -246,8 +248,9 @@ final class OpenSSLX509CRL extends X509CRL {
     }
 
     @Override
-    public void verify(PublicKey key) throws CRLException, NoSuchAlgorithmException,
-            InvalidKeyException, NoSuchProviderException, SignatureException {
+    public void verify(PublicKey key)
+            throws CRLException, NoSuchAlgorithmException, InvalidKeyException,
+                   NoSuchProviderException, SignatureException {
         if (key instanceof OpenSSLKeyHolder) {
             OpenSSLKey pkey = ((OpenSSLKeyHolder) key).getOpenSSLKey();
             verifyOpenSSL(pkey);
@@ -258,9 +261,9 @@ final class OpenSSLX509CRL extends X509CRL {
     }
 
     @Override
-    public void verify(PublicKey key, String sigProvider) throws CRLException,
-            NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException,
-            SignatureException {
+    public void verify(PublicKey key, String sigProvider)
+            throws CRLException, NoSuchAlgorithmException, InvalidKeyException,
+                   NoSuchProviderException, SignatureException {
         verifyInternal(key, sigProvider);
     }
 
@@ -294,8 +297,8 @@ final class OpenSSLX509CRL extends X509CRL {
 
     @Override
     public X509CRLEntry getRevokedCertificate(BigInteger serialNumber) {
-        final long revokedRef = NativeCrypto.X509_CRL_get0_by_serial(mContext, this,
-                serialNumber.toByteArray());
+        final long revokedRef =
+                NativeCrypto.X509_CRL_get0_by_serial(mContext, this, serialNumber.toByteArray());
         if (revokedRef == 0) {
             return null;
         }
@@ -310,8 +313,8 @@ final class OpenSSLX509CRL extends X509CRL {
     public X509CRLEntry getRevokedCertificate(X509Certificate certificate) {
         if (certificate instanceof OpenSSLX509Certificate) {
             OpenSSLX509Certificate osslCert = (OpenSSLX509Certificate) certificate;
-            final long x509RevokedRef = NativeCrypto.X509_CRL_get0_by_cert(mContext, this,
-                    osslCert.getContext(), osslCert);
+            final long x509RevokedRef = NativeCrypto.X509_CRL_get0_by_cert(
+                    mContext, this, osslCert.getContext(), osslCert);
 
             if (x509RevokedRef == 0) {
                 return null;
@@ -391,15 +394,15 @@ final class OpenSSLX509CRL extends X509CRL {
             osslCert = (OpenSSLX509Certificate) cert;
         } else {
             try {
-                osslCert = OpenSSLX509Certificate.fromX509DerInputStream(new ByteArrayInputStream(
-                        cert.getEncoded()));
+                osslCert = OpenSSLX509Certificate.fromX509DerInputStream(
+                        new ByteArrayInputStream(cert.getEncoded()));
             } catch (Exception e) {
                 throw new RuntimeException("cannot convert certificate", e);
             }
         }
 
-        final long x509RevokedRef = NativeCrypto.X509_CRL_get0_by_cert(mContext, this,
-                osslCert.getContext(), osslCert);
+        final long x509RevokedRef =
+                NativeCrypto.X509_CRL_get0_by_cert(mContext, this, osslCert.getContext(), osslCert);
 
         return x509RevokedRef != 0;
     }

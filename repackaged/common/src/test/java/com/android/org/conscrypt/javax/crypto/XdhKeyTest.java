@@ -68,9 +68,9 @@ public class XdhKeyTest {
         assertNotSame(publicKey, copy);
         assertKeysWork(copy, privateKey);
         assertThrows(IllegalArgumentException.class,
-                () -> new OpenSSLX25519PublicKey(loseOneByte(publicKeyBytes)));
+                     () -> new OpenSSLX25519PublicKey(loseOneByte(publicKeyBytes)));
         assertThrows(IllegalArgumentException.class,
-                () -> new OpenSSLX25519PublicKey(gainOneByte(publicKeyBytes)));
+                     () -> new OpenSSLX25519PublicKey(gainOneByte(publicKeyBytes)));
     }
 
     @Test
@@ -81,9 +81,9 @@ public class XdhKeyTest {
         assertKeysWork(copy, privateKey);
 
         assertThrows(InvalidKeySpecException.class,
-                () -> new OpenSSLX25519PublicKey(new XdhKeySpec(loseOneByte(publicKeyBytes))));
+                     () -> new OpenSSLX25519PublicKey(new XdhKeySpec(loseOneByte(publicKeyBytes))));
         assertThrows(InvalidKeySpecException.class,
-                () -> new OpenSSLX25519PublicKey(new XdhKeySpec(gainOneByte(publicKeyBytes))));
+                     () -> new OpenSSLX25519PublicKey(new XdhKeySpec(gainOneByte(publicKeyBytes))));
     }
 
     @Test
@@ -97,10 +97,11 @@ public class XdhKeyTest {
         assertKeysWork(copy, privateKey);
 
         assertThrows(InvalidKeySpecException.class,
-                () -> new OpenSSLX25519PublicKey(new X509EncodedKeySpec(privateKeyBytes)));
+                     () -> new OpenSSLX25519PublicKey(new X509EncodedKeySpec(privateKeyBytes)));
         assertThrows(InvalidKeySpecException.class,
-                () -> new OpenSSLX25519PublicKey(new X509EncodedKeySpec(flipBit(x509bytes))));
-        assertThrows(InvalidKeySpecException.class,
+                     () -> new OpenSSLX25519PublicKey(new X509EncodedKeySpec(flipBit(x509bytes))));
+        assertThrows(
+                InvalidKeySpecException.class,
                 () -> new OpenSSLX25519PublicKey(new X509EncodedKeySpec(loseOneByte(x509bytes))));
 
         // Should ignore extra data for better JCA compatibility.
@@ -118,9 +119,9 @@ public class XdhKeyTest {
         assertKeysWork(publicKey, copy);
 
         assertThrows(IllegalArgumentException.class,
-                () -> new OpenSSLX25519PrivateKey(loseOneByte(privateKeyBytes)));
+                     () -> new OpenSSLX25519PrivateKey(loseOneByte(privateKeyBytes)));
         assertThrows(IllegalArgumentException.class,
-                () -> new OpenSSLX25519PrivateKey(gainOneByte(privateKeyBytes)));
+                     () -> new OpenSSLX25519PrivateKey(gainOneByte(privateKeyBytes)));
     }
 
     @Test
@@ -131,9 +132,11 @@ public class XdhKeyTest {
         assertNotSame(privateKey, copy);
         assertKeysWork(publicKey, copy);
 
-        assertThrows(InvalidKeySpecException.class,
+        assertThrows(
+                InvalidKeySpecException.class,
                 () -> new OpenSSLX25519PrivateKey(new XdhKeySpec(loseOneByte(publicKeyBytes))));
-        assertThrows(InvalidKeySpecException.class,
+        assertThrows(
+                InvalidKeySpecException.class,
                 () -> new OpenSSLX25519PrivateKey(new XdhKeySpec(gainOneByte(publicKeyBytes))));
     }
 
@@ -149,13 +152,14 @@ public class XdhKeyTest {
         assertKeysWork(publicKey, copy);
 
         assertThrows(InvalidKeySpecException.class,
-                () -> new OpenSSLX25519PrivateKey(new X509EncodedKeySpec(pkcs8Bytes)));
-        assertThrows(InvalidKeySpecException.class,
+                     () -> new OpenSSLX25519PrivateKey(new X509EncodedKeySpec(pkcs8Bytes)));
+        assertThrows(
+                InvalidKeySpecException.class,
                 () -> new OpenSSLX25519PrivateKey(new PKCS8EncodedKeySpec(flipBit(pkcs8Bytes))));
         assertThrows(InvalidKeySpecException.class,
-                ()
-                        -> new OpenSSLX25519PrivateKey(
-                                new PKCS8EncodedKeySpec(loseOneByte(pkcs8Bytes))));
+                     ()
+                             -> new OpenSSLX25519PrivateKey(
+                                     new PKCS8EncodedKeySpec(loseOneByte(pkcs8Bytes))));
 
         // EVP_parse_private_key ignores extra data for JCA compatibility.
         copy = new OpenSSLX25519PrivateKey(new PKCS8EncodedKeySpec(gainOneByte(pkcs8Bytes)));
@@ -166,9 +170,9 @@ public class XdhKeyTest {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
         assertThrows(InvalidKeySpecException.class,
-                ()
-                        -> new OpenSSLX25519PrivateKey(
-                                new PKCS8EncodedKeySpec(keyPair.getPrivate().getEncoded())));
+                     ()
+                             -> new OpenSSLX25519PrivateKey(
+                                     new PKCS8EncodedKeySpec(keyPair.getPrivate().getEncoded())));
     }
 
     @Test

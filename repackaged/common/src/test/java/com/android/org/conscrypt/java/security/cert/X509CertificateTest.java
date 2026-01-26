@@ -65,7 +65,6 @@ import tests.util.ServiceTester;
  */
 @RunWith(JUnit4.class)
 public class X509CertificateTest {
-
     // BEGIN Android-Added: Allow access to deprecated BC algorithms.
     // Allow access to deprecated BC algorithms in this test, so we can ensure they
     // continue to work
@@ -74,8 +73,7 @@ public class X509CertificateTest {
             EnableDeprecatedBouncyCastleAlgorithmsRule.getInstance();
     // END Android-Added: Allow access to deprecated BC algorithms.
 
-    private static final String VALID_CERT =
-            "-----BEGIN CERTIFICATE-----\n"
+    private static final String VALID_CERT = "-----BEGIN CERTIFICATE-----\n"
             + "MIIFMjCCAxqgAwIBAgIJAL0mG5fOeJ7xMA0GCSqGSIb3DQEBCwUAMC0xCzAJBgNV\n"
             + "BAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDTALBgNVBAoMBFRlc3QwIBcNMTgwOTE3\n"
             + "MTIxNzU3WhgPMjExODA4MjQxMjE3NTdaMC0xCzAJBgNVBAYTAkdCMQ8wDQYDVQQH\n"
@@ -112,8 +110,7 @@ public class X509CertificateTest {
      declaration from sha256withRSAEncryption to sha512withRSAEncryption.  This causes
      the signature block's algorithm (which is unmodified) to not match the cert info.
      */
-    private static final String MISMATCHED_ALGORITHM_CERT =
-            "-----BEGIN CERTIFICATE-----\n"
+    private static final String MISMATCHED_ALGORITHM_CERT = "-----BEGIN CERTIFICATE-----\n"
             + "MIIFMjCCAxqgAwIBAgIJAL0mG5fOeJ7xMA0GCSqGSIb3DQEBDQUAMC0xCzAJBgNV\n"
             + "BAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDTALBgNVBAoMBFRlc3QwIBcNMTgwOTE3\n"
             + "MTIxNzU3WhgPMjExODA4MjQxMjE3NTdaMC0xCzAJBgNVBAYTAkdCMQ8wDQYDVQQH\n"
@@ -147,8 +144,7 @@ public class X509CertificateTest {
     /**
      * This cert has an EC key with curve prime256v1 encoded using explicit params.
      */
-    private static final String EC_EXPLICIT_KEY_CERT =
-            "-----BEGIN CERTIFICATE-----\n"
+    private static final String EC_EXPLICIT_KEY_CERT = "-----BEGIN CERTIFICATE-----\n"
             + "MIICAjCCAagCCQCrIzClvU58azAKBggqhkjOPQQDAjAPMQ0wCwYDVQQDDARUZXN0\n"
             + "MB4XDTE4MTAwMjEyNDQzMloXDTE4MTEwMTEyNDQzMlowDzENMAsGA1UEAwwEVGVz\n"
             + "dDCCAUswggEDBgcqhkjOPQIBMIH3AgEBMCwGByqGSM49AQECIQD/////AAAAAQAA\n"
@@ -388,8 +384,8 @@ public class X509CertificateTest {
             + "0K8A7gKLY0jP8Zp+6rYBcpxc7cylWMbdlhFTHAGiKI+XeQ/9u+RPeocZsn5jGlDt\n"
             + "K3ftMoWFce+baNq/WcMzRj04AA==\n"
             + "-----END CERTIFICATE-----\n";
-    private static Date dateFromUTC(
-            int year, int month, int day, int hour, int minute, int second) {
+    private static Date dateFromUTC(int year, int month, int day, int hour, int minute,
+                                    int second) {
         Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         c.set(year, month, day, hour, minute, second);
         c.set(Calendar.MILLISECOND, 0);
@@ -419,12 +415,12 @@ public class X509CertificateTest {
         // Collection, so there is no guarantee of the provider using a particular order. Normalize
         // the order before comparing.
         result.sort(Comparator.comparingInt((Pair<Integer, String> a) -> a.getFirst())
-                        .thenComparing(Pair::getSecond));
+                            .thenComparing(Pair::getSecond));
         return result;
     }
 
-    private static void assertGeneralNamesEqual(
-            Collection<List<?>> expected, Collection<List<?>> actual) {
+    private static void assertGeneralNamesEqual(Collection<List<?>> expected,
+                                                Collection<List<?>> actual) {
         assertEquals(normalizeGeneralNames(expected), normalizeGeneralNames(actual));
     }
 
@@ -592,30 +588,32 @@ public class X509CertificateTest {
             }
 
             assertArrayEquals(new boolean[] {true, false, true, false}, c.getIssuerUniqueID());
-            assertArrayEquals(
-                    new boolean[] {false, true, false, true, false}, c.getSubjectUniqueID());
+            assertArrayEquals(new boolean[] {false, true, false, true, false},
+                              c.getSubjectUniqueID());
             assertEquals(10, c.getBasicConstraints());
             assertEquals(Arrays.asList("1.3.6.1.5.5.7.3.1", "1.2.840.113554.4.1.72585.2"),
-                    c.getExtendedKeyUsage());
+                         c.getExtendedKeyUsage());
 
             // TODO(davidben): Test the other name types.
-            assertGeneralNamesEqual(Arrays.asList(Arrays.asList(1, "issuer@example.com"),
-                                            Arrays.asList(2, "issuer.example.com"),
-                                            Arrays.asList(4, "CN=Test Issuer"),
-                                            Arrays.asList(6, "https://example.com/issuer"),
-                                            // TODO(https://github.com/google/conscrypt/issues/938):
-                                            // Fix IPv6 handling and include it in this test.
-                                            Arrays.asList(7, "127.0.0.1"),
-                                            Arrays.asList(8, "1.2.840.113554.4.1.72585.2")),
+            assertGeneralNamesEqual(
+                    Arrays.asList(Arrays.asList(1, "issuer@example.com"),
+                                  Arrays.asList(2, "issuer.example.com"),
+                                  Arrays.asList(4, "CN=Test Issuer"),
+                                  Arrays.asList(6, "https://example.com/issuer"),
+                                  // TODO(https://github.com/google/conscrypt/issues/938):
+                                  // Fix IPv6 handling and include it in this test.
+                                  Arrays.asList(7, "127.0.0.1"),
+                                  Arrays.asList(8, "1.2.840.113554.4.1.72585.2")),
                     c.getIssuerAlternativeNames());
-            assertGeneralNamesEqual(Arrays.asList(Arrays.asList(1, "subject@example.com"),
-                                            Arrays.asList(2, "subject.example.com"),
-                                            Arrays.asList(4, "CN=Test Subject"),
-                                            Arrays.asList(6, "https://example.com/subject"),
-                                            // TODO(https://github.com/google/conscrypt/issues/938):
-                                            // Fix IPv6 handling and include it in this test.
-                                            Arrays.asList(7, "127.0.0.1"),
-                                            Arrays.asList(8, "1.2.840.113554.4.1.72585.2")),
+            assertGeneralNamesEqual(
+                    Arrays.asList(Arrays.asList(1, "subject@example.com"),
+                                  Arrays.asList(2, "subject.example.com"),
+                                  Arrays.asList(4, "CN=Test Subject"),
+                                  Arrays.asList(6, "https://example.com/subject"),
+                                  // TODO(https://github.com/google/conscrypt/issues/938):
+                                  // Fix IPv6 handling and include it in this test.
+                                  Arrays.asList(7, "127.0.0.1"),
+                                  Arrays.asList(8, "1.2.840.113554.4.1.72585.2")),
                     c.getSubjectAlternativeNames());
 
             // Although the BIT STRING in the certificate only has three bits, getKeyUsage()
@@ -671,8 +669,8 @@ public class X509CertificateTest {
         tester.run((p, algorithm) -> {
             X509Certificate c = certificateFromPEM(p, LARGE_KEY_USAGE);
             assertArrayEquals(new boolean[] {true, false, true, false, false, false, false, false,
-                                      false, false, false},
-                    c.getKeyUsage());
+                                             false, false, false},
+                              c.getKeyUsage());
         });
     }
 
@@ -710,10 +708,10 @@ public class X509CertificateTest {
                 .skipProvider("BC")
                 .run((p, algorithm) -> {
                     X509Certificate c = certificateFromPEM(p, UTCTIME_WITH_OFFSET);
-                    assertDatesEqual(
-                            dateFromUTC(2014, Calendar.JULY, 4, 0, 0, 0), c.getNotBefore());
-                    assertDatesEqual(
-                            dateFromUTC(2048, Calendar.AUGUST, 1, 10, 21, 23), c.getNotAfter());
+                    assertDatesEqual(dateFromUTC(2014, Calendar.JULY, 4, 0, 0, 0),
+                                     c.getNotBefore());
+                    assertDatesEqual(dateFromUTC(2048, Calendar.AUGUST, 1, 10, 21, 23),
+                                     c.getNotAfter());
                 });
     }
 }

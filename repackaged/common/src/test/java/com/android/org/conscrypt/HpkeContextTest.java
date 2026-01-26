@@ -31,18 +31,20 @@ import static com.android.org.conscrypt.HpkeFixture.createDefaultHpkeContextSend
 import static com.android.org.conscrypt.HpkeFixture.createPrivateKey;
 import static com.android.org.conscrypt.HpkeFixture.createPublicKey;
 import static com.android.org.conscrypt.TestUtils.encodeHex;
+
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 
-import java.security.GeneralSecurityException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.security.GeneralSecurityException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 
 /**
  * @hide This class is not part of the Android public SDK API
@@ -156,8 +158,8 @@ public class HpkeContextTest {
         final HpkeContextRecipient ctxRecipient =
                 HpkeContextRecipient.getInstance(DEFAULT_SUITE_NAME);
         ctxRecipient.init(enc, privateKey, DEFAULT_INFO);
-        assertThrows(
-                GeneralSecurityException.class, () -> ctxRecipient.open(ciphertext, DEFAULT_AAD));
+        assertThrows(GeneralSecurityException.class,
+                     () -> ctxRecipient.open(ciphertext, DEFAULT_AAD));
     }
 
     @Test

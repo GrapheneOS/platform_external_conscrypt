@@ -17,9 +17,10 @@
 
 package com.android.org.conscrypt.ct;
 
+import com.android.org.conscrypt.Internal;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import com.android.org.conscrypt.Internal;
 
 /**
  * DigitallySigned structure, as defined by RFC5246 Section 4.7.
@@ -72,22 +73,16 @@ public class DigitallySigned {
     private final SignatureAlgorithm signatureAlgorithm;
     private final byte[] signature;
 
-    public DigitallySigned(HashAlgorithm hashAlgorithm,
-                           SignatureAlgorithm signatureAlgorithm,
+    public DigitallySigned(HashAlgorithm hashAlgorithm, SignatureAlgorithm signatureAlgorithm,
                            byte[] signature) {
         this.hashAlgorithm = hashAlgorithm;
         this.signatureAlgorithm = signatureAlgorithm;
         this.signature = signature;
     }
 
-    public DigitallySigned(int hashAlgorithm,
-                           int signatureAlgorithm,
-                           byte[] signature) {
-        this(
-            HashAlgorithm.valueOf(hashAlgorithm),
-            SignatureAlgorithm.valueOf(signatureAlgorithm),
-            signature
-        );
+    public DigitallySigned(int hashAlgorithm, int signatureAlgorithm, byte[] signature) {
+        this(HashAlgorithm.valueOf(hashAlgorithm), SignatureAlgorithm.valueOf(signatureAlgorithm),
+             signature);
     }
 
     public HashAlgorithm getHashAlgorithm() {
@@ -111,8 +106,7 @@ public class DigitallySigned {
     /**
      * Decode a TLS encoded DigitallySigned structure.
      */
-    public static DigitallySigned decode(InputStream input)
-        throws SerializationException {
+    public static DigitallySigned decode(InputStream input) throws SerializationException {
         try {
             return new DigitallySigned(
                     Serialization.readNumber(input, Constants.HASH_ALGORITHM_LENGTH),
@@ -126,10 +120,7 @@ public class DigitallySigned {
     /**
      * Decode a TLS encoded DigitallySigned structure.
      */
-    public static DigitallySigned decode(byte[] input)
-            throws SerializationException {
+    public static DigitallySigned decode(byte[] input) throws SerializationException {
         return decode(new ByteArrayInputStream(input));
     }
 }
-
-

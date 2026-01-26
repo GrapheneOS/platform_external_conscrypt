@@ -152,9 +152,11 @@ public class PolicyImplTest {
          * previous step (see the Verifier class).
          */
         embeddedSCT = new SignedCertificateTimestamp(SignedCertificateTimestamp.Version.V1, null,
-                JAN2023, null, null, SignedCertificateTimestamp.Origin.EMBEDDED);
+                                                     JAN2023, null, null,
+                                                     SignedCertificateTimestamp.Origin.EMBEDDED);
         ocspSCT = new SignedCertificateTimestamp(SignedCertificateTimestamp.Version.V1, null,
-                JAN2023, null, null, SignedCertificateTimestamp.Origin.OCSP_RESPONSE);
+                                                 JAN2023, null, null,
+                                                 SignedCertificateTimestamp.Origin.OCSP_RESPONSE);
     }
 
     @Test
@@ -164,7 +166,7 @@ public class PolicyImplTest {
 
         X509Certificate leaf = new FakeX509Certificate();
         assertEquals("An empty VerificationResult", PolicyCompliance.NOT_ENOUGH_SCTS,
-                p.doesResultConformToPolicyAt(result, leaf, JAN2024));
+                     p.doesResultConformToPolicyAt(result, leaf, JAN2024));
     }
 
     public void validVerificationResult(SignedCertificateTimestamp sct) throws Exception {
@@ -186,7 +188,7 @@ public class PolicyImplTest {
 
         X509Certificate leaf = new FakeX509Certificate();
         assertEquals("Two valid SCTs from different operators", PolicyCompliance.COMPLY,
-                p.doesResultConformToPolicyAt(result, leaf, JAN2024));
+                     p.doesResultConformToPolicyAt(result, leaf, JAN2024));
     }
 
     @Test
@@ -219,7 +221,7 @@ public class PolicyImplTest {
 
         X509Certificate leaf = new FakeX509Certificate();
         assertEquals("One valid, one retired SCTs from different operators",
-                PolicyCompliance.COMPLY, p.doesResultConformToPolicyAt(result, leaf, JAN2024));
+                     PolicyCompliance.COMPLY, p.doesResultConformToPolicyAt(result, leaf, JAN2024));
     }
 
     @Test
@@ -242,8 +244,8 @@ public class PolicyImplTest {
 
         X509Certificate leaf = new FakeX509Certificate();
         assertEquals("One valid, one retired SCTs from different operators",
-                PolicyCompliance.NOT_ENOUGH_SCTS,
-                p.doesResultConformToPolicyAt(result, leaf, JAN2024));
+                     PolicyCompliance.NOT_ENOUGH_SCTS,
+                     p.doesResultConformToPolicyAt(result, leaf, JAN2024));
     }
 
     public void invalidWithRetiredVerificationResult(SignedCertificateTimestamp sct)
@@ -266,8 +268,8 @@ public class PolicyImplTest {
 
         X509Certificate leaf = new FakeX509Certificate();
         assertEquals("One valid, one retired (before SCT timestamp) SCTs from different operators",
-                PolicyCompliance.NOT_ENOUGH_SCTS,
-                p.doesResultConformToPolicyAt(result, leaf, JAN2024));
+                     PolicyCompliance.NOT_ENOUGH_SCTS,
+                     p.doesResultConformToPolicyAt(result, leaf, JAN2024));
     }
 
     @Test
@@ -293,7 +295,7 @@ public class PolicyImplTest {
 
         X509Certificate leaf = new FakeX509Certificate();
         assertEquals("One valid SCT", PolicyCompliance.NOT_ENOUGH_SCTS,
-                p.doesResultConformToPolicyAt(result, leaf, JAN2024));
+                     p.doesResultConformToPolicyAt(result, leaf, JAN2024));
     }
 
     @Test
@@ -326,7 +328,7 @@ public class PolicyImplTest {
 
         X509Certificate leaf = new FakeX509Certificate();
         assertEquals("Two retired SCTs from different operators", PolicyCompliance.NOT_ENOUGH_SCTS,
-                p.doesResultConformToPolicyAt(result, leaf, JAN2024));
+                     p.doesResultConformToPolicyAt(result, leaf, JAN2024));
     }
 
     @Test
@@ -359,7 +361,7 @@ public class PolicyImplTest {
 
         X509Certificate leaf = new FakeX509Certificate();
         assertEquals("Two SCTs from the same operator", PolicyCompliance.NOT_ENOUGH_DIVERSE_SCTS,
-                p.doesResultConformToPolicyAt(result, leaf, JAN2024));
+                     p.doesResultConformToPolicyAt(result, leaf, JAN2024));
     }
 
     @Test
@@ -392,7 +394,7 @@ public class PolicyImplTest {
 
         X509Certificate leaf = new FakeX509Certificate();
         assertEquals("Two valid SCTs with different origins", PolicyCompliance.NOT_ENOUGH_SCTS,
-                p.doesResultConformToPolicyAt(result, leaf, JAN2024));
+                     p.doesResultConformToPolicyAt(result, leaf, JAN2024));
     }
 
     public void validVerificationResultPartialStatic(SignedCertificateTimestamp sct)
@@ -415,7 +417,7 @@ public class PolicyImplTest {
 
         X509Certificate leaf = new FakeX509Certificate();
         assertEquals("Two valid SCTs from different operators", PolicyCompliance.COMPLY,
-                p.doesResultConformToPolicyAt(result, leaf, JAN2024));
+                     p.doesResultConformToPolicyAt(result, leaf, JAN2024));
     }
 
     @Test
@@ -447,7 +449,7 @@ public class PolicyImplTest {
 
         X509Certificate leaf = new FakeX509Certificate();
         assertEquals("Two static SCTs", PolicyCompliance.NO_RFC6962_LOG,
-                p.doesResultConformToPolicyAt(result, leaf, JAN2024));
+                     p.doesResultConformToPolicyAt(result, leaf, JAN2024));
     }
 
     @Test

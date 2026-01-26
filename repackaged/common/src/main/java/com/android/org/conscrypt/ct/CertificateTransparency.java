@@ -43,7 +43,8 @@ public class CertificateTransparency {
     private Supplier<NetworkSecurityPolicy> policySupplier;
 
     public CertificateTransparency(LogStore logStore, Policy policy, Verifier verifier,
-            StatsLog statsLog, Supplier<NetworkSecurityPolicy> policySupplier) {
+                                   StatsLog statsLog,
+                                   Supplier<NetworkSecurityPolicy> policySupplier) {
         Objects.requireNonNull(logStore);
         Objects.requireNonNull(policy);
         Objects.requireNonNull(verifier);
@@ -67,8 +68,9 @@ public class CertificateTransparency {
              * be because there is no log list available or that the log list
              * is too old (according to the policy). */
             statsLog.reportCTVerificationResult(logStore,
-                    /* VerificationResult */ null,
-                    /* PolicyCompliance */ null, getVerificationReason(host));
+                                                /* VerificationResult */ null,
+                                                /* PolicyCompliance */ null,
+                                                getVerificationReason(host));
             return;
         }
         VerificationResult result =
@@ -76,8 +78,8 @@ public class CertificateTransparency {
 
         X509Certificate leaf = chain.get(0);
         PolicyCompliance compliance = policy.doesResultConformToPolicy(result, leaf);
-        statsLog.reportCTVerificationResult(
-                logStore, result, compliance, getVerificationReason(host));
+        statsLog.reportCTVerificationResult(logStore, result, compliance,
+                                            getVerificationReason(host));
         if (compliance != PolicyCompliance.COMPLY) {
             throw new CertificateException(
                     "Certificate chain does not conform to required transparency policy: "

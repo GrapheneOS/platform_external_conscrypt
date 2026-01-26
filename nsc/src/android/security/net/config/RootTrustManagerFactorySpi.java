@@ -34,7 +34,8 @@ public class RootTrustManagerFactorySpi extends TrustManagerFactorySpi {
     public void engineInit(ManagerFactoryParameters spec)
             throws InvalidAlgorithmParameterException {
         if (!(spec instanceof ApplicationConfigParameters)) {
-            throw new InvalidAlgorithmParameterException("Unsupported spec: " + spec + ". Only "
+            throw new InvalidAlgorithmParameterException(
+                    "Unsupported spec: " + spec + ". Only "
                     + ApplicationConfigParameters.class.getName() + " supported");
         }
         mApplicationConfig = ((ApplicationConfigParameters) spec).config;

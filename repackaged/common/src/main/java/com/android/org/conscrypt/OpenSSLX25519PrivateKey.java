@@ -110,8 +110,10 @@ public class OpenSSLX25519PrivateKey implements OpenSSLX25519Key, PrivateKey {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof OpenSSLX25519PrivateKey)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof OpenSSLX25519PrivateKey))
+            return false;
         OpenSSLX25519PrivateKey that = (OpenSSLX25519PrivateKey) o;
         return Arrays.equals(uCoordinate, that.uCoordinate);
     }

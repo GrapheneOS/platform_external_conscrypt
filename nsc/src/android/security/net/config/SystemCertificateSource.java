@@ -46,7 +46,7 @@ public final class SystemCertificateSource extends DirectoryCertificateSource {
 
     private static File getDirectory() {
         if ((System.getProperty("system.certs.enabled") != null)
-                && (System.getProperty("system.certs.enabled")).equals("true")) {
+            && (System.getProperty("system.certs.enabled")).equals("true")) {
             return new File(System.getenv("ANDROID_ROOT") + "/etc/security/cacerts");
         }
         File updatable_dir = new File("/apex/com.android.conscrypt/cacerts");

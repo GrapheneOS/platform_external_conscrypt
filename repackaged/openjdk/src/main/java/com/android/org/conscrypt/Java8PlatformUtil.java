@@ -22,6 +22,7 @@ import static javax.net.ssl.StandardConstants.SNI_HOST_NAME;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
 import javax.net.ssl.SNIHostName;
 import javax.net.ssl.SNIMatcher;
 import javax.net.ssl.SNIServerName;
@@ -33,8 +34,8 @@ import javax.net.ssl.SSLSession;
  * Utility methods supported on Java 8+.
  */
 final class Java8PlatformUtil {
-    static void setSSLParameters(
-            SSLParameters params, SSLParametersImpl impl, AbstractConscryptSocket socket) {
+    static void setSSLParameters(SSLParameters params, SSLParametersImpl impl,
+                                 AbstractConscryptSocket socket) {
         setSSLParameters(params, impl);
 
         String sniHost = getSniHostName(params);
@@ -43,8 +44,8 @@ final class Java8PlatformUtil {
         }
     }
 
-    static void setSSLParameters(
-            SSLParameters params, SSLParametersImpl impl, ConscryptEngine engine) {
+    static void setSSLParameters(SSLParameters params, SSLParametersImpl impl,
+                                 ConscryptEngine engine) {
         setSSLParameters(params, impl);
 
         String sniHost = getSniHostName(params);
@@ -53,8 +54,8 @@ final class Java8PlatformUtil {
         }
     }
 
-    static void getSSLParameters(
-            SSLParameters params, SSLParametersImpl impl, AbstractConscryptSocket socket) {
+    static void getSSLParameters(SSLParameters params, SSLParametersImpl impl,
+                                 AbstractConscryptSocket socket) {
         getSSLParameters(params, impl);
         if (impl.getUseSni() && AddressUtils.isValidSniHostname(socket.getHostname())) {
             params.setServerNames(Collections.singletonList(
@@ -62,8 +63,8 @@ final class Java8PlatformUtil {
         }
     }
 
-    static void getSSLParameters(
-            SSLParameters params, SSLParametersImpl impl, ConscryptEngine engine) {
+    static void getSSLParameters(SSLParameters params, SSLParametersImpl impl,
+                                 ConscryptEngine engine) {
         getSSLParameters(params, impl);
         if (impl.getUseSni() && AddressUtils.isValidSniHostname(engine.getHostname())) {
             params.setServerNames(Collections.singletonList(

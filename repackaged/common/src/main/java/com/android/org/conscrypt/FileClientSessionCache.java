@@ -185,9 +185,9 @@ public final class FileClientSessionCache {
 
         static void logReadError(String host, File file, Throwable t) {
             logger.log(Level.WARNING,
-                    "FileClientSessionCache: Error reading session data for " + host + " from "
-                            + file + ".",
-                    t);
+                       "FileClientSessionCache: Error reading session data for " + host + " from "
+                               + file + ".",
+                       t);
         }
 
         @Override
@@ -309,9 +309,9 @@ public final class FileClientSessionCache {
 
         static void logWriteError(String host, File file, Throwable t) {
             logger.log(Level.WARNING,
-                    "FileClientSessionCache: Error writing session data for " + host + " to " + file
-                            + ".",
-                    t);
+                       "FileClientSessionCache: Error writing session data for " + host + " to "
+                               + file + ".",
+                       t);
         }
     }
 

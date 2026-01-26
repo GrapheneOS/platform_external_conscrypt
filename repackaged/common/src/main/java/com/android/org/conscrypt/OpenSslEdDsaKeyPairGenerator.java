@@ -48,7 +48,7 @@ public final class OpenSslEdDsaKeyPairGenerator extends KeyPairGenerator {
         byte[] privateKeySeed = Arrays.copyOf(privateKeyBytes, 32);
 
         return new KeyPair(new OpenSslEdDsaPublicKey(publicKeyBytes),
-                new OpenSslEdDsaPrivateKey(privateKeySeed));
+                           new OpenSslEdDsaPrivateKey(privateKeySeed));
     }
 
     @Override

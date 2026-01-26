@@ -6,7 +6,6 @@ package com.android.org.conscrypt;
  */
 @SuppressWarnings("ImmutableEnumChecker")
 public enum BenchmarkProtocol {
-
     TLSv13("TLSv1.3"),
     TLSv12("TLSv1.2");
 

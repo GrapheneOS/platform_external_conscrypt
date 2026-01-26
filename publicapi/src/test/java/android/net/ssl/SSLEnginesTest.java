@@ -28,45 +28,119 @@ import com.android.org.conscrypt.javax.net.ssl.TestSSLEnginePair;
 import com.android.org.conscrypt.tlswire.TlsTester;
 import com.android.org.conscrypt.tlswire.handshake.ClientHello;
 import com.android.org.conscrypt.tlswire.handshake.HelloExtension;
-import java.nio.ByteBuffer;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLEngineResult;
-import javax.net.ssl.SSLSession;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.nio.ByteBuffer;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLEngineResult;
+import javax.net.ssl.SSLSession;
+
 @RunWith(JUnit4.class)
 public class SSLEnginesTest {
-
     private static class BrokenSSLEngine extends SSLEngine {
-        @Override public SSLEngineResult wrap(ByteBuffer[] byteBuffers, int i, int i1,
-                ByteBuffer byteBuffer) { throw new AssertionError(); }
-        @Override public SSLEngineResult unwrap(ByteBuffer byteBuffer, ByteBuffer[] byteBuffers,
-                int i, int i1)  { throw new AssertionError(); }
-        @Override public Runnable getDelegatedTask() { throw new AssertionError(); }
-        @Override public void closeInbound()  { throw new AssertionError(); }
-        @Override public boolean isInboundDone() { throw new AssertionError(); }
-        @Override public void closeOutbound() { throw new AssertionError(); }
-        @Override public boolean isOutboundDone() { throw new AssertionError(); }
-        @Override public String[] getSupportedCipherSuites() { throw new AssertionError(); }
-        @Override public String[] getEnabledCipherSuites() { throw new AssertionError(); }
-        @Override public void setEnabledCipherSuites(String[] strings) { throw new AssertionError(); }
-        @Override public String[] getSupportedProtocols() { throw new AssertionError(); }
-        @Override public String[] getEnabledProtocols() { throw new AssertionError(); }
-        @Override public void setEnabledProtocols(String[] strings) { throw new AssertionError(); }
-        @Override public SSLSession getSession() { throw new AssertionError(); }
-        @Override public void beginHandshake() { throw new AssertionError(); }
-        @Override public SSLEngineResult.HandshakeStatus getHandshakeStatus() { throw new AssertionError(); }
-        @Override public void setUseClientMode(boolean b) { throw new AssertionError(); }
-        @Override public boolean getUseClientMode() { throw new AssertionError(); }
-        @Override public void setNeedClientAuth(boolean b) { throw new AssertionError(); }
-        @Override public boolean getNeedClientAuth() { throw new AssertionError(); }
-        @Override public void setWantClientAuth(boolean b) { throw new AssertionError(); }
-        @Override public boolean getWantClientAuth() { throw new AssertionError(); }
-        @Override public void setEnableSessionCreation(boolean b) { throw new AssertionError(); }
-        @Override public boolean getEnableSessionCreation() { throw new AssertionError(); }
+        @Override
+        public SSLEngineResult wrap(ByteBuffer[] byteBuffers, int i, int i1,
+                                    ByteBuffer byteBuffer) {
+            throw new AssertionError();
+        }
+        @Override
+        public SSLEngineResult unwrap(ByteBuffer byteBuffer, ByteBuffer[] byteBuffers, int i,
+                                      int i1) {
+            throw new AssertionError();
+        }
+        @Override
+        public Runnable getDelegatedTask() {
+            throw new AssertionError();
+        }
+        @Override
+        public void closeInbound() {
+            throw new AssertionError();
+        }
+        @Override
+        public boolean isInboundDone() {
+            throw new AssertionError();
+        }
+        @Override
+        public void closeOutbound() {
+            throw new AssertionError();
+        }
+        @Override
+        public boolean isOutboundDone() {
+            throw new AssertionError();
+        }
+        @Override
+        public String[] getSupportedCipherSuites() {
+            throw new AssertionError();
+        }
+        @Override
+        public String[] getEnabledCipherSuites() {
+            throw new AssertionError();
+        }
+        @Override
+        public void setEnabledCipherSuites(String[] strings) {
+            throw new AssertionError();
+        }
+        @Override
+        public String[] getSupportedProtocols() {
+            throw new AssertionError();
+        }
+        @Override
+        public String[] getEnabledProtocols() {
+            throw new AssertionError();
+        }
+        @Override
+        public void setEnabledProtocols(String[] strings) {
+            throw new AssertionError();
+        }
+        @Override
+        public SSLSession getSession() {
+            throw new AssertionError();
+        }
+        @Override
+        public void beginHandshake() {
+            throw new AssertionError();
+        }
+        @Override
+        public SSLEngineResult.HandshakeStatus getHandshakeStatus() {
+            throw new AssertionError();
+        }
+        @Override
+        public void setUseClientMode(boolean b) {
+            throw new AssertionError();
+        }
+        @Override
+        public boolean getUseClientMode() {
+            throw new AssertionError();
+        }
+        @Override
+        public void setNeedClientAuth(boolean b) {
+            throw new AssertionError();
+        }
+        @Override
+        public boolean getNeedClientAuth() {
+            throw new AssertionError();
+        }
+        @Override
+        public void setWantClientAuth(boolean b) {
+            throw new AssertionError();
+        }
+        @Override
+        public boolean getWantClientAuth() {
+            throw new AssertionError();
+        }
+        @Override
+        public void setEnableSessionCreation(boolean b) {
+            throw new AssertionError();
+        }
+        @Override
+        public boolean getEnableSessionCreation() {
+            throw new AssertionError();
+        }
     }
 
     private static final ByteBuffer EMPTY_BUFFER = ByteBuffer.allocate(0);

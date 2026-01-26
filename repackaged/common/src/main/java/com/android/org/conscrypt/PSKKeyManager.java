@@ -18,6 +18,7 @@
 package com.android.org.conscrypt;
 
 import java.net.Socket;
+
 import javax.crypto.SecretKey;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLEngine;
@@ -101,7 +102,6 @@ import javax.net.ssl.SSLEngine;
 @Deprecated
 @Internal
 public interface PSKKeyManager extends KeyManager {
-
     /**
      * Maximum supported length (in bytes) for PSK identity hint (in modified UTF-8 representation).
      */

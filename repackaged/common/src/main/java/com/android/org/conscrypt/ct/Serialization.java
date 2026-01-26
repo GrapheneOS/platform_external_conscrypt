@@ -17,12 +17,13 @@
 
 package com.android.org.conscrypt.ct;
 
+import com.android.org.conscrypt.Internal;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import com.android.org.conscrypt.Internal;
 
 /**
  * @hide This class is not part of the Android public SDK API
@@ -35,13 +36,11 @@ public class Serialization {
     private static final int DER_TAG_OCTET_STRING = 0x4;
     private static final int DER_LENGTH_LONG_FORM_FLAG = 0x80;
 
-    public static byte[] readDEROctetString(byte[] input)
-            throws SerializationException {
+    public static byte[] readDEROctetString(byte[] input) throws SerializationException {
         return readDEROctetString(new ByteArrayInputStream(input));
     }
 
-    public static byte[] readDEROctetString(InputStream input)
-            throws SerializationException {
+    public static byte[] readDEROctetString(InputStream input) throws SerializationException {
         int tag = readByte(input) & DER_TAG_MASK;
         if (tag != DER_TAG_OCTET_STRING) {
             throw new SerializationException("Wrong DER tag, expected OCTET STRING, got " + tag);
@@ -113,8 +112,8 @@ public class Serialization {
             byte[] data = new byte[length];
             int count = input.read(data);
             if (count < length) {
-                throw new SerializationException("Premature end of input, expected " + length +
-                                                 " bytes, only read " + count);
+                throw new SerializationException("Premature end of input, expected " + length
+                                                 + " bytes, only read " + count);
             }
             return data;
         } catch (IOException e) {
@@ -172,7 +171,7 @@ public class Serialization {
             if (b == -1) {
                 throw new SerializationException("Premature end of input, could not read byte.");
             }
-            return (byte)b;
+            return (byte) b;
         } catch (IOException e) {
             throw new SerializationException(e);
         }
@@ -219,8 +218,8 @@ public class Serialization {
             throw new SerializationException("Negative width: " + width);
         }
         if (width < 8 && value >= (1L << (8 * width))) {
-            throw new SerializationException(
-                    "Number too large, " + value + " does not fit in " + width + " bytes");
+            throw new SerializationException("Number too large, " + value + " does not fit in "
+                                             + width + " bytes");
         }
 
         try {
@@ -240,4 +239,3 @@ public class Serialization {
         }
     }
 }
-

@@ -82,7 +82,8 @@ public final class ApplicationConfig {
     @SystemApi(client = SystemApi.Client.MODULE_LIBRARIES)
     @NonNull
     public static ApplicationConfig createInstanceForPackage(@NonNull Context context,
-            @NonNull String packageName) throws PackageManager.NameNotFoundException {
+                                                             @NonNull String packageName)
+            throws PackageManager.NameNotFoundException {
         Context appContext = context.createPackageContext(packageName, 0);
         ManifestConfigSource source = new ManifestConfigSource(appContext);
         return new ApplicationConfig(source);
@@ -135,7 +136,7 @@ public final class ApplicationConfig {
     public NetworkSecurityConfig getConfigForHostname(String hostname) {
         ensureInitialized();
         if (hostname == null || hostname.isEmpty()
-                || (mConfigs == null && mLocalhostConfig == null)) {
+            || (mConfigs == null && mLocalhostConfig == null)) {
             return mDefaultConfig;
         }
         if (hostname.charAt(0) == '.') {
@@ -162,8 +163,7 @@ public final class ApplicationConfig {
                 // Otherwise check if the Domain includes sub-domains and that the hostname is a
                 // sub-domain of the Domain.
                 if (domain.subdomainsIncluded && hostname.endsWith(domain.hostname)
-                        && hostname.charAt(hostname.length() - domain.hostname.length() - 1)
-                                == '.') {
+                    && hostname.charAt(hostname.length() - domain.hostname.length() - 1) == '.') {
                     if (bestMatch == null) {
                         bestMatch = entry;
                     } else if (domain.hostname.length() > bestMatch.first.hostname.length()) {

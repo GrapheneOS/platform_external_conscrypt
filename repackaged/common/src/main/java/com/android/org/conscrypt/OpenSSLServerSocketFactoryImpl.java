@@ -105,8 +105,8 @@ final class OpenSSLServerSocketFactoryImpl extends SSLServerSocketFactory {
     @Override
     public ServerSocket createServerSocket(int port, int backlog, InetAddress iAddress)
             throws IOException {
-        return new ConscryptServerSocket(
-                port, backlog, iAddress, (SSLParametersImpl) sslParameters.clone())
+        return new ConscryptServerSocket(port, backlog, iAddress,
+                                         (SSLParametersImpl) sslParameters.clone())
                 .setUseEngineSocket(useEngineSocket);
     }
 }

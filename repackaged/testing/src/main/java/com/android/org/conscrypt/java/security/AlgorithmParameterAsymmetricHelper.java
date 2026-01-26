@@ -30,7 +30,6 @@ import javax.crypto.Cipher;
  * @hide This class is not part of the Android public SDK API
  */
 public class AlgorithmParameterAsymmetricHelper extends TestHelper<AlgorithmParameters> {
-
     private static final String plainData = "some data to encrypt and decrypt";
     private final String algorithmName;
 
@@ -39,9 +38,8 @@ public class AlgorithmParameterAsymmetricHelper extends TestHelper<AlgorithmPara
     }
 
     private String baseName() {
-        return algorithmName.contains("/")
-                ? algorithmName.substring(0, algorithmName.indexOf('/'))
-                : algorithmName;
+        return algorithmName.contains("/") ? algorithmName.substring(0, algorithmName.indexOf('/'))
+                                           : algorithmName;
     }
 
     @Override

@@ -39,8 +39,8 @@ public interface ConscryptX509TrustManager {
      * @throws CertificateException if the chain does not verify correctly.
      * @return the properly ordered chain used for verification as a list of X509Certificates.
      */
-    public List<X509Certificate> checkServerTrusted(
-            X509Certificate[] chain, String authType, String hostname) throws CertificateException;
+    public List<X509Certificate> checkServerTrusted(X509Certificate[] chain, String authType,
+                                                    String hostname) throws CertificateException;
 
     /**
      * Verifies the given certificate chain.
@@ -58,5 +58,6 @@ public interface ConscryptX509TrustManager {
      * @return the properly ordered chain used for verification as a list of X509Certificates.
      */
     public List<X509Certificate> checkServerTrusted(X509Certificate[] chain, byte[] ocspData,
-            byte[] tlsSctData, String authType, String hostname) throws CertificateException;
+                                                    byte[] tlsSctData, String authType,
+                                                    String hostname) throws CertificateException;
 }

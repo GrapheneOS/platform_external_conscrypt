@@ -122,7 +122,7 @@ public class KeyGeneratorTest {
         putKeySize("ARCFOUR", 40);
         putKeySize("ARCFOUR", 41);
         putKeySize("Blowfish", 32);
-        putKeySize("Blowfish", 32+8);
+        putKeySize("Blowfish", 32 + 8);
         putKeySize("Blowfish", 448);
         putKeySize("ChaCha20", 256);
         putKeySize("DES", 56);
@@ -176,7 +176,7 @@ public class KeyGeneratorTest {
     private void test_SecretKey(KeyGenerator kg, SecretKey sk) {
         assertNotNull(sk);
         assertEquals(kg.getAlgorithm().toUpperCase(Locale.ROOT),
-                sk.getAlgorithm().toUpperCase(Locale.ROOT));
+                     sk.getAlgorithm().toUpperCase(Locale.ROOT));
         assertNotNull(sk.getEncoded());
         assertNotNull(sk.getFormat());
     }

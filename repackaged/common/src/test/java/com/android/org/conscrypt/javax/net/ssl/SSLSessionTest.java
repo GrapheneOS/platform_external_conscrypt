@@ -125,7 +125,9 @@ public class SSLSessionTest {
     @Test
     public void test_SSLSession_getId_TLS12() {
         TestSSLSessions s = TestSSLSessions.create(TestSSLContext.newBuilder()
-            .clientProtocol("TLSv1.2").serverProtocol("TLSv1.2").build());
+                                                           .clientProtocol("TLSv1.2")
+                                                           .serverProtocol("TLSv1.2")
+                                                           .build());
         assertNotNull(s.invalid.getId());
         assertNotNull(s.server.getId());
         assertNotNull(s.client.getId());
@@ -143,7 +145,9 @@ public class SSLSessionTest {
     @Test
     public void test_SSLSession_getId_TLS13() {
         TestSSLSessions s = TestSSLSessions.create(TestSSLContext.newBuilder()
-            .clientProtocol("TLSv1.3").serverProtocol("TLSv1.3").build());
+                                                           .clientProtocol("TLSv1.3")
+                                                           .serverProtocol("TLSv1.3")
+                                                           .build());
         assertNotNull(s.invalid.getId());
         assertNotNull(s.server.getId());
         assertNotNull(s.client.getId());
@@ -159,10 +163,10 @@ public class SSLSessionTest {
         assertTrue(s.invalid.getLastAccessedTime() > 0);
         assertTrue(s.server.getLastAccessedTime() > 0);
         assertTrue(s.client.getLastAccessedTime() > 0);
-        assertTrue("s.server.getLastAccessedTime()=" + s.server.getLastAccessedTime() + " "
+        assertTrue(
+                "s.server.getLastAccessedTime()=" + s.server.getLastAccessedTime() + " "
                         + "s.client.getLastAccessedTime()=" + s.client.getLastAccessedTime(),
-                Math.abs(s.server.getLastAccessedTime() - s.client.getLastAccessedTime())
-                        <= 1000);
+                Math.abs(s.server.getLastAccessedTime() - s.client.getLastAccessedTime()) <= 1000);
         assertTrue(s.server.getLastAccessedTime() >= s.server.getCreationTime());
         assertTrue(s.client.getLastAccessedTime() >= s.client.getCreationTime());
         s.close();
@@ -175,10 +179,10 @@ public class SSLSessionTest {
         assertNull(s.client.getLocalCertificates());
         assertNotNull(s.server.getLocalCertificates());
         TestKeyStore.assertChainLength(s.server.getLocalCertificates());
-        TestSSLContext.assertServerCertificateChain(
-                s.s.c.serverTrustManager, s.server.getLocalCertificates());
-        TestSSLContext.assertCertificateInKeyStore(
-                s.server.getLocalCertificates()[0], s.s.c.serverKeyStore);
+        TestSSLContext.assertServerCertificateChain(s.s.c.serverTrustManager,
+                                                    s.server.getLocalCertificates());
+        TestSSLContext.assertCertificateInKeyStore(s.server.getLocalCertificates()[0],
+                                                   s.s.c.serverKeyStore);
         s.close();
     }
 
@@ -189,8 +193,8 @@ public class SSLSessionTest {
         assertNull(s.client.getLocalPrincipal());
         assertNotNull(s.server.getLocalPrincipal());
         assertNotNull(s.server.getLocalPrincipal().getName());
-        TestSSLContext.assertCertificateInKeyStore(
-                s.server.getLocalPrincipal(), s.s.c.serverKeyStore);
+        TestSSLContext.assertCertificateInKeyStore(s.server.getLocalPrincipal(),
+                                                   s.s.c.serverKeyStore);
         s.close();
     }
 
@@ -242,10 +246,10 @@ public class SSLSessionTest {
         }
         assertNotNull(s.client.getPeerCertificates());
         TestKeyStore.assertChainLength(s.client.getPeerCertificates());
-        TestSSLContext.assertServerCertificateChain(
-                s.s.c.serverTrustManager, s.client.getPeerCertificates());
-        TestSSLContext.assertCertificateInKeyStore(
-                s.client.getPeerCertificates()[0], s.s.c.serverKeyStore);
+        TestSSLContext.assertServerCertificateChain(s.s.c.serverTrustManager,
+                                                    s.client.getPeerCertificates());
+        TestSSLContext.assertCertificateInKeyStore(s.client.getPeerCertificates()[0],
+                                                   s.s.c.serverKeyStore);
         try {
             s.server.getPeerCertificates();
             fail();
@@ -273,8 +277,8 @@ public class SSLSessionTest {
         client.close();
         server.close();
 
-        client = (SSLSocket) context.clientContext.getSocketFactory().createSocket(
-                context.host, context.port);
+        client = (SSLSocket) context.clientContext.getSocketFactory().createSocket(context.host,
+                                                                                   context.port);
         server = (SSLSocket) context.serverSocket.accept();
         connect(client, server);
 
@@ -342,8 +346,8 @@ public class SSLSessionTest {
         }
         assertNotNull(s.client.getPeerPrincipal());
         assertNotNull(s.client.getPeerPrincipal().getName());
-        TestSSLContext.assertCertificateInKeyStore(
-                s.client.getPeerPrincipal(), s.s.c.serverKeyStore);
+        TestSSLContext.assertCertificateInKeyStore(s.client.getPeerPrincipal(),
+                                                   s.s.c.serverKeyStore);
         s.close();
     }
 
@@ -455,7 +459,7 @@ public class SSLSessionTest {
     public void test_SSLSession_BindingListener() {
         final TestSSLSessions s = TestSSLSessions.create();
         final String key = "KEY";
-        final boolean[] bound = new boolean[] { false };
+        final boolean[] bound = new boolean[] {false};
         final Object value = new SSLSessionBindingListener() {
             @Override
             public void valueBound(SSLSessionBindingEvent e) {
@@ -503,11 +507,11 @@ public class SSLSessionTest {
         getHolder.setAccessible(true);
 
         Field originalHostNameField = Class.forName("java.net.InetAddress$InetAddressHolder")
-                .getDeclaredField("originalHostName");
+                                              .getDeclaredField("originalHostName");
         originalHostNameField.setAccessible(true);
 
         Object holder = getHolder.invoke(inetAddress);
-        String oldValue = (String)originalHostNameField.get(holder);
+        String oldValue = (String) originalHostNameField.get(holder);
         originalHostNameField.set(holder, originalHostName);
         return oldValue;
     }
@@ -526,12 +530,12 @@ public class SSLSessionTest {
 
             ExecutorService executor = Executors.newSingleThreadExecutor();
             Future<Void> future = executor.submit(new Callable<Void>() {
-                                                      @Override
-                                                      public Void call() throws Exception {
-                                                          server.startHandshake();
-                                                          return null;
-                                                      }
-                                                  });
+                @Override
+                public Void call() throws Exception {
+                    server.startHandshake();
+                    return null;
+                }
+            });
             executor.shutdown();
             client.startHandshake();
 

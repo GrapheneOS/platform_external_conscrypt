@@ -24,8 +24,8 @@ import java.util.Set;
 public class TestConfigSource implements ConfigSource {
     private final Set<Pair<Domain, NetworkSecurityConfig>> mConfigs;
     private final NetworkSecurityConfig mDefaultConfig;
-    public TestConfigSource(
-            Set<Pair<Domain, NetworkSecurityConfig>> configs, NetworkSecurityConfig defaultConfig) {
+    public TestConfigSource(Set<Pair<Domain, NetworkSecurityConfig>> configs,
+                            NetworkSecurityConfig defaultConfig) {
         mConfigs = configs;
         mDefaultConfig = defaultConfig;
     }

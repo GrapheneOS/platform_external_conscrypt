@@ -128,8 +128,8 @@ public class RootTrustManager
 
     @Override
     @UnsupportedAppUsage
-    public List<X509Certificate> checkServerTrusted(
-            X509Certificate[] certs, String authType, String hostname) throws CertificateException {
+    public List<X509Certificate> checkServerTrusted(X509Certificate[] certs, String authType,
+                                                    String hostname) throws CertificateException {
         if (hostname == null && mConfig.hasPerDomainConfigs()) {
             throw new CertificateException(
                     "Domain specific configurations require that the hostname be provided");
@@ -140,14 +140,15 @@ public class RootTrustManager
 
     @Override
     public List<X509Certificate> checkServerTrusted(X509Certificate[] certs, byte[] ocspData,
-            byte[] tlsSctData, String authType, String hostname) throws CertificateException {
+                                                    byte[] tlsSctData, String authType,
+                                                    String hostname) throws CertificateException {
         if (hostname == null && mConfig.hasPerDomainConfigs()) {
             throw new CertificateException(
                     "Domain specific configurations require that the hostname be provided");
         }
         NetworkSecurityConfig config = mConfig.getConfigForHostname(hostname);
-        return config.getTrustManager().checkServerTrusted(
-                certs, ocspData, tlsSctData, authType, hostname);
+        return config.getTrustManager().checkServerTrusted(certs, ocspData, tlsSctData, authType,
+                                                           hostname);
     }
 
     /**

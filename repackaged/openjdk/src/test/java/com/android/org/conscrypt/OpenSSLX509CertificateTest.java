@@ -109,7 +109,7 @@ public class OpenSSLX509CertificateTest {
             boolean fixed = false;
             for (int i = 0; i < impostorBytes.length - 4; i++) {
                 if (impostorBytes[i] == 'Z' && impostorBytes[i + 1] == 'p'
-                        && impostorBytes[i + 2] == 'e' && impostorBytes[i + 3] == 'n') {
+                    && impostorBytes[i + 2] == 'e' && impostorBytes[i + 3] == 'n') {
                     impostorBytes[i] = 'O';
                     fixed = true;
                     break;
@@ -144,13 +144,11 @@ public class OpenSSLX509CertificateTest {
         OpenSSLX509Certificate cert = loadTestCertificate("cert.pem");
         OpenSSLX509Certificate certPoisoned = loadTestCertificate("cert-ct-poisoned.pem");
 
-        assertFalse(Arrays.equals(
-                certPoisoned.getTBSCertificate(),
-                cert.getTBSCertificate()));
+        assertFalse(Arrays.equals(certPoisoned.getTBSCertificate(), cert.getTBSCertificate()));
 
         assertTrue(
                 Arrays.equals(certPoisoned.getTBSCertificateWithoutExtension(CT_POISON_EXTENSION),
-                        cert.getTBSCertificate()));
+                              cert.getTBSCertificate()));
     }
 
     @Test

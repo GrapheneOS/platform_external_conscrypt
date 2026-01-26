@@ -47,9 +47,7 @@ public class VeryBasicHttpServer {
     private final ServerSocket tlsSocket = context.serverSocket;
     private final ServerSocket plainSocket = new ServerSocket(0);
 
-
-    public VeryBasicHttpServer() throws IOException {
-    }
+    public VeryBasicHttpServer() throws IOException {}
 
     public String getTlsHostname() {
         return context.host.getHostName();
@@ -169,8 +167,8 @@ public class VeryBasicHttpServer {
         private final boolean useTls;
         private final boolean closeBeforeRead;
 
-        Op(Map<String, String> content, long postAcceptDelay,
-           boolean useTls, boolean closeBeforeRead) {
+        Op(Map<String, String> content, long postAcceptDelay, boolean useTls,
+           boolean closeBeforeRead) {
             this.content = content;
             this.postAcceptDelay = postAcceptDelay;
             this.useTls = useTls;
@@ -238,8 +236,8 @@ public class VeryBasicHttpServer {
 
         @Override
         public String toString() {
-            return String.format("cmd=%s proto=%s path=%s headers=%s",
-                    command, protocol, path, headers.toString());
+            return String.format("cmd=%s proto=%s path=%s headers=%s", command, protocol, path,
+                                 headers.toString());
         }
 
         public void sendStatus(int result, String proto, String extra) throws Exception {
@@ -247,7 +245,7 @@ public class VeryBasicHttpServer {
             outputStream.write(resultString.getBytes(StandardCharsets.UTF_8));
         }
 
-        public void sendString (String string) throws Exception {
+        public void sendString(String string) throws Exception {
             outputStream.write(string.getBytes(StandardCharsets.UTF_8));
         }
 

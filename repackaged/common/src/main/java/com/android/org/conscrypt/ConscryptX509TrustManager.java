@@ -47,8 +47,8 @@ public interface ConscryptX509TrustManager {
     @android.annotation.
     FlaggedApi(com.android.org.conscrypt.net.flags.Flags.FLAG_CONSCRYPTX509TRUSTMANAGER)
     @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
-    public List<X509Certificate> checkServerTrusted(
-            X509Certificate[] chain, String authType, String hostname) throws CertificateException;
+    public List<X509Certificate> checkServerTrusted(X509Certificate[] chain, String authType,
+                                                    String hostname) throws CertificateException;
 
     /**
      * Verifies the given certificate chain.
@@ -69,5 +69,6 @@ public interface ConscryptX509TrustManager {
     FlaggedApi(com.android.org.conscrypt.net.flags.Flags.FLAG_CONSCRYPTX509TRUSTMANAGER)
     @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
     public List<X509Certificate> checkServerTrusted(X509Certificate[] chain, byte[] ocspData,
-            byte[] tlsSctData, String authType, String hostname) throws CertificateException;
+                                                    byte[] tlsSctData, String authType,
+                                                    String hostname) throws CertificateException;
 }

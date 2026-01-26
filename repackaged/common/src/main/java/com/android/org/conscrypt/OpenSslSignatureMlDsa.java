@@ -45,8 +45,10 @@ public abstract class OpenSslSignatureMlDsa extends SignatureSpi {
 
     abstract boolean supportsAlgorithm(MlDsaAlgorithm algorithm);
 
-    /** ML-DSA 
-     * @hide This class is not part of the Android public SDK API*/
+    /**
+     * ML-DSA
+     * @hide This class is not part of the Android public SDK API
+     */
     public static class MlDsa extends OpenSslSignatureMlDsa {
         public MlDsa() {
             super();
@@ -58,8 +60,10 @@ public abstract class OpenSslSignatureMlDsa extends SignatureSpi {
         }
     }
 
-    /** ML-DSA-65 
-     * @hide This class is not part of the Android public SDK API*/
+    /**
+     * ML-DSA-65
+     * @hide This class is not part of the Android public SDK API
+     */
     public static class MlDsa65 extends OpenSslSignatureMlDsa {
         public MlDsa65() {
             super();
@@ -70,8 +74,10 @@ public abstract class OpenSslSignatureMlDsa extends SignatureSpi {
         }
     }
 
-    /** ML-DSA-87 
-     * @hide This class is not part of the Android public SDK API*/
+    /**
+     * ML-DSA-87
+     * @hide This class is not part of the Android public SDK API
+     */
     public static class MlDsa87 extends OpenSslSignatureMlDsa {
         public MlDsa87() {
             super();
@@ -152,8 +158,8 @@ public abstract class OpenSslSignatureMlDsa extends SignatureSpi {
             throw new SignatureException("No key provided");
         }
 
-        boolean result = NativeCrypto.EVP_DigestVerify(
-                ctxLocal, sigBytes, 0, sigBytes.length, buffer.array(), 0, buffer.size());
+        boolean result = NativeCrypto.EVP_DigestVerify(ctxLocal, sigBytes, 0, sigBytes.length,
+                                                       buffer.array(), 0, buffer.size());
         buffer.reset();
         return result;
     }

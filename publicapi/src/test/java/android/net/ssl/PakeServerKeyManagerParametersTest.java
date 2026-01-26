@@ -66,8 +66,8 @@ public class PakeServerKeyManagerParametersTest {
     @Test(expected = NullPointerException.class)
     @RequiresFlagsEnabled(com.android.org.conscrypt.flags.Flags.FLAG_SPAKE2PLUS_API)
     public void testBuilder_nullOption() {
-        new PakeServerKeyManagerParameters.Builder().setOptions(
-                CLIENT_ID_1, SERVER_ID_1, List.of((PakeOption) null));
+        new PakeServerKeyManagerParameters.Builder().setOptions(CLIENT_ID_1, SERVER_ID_1,
+                                                                List.of((PakeOption) null));
     }
 
     @Test
@@ -76,16 +76,16 @@ public class PakeServerKeyManagerParametersTest {
         PakeOption option = createOption("SPAKE2PLUS_PRERELEASE", "password");
         PakeOption sameOption = createOption("SPAKE2PLUS_PRERELEASE", "password");
         assertThrows(InvalidParameterException.class,
-                ()
-                        -> new PakeServerKeyManagerParameters.Builder().setOptions(
-                                CLIENT_ID_1, SERVER_ID_1, List.of(option, sameOption)));
+                     ()
+                             -> new PakeServerKeyManagerParameters.Builder().setOptions(
+                                     CLIENT_ID_1, SERVER_ID_1, List.of(option, sameOption)));
     }
 
     @Test(expected = InvalidParameterException.class)
     @RequiresFlagsEnabled(com.android.org.conscrypt.flags.Flags.FLAG_SPAKE2PLUS_API)
     public void testBuilder_linkWithNoOptions() {
-        new PakeServerKeyManagerParameters.Builder().setOptions(
-                CLIENT_ID_1, SERVER_ID_1, new ArrayList());
+        new PakeServerKeyManagerParameters.Builder().setOptions(CLIENT_ID_1, SERVER_ID_1,
+                                                                new ArrayList());
     }
 
     @Test
@@ -98,8 +98,8 @@ public class PakeServerKeyManagerParametersTest {
                         .setOptions(CLIENT_ID_1, SERVER_ID_1, List.of(option1))
                         .build();
 
-        assertThrows(
-                InvalidParameterException.class, () -> params.getOptions(CLIENT_ID_2, SERVER_ID_2));
+        assertThrows(InvalidParameterException.class,
+                     () -> params.getOptions(CLIENT_ID_2, SERVER_ID_2));
     }
 
     @Test

@@ -62,8 +62,8 @@ public class ResourceCertificateSource implements CertificateSource {
                 in = mContext.getResources().openRawResource(mResourceId);
                 certs = factory.generateCertificates(in);
             } catch (CertificateException e) {
-                throw new RuntimeException(
-                        "Failed to load trust anchors from id " + mResourceId, e);
+                throw new RuntimeException("Failed to load trust anchors from id " + mResourceId,
+                                           e);
             } finally {
                 IoUtils.closeQuietly(in);
             }

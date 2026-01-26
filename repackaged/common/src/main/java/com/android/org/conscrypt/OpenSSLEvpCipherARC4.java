@@ -43,8 +43,7 @@ public class OpenSSLEvpCipherARC4 extends OpenSSLEvpCipher {
     }
 
     @Override
-    void checkSupportedKeySize(int keySize) throws InvalidKeyException {
-    }
+    void checkSupportedKeySize(int keySize) throws InvalidKeyException {}
 
     @Override
     void checkSupportedMode(Mode mode) throws NoSuchAlgorithmException {

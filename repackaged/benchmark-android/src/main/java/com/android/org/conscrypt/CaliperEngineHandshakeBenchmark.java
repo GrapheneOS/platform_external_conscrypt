@@ -33,10 +33,11 @@
 
 package com.android.org.conscrypt;
 
+import com.android.org.conscrypt.EngineHandshakeBenchmark.Config;
+
 import com.google.caliper.BeforeExperiment;
 import com.google.caliper.Benchmark;
 import com.google.caliper.Param;
-import com.android.org.conscrypt.EngineHandshakeBenchmark.Config;
 
 /**
  * Benchmark comparing handshake performance of various engine implementations.
@@ -46,19 +47,15 @@ import com.android.org.conscrypt.EngineHandshakeBenchmark.Config;
 public class CaliperEngineHandshakeBenchmark {
     private final CaliperConfig config = new CaliperConfig();
 
-    @Param({TestUtils.TEST_CIPHER})
-    public String a_cipher;
+    @Param({TestUtils.TEST_CIPHER}) public String a_cipher;
 
-    @Param
-    public BufferType b_buffer;
+    @Param public BufferType b_buffer;
 
     @Param({"CONSCRYPT_UNPOOLED"}) public AndroidEngineFactory c_engine;
 
-    @Param
-    public BenchmarkProtocol d_protocol;
+    @Param public BenchmarkProtocol d_protocol;
 
-    @Param({"100"})
-    public int e_rtt;
+    @Param({"100"}) public int e_rtt;
 
     private EngineHandshakeBenchmark benchmark;
 

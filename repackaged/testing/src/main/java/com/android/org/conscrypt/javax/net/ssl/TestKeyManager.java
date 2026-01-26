@@ -17,16 +17,18 @@
 
 package com.android.org.conscrypt.javax.net.ssl;
 
+import com.android.org.conscrypt.java.security.StandardNames;
+import com.android.org.conscrypt.testing.NullPrintStream;
+
 import java.io.PrintStream;
 import java.net.Socket;
 import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.X509ExtendedKeyManager;
-import com.android.org.conscrypt.java.security.StandardNames;
-import com.android.org.conscrypt.testing.NullPrintStream;
 
 /**
  * TestKeyManager is a simple proxy class that wraps an existing

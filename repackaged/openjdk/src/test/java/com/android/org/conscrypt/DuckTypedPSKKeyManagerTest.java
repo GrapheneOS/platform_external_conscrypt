@@ -77,7 +77,8 @@ public class DuckTypedPSKKeyManagerTest {
         try {
             DuckTypedPSKKeyManager.getInstance(new AlmostPSKKeyManager());
             fail();
-        } catch (NoSuchMethodException expected) {}
+        } catch (NoSuchMethodException expected) {
+        }
     }
 
     @Test
@@ -86,8 +87,9 @@ public class DuckTypedPSKKeyManagerTest {
         try {
             assertNotNull(DuckTypedPSKKeyManager.getInstance(
                     new KeyManagerOfferingAllPSKKeyManagerMethodsWithIncompatibleReturnTypes()));
-        fail();
-        } catch (NoSuchMethodException expected) {}
+            fail();
+        } catch (NoSuchMethodException expected) {
+        }
     }
 
     @Test
@@ -125,18 +127,18 @@ public class DuckTypedPSKKeyManagerTest {
         mockInvocationHandler.returnValue = identityHint;
         assertSame(identityHint, pskKeyManager.chooseServerKeyIdentityHint(mSSLSocket));
         assertEquals("chooseServerKeyIdentityHint",
-                mockInvocationHandler.lastInvokedMethod.getName());
+                     mockInvocationHandler.lastInvokedMethod.getName());
         assertEquals(Arrays.asList(new Class<?>[] {Socket.class}),
-                Arrays.asList(mockInvocationHandler.lastInvokedMethod.getParameterTypes()));
+                     Arrays.asList(mockInvocationHandler.lastInvokedMethod.getParameterTypes()));
         assertEquals(1, mockInvocationHandler.lastInvokedMethodArgs.length);
         assertSame(mSSLSocket, mockInvocationHandler.lastInvokedMethodArgs[0]);
 
         mockInvocationHandler.returnValue = identityHint;
         assertSame(identityHint, pskKeyManager.chooseServerKeyIdentityHint(mSSLEngine));
         assertEquals("chooseServerKeyIdentityHint",
-                mockInvocationHandler.lastInvokedMethod.getName());
+                     mockInvocationHandler.lastInvokedMethod.getName());
         assertEquals(Arrays.asList(new Class<?>[] {SSLEngine.class}),
-                Arrays.asList(mockInvocationHandler.lastInvokedMethod.getParameterTypes()));
+                     Arrays.asList(mockInvocationHandler.lastInvokedMethod.getParameterTypes()));
         assertEquals(1, mockInvocationHandler.lastInvokedMethodArgs.length);
         assertSame(mSSLEngine, mockInvocationHandler.lastInvokedMethodArgs[0]);
 
@@ -144,7 +146,7 @@ public class DuckTypedPSKKeyManagerTest {
         assertSame(identity, pskKeyManager.chooseClientKeyIdentity(identityHint, mSSLSocket));
         assertEquals("chooseClientKeyIdentity", mockInvocationHandler.lastInvokedMethod.getName());
         assertEquals(Arrays.asList(new Class<?>[] {String.class, Socket.class}),
-                Arrays.asList(mockInvocationHandler.lastInvokedMethod.getParameterTypes()));
+                     Arrays.asList(mockInvocationHandler.lastInvokedMethod.getParameterTypes()));
         assertEquals(2, mockInvocationHandler.lastInvokedMethodArgs.length);
         assertSame(identityHint, mockInvocationHandler.lastInvokedMethodArgs[0]);
         assertSame(mSSLSocket, mockInvocationHandler.lastInvokedMethodArgs[1]);
@@ -153,7 +155,7 @@ public class DuckTypedPSKKeyManagerTest {
         assertSame(identity, pskKeyManager.chooseClientKeyIdentity(identityHint, mSSLEngine));
         assertEquals("chooseClientKeyIdentity", mockInvocationHandler.lastInvokedMethod.getName());
         assertEquals(Arrays.asList(new Class<?>[] {String.class, SSLEngine.class}),
-                Arrays.asList(mockInvocationHandler.lastInvokedMethod.getParameterTypes()));
+                     Arrays.asList(mockInvocationHandler.lastInvokedMethod.getParameterTypes()));
         assertEquals(2, mockInvocationHandler.lastInvokedMethodArgs.length);
         assertSame(identityHint, mockInvocationHandler.lastInvokedMethodArgs[0]);
         assertSame(mSSLEngine, mockInvocationHandler.lastInvokedMethodArgs[1]);
@@ -163,7 +165,7 @@ public class DuckTypedPSKKeyManagerTest {
         assertSame(key, pskKeyManager.getKey(identityHint, identity, mSSLSocket));
         assertEquals("getKey", mockInvocationHandler.lastInvokedMethod.getName());
         assertEquals(Arrays.asList(new Class<?>[] {String.class, String.class, Socket.class}),
-                Arrays.asList(mockInvocationHandler.lastInvokedMethod.getParameterTypes()));
+                     Arrays.asList(mockInvocationHandler.lastInvokedMethod.getParameterTypes()));
         assertEquals(3, mockInvocationHandler.lastInvokedMethodArgs.length);
         assertSame(identityHint, mockInvocationHandler.lastInvokedMethodArgs[0]);
         assertSame(identity, mockInvocationHandler.lastInvokedMethodArgs[1]);
@@ -173,7 +175,7 @@ public class DuckTypedPSKKeyManagerTest {
         assertSame(key, pskKeyManager.getKey(identityHint, identity, mSSLEngine));
         assertEquals("getKey", mockInvocationHandler.lastInvokedMethod.getName());
         assertEquals(Arrays.asList(new Class<?>[] {String.class, String.class, SSLEngine.class}),
-                Arrays.asList(mockInvocationHandler.lastInvokedMethod.getParameterTypes()));
+                     Arrays.asList(mockInvocationHandler.lastInvokedMethod.getParameterTypes()));
         assertEquals(3, mockInvocationHandler.lastInvokedMethodArgs.length);
         assertSame(identityHint, mockInvocationHandler.lastInvokedMethodArgs[0]);
         assertSame(identity, mockInvocationHandler.lastInvokedMethodArgs[1]);

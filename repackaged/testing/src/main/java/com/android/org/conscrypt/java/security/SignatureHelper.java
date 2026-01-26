@@ -29,7 +29,6 @@ import java.security.Signature;
  * @hide This class is not part of the Android public SDK API
  */
 public class SignatureHelper extends TestHelper<KeyPair> {
-
     private final String algorithmName;
     private final String plainData = "some data do sign and verify";
 

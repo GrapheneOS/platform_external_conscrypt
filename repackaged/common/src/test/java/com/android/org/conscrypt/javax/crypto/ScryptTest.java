@@ -65,7 +65,7 @@ public final class ScryptTest {
     private static final int TEST_KEY_SIZE = 512;
     private static final byte[] TEST_KEY =
             decodeHex("fdbabe1c9d3472007856e7190d01e9fe7c6ad7cbc8237830e77376634b373162"
-                    + "2eaf30d92e22a3886ff109279d9830dac727afb94a83ee6d8360cbdfa2cc0640");
+                      + "2eaf30d92e22a3886ff109279d9830dac727afb94a83ee6d8360cbdfa2cc0640");
 
     private final List<String[]> testVectors = readTestVectors();
 
@@ -88,7 +88,7 @@ public final class ScryptTest {
         assertEquals(alias, factory.getAlgorithm());
 
         ScryptKeySpec spec = new ScryptKeySpec(TEST_PASSWORD, TEST_SALT, TEST_COST, TEST_BLOCKSIZE,
-                TEST_PARALLELIZATION, TEST_KEY_SIZE);
+                                               TEST_PARALLELIZATION, TEST_KEY_SIZE);
         SecretKey key = factory.generateSecret(spec);
         assertArrayEquals(TEST_KEY, key.getEncoded());
 
@@ -104,7 +104,7 @@ public final class ScryptTest {
         SecretKeyFactory factory = SecretKeyFactory.getInstance(alias);
 
         KeySpec spec = new MyPrivateKeySpec(TEST_PASSWORD, TEST_SALT, TEST_COST, TEST_BLOCKSIZE,
-                TEST_PARALLELIZATION, TEST_KEY_SIZE);
+                                            TEST_PARALLELIZATION, TEST_KEY_SIZE);
 
         SecretKey key = factory.generateSecret(spec);
         assertArrayEquals(TEST_KEY, key.getEncoded());
@@ -123,7 +123,8 @@ public final class ScryptTest {
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
 
         cipher.init(Cipher.ENCRYPT_MODE, spec);
-        byte[] input = "The quick brown fox jumps over the lazy dog".getBytes(StandardCharsets.UTF_8);
+        byte[] input =
+                "The quick brown fox jumps over the lazy dog".getBytes(StandardCharsets.UTF_8);
         byte[] encrypted = cipher.doFinal(input);
         assertNotEquals(encrypted[0], input[0]);
 
@@ -142,7 +143,8 @@ public final class ScryptTest {
             int p = Integer.parseInt(entry[P_INDEX]);
             byte[] expectedBytes = decodeHex(entry[KEY_INDEX]);
 
-            ScryptKeySpec spec = new ScryptKeySpec(password, salt, n, r, p, expectedBytes.length * 8);
+            ScryptKeySpec spec =
+                    new ScryptKeySpec(password, salt, n, r, p, expectedBytes.length * 8);
             SecretKeyFactory factory = SecretKeyFactory.getInstance(alias);
             SecretKey key = factory.generateSecret(spec);
             assertNotNull(key);
@@ -170,7 +172,8 @@ public final class ScryptTest {
         private final int p;
         private final int keyOutputBits;
 
-        public MyPrivateKeySpec(char[] password, byte[] salt, int n, int r, int p, int keyOutputBits) {
+        public MyPrivateKeySpec(char[] password, byte[] salt, int n, int r, int p,
+                                int keyOutputBits) {
             this.password = password;
             this.salt = salt;
             this.n = n;

@@ -26,6 +26,7 @@ import java.security.GeneralSecurityException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.SecureRandom;
+
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManager;
@@ -111,8 +112,8 @@ public class DefaultSSLContextImpl extends OpenSSLContextImpl {
     }
 
     @Override
-    public void engineInit(KeyManager[] kms, TrustManager[] tms,
-            SecureRandom sr) throws KeyManagementException {
+    public void engineInit(KeyManager[] kms, TrustManager[] tms, SecureRandom sr)
+            throws KeyManagementException {
         throw new KeyManagementException("Do not init() the default SSLContext ");
     }
 

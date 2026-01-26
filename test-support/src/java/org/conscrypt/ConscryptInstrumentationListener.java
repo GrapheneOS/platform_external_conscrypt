@@ -20,17 +20,22 @@ import android.os.Bundle;
 import android.system.ErrnoException;
 import android.system.Os;
 import android.util.Log;
+
 import androidx.test.InstrumentationRegistry;
 import androidx.test.internal.runner.listener.InstrumentationRunListener;
+
 import com.android.org.conscrypt.Conscrypt;
+
+import org.junit.runner.Description;
+import org.junit.runner.Result;
+
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Socket;
 import java.util.Objects;
+
 import javax.net.ssl.SSLSocketFactory;
-import org.junit.runner.Description;
-import org.junit.runner.Result;
 
 /**
  * An @link(InstrumentationRunListener) which can be used in CTS tests to control the
@@ -72,8 +77,8 @@ public class ConscryptInstrumentationListener extends InstrumentationRunListener
             try {
                 return Class.forName(expectedClassName).asSubclass(Socket.class);
             } catch (ClassNotFoundException e) {
-                throw new IllegalStateException(
-                        "Invalid SSLSocket class: '" + expectedClassName + "'");
+                throw new IllegalStateException("Invalid SSLSocket class: '" + expectedClassName
+                                                + "'");
             }
         }
 
@@ -81,8 +86,8 @@ public class ConscryptInstrumentationListener extends InstrumentationRunListener
             try {
                 return valueOf(name.toUpperCase());
             } catch (Exception e) {
-                throw new IllegalArgumentException(
-                        "Invalid SSLSocket implementation: '" + name + "'");
+                throw new IllegalArgumentException("Invalid SSLSocket implementation: '" + name
+                                                   + "'");
             }
         }
     }
@@ -144,8 +149,8 @@ public class ConscryptInstrumentationListener extends InstrumentationRunListener
         }
 
         Log.i(LOG_TAG,
-                String.format("Sending coverage dump signal %d to pid %d uid %d", COVERAGE_SIGNAL,
-                        Os.getpid(), Os.getuid()));
+              String.format("Sending coverage dump signal %d to pid %d uid %d", COVERAGE_SIGNAL,
+                            Os.getpid(), Os.getuid()));
         try {
             Os.kill(Os.getpid(), COVERAGE_SIGNAL);
         } catch (ErrnoException e) {
@@ -165,8 +170,8 @@ public class ConscryptInstrumentationListener extends InstrumentationRunListener
                     if (siginfo.isValid() && !siginfo.isBlocked(COVERAGE_SIGNAL)) {
                         // Coverage handler exited while we were asleep
                         Log.i(LOG_TAG,
-                                String.format("Coverage dump detected finished after %dms",
-                                        System.currentTimeMillis() - start));
+                              String.format("Coverage dump detected finished after %dms",
+                                            System.currentTimeMillis() - start));
                         break;
                     }
                 } else {
@@ -203,8 +208,8 @@ public class ConscryptInstrumentationListener extends InstrumentationRunListener
         Class<? extends Socket> expectedClass = implementation.getExpectedClass();
         if (!expectedClass.isAssignableFrom(socket.getClass())) {
             throw new IllegalArgumentException("Expected SSLSocket class or subclass of "
-                    + expectedClass.getSimpleName() + " but got "
-                    + socket.getClass().getSimpleName());
+                                               + expectedClass.getSimpleName() + " but got "
+                                               + socket.getClass().getSimpleName());
         }
     }
 }

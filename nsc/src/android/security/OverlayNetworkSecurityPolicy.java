@@ -25,8 +25,8 @@ public class OverlayNetworkSecurityPolicy extends libcore.net.NetworkSecurityPol
     private final libcore.net.NetworkSecurityPolicy mParent;
     private final boolean mCleartextTrafficPermitted;
 
-    public OverlayNetworkSecurityPolicy(
-            libcore.net.NetworkSecurityPolicy policy, boolean cleartextTrafficPermitted) {
+    public OverlayNetworkSecurityPolicy(libcore.net.NetworkSecurityPolicy policy,
+                                        boolean cleartextTrafficPermitted) {
         mParent = policy;
         mCleartextTrafficPermitted = cleartextTrafficPermitted;
     }

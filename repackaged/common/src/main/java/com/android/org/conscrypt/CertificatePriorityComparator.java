@@ -42,7 +42,6 @@ import java.util.Map;
  */
 @Internal
 public final class CertificatePriorityComparator implements Comparator<X509Certificate> {
-
     /**
      * Map of signature algorithm OIDs to priorities. OIDs with a lower priority will be sorted
      * before those with higher.
@@ -152,8 +151,8 @@ public final class CertificatePriorityComparator implements Comparator<X509Certi
         } else if (pkey instanceof RSAPublicKey) {
             return ((RSAPublicKey) pkey).getModulus().bitLength();
         } else {
-            throw new IllegalArgumentException(
-                    "Unsupported public key type: " + pkey.getClass().getName());
+            throw new IllegalArgumentException("Unsupported public key type: "
+                                               + pkey.getClass().getName());
         }
     }
 

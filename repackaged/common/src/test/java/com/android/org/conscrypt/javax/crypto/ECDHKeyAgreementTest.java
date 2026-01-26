@@ -72,7 +72,6 @@ import javax.crypto.ShortBufferException;
  */
 @RunWith(JUnit4.class)
 public class ECDHKeyAgreementTest {
-
     // BEGIN Android-Added: Allow access to deprecated BC algorithms.
     // Allow access to deprecated BC algorithms in this test, so we can ensure they
     // continue to work
@@ -138,32 +137,29 @@ public class ECDHKeyAgreementTest {
             for (Provider keyFactoryProvider2 : getKeyFactoryProviders()) {
                 ECPrivateKey privateKey2 =
                         getPrivateKey(KAT_PRIVATE_KEY2_PKCS8, keyFactoryProvider2);
-                ECPublicKey publicKey2 =
-                        getPublicKey(KAT_PUBLIC_KEY2_X509, keyFactoryProvider2);
+                ECPublicKey publicKey2 = getPublicKey(KAT_PUBLIC_KEY2_X509, keyFactoryProvider2);
                 for (Provider keyAgreementProvider : getKeyAgreementProviders()) {
                     try {
                         testKnownAnswer(publicKey1, privateKey1, publicKey2, privateKey2,
-                                keyAgreementProvider);
+                                        keyAgreementProvider);
                     } catch (Throwable e) {
                         throw new RuntimeException(getClass().getSimpleName() + ".testKnownAnswer("
-                                + keyFactoryProvider1.getName()
-                                + ", " + keyFactoryProvider2.getName()
-                                + ", " + keyAgreementProvider.getName() + ")",
-                                e);
+                                                           + keyFactoryProvider1.getName() + ", "
+                                                           + keyFactoryProvider2.getName() + ", "
+                                                           + keyAgreementProvider.getName() + ")",
+                                                   e);
                     }
                 }
             }
         }
     }
 
-    void testKnownAnswer(
-            ECPublicKey publicKey1, ECPrivateKey privateKey1,
-            ECPublicKey publicKey2, ECPrivateKey privateKey2,
-            Provider keyAgreementProvider) throws Exception {
-        assertTrue(Arrays.equals(
-                KAT_SECRET, generateSecret(keyAgreementProvider, privateKey1, publicKey2)));
-        assertTrue(Arrays.equals(
-                KAT_SECRET, generateSecret(keyAgreementProvider, privateKey2, publicKey1)));
+    void testKnownAnswer(ECPublicKey publicKey1, ECPrivateKey privateKey1, ECPublicKey publicKey2,
+                         ECPrivateKey privateKey2, Provider keyAgreementProvider) throws Exception {
+        assertTrue(Arrays.equals(KAT_SECRET,
+                                 generateSecret(keyAgreementProvider, privateKey1, publicKey2)));
+        assertTrue(Arrays.equals(KAT_SECRET,
+                                 generateSecret(keyAgreementProvider, privateKey2, publicKey1)));
     }
 
     @Test
@@ -194,7 +190,8 @@ public class ECDHKeyAgreementTest {
         try {
             keyAgreement.init(null);
             fail();
-        } catch (InvalidKeyException expected) {}
+        } catch (InvalidKeyException expected) {
+        }
     }
 
     @Test
@@ -207,7 +204,8 @@ public class ECDHKeyAgreementTest {
         try {
             keyAgreement.init(KAT_PUBLIC_KEY1);
             fail();
-        } catch (InvalidKeyException expected) {}
+        } catch (InvalidKeyException expected) {
+        }
     }
 
     @Test
@@ -219,7 +217,8 @@ public class ECDHKeyAgreementTest {
         try {
             getKeyAgreement(provider).init(KAT_PRIVATE_KEY1, new ECGenParameterSpec("prime256v1"));
             fail();
-        } catch (InvalidAlgorithmParameterException expected) {}
+        } catch (InvalidAlgorithmParameterException expected) {
+        }
     }
 
     @Test
@@ -231,7 +230,8 @@ public class ECDHKeyAgreementTest {
         try {
             getKeyAgreement(provider).doPhase(KAT_PUBLIC_KEY1, true);
             fail();
-        } catch (IllegalStateException expected) {}
+        } catch (IllegalStateException expected) {
+        }
     }
 
     @Test
@@ -256,7 +256,8 @@ public class ECDHKeyAgreementTest {
         try {
             keyAgreement.doPhase(KAT_PUBLIC_KEY2, false);
             fail();
-        } catch (IllegalStateException expected) {}
+        } catch (IllegalStateException expected) {
+        }
     }
 
     @Test
@@ -270,7 +271,8 @@ public class ECDHKeyAgreementTest {
         try {
             keyAgreement.doPhase(null, true);
             fail();
-        } catch (InvalidKeyException expected) {}
+        } catch (InvalidKeyException expected) {
+        }
     }
 
     @Test
@@ -284,7 +286,8 @@ public class ECDHKeyAgreementTest {
         try {
             keyAgreement.doPhase(KAT_PRIVATE_KEY1, true);
             fail();
-        } catch (InvalidKeyException expected) {}
+        } catch (InvalidKeyException expected) {
+        }
     }
 
     @Test
@@ -299,7 +302,8 @@ public class ECDHKeyAgreementTest {
         try {
             keyAgreement.generateSecret(null, 0);
             fail();
-        } catch (NullPointerException expected) {}
+        } catch (NullPointerException expected) {
+        }
     }
 
     @Test
@@ -356,7 +360,8 @@ public class ECDHKeyAgreementTest {
             // at offset 1020 thus leaving only 4 bytes for the secret, which is not enough.
             keyAgreement.generateSecret(new byte[1024], 1020);
             fail();
-        } catch (ShortBufferException expected) {}
+        } catch (ShortBufferException expected) {
+        }
     }
 
     @Test
@@ -419,8 +424,9 @@ public class ECDHKeyAgreementTest {
         keyGen.initialize(ecSpec224);
         KeyPair keyPairB = keyGen.generateKeyPair();
 
-        assertFalse(((ECKey) keyPairA.getPublic()).getParams().equals(
-            ((ECKey) keyPairB.getPublic()).getParams()));
+        assertFalse(((ECKey) keyPairA.getPublic())
+                            .getParams()
+                            .equals(((ECKey) keyPairB.getPublic()).getParams()));
 
         KeyAgreement kaA = KeyAgreement.getInstance("ECDH", provider);
         kaA.init(keyPairA.getPrivate());
@@ -437,7 +443,7 @@ public class ECDHKeyAgreementTest {
         String callingMethodName = null;
         for (int i = 0; i < stackTrace.length; i++) {
             if ("invokeCallingMethodForEachKeyAgreementProvider".equals(
-                    stackTrace[i].getMethodName())) {
+                        stackTrace[i].getMethodName())) {
                 callingMethodName = stackTrace[i + 1].getMethodName();
             }
         }
@@ -451,7 +457,8 @@ public class ECDHKeyAgreementTest {
             method = getClass().getDeclaredMethod(invokedMethodName, Provider.class);
         } catch (NoSuchMethodError e) {
             throw new AssertionFailedError("Failed to find per-Provider test method "
-                    + getClass().getSimpleName() + "." + invokedMethodName + "(Provider)");
+                                           + getClass().getSimpleName() + "." + invokedMethodName
+                                           + "(Provider)");
         }
 
         for (Provider provider : getKeyAgreementProviders()) {
@@ -459,8 +466,9 @@ public class ECDHKeyAgreementTest {
                 method.invoke(this, provider);
             } catch (InvocationTargetException e) {
                 throw new RuntimeException(getClass().getSimpleName() + "." + invokedMethodName
-                        + "(provider: " + provider.getName() + ") failed",
-                        e.getCause());
+                                                   + "(provider: " + provider.getName()
+                                                   + ") failed",
+                                           e.getCause());
             }
         }
     }
@@ -529,8 +537,7 @@ public class ECDHKeyAgreementTest {
         return (ECPrivateKey) keyFactory.generatePrivate(new PKCS8EncodedKeySpec(pkcs8EncodedKey));
     }
 
-    private static ECPublicKey getPublicKey(byte[] x509EncodedKey)
-            throws GeneralSecurityException {
+    private static ECPublicKey getPublicKey(byte[] x509EncodedKey) throws GeneralSecurityException {
         KeyFactory keyFactory = KeyFactory.getInstance("EC");
         return (ECPublicKey) keyFactory.generatePublic(new X509EncodedKeySpec(x509EncodedKey));
     }
@@ -539,9 +546,8 @@ public class ECDHKeyAgreementTest {
         return KeyAgreement.getInstance("ECDH", provider);
     }
 
-    private static byte[] generateSecret(
-            Provider keyAgreementProvider, PrivateKey privateKey, PublicKey publicKey)
-            throws GeneralSecurityException {
+    private static byte[] generateSecret(Provider keyAgreementProvider, PrivateKey privateKey,
+                                         PublicKey publicKey) throws GeneralSecurityException {
         KeyAgreement keyAgreement = getKeyAgreement(keyAgreementProvider);
         keyAgreement.init(privateKey);
         keyAgreement.doPhase(publicKey, true);

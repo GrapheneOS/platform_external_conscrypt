@@ -60,7 +60,7 @@ public class PlatformTest {
         try {
             getApplicationProtocolsMethod = sslParameters.getMethod("getApplicationProtocols");
             setApplicationProtocolsMethod =
-                sslParameters.getMethod("setApplicationProtocols", String[].class);
+                    sslParameters.getMethod("setApplicationProtocols", String[].class);
         } catch (NoSuchMethodException e) {
             getApplicationProtocolsMethod = null;
             setApplicationProtocolsMethod = null;
@@ -183,7 +183,7 @@ public class PlatformTest {
         assertEquals(paramsIn.getServerNames(), paramsOut.getServerNames());
         assertEquals(paramsIn.getUseCipherSuitesOrder(), paramsOut.getUseCipherSuitesOrder());
         assertEquals(paramsIn.getEndpointIdentificationAlgorithm(),
-                paramsOut.getEndpointIdentificationAlgorithm());
+                     paramsOut.getEndpointIdentificationAlgorithm());
         assertEquals(paramsIn.getWantClientAuth(), paramsOut.getWantClientAuth());
         assertEquals(paramsIn.getNeedClientAuth(), paramsOut.getNeedClientAuth());
         assertSNIMatchersEqual(paramsIn.getSNIMatchers(), paramsOut.getSNIMatchers());

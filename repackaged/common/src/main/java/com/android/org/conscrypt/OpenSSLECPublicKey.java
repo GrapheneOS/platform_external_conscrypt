@@ -49,18 +49,18 @@ final class OpenSSLECPublicKey implements ECPublicKey, OpenSSLKeyHolder {
     }
 
     OpenSSLECPublicKey(OpenSSLKey key) {
-        this.group = new OpenSSLECGroupContext(new NativeRef.EC_GROUP(
-                NativeCrypto.EC_KEY_get1_group(key.getNativeRef())));
+        this.group = new OpenSSLECGroupContext(
+                new NativeRef.EC_GROUP(NativeCrypto.EC_KEY_get1_group(key.getNativeRef())));
         this.key = key;
     }
 
     OpenSSLECPublicKey(ECPublicKeySpec ecKeySpec) throws InvalidKeySpecException {
         try {
             group = OpenSSLECGroupContext.getInstance(ecKeySpec.getParams());
-            OpenSSLECPointContext pubKey = OpenSSLECPointContext.getInstance(group,
-                    ecKeySpec.getW());
+            OpenSSLECPointContext pubKey =
+                    OpenSSLECPointContext.getInstance(group, ecKeySpec.getW());
             key = new OpenSSLKey(NativeCrypto.EVP_PKEY_new_EC_KEY(group.getNativeRef(),
-                    pubKey.getNativeRef(), null));
+                                                                  pubKey.getNativeRef(), null));
         } catch (Exception e) {
             throw new InvalidKeySpecException(e);
         }
@@ -68,12 +68,12 @@ final class OpenSSLECPublicKey implements ECPublicKey, OpenSSLKeyHolder {
 
     static OpenSSLKey getInstance(ECPublicKey ecPublicKey) throws InvalidKeyException {
         try {
-            OpenSSLECGroupContext group = OpenSSLECGroupContext
-                    .getInstance(ecPublicKey.getParams());
-            OpenSSLECPointContext pubKey = OpenSSLECPointContext.getInstance(group,
-                    ecPublicKey.getW());
+            OpenSSLECGroupContext group =
+                    OpenSSLECGroupContext.getInstance(ecPublicKey.getParams());
+            OpenSSLECPointContext pubKey =
+                    OpenSSLECPointContext.getInstance(group, ecPublicKey.getW());
             return new OpenSSLKey(NativeCrypto.EVP_PKEY_new_EC_KEY(group.getNativeRef(),
-                    pubKey.getNativeRef(), null));
+                                                                   pubKey.getNativeRef(), null));
         } catch (Exception e) {
             throw new InvalidKeyException(e);
         }
@@ -100,7 +100,8 @@ final class OpenSSLECPublicKey implements ECPublicKey, OpenSSLKeyHolder {
     }
 
     private ECPoint getPublicKey() {
-        final OpenSSLECPointContext pubKey = new OpenSSLECPointContext(group,
+        final OpenSSLECPointContext pubKey = new OpenSSLECPointContext(
+                group,
                 new NativeRef.EC_POINT(NativeCrypto.EC_KEY_get_public_key(key.getNativeRef())));
 
         return pubKey.getECPoint();
@@ -165,8 +166,8 @@ final class OpenSSLECPublicKey implements ECPublicKey, OpenSSLKeyHolder {
         } catch (ParsingException e) {
             throw new IOException(e);
         }
-        group = new OpenSSLECGroupContext(new NativeRef.EC_GROUP(
-                NativeCrypto.EC_KEY_get1_group(key.getNativeRef())));
+        group = new OpenSSLECGroupContext(
+                new NativeRef.EC_GROUP(NativeCrypto.EC_KEY_get1_group(key.getNativeRef())));
     }
 
     private void writeObject(ObjectOutputStream stream) throws IOException {

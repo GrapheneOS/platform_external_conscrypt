@@ -30,8 +30,8 @@ class KeyStoreConfigSource implements ConfigSource {
 
     public KeyStoreConfigSource(KeyStore ks) {
         CertificatesEntryRef entry = new CertificatesEntryRef(new KeyStoreCertificateSource(ks),
-                /* overridesPins= */ false,
-                /* disableCT= */ true);
+                                                              /* overridesPins= */ false,
+                                                              /* disableCT= */ true);
 
         mConfig = new NetworkSecurityConfig.Builder().addCertificatesEntryRef(entry).build();
     }

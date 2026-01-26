@@ -48,8 +48,8 @@ public class HpkeFixture {
 
     static final byte[] DEFAULT_PT =
             decodeHex("4265617574792069732074727574682c20747275746820626561757479");
-    static final byte[] DEFAULT_CT = decodeHex(
-            "f938558b5d72f1a23810b4be2ab4f84331acc02fc97babc53a52ae8218a355a96d8770ac83d07bea87e13c512a");
+    static final byte[] DEFAULT_CT = decodeHex("f938558b5d72f1a23810b4be2ab4f84331acc02fc97babc53a5"
+                                               + "2ae8218a355a96d8770ac83d07bea87e13c512a");
 
     static final int DEFAULT_EXPORTER_LENGTH = 32;
     static final byte[] DEFAULT_EXPORTER_CONTEXT = decodeHex("00");

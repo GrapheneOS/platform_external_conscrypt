@@ -40,7 +40,6 @@ import javax.net.ssl.X509TrustManager;
 
 @RunWith(JUnit4.class)
 public class CertBlocklistTest {
-
     private static final String BLOCKLIST_CA = "test_blocklist_ca.pem";
     private static final String BLOCKLIST_CA2 = "test_blocklist_ca2.pem";
     private static final String BLOCKLISTED_CHAIN = "blocklist_test_chain.pem";
@@ -87,7 +86,8 @@ public class CertBlocklistTest {
         assertUntrusted(chain, getTrustManager(blocklistedCa));
     }
 
-    /** Test that the path building correctly routes around a blocklisted cert where there are
+    /**
+     * Test that the path building correctly routes around a blocklisted cert where there are
      * other valid paths available. This prevents breakage where a cert was cross signed by a
      * blocklisted CA but is still valid due to also being cross signed by CAs that remain trusted.
      * Path:

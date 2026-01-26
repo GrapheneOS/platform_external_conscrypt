@@ -59,12 +59,13 @@ public class HpkeContextRecipientTest {
     public void testGetInstance() throws Exception {
         assertThrows(NoSuchAlgorithmException.class, () -> HpkeContextRecipient.getInstance(null));
         assertThrows(NoSuchAlgorithmException.class,
-                () -> HpkeContextRecipient.getInstance("No/Such/Thing"));
+                     () -> HpkeContextRecipient.getInstance("No/Such/Thing"));
         assertThrows(IllegalArgumentException.class,
-                () -> HpkeContextRecipient.getInstance(DEFAULT_SUITE_NAME, (String) null));
+                     () -> HpkeContextRecipient.getInstance(DEFAULT_SUITE_NAME, (String) null));
         assertThrows(IllegalArgumentException.class,
-                () -> HpkeContextRecipient.getInstance(DEFAULT_SUITE_NAME, (Provider) null));
-        assertThrows(NoSuchProviderException.class,
+                     () -> HpkeContextRecipient.getInstance(DEFAULT_SUITE_NAME, (Provider) null));
+        assertThrows(
+                NoSuchProviderException.class,
                 () -> HpkeContextRecipient.getInstance(DEFAULT_SUITE_NAME, "NonsenseProviderName"));
         HpkeContextRecipient recipient = HpkeContextRecipient.getInstance(DEFAULT_SUITE_NAME);
         assertNotNull(recipient);
@@ -76,24 +77,24 @@ public class HpkeContextRecipientTest {
         final PrivateKey invalidKey = DefaultKeys.getPrivateKey("DH");
 
         assertThrows(NullPointerException.class,
-                () -> recipient.init(/* enc= */ null, DEFAULT_SK, DEFAULT_INFO));
+                     () -> recipient.init(/* enc= */ null, DEFAULT_SK, DEFAULT_INFO));
 
         assertThrows(InvalidKeyException.class,
-                () -> recipient.init(DEFAULT_ENC, /* privateKey= */ null, DEFAULT_INFO));
+                     () -> recipient.init(DEFAULT_ENC, /* privateKey= */ null, DEFAULT_INFO));
 
         // Incorrect enc size
         assertThrows(InvalidKeyException.class,
-                () -> recipient.init(new byte[1], DEFAULT_SK, DEFAULT_INFO));
+                     () -> recipient.init(new byte[1], DEFAULT_SK, DEFAULT_INFO));
 
         assertThrows(InvalidKeyException.class,
-                () -> recipient.init(DEFAULT_ENC, invalidKey, DEFAULT_INFO));
+                     () -> recipient.init(DEFAULT_ENC, invalidKey, DEFAULT_INFO));
 
         // Should succeed
         recipient.init(DEFAULT_ENC, DEFAULT_SK, DEFAULT_INFO);
 
         // Can't initialise twice
         assertThrows(IllegalStateException.class,
-                () -> recipient.init(DEFAULT_ENC, DEFAULT_SK, DEFAULT_INFO));
+                     () -> recipient.init(DEFAULT_ENC, DEFAULT_SK, DEFAULT_INFO));
 
         HpkeContextRecipient recipient2 = HpkeContextRecipient.getInstance(DEFAULT_SUITE_NAME);
         // null is explicitly allowed
@@ -107,19 +108,20 @@ public class HpkeContextRecipientTest {
         byte[] psk_id = "id".getBytes(StandardCharsets.UTF_8);
 
         assertThrows(UnsupportedOperationException.class,
-                () -> recipient.init(DEFAULT_ENC, DEFAULT_SK, DEFAULT_INFO, DEFAULT_PK));
+                     () -> recipient.init(DEFAULT_ENC, DEFAULT_SK, DEFAULT_INFO, DEFAULT_PK));
         assertThrows(UnsupportedOperationException.class,
-                () -> recipient.init(DEFAULT_ENC, DEFAULT_SK, DEFAULT_INFO, psk, psk_id));
+                     () -> recipient.init(DEFAULT_ENC, DEFAULT_SK, DEFAULT_INFO, psk, psk_id));
         assertThrows(UnsupportedOperationException.class,
-                ()
-                        -> recipient.init(
-                                DEFAULT_ENC, DEFAULT_SK, DEFAULT_INFO, DEFAULT_PK, psk, psk_id));
+                     ()
+                             -> recipient.init(DEFAULT_ENC, DEFAULT_SK, DEFAULT_INFO, DEFAULT_PK,
+                                               psk, psk_id));
     }
 
     @Test
     public void testOpen_successfully() throws Exception {
-        final HpkeSuite suite = new HpkeSuite(HpkeSuite.KEM_DHKEM_X25519_HKDF_SHA256,
-                HpkeSuite.KDF_HKDF_SHA256, HpkeSuite.AEAD_AES_128_GCM);
+        final HpkeSuite suite =
+                new HpkeSuite(HpkeSuite.KEM_DHKEM_X25519_HKDF_SHA256, HpkeSuite.KDF_HKDF_SHA256,
+                              HpkeSuite.AEAD_AES_128_GCM);
         final HpkeContextRecipient ctxRecipient = HpkeContextRecipient.getInstance(suite.name());
         ctxRecipient.init(DEFAULT_ENC, DEFAULT_SK, DEFAULT_INFO);
         byte[] plaintext = ctxRecipient.open(DEFAULT_CT, DEFAULT_AAD);
@@ -134,7 +136,7 @@ public class HpkeContextRecipientTest {
         ctxRecipient.init(DEFAULT_ENC, DEFAULT_SK, DEFAULT_INFO);
 
         assertThrows(NullPointerException.class,
-                () -> ctxRecipient.open(/* ciphertext= */ null, DEFAULT_AAD));
+                     () -> ctxRecipient.open(/* ciphertext= */ null, DEFAULT_AAD));
     }
 
     @Test
@@ -144,8 +146,8 @@ public class HpkeContextRecipientTest {
         final HpkeContextRecipient ctxRecipient =
                 HpkeContextRecipient.getInstance(DEFAULT_SUITE_NAME);
         ctxRecipient.init(DEFAULT_ENC, privateKey, DEFAULT_INFO);
-        assertThrows(
-                GeneralSecurityException.class, () -> ctxRecipient.open(DEFAULT_CT, DEFAULT_AAD));
+        assertThrows(GeneralSecurityException.class,
+                     () -> ctxRecipient.open(DEFAULT_CT, DEFAULT_AAD));
     }
 
     @Test
@@ -156,8 +158,8 @@ public class HpkeContextRecipientTest {
                 HpkeContextRecipient.getInstance(DEFAULT_SUITE_NAME);
         ctxRecipient.init(enc, DEFAULT_SK, DEFAULT_INFO);
 
-        assertThrows(
-                GeneralSecurityException.class, () -> ctxRecipient.open(DEFAULT_CT, DEFAULT_AAD));
+        assertThrows(GeneralSecurityException.class,
+                     () -> ctxRecipient.open(DEFAULT_CT, DEFAULT_AAD));
     }
 
     @Test
@@ -167,7 +169,7 @@ public class HpkeContextRecipientTest {
         ctxRecipient.init(DEFAULT_ENC, DEFAULT_SK, DEFAULT_INFO);
 
         assertThrows(GeneralSecurityException.class,
-                () -> ctxRecipient.open(/* ct= */ new byte[32], DEFAULT_AAD));
+                     () -> ctxRecipient.open(/* ct= */ new byte[32], DEFAULT_AAD));
     }
 
     @Test
@@ -195,6 +197,6 @@ public class HpkeContextRecipientTest {
         final byte[] export = ctxRecipient.export(/* length= */ 0, DEFAULT_EXPORTER_CONTEXT);
         assertNotNull(export);
         assertThrows(IllegalArgumentException.class,
-                () -> ctxRecipient.export(/* length= */ -1, DEFAULT_EXPORTER_CONTEXT));
+                     () -> ctxRecipient.export(/* length= */ -1, DEFAULT_EXPORTER_CONTEXT));
     }
 }

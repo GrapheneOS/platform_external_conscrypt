@@ -26,6 +26,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+
 import javax.net.ServerSocketFactory;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
@@ -72,7 +73,8 @@ public enum ChannelType {
         }
 
         @Override
-        public SSLSocket accept(ServerSocket serverSocket, SSLSocketFactory factory) throws IOException {
+        public SSLSocket accept(ServerSocket serverSocket, SSLSocketFactory factory)
+                throws IOException {
             assertFalse(serverSocket instanceof SSLServerSocket);
             Socket wrapped = serverSocket.accept();
             assertNull(wrapped.getChannel());
@@ -97,7 +99,8 @@ public enum ChannelType {
         }
 
         @Override
-        public SSLSocket accept(ServerSocket serverSocket, SSLSocketFactory factory) throws IOException {
+        public SSLSocket accept(ServerSocket serverSocket, SSLSocketFactory factory)
+                throws IOException {
             assertFalse(serverSocket instanceof SSLServerSocket);
             ServerSocketChannel serverChannel = serverSocket.getChannel();
 
@@ -113,10 +116,11 @@ public enum ChannelType {
         }
     };
 
-    public abstract SSLSocket newClientSocket(SSLSocketFactory factory, InetAddress address, int port)
-            throws IOException;
+    public abstract SSLSocket newClientSocket(SSLSocketFactory factory, InetAddress address,
+                                              int port) throws IOException;
     public abstract ServerSocket newServerSocket(SSLServerSocketFactory factory) throws IOException;
-    public abstract SSLSocket accept(ServerSocket socket, SSLSocketFactory factory) throws IOException;
+    public abstract SSLSocket accept(ServerSocket socket, SSLSocketFactory factory)
+            throws IOException;
 
     private static SSLSocket clientMode(Socket socket) {
         SSLSocket sslSocket = (SSLSocket) socket;

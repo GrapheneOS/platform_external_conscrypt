@@ -19,6 +19,7 @@ package com.android.org.conscrypt;
 
 import java.util.Collections;
 import java.util.List;
+
 import javax.net.ssl.ExtendedSSLSession;
 import javax.net.ssl.SNIHostName;
 import javax.net.ssl.SNIServerName;
@@ -32,13 +33,13 @@ class Java8ExtendedSSLSession extends Java7ExtendedSSLSession {
         super(delegate);
     }
 
-  @Override
-  public final List<SNIServerName> getRequestedServerNames() {
-      String requestedServerName = delegate.getRequestedServerName();
-      if (requestedServerName == null) {
-          return Collections.emptyList();
-      }
+    @Override
+    public final List<SNIServerName> getRequestedServerNames() {
+        String requestedServerName = delegate.getRequestedServerName();
+        if (requestedServerName == null) {
+            return Collections.emptyList();
+        }
 
-      return Collections.singletonList((SNIServerName) new SNIHostName(requestedServerName));
-  }
+        return Collections.singletonList((SNIServerName) new SNIHostName(requestedServerName));
+    }
 }

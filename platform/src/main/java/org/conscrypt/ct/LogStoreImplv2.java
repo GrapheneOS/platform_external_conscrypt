@@ -24,7 +24,6 @@ import org.conscrypt.Internal;
 import org.conscrypt.OpenSSLKey;
 import org.conscrypt.Platform;
 import org.conscrypt.metrics.StatsLog;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -90,7 +89,7 @@ public class LogStoreImplv2 implements LogStore {
 
     public LogStoreImplv2(Policy policy) {
         this(policy, getPathForCompatVersion(COMPAT_VERSION), Platform.getStatsLog(),
-                new SystemTimeSupplier());
+             new SystemTimeSupplier());
     }
 
     public LogStoreImplv2(Policy policy, Path logList, StatsLog metrics, Supplier<Long> clock) {
@@ -177,7 +176,7 @@ public class LogStoreImplv2 implements LogStore {
     private synchronized void resetLogListIfRequired() {
         long now = clock.get();
         if (now >= this.logListLastChecked
-                && now < this.logListLastChecked + LOG_LIST_CHECK_INTERVAL_IN_MS) {
+            && now < this.logListLastChecked + LOG_LIST_CHECK_INTERVAL_IN_MS) {
             return;
         }
         this.logListLastChecked = now;
@@ -249,7 +248,7 @@ public class LogStoreImplv2 implements LogStore {
     }
 
     private void addLogsToMap(JSONArray logs, String operatorName, int logType,
-            Map<ByteArray, LogInfo> logsMap) throws JSONException {
+                              Map<ByteArray, LogInfo> logsMap) throws JSONException {
         for (int j = 0; j < logs.length(); j++) {
             JSONObject log = logs.getJSONObject(j);
             LogInfo.Builder builder = new LogInfo.Builder()
@@ -276,7 +275,7 @@ public class LogStoreImplv2 implements LogStore {
             //  positives when validating SCTs.
             if (logInfo.getStateAt(clock.get()) == LogInfo.STATE_UNKNOWN) {
                 throw new IllegalArgumentException("Log current state is "
-                        + "unknown, logId: " + logIdFromList);
+                                                   + "unknown, logId: " + logIdFromList);
             }
 
             logsMap.put(new ByteArray(logId), logInfo);

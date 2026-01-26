@@ -20,8 +20,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeFalse;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeFalse;
 
 import org.conscrypt.TestUtils;
 import org.conscrypt.VeryBasicHttpServer;
@@ -57,12 +57,10 @@ public class HttpsURLConnectionTest {
     private static final String UNRESOLVABLE_HTTPS_URL = "https:///";
     private static final String UNREACHABLE_IP = "10.255.255.1";
 
-
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final VeryBasicHttpServer server = new VeryBasicHttpServer();
 
-    public HttpsURLConnectionTest() throws IOException {
-    }
+    public HttpsURLConnectionTest() throws IOException {}
 
     @After
     public void after() {
@@ -116,9 +114,7 @@ public class HttpsURLConnectionTest {
 
     @Test
     public void failedUrlConnect() throws Exception {
-        VeryBasicHttpServer.Op op = server
-                .opBuilder()
-                .build();
+        VeryBasicHttpServer.Op op = server.opBuilder().build();
 
         Future<Void> future = executor.submit(server.run(op));
 
@@ -132,10 +128,7 @@ public class HttpsURLConnectionTest {
 
     @Test
     public void successfulUrlConnect() throws Exception {
-        VeryBasicHttpServer.Op op = server
-                .opBuilder()
-                .content("/file", "Hello\nWorld\n")
-                .build();
+        VeryBasicHttpServer.Op op = server.opBuilder().content("/file", "Hello\nWorld\n").build();
         Future<Void> future = executor.submit(server.run(op));
 
         HttpsURLConnection connection = server.tlsConnection("/file");
@@ -146,15 +139,11 @@ public class HttpsURLConnectionTest {
         future.get(2000, TimeUnit.MILLISECONDS);
     }
 
-
     @Test
     public void urlReadTimeout() throws Exception {
         TestUtils.assumeEngineSocket();
-        VeryBasicHttpServer.Op op = server
-                .opBuilder()
-                .postAcceptDelay(5000)
-                .closeBeforeRead()
-                .build();
+        VeryBasicHttpServer.Op op =
+                server.opBuilder().postAcceptDelay(5000).closeBeforeRead().build();
         Future<Void> future = executor.submit(server.run(op));
 
         HttpsURLConnection connection = server.tlsConnection("/file");
@@ -201,7 +190,7 @@ public class HttpsURLConnectionTest {
         // cannot control network availability.
         assumeFalse("Skipping test. Connection not available", result instanceof ConnectException);
         assertTrue("Connection failure other than timeout received",
-                result instanceof SocketTimeoutException);
+                   result instanceof SocketTimeoutException);
     }
 
     @Test
@@ -263,8 +252,8 @@ public class HttpsURLConnectionTest {
         }
 
         @Override
-        public Socket createSocket(
-                InetAddress address, int port, InetAddress localAddress, int localPort) {
+        public Socket createSocket(InetAddress address, int port, InetAddress localAddress,
+                                   int localPort) {
             throw new UnsupportedOperationException();
         }
 
@@ -283,6 +272,4 @@ public class HttpsURLConnectionTest {
             throw new UnsupportedOperationException();
         }
     }
-
-
 }

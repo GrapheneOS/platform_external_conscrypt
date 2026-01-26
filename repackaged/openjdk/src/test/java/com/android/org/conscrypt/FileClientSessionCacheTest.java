@@ -40,10 +40,9 @@ public class FileClientSessionCacheTest {
         if (tmpDir == null) {
             fail("Please set 'java.io.tmpdir' system property.");
         }
-        File cacheDir = new File(tmpDir
-                + "/" + FileClientSessionCacheTest.class.getName() + "/cache");
-        final SSLClientSessionCache cache
-                = FileClientSessionCache.usingDirectory(cacheDir);
+        File cacheDir =
+                new File(tmpDir + "/" + FileClientSessionCacheTest.class.getName() + "/cache");
+        final SSLClientSessionCache cache = FileClientSessionCache.usingDirectory(cacheDir);
         Thread[] threads = new Thread[10];
         final int iterations = FileClientSessionCache.MAX_SIZE * 10;
         for (int i = 0; i < threads.length; i++) {

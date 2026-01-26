@@ -16,18 +16,19 @@
  */
 package com.android.org.conscrypt.java.security;
 
-import java.security.spec.DSAParameterSpec;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.security.spec.DSAParameterSpec;
 
 /**
  * @hide This class is not part of the Android public SDK API
  */
 @RunWith(JUnit4.class)
-public class AlgorithmParameterGeneratorTestDSA extends
-        AbstractAlgorithmParameterGeneratorTest {
-
+public class AlgorithmParameterGeneratorTestDSA extends AbstractAlgorithmParameterGeneratorTest {
     public AlgorithmParameterGeneratorTestDSA() {
-        super("DSA", new AlgorithmParameterSignatureHelper<DSAParameterSpec>("DSA", DSAParameterSpec.class));
+        super("DSA",
+              new AlgorithmParameterSignatureHelper<DSAParameterSpec>("DSA",
+                                                                      DSAParameterSpec.class));
     }
 }

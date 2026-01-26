@@ -27,44 +27,101 @@ import com.android.org.conscrypt.javax.net.ssl.TestSSLSocketPair;
 import com.android.org.conscrypt.tlswire.TlsTester;
 import com.android.org.conscrypt.tlswire.handshake.ClientHello;
 import com.android.org.conscrypt.tlswire.handshake.HelloExtension;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import javax.net.ssl.HandshakeCompletedListener;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.HandshakeCompletedListener;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+
 import tests.net.DelegatingSSLSocketFactory;
 
 @RunWith(JUnit4.class)
 public class SSLSocketsTest {
-
     private static class BrokenSSLSocket extends SSLSocket {
-        @Override public String[] getSupportedCipherSuites() { throw new AssertionError(); }
-        @Override public String[] getEnabledCipherSuites() { throw new AssertionError(); }
-        @Override public void setEnabledCipherSuites(String[] strings) { throw new AssertionError(); }
-        @Override public String[] getSupportedProtocols() { throw new AssertionError(); }
-        @Override public String[] getEnabledProtocols() { throw new AssertionError(); }
-        @Override public void setEnabledProtocols(String[] strings) { throw new AssertionError(); }
-        @Override public SSLSession getSession() { throw new AssertionError(); }
-        @Override public void addHandshakeCompletedListener(
-                HandshakeCompletedListener handshakeCompletedListener) { throw new AssertionError(); }
-        @Override public void removeHandshakeCompletedListener(
-                HandshakeCompletedListener handshakeCompletedListener) { throw new AssertionError(); }
-        @Override public void startHandshake() { throw new AssertionError(); }
-        @Override public void setUseClientMode(boolean b) { throw new AssertionError(); }
-        @Override public boolean getUseClientMode() { throw new AssertionError(); }
-        @Override public void setNeedClientAuth(boolean b) { throw new AssertionError(); }
-        @Override public boolean getNeedClientAuth() { throw new AssertionError(); }
-        @Override public void setWantClientAuth(boolean b) { throw new AssertionError(); }
-        @Override public boolean getWantClientAuth() { throw new AssertionError(); }
-        @Override public void setEnableSessionCreation(boolean b) { throw new AssertionError(); }
-        @Override public boolean getEnableSessionCreation() { throw new AssertionError(); }
+        @Override
+        public String[] getSupportedCipherSuites() {
+            throw new AssertionError();
+        }
+        @Override
+        public String[] getEnabledCipherSuites() {
+            throw new AssertionError();
+        }
+        @Override
+        public void setEnabledCipherSuites(String[] strings) {
+            throw new AssertionError();
+        }
+        @Override
+        public String[] getSupportedProtocols() {
+            throw new AssertionError();
+        }
+        @Override
+        public String[] getEnabledProtocols() {
+            throw new AssertionError();
+        }
+        @Override
+        public void setEnabledProtocols(String[] strings) {
+            throw new AssertionError();
+        }
+        @Override
+        public SSLSession getSession() {
+            throw new AssertionError();
+        }
+        @Override
+        public void addHandshakeCompletedListener(
+                HandshakeCompletedListener handshakeCompletedListener) {
+            throw new AssertionError();
+        }
+        @Override
+        public void removeHandshakeCompletedListener(
+                HandshakeCompletedListener handshakeCompletedListener) {
+            throw new AssertionError();
+        }
+        @Override
+        public void startHandshake() {
+            throw new AssertionError();
+        }
+        @Override
+        public void setUseClientMode(boolean b) {
+            throw new AssertionError();
+        }
+        @Override
+        public boolean getUseClientMode() {
+            throw new AssertionError();
+        }
+        @Override
+        public void setNeedClientAuth(boolean b) {
+            throw new AssertionError();
+        }
+        @Override
+        public boolean getNeedClientAuth() {
+            throw new AssertionError();
+        }
+        @Override
+        public void setWantClientAuth(boolean b) {
+            throw new AssertionError();
+        }
+        @Override
+        public boolean getWantClientAuth() {
+            throw new AssertionError();
+        }
+        @Override
+        public void setEnableSessionCreation(boolean b) {
+            throw new AssertionError();
+        }
+        @Override
+        public boolean getEnableSessionCreation() {
+            throw new AssertionError();
+        }
     }
 
     private ExecutorService executor;
@@ -99,18 +156,22 @@ public class SSLSocketsTest {
         SSLSocket s = (SSLSocket) SSLSocketFactory.getDefault().createSocket();
         SSLSockets.setUseSessionTickets(s, true);
 
-        ClientHello hello = TlsTester.captureTlsHandshakeClientHello(executor,
+        ClientHello hello = TlsTester.captureTlsHandshakeClientHello(
+                executor,
                 new DelegatingSSLSocketFactory((SSLSocketFactory) SSLSocketFactory.getDefault()) {
-                    @Override public SSLSocket configureSocket(SSLSocket socket) {
+                    @Override
+                    public SSLSocket configureSocket(SSLSocket socket) {
                         SSLSockets.setUseSessionTickets(socket, true);
                         return socket;
                     }
                 });
         assertNotNull(hello.findExtensionByType(HelloExtension.TYPE_SESSION_TICKET));
 
-        hello = TlsTester.captureTlsHandshakeClientHello(executor,
+        hello = TlsTester.captureTlsHandshakeClientHello(
+                executor,
                 new DelegatingSSLSocketFactory((SSLSocketFactory) SSLSocketFactory.getDefault()) {
-                    @Override public SSLSocket configureSocket(SSLSocket socket) {
+                    @Override
+                    public SSLSocket configureSocket(SSLSocket socket) {
                         SSLSockets.setUseSessionTickets(socket, false);
                         return socket;
                     }

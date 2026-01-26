@@ -30,12 +30,7 @@ public final class VerifiedSCT {
     /**
      * @hide This class is not part of the Android public SDK API
      */
-    public enum Status {
-        VALID,
-        INVALID_SIGNATURE,
-        UNKNOWN_LOG,
-        INVALID_SCT
-    }
+    public enum Status { VALID, INVALID_SIGNATURE, UNKNOWN_LOG, INVALID_SCT }
 
     private final SignedCertificateTimestamp sct;
     private final Status status;
@@ -97,4 +92,3 @@ public final class VerifiedSCT {
         }
     }
 }
-

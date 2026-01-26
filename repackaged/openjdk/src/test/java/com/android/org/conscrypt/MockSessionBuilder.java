@@ -17,6 +17,7 @@
 package com.android.org.conscrypt;
 
 import static com.android.org.conscrypt.TestUtils.UTF_8;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 

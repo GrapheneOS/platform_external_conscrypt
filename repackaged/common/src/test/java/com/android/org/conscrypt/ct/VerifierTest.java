@@ -160,8 +160,8 @@ public class VerifierTest {
                 ctVerifier.verifySignedCertificateTimestamps(chain, tlsExtension, null);
         assertEquals(0, result.getValidSCTs().size());
         assertEquals(1, result.getInvalidSCTs().size());
-        assertEquals(
-                VerifiedSCT.Status.INVALID_SIGNATURE, result.getInvalidSCTs().get(0).getStatus());
+        assertEquals(VerifiedSCT.Status.INVALID_SIGNATURE,
+                     result.getInvalidSCTs().get(0).getStatus());
     }
 
     @Test
@@ -219,8 +219,8 @@ public class VerifierTest {
         assertEquals(1, result.getValidSCTs().size());
         assertEquals(1, result.getInvalidSCTs().size());
         assertEquals(SignedCertificateTimestamp.Origin.OCSP_RESPONSE,
-                result.getValidSCTs().get(0).getSct().getOrigin());
+                     result.getValidSCTs().get(0).getSct().getOrigin());
         assertEquals(SignedCertificateTimestamp.Origin.TLS_EXTENSION,
-                result.getInvalidSCTs().get(0).getSct().getOrigin());
+                     result.getInvalidSCTs().get(0).getSct().getOrigin());
     }
 }

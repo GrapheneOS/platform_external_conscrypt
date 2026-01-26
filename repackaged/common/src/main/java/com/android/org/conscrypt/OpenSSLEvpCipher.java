@@ -38,8 +38,7 @@ public abstract class OpenSSLEvpCipher extends OpenSSLCipher {
     /**
      * Native pointer for the OpenSSL EVP_CIPHER context.
      */
-    private final EVP_CIPHER_CTX cipherCtx = new EVP_CIPHER_CTX(
-            NativeCrypto.EVP_CIPHER_CTX_new());
+    private final EVP_CIPHER_CTX cipherCtx = new EVP_CIPHER_CTX(NativeCrypto.EVP_CIPHER_CTX_new());
 
     /**
      * Whether the cipher has processed any data yet. EVP_CIPHER doesn't
@@ -58,9 +57,8 @@ public abstract class OpenSSLEvpCipher extends OpenSSLCipher {
     }
 
     @Override
-    void engineInitInternal(byte[] encodedKey, AlgorithmParameterSpec params,
-            SecureRandom random) throws InvalidKeyException,
-        InvalidAlgorithmParameterException {
+    void engineInitInternal(byte[] encodedKey, AlgorithmParameterSpec params, SecureRandom random)
+            throws InvalidKeyException, InvalidAlgorithmParameterException {
         byte[] iv;
         if (params instanceof IvParameterSpec) {
             IvParameterSpec ivParams = (IvParameterSpec) params;
@@ -69,11 +67,12 @@ public abstract class OpenSSLEvpCipher extends OpenSSLCipher {
             iv = null;
         }
 
-        final long cipherType = NativeCrypto.EVP_get_cipherbyname(getCipherName(
-                encodedKey.length, mode));
+        final long cipherType =
+                NativeCrypto.EVP_get_cipherbyname(getCipherName(encodedKey.length, mode));
         if (cipherType == 0) {
             throw new InvalidAlgorithmParameterException("Cannot find name for key length = "
-                    + (encodedKey.length * 8) + " and mode = " + mode);
+                                                         + (encodedKey.length * 8)
+                                                         + " and mode = " + mode);
         }
 
         final boolean encrypting = isEncrypting();
@@ -82,7 +81,7 @@ public abstract class OpenSSLEvpCipher extends OpenSSLCipher {
         if (iv == null && expectedIvLength != 0) {
             if (!encrypting) {
                 throw new InvalidAlgorithmParameterException("IV must be specified in " + mode
-                        + " mode");
+                                                             + " mode");
             }
 
             iv = new byte[expectedIvLength];
@@ -94,8 +93,8 @@ public abstract class OpenSSLEvpCipher extends OpenSSLCipher {
         } else if (expectedIvLength == 0 && iv != null) {
             throw new InvalidAlgorithmParameterException("IV not used in " + mode + " mode");
         } else if (iv != null && iv.length != expectedIvLength) {
-            throw new InvalidAlgorithmParameterException("expected IV length of "
-                    + expectedIvLength + " but was " + iv.length);
+            throw new InvalidAlgorithmParameterException("expected IV length of " + expectedIvLength
+                                                         + " but was " + iv.length);
         }
 
         this.iv = iv;
@@ -109,15 +108,14 @@ public abstract class OpenSSLEvpCipher extends OpenSSLCipher {
         }
 
         // OpenSSL only supports PKCS5 Padding.
-        NativeCrypto
-                .EVP_CIPHER_CTX_set_padding(cipherCtx, getPadding() == Padding.PKCS5PADDING);
+        NativeCrypto.EVP_CIPHER_CTX_set_padding(cipherCtx, getPadding() == Padding.PKCS5PADDING);
         modeBlockSize = NativeCrypto.EVP_CIPHER_CTX_block_size(cipherCtx);
         calledUpdate = false;
     }
 
     @Override
-    int updateInternal(byte[] input, int inputOffset, int inputLen, byte[] output,
-            int outputOffset, int maximumLen) throws ShortBufferException {
+    int updateInternal(byte[] input, int inputOffset, int inputLen, byte[] output, int outputOffset,
+                       int maximumLen) throws ShortBufferException {
         final int intialOutputOffset = outputOffset;
 
         final int bytesLeft = output.length - outputOffset;
@@ -127,7 +125,7 @@ public abstract class OpenSSLEvpCipher extends OpenSSLCipher {
         }
 
         outputOffset += NativeCrypto.EVP_CipherUpdate(cipherCtx, output, outputOffset, input,
-                inputOffset, inputLen);
+                                                      inputOffset, inputLen);
 
         calledUpdate = true;
 
@@ -205,8 +203,8 @@ public abstract class OpenSSLEvpCipher extends OpenSSLCipher {
     }
 
     @Override
-    protected int engineDoFinal(
-            byte[] input, int inputOffset, int inputLen, byte[] output, int outputOffset)
+    protected int engineDoFinal(byte[] input, int inputOffset, int inputLen, byte[] output,
+                                int outputOffset)
             throws ShortBufferException, IllegalBlockSizeException, BadPaddingException {
         if (output == null) {
             throw new NullPointerException("output == null");
@@ -243,8 +241,7 @@ public abstract class OpenSSLEvpCipher extends OpenSSLCipher {
                 // Extra block for remainder bytes plus padding.
                 // In case it's encrypting and there are no remainder bytes, add an extra block
                 // consisting only of padding.
-                totalLen += ((totalLen % modeBlockSize != 0) || isEncrypting())
-                        ? modeBlockSize : 0;
+                totalLen += ((totalLen % modeBlockSize != 0) || isEncrypting()) ? modeBlockSize : 0;
                 // The minimum multiple of {@code modeBlockSize} that can hold all the bytes.
                 return totalLen - (totalLen % modeBlockSize);
             }

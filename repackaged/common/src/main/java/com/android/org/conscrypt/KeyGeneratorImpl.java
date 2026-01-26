@@ -20,6 +20,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidParameterException;
 import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
+
 import javax.crypto.KeyGeneratorSpi;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.DESedeKeySpec;
@@ -58,8 +59,8 @@ public abstract class KeyGeneratorImpl extends KeyGeneratorSpi {
         if (params == null) {
             throw new InvalidAlgorithmParameterException("No params provided");
         } else {
-            throw new InvalidAlgorithmParameterException(
-                    "Unknown param type: " + params.getClass().getName());
+            throw new InvalidAlgorithmParameterException("Unknown param type: "
+                                                         + params.getClass().getName());
         }
     }
 

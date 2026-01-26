@@ -17,6 +17,7 @@
 package com.android.org.conscrypt;
 
 import java.security.Security;
+
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 
@@ -95,7 +96,7 @@ public enum AndroidEngineFactory implements EngineFactory {
     }
 
     static SSLEngine initEngine(SSLEngine engine, String cipher, boolean client) {
-        engine.setEnabledProtocols(new String[]{"TLSv1.2"});
+        engine.setEnabledProtocols(new String[] {"TLSv1.2"});
         engine.setEnabledCipherSuites(new String[] {cipher});
         engine.setUseClientMode(client);
         return engine;

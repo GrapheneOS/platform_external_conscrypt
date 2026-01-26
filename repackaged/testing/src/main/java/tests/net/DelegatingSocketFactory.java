@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+
 import javax.net.SocketFactory;
 /**
  * {@link SocketFactory} which delegates all invocations to the provided delegate
@@ -61,7 +62,7 @@ public class DelegatingSocketFactory extends SocketFactory {
     }
     @Override
     public Socket createSocket(InetAddress address, int port, InetAddress localAddress,
-            int localPort) throws IOException {
+                               int localPort) throws IOException {
         Socket socket = mDelegate.createSocket(address, port, localAddress, localPort);
         return configureSocket(socket);
     }

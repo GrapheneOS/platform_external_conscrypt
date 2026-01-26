@@ -22,20 +22,21 @@ import static org.junit.Assert.assertNotNull;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+
 import javax.crypto.KeyAgreement;
 
 /**
  * @hide This class is not part of the Android public SDK API
  */
 public class KeyAgreementHelper extends TestHelper<KeyPair> {
-
     private final String algorithmName;
 
     public KeyAgreementHelper(String algorithmName) {
         this.algorithmName = algorithmName;
     }
 
-    @Override public void test(KeyPair keyPair) throws Exception {
+    @Override
+    public void test(KeyPair keyPair) throws Exception {
         test(keyPair.getPrivate(), keyPair.getPublic());
     }
 

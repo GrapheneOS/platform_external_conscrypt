@@ -24,8 +24,10 @@ import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 
-/** An X-Wing public key. 
- * @hide This class is not part of the Android public SDK API*/
+/**
+ * An X-Wing public key.
+ * @hide This class is not part of the Android public SDK API
+ */
 public class OpenSslXwingPublicKey implements PublicKey {
     private static final long serialVersionUID = 1L;
 

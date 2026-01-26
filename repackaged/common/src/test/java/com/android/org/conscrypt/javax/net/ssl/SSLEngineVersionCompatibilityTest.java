@@ -91,20 +91,19 @@ import javax.net.ssl.X509TrustManager;
  */
 @RunWith(Parameterized.class)
 public class SSLEngineVersionCompatibilityTest {
-
     @Parameterized.Parameters(name = "{index}: {0} client, {1} server")
     public static Iterable<Object[]> data() {
         // We can't support TLS 1.3 without our own trust manager (which requires
         // X509ExtendedTrustManager), so only test TLS 1.2 if it's not available.
         if (TestUtils.isClassAvailable("javax.net.ssl.X509ExtendedTrustManager")) {
             return Arrays.asList(new Object[][] {
-                    { "TLSv1.2", "TLSv1.2" },
-                    { "TLSv1.2", "TLSv1.3" },
-                    { "TLSv1.3", "TLSv1.2" },
-                    { "TLSv1.3", "TLSv1.3" },
+                    {"TLSv1.2", "TLSv1.2"},
+                    {"TLSv1.2", "TLSv1.3"},
+                    {"TLSv1.3", "TLSv1.2"},
+                    {"TLSv1.3", "TLSv1.3"},
             });
         } else {
-            return Arrays.asList(new Object[][]{{ "TLSv1.2", "TLSv1.2"}});
+            return Arrays.asList(new Object[][] {{"TLSv1.2", "TLSv1.2"}});
         }
     }
 
@@ -117,7 +116,8 @@ public class SSLEngineVersionCompatibilityTest {
     }
 
     private static void assertSendsCorrectly(final byte[] sourceBytes, SSLEngine source,
-            SSLEngine dest, boolean needsRecordSplit) throws SSLException {
+                                             SSLEngine dest, boolean needsRecordSplit)
+            throws SSLException {
         ByteBuffer sourceOut = ByteBuffer.wrap(sourceBytes);
         SSLSession sourceSession = source.getSession();
         ByteBuffer sourceToDest = ByteBuffer.allocate(sourceSession.getPacketBufferSize());
@@ -127,7 +127,7 @@ public class SSLEngineVersionCompatibilityTest {
         String sourceCipherSuite = source.getSession().getCipherSuite();
         assertEquals(sourceCipherSuite, sourceBytes.length, sourceOutRes.bytesConsumed());
         assertEquals(sourceCipherSuite, HandshakeStatus.NOT_HANDSHAKING,
-                sourceOutRes.getHandshakeStatus());
+                     sourceOutRes.getHandshakeStatus());
 
         SSLSession destSession = dest.getSession();
         ByteBuffer destIn = ByteBuffer.allocate(destSession.getApplicationBufferSize());
@@ -136,7 +136,7 @@ public class SSLEngineVersionCompatibilityTest {
         while (destIn.position() != sourceOut.limit()) {
             SSLEngineResult destRes = dest.unwrap(sourceToDest, destIn);
             assertEquals(sourceCipherSuite, HandshakeStatus.NOT_HANDSHAKING,
-                    destRes.getHandshakeStatus());
+                         destRes.getHandshakeStatus());
             if (needsRecordSplit && numUnwrapCalls == 0) {
                 assertEquals(sourceCipherSuite, 1, destRes.bytesProduced());
             }
@@ -157,7 +157,7 @@ public class SSLEngineVersionCompatibilityTest {
     }
 
     private static void assertSendsCorrectlyWhenSplit(final byte[] sourceBytes, SSLEngine source,
-            SSLEngine dest) throws SSLException {
+                                                      SSLEngine dest) throws SSLException {
         // Split the input into three to test the version that accepts ByteBuffer[].  Three
         // is chosen somewhat arbitrarily as a number larger than the minimum of 2 but small
         // enough that it's not unwieldy.
@@ -165,8 +165,8 @@ public class SSLEngineVersionCompatibilityTest {
         int sourceLen = sourceBytes.length;
         sourceBufs[0] = ByteBuffer.wrap(sourceBytes, 0, sourceLen / 3);
         sourceBufs[1] = ByteBuffer.wrap(sourceBytes, sourceLen / 3, sourceLen / 3);
-        sourceBufs[2] = ByteBuffer.wrap(
-            sourceBytes, 2 * (sourceLen / 3), sourceLen - 2 * (sourceLen / 3));
+        sourceBufs[2] =
+                ByteBuffer.wrap(sourceBytes, 2 * (sourceLen / 3), sourceLen - 2 * (sourceLen / 3));
         SSLSession sourceSession = source.getSession();
         ByteBuffer sourceToDest = ByteBuffer.allocate(sourceSession.getPacketBufferSize());
         SSLEngineResult sourceOutRes = source.wrap(sourceBufs, sourceToDest);
@@ -174,13 +174,13 @@ public class SSLEngineVersionCompatibilityTest {
         String sourceCipherSuite = source.getSession().getCipherSuite();
         assertEquals(sourceCipherSuite, sourceBytes.length, sourceOutRes.bytesConsumed());
         assertEquals(sourceCipherSuite, HandshakeStatus.NOT_HANDSHAKING,
-                sourceOutRes.getHandshakeStatus());
+                     sourceOutRes.getHandshakeStatus());
         SSLSession destSession = dest.getSession();
         ByteBuffer destIn = ByteBuffer.allocate(destSession.getApplicationBufferSize());
         while (destIn.position() != sourceBytes.length) {
             SSLEngineResult destRes = dest.unwrap(sourceToDest, destIn);
             assertEquals(sourceCipherSuite, HandshakeStatus.NOT_HANDSHAKING,
-                    destRes.getHandshakeStatus());
+                         destRes.getHandshakeStatus());
         }
         destIn.flip();
         byte[] actual = new byte[destIn.remaining()];
@@ -191,8 +191,9 @@ public class SSLEngineVersionCompatibilityTest {
     @Test
     public void test_SSLEngine_beginHandshake() throws Exception {
         TestSSLContext c = TestSSLContext.newBuilder()
-                .clientProtocol(clientVersion)
-                .serverProtocol(serverVersion).build();
+                                   .clientProtocol(clientVersion)
+                                   .serverProtocol(serverVersion)
+                                   .build();
 
         try {
             c.clientContext.createSSLEngine().beginHandshake();
@@ -214,9 +215,10 @@ public class SSLEngineVersionCompatibilityTest {
         SSLContext serverContext = SSLContext.getInstance(serverVersion);
         serverContext.init(null, null, null);
         TestSSLContext c = TestSSLContext.newBuilder()
-                .useDefaults(false)
-                .clientContext(clientContext)
-                .serverContext(serverContext).build();
+                                   .useDefaults(false)
+                                   .clientContext(clientContext)
+                                   .serverContext(serverContext)
+                                   .build();
         SSLEngine[] p = null;
         try {
             // TODO Fix KnownFailure AlertException "NO SERVER CERTIFICATE FOUND"
@@ -236,8 +238,9 @@ public class SSLEngineVersionCompatibilityTest {
     @Test
     public void test_SSLEngine_beginHandshake_noClientCertificate() throws Exception {
         TestSSLContext c = TestSSLContext.newBuilder()
-                .clientProtocol(clientVersion)
-                .serverProtocol(serverVersion).build();
+                                   .clientProtocol(clientVersion)
+                                   .serverProtocol(serverVersion)
+                                   .build();
         SSLEngine[] engines = TestSSLEnginePair.connect(c, null);
         assertConnected(engines[0], engines[1]);
         c.close();
@@ -247,8 +250,9 @@ public class SSLEngineVersionCompatibilityTest {
     @Test
     public void test_SSLEngine_clientAuth() throws Exception {
         TestSSLContext c = TestSSLContext.newBuilder()
-                .clientProtocol(clientVersion)
-                .serverProtocol(serverVersion).build();
+                                   .clientProtocol(clientVersion)
+                                   .serverProtocol(serverVersion)
+                                   .build();
         SSLEngine e = c.clientContext.createSSLEngine();
 
         assertFalse(e.getWantClientAuth());
@@ -271,10 +275,11 @@ public class SSLEngineVersionCompatibilityTest {
 
         // TODO Fix KnownFailure "init - invalid private key"
         TestSSLContext clientAuthContext = new TestSSLContext.Builder()
-                .client(TestKeyStore.getClientCertificate())
-                .server(TestKeyStore.getServer())
-                .clientProtocol(clientVersion)
-                .serverProtocol(serverVersion).build();
+                                                   .client(TestKeyStore.getClientCertificate())
+                                                   .server(TestKeyStore.getServer())
+                                                   .clientProtocol(clientVersion)
+                                                   .serverProtocol(serverVersion)
+                                                   .build();
         TestSSLEnginePair p =
                 TestSSLEnginePair.create(clientAuthContext, new TestSSLEnginePair.Hooks() {
                     @Override
@@ -285,8 +290,8 @@ public class SSLEngineVersionCompatibilityTest {
         assertConnected(p);
         assertNotNull(p.client.getSession().getLocalCertificates());
         TestKeyStore.assertChainLength(p.client.getSession().getLocalCertificates());
-        TestSSLContext.assertClientCertificateChain(
-                clientAuthContext.clientTrustManager, p.client.getSession().getLocalCertificates());
+        TestSSLContext.assertClientCertificateChain(clientAuthContext.clientTrustManager,
+                                                    p.client.getSession().getLocalCertificates());
         clientAuthContext.close();
         c.close();
         p.close();
@@ -299,10 +304,11 @@ public class SSLEngineVersionCompatibilityTest {
     @Test
     public void test_SSLEngine_clientAuthWantedNoClientCert() throws Exception {
         TestSSLContext clientAuthContext = new TestSSLContext.Builder()
-                .client(TestKeyStore.getClient())
-                .server(TestKeyStore.getServer())
-                .clientProtocol(clientVersion)
-                .serverProtocol(serverVersion).build();
+                                                   .client(TestKeyStore.getClient())
+                                                   .server(TestKeyStore.getServer())
+                                                   .clientProtocol(clientVersion)
+                                                   .serverProtocol(serverVersion)
+                                                   .build();
         TestSSLEnginePair p =
                 TestSSLEnginePair.create(clientAuthContext, new TestSSLEnginePair.Hooks() {
                     @Override
@@ -324,10 +330,11 @@ public class SSLEngineVersionCompatibilityTest {
     @Test
     public void test_SSLEngine_clientAuthNeededNoClientCert() throws Exception {
         TestSSLContext clientAuthContext = new TestSSLContext.Builder()
-                .client(TestKeyStore.getClient())
-                .server(TestKeyStore.getServer())
-                .clientProtocol(clientVersion)
-                .serverProtocol(serverVersion).build();
+                                                   .client(TestKeyStore.getClient())
+                                                   .server(TestKeyStore.getServer())
+                                                   .clientProtocol(clientVersion)
+                                                   .serverProtocol(serverVersion)
+                                                   .build();
         TestSSLEnginePair p = null;
         try {
             p = TestSSLEnginePair.create(clientAuthContext, new TestSSLEnginePair.Hooks() {
@@ -356,8 +363,9 @@ public class SSLEngineVersionCompatibilityTest {
         HttpsURLConnection.setDefaultHostnameVerifier(new TestHostnameVerifier());
         try {
             TestSSLContext c = TestSSLContext.newBuilder()
-                    .clientProtocol(clientVersion)
-                    .serverProtocol(serverVersion).build();
+                                       .clientProtocol(clientVersion)
+                                       .serverProtocol(serverVersion)
+                                       .build();
             TestSSLEnginePair p = TestSSLEnginePair.create(c, new TestSSLEnginePair.Hooks() {
                 @Override
                 void beforeBeginHandshake(SSLEngine client, SSLEngine server) {
@@ -375,10 +383,10 @@ public class SSLEngineVersionCompatibilityTest {
 
     @Test
     public void test_TestSSLEnginePair_create() throws Exception {
-        TestSSLEnginePair test = TestSSLEnginePair.create(
-                TestSSLContext.newBuilder()
-                        .clientProtocol(clientVersion)
-                        .serverProtocol(serverVersion).build());
+        TestSSLEnginePair test = TestSSLEnginePair.create(TestSSLContext.newBuilder()
+                                                                  .clientProtocol(clientVersion)
+                                                                  .serverProtocol(serverVersion)
+                                                                  .build());
         assertNotNull(test.c);
         assertNotNull(test.server);
         assertNotNull(test.client);
@@ -390,10 +398,11 @@ public class SSLEngineVersionCompatibilityTest {
 
     @Test
     public void test_SSLEngine_Multiple_Thread_Success() throws Exception {
-        final TestSSLEnginePair pair = TestSSLEnginePair.create(
-                TestSSLContext.newBuilder()
-                        .clientProtocol(clientVersion)
-                        .serverProtocol(serverVersion).build());
+        final TestSSLEnginePair pair =
+                TestSSLEnginePair.create(TestSSLContext.newBuilder()
+                                                 .clientProtocol(clientVersion)
+                                                 .serverProtocol(serverVersion)
+                                                 .build());
         try {
             assertConnected(pair);
 
@@ -406,7 +415,7 @@ public class SSLEngineVersionCompatibilityTest {
 
                     for (int i = 0; i < NUM_STRESS_ITERATIONS; i++) {
                         assertSendsCorrectly("This is the client. Hello!".getBytes(UTF_8),
-                                pair.client, pair.server, false);
+                                             pair.client, pair.server, false);
                     }
 
                     return null;
@@ -418,8 +427,8 @@ public class SSLEngineVersionCompatibilityTest {
                     startUpSync.countDown();
 
                     for (int i = 0; i < NUM_STRESS_ITERATIONS; i++) {
-                        assertSendsCorrectly("This is the server. Hi!".getBytes(UTF_8), pair.server,
-                                pair.client, false);
+                        assertSendsCorrectly("This is the server. Hi!".getBytes(UTF_8),
+                                             pair.server, pair.client, false);
                     }
 
                     return null;
@@ -435,17 +444,18 @@ public class SSLEngineVersionCompatibilityTest {
 
     @Test
     public void test_SSLEngine_CloseOutbound() throws Exception {
-        final TestSSLEnginePair pair = TestSSLEnginePair.create(
-                TestSSLContext.newBuilder()
-                        .clientProtocol(clientVersion)
-                        .serverProtocol(serverVersion).build());
+        final TestSSLEnginePair pair =
+                TestSSLEnginePair.create(TestSSLContext.newBuilder()
+                                                 .clientProtocol(clientVersion)
+                                                 .serverProtocol(serverVersion)
+                                                 .build());
         try {
             assertConnected(pair);
 
             // Closing the outbound direction should cause a close_notify to be sent
             pair.client.closeOutbound();
-            ByteBuffer clientOut = ByteBuffer
-                    .allocate(pair.client.getSession().getPacketBufferSize());
+            ByteBuffer clientOut =
+                    ByteBuffer.allocate(pair.client.getSession().getPacketBufferSize());
             SSLEngineResult res = pair.client.wrap(ByteBuffer.wrap(new byte[0]), clientOut);
             assertEquals(Status.CLOSED, res.getStatus());
             assertEquals(HandshakeStatus.NOT_HANDSHAKING, res.getHandshakeStatus());
@@ -453,15 +463,15 @@ public class SSLEngineVersionCompatibilityTest {
 
             // Read the close_notify in the server
             clientOut.flip();
-            ByteBuffer serverIn = ByteBuffer
-                    .allocate(pair.server.getSession().getApplicationBufferSize());
+            ByteBuffer serverIn =
+                    ByteBuffer.allocate(pair.server.getSession().getApplicationBufferSize());
             res = pair.server.unwrap(clientOut, serverIn);
             assertEquals(Status.CLOSED, res.getStatus());
             assertEquals(HandshakeStatus.NEED_WRAP, res.getHandshakeStatus());
 
             // Reading the close_notify should cause a close_notify to be sent back
-            ByteBuffer serverOut = ByteBuffer
-                    .allocate(pair.server.getSession().getPacketBufferSize());
+            ByteBuffer serverOut =
+                    ByteBuffer.allocate(pair.server.getSession().getPacketBufferSize());
             res = pair.server.wrap(ByteBuffer.wrap(new byte[0]), serverOut);
             assertEquals(Status.CLOSED, res.getStatus());
             assertEquals(HandshakeStatus.NOT_HANDSHAKING, res.getHandshakeStatus());
@@ -469,8 +479,8 @@ public class SSLEngineVersionCompatibilityTest {
 
             // Read the close_notify in the client
             serverOut.flip();
-            ByteBuffer clientIn = ByteBuffer
-                    .allocate(pair.client.getSession().getApplicationBufferSize());
+            ByteBuffer clientIn =
+                    ByteBuffer.allocate(pair.client.getSession().getApplicationBufferSize());
             res = pair.client.unwrap(serverOut, clientIn);
             assertEquals(Status.CLOSED, res.getStatus());
             assertEquals(HandshakeStatus.NOT_HANDSHAKING, res.getHandshakeStatus());
@@ -486,20 +496,21 @@ public class SSLEngineVersionCompatibilityTest {
 
     @Test
     public void test_SSLEngine_Closed() throws Exception {
-        final TestSSLEnginePair pair = TestSSLEnginePair.create(
-                TestSSLContext.newBuilder()
-                        .clientProtocol(clientVersion)
-                        .serverProtocol(serverVersion).build());
+        final TestSSLEnginePair pair =
+                TestSSLEnginePair.create(TestSSLContext.newBuilder()
+                                                 .clientProtocol(clientVersion)
+                                                 .serverProtocol(serverVersion)
+                                                 .build());
         pair.close();
         ByteBuffer out = ByteBuffer.allocate(pair.client.getSession().getPacketBufferSize());
-        SSLEngineResult res = pair.client.wrap(ByteBuffer.wrap(new byte[] { 0x01 }), out);
+        SSLEngineResult res = pair.client.wrap(ByteBuffer.wrap(new byte[] {0x01}), out);
         assertEquals(Status.CLOSED, res.getStatus());
         // The engine should have a close_notify alert pending, so it should ignore the
         // proffered data and push the alert into out
         assertEquals(0, res.bytesConsumed());
         assertNotEquals(0, res.bytesProduced());
 
-        res = pair.client.unwrap(ByteBuffer.wrap(new byte[] { 0x01} ), out);
+        res = pair.client.unwrap(ByteBuffer.wrap(new byte[] {0x01}), out);
         assertEquals(Status.CLOSED, res.getStatus());
         assertEquals(0, res.bytesConsumed());
         assertEquals(0, res.bytesProduced());
@@ -528,13 +539,13 @@ public class SSLEngineVersionCompatibilityTest {
         assertEquals("TLS record type", TlsProtocols.HANDSHAKE, firstReceivedTlsRecord.type);
         HandshakeMessage handshakeMessage = HandshakeMessage.read(
                 new DataInputStream(new ByteArrayInputStream(firstReceivedTlsRecord.fragment)));
-        assertEquals(
-                "HandshakeMessage type", HandshakeMessage.TYPE_CLIENT_HELLO, handshakeMessage.type);
+        assertEquals("HandshakeMessage type", HandshakeMessage.TYPE_CLIENT_HELLO,
+                     handshakeMessage.type);
 
         int fragmentLength = firstReceivedTlsRecord.fragment.length;
         if ((fragmentLength >= 256) && (fragmentLength <= 511)) {
             fail("Fragment containing ClientHello is of dangerous length: " + fragmentLength
-                    + " bytes");
+                 + " bytes");
         }
     }
 
@@ -558,7 +569,7 @@ public class SSLEngineVersionCompatibilityTest {
 
     @Test
     public void test_SSLEngine_ClientHello_ALPN() throws Exception {
-        String[] protocolList = new String[] { "h2", "http/1.1" };
+        String[] protocolList = new String[] {"h2", "http/1.1"};
 
         SSLContext context = SSLContext.getInstance(clientVersion);
         context.init(null, null, null);
@@ -568,9 +579,8 @@ public class SSLEngineVersionCompatibilityTest {
         Conscrypt.setApplicationProtocols(e, protocolList);
 
         ClientHello clientHello = TlsTester.parseClientHello(getFirstChunk(e));
-        AlpnHelloExtension alpnExtension =
-                (AlpnHelloExtension) clientHello.findExtensionByType(
-                        HelloExtension.TYPE_APPLICATION_LAYER_PROTOCOL_NEGOTIATION);
+        AlpnHelloExtension alpnExtension = (AlpnHelloExtension) clientHello.findExtensionByType(
+                HelloExtension.TYPE_APPLICATION_LAYER_PROTOCOL_NEGOTIATION);
         assertNotNull(alpnExtension);
         assertEquals(Arrays.asList(protocolList), alpnExtension.protocols);
     }
@@ -595,7 +605,8 @@ public class SSLEngineVersionCompatibilityTest {
         TestSSLEnginePair pair = TestSSLEnginePair.create(
                 TestSSLContext.newBuilder()
                         .clientProtocol(clientVersion)
-                        .serverProtocol(serverVersion).build(),
+                        .serverProtocol(serverVersion)
+                        .build(),
                 new TestSSLEnginePair.Hooks() {
                     @Override
                     void beforeBeginHandshake(SSLEngine client, SSLEngine server) {
@@ -621,7 +632,8 @@ public class SSLEngineVersionCompatibilityTest {
         TestSSLEnginePair pair = TestSSLEnginePair.create(
                 TestSSLContext.newBuilder()
                         .clientProtocol(clientVersion)
-                        .serverProtocol(serverVersion).build(),
+                        .serverProtocol(serverVersion)
+                        .build(),
                 new TestSSLEnginePair.Hooks() {
                     @Override
                     void beforeBeginHandshake(SSLEngine client, SSLEngine server) {
@@ -644,10 +656,10 @@ public class SSLEngineVersionCompatibilityTest {
             assertEquals(20, serverEkm.length);
             assertArrayEquals(clientEkm, serverEkm);
 
-            byte[] clientContextEkm = Conscrypt.exportKeyingMaterial(
-                    pair.client, "FOO", new byte[0], 20);
-            byte[] serverContextEkm = Conscrypt.exportKeyingMaterial(
-                    pair.server, "FOO", new byte[0], 20);
+            byte[] clientContextEkm =
+                    Conscrypt.exportKeyingMaterial(pair.client, "FOO", new byte[0], 20);
+            byte[] serverContextEkm =
+                    Conscrypt.exportKeyingMaterial(pair.server, "FOO", new byte[0], 20);
             assertNotNull(clientContextEkm);
             assertNotNull(serverContextEkm);
             assertEquals(20, clientContextEkm.length);
@@ -676,11 +688,10 @@ public class SSLEngineVersionCompatibilityTest {
             public boolean threw = false;
             @Override
             public void checkClientTrusted(X509Certificate[] x509Certificates, String s)
-                throws CertificateException {
-            }
+                    throws CertificateException {}
             @Override
             public void checkServerTrusted(X509Certificate[] x509Certificates, String s)
-                throws CertificateException {
+                    throws CertificateException {
                 threw = true;
                 throw new CertificateException("Nope!");
             }
@@ -691,9 +702,10 @@ public class SSLEngineVersionCompatibilityTest {
         }
         ThrowingTrustManager trustManager = new ThrowingTrustManager();
         final TestSSLContext c = TestSSLContext.newBuilder()
-            .clientProtocol(clientVersion)
-            .serverProtocol(serverVersion)
-            .clientTrustManager(trustManager).build();
+                                         .clientProtocol(clientVersion)
+                                         .serverProtocol(serverVersion)
+                                         .clientTrustManager(trustManager)
+                                         .build();
 
         // The following code is taken from TestSSLEnginePair.connect()
         SSLSession session = c.clientContext.createSSLEngine().getSession();
@@ -720,16 +732,10 @@ public class SSLEngineVersionCompatibilityTest {
                     break;
                 }
 
-                boolean progress = TestSSLEnginePair.handshakeStep(client,
-                    clientToServer,
-                    serverToClient,
-                    scratch,
-                    new boolean[1]);
-                progress |= TestSSLEnginePair.handshakeStep(server,
-                    serverToClient,
-                    clientToServer,
-                    scratch,
-                    new boolean[1]);
+                boolean progress = TestSSLEnginePair.handshakeStep(
+                        client, clientToServer, serverToClient, scratch, new boolean[1]);
+                progress |= TestSSLEnginePair.handshakeStep(server, serverToClient, clientToServer,
+                                                            scratch, new boolean[1]);
                 assertFalse(trustManager.threw);
                 if (!progress) {
                     break;
@@ -747,10 +753,11 @@ public class SSLEngineVersionCompatibilityTest {
         assumeJava8();
 
         try {
-            TestSSLEnginePair.create(TestSSLContext.newBuilder()
-                                             .clientProtocol(clientVersion)
-                                             .serverProtocol(serverVersion)
-                                             .build(),
+            TestSSLEnginePair.create(
+                    TestSSLContext.newBuilder()
+                            .clientProtocol(clientVersion)
+                            .serverProtocol(serverVersion)
+                            .build(),
                     new TestSSLEnginePair.Hooks() {
                         @Override
                         void beforeBeginHandshake(SSLEngine client, SSLEngine server) {
@@ -809,7 +816,7 @@ public class SSLEngineVersionCompatibilityTest {
 
         ExtendedSSLSession session = (ExtendedSSLSession) pair.server.getSession();
         assertEquals(Collections.singletonList(new SNIHostName(host)),
-                session.getRequestedServerNames());
+                     session.getRequestedServerNames());
         assertEquals(host, serverHost.get());
         assertTrue(serverAliasCalled.get());
     }
@@ -832,8 +839,8 @@ public class SSLEngineVersionCompatibilityTest {
     // of size bufferSize and verifies it arrives intact. If offset is non-zero then
     // additional invalid buffers will be added to the start and end of the buffer array
     // in order to test the offset and length arguments of wrap().
-    private void sendAppDataInMultipleBuffers(
-            SSLEngine src, SSLEngine dst, int dataSize, int bufferSize) throws SSLException {
+    private void sendAppDataInMultipleBuffers(SSLEngine src, SSLEngine dst, int dataSize,
+                                              int bufferSize) throws SSLException {
         // Generate random data and split into multiple.
         byte[] sourceData = new byte[dataSize];
         Random random = new Random(System.currentTimeMillis());
@@ -915,8 +922,8 @@ public class SSLEngineVersionCompatibilityTest {
         X509ExtendedKeyManager tm = new ForwardingX509ExtendedKeyManager(
                 (X509ExtendedKeyManager) store.keyManagers[0]) {
             @Override
-            public String chooseEngineServerAlias(
-                    String keyType, Principal[] issuers, SSLEngine engine) {
+            public String chooseEngineServerAlias(String keyType, Principal[] issuers,
+                                                  SSLEngine engine) {
                 callback.run();
                 return super.chooseEngineServerAlias(keyType, issuers, engine);
             }

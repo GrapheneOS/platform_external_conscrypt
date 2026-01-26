@@ -102,8 +102,10 @@ public class OpenSSLX25519PublicKey implements OpenSSLX25519Key, PublicKey {
             throw new IllegalStateException("key is destroyed");
         }
 
-        if (this == o) return true;
-        if (!(o instanceof OpenSSLX25519PublicKey)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof OpenSSLX25519PublicKey))
+            return false;
         OpenSSLX25519PublicKey that = (OpenSSLX25519PublicKey) o;
         return Arrays.equals(uCoordinate, that.uCoordinate);
     }

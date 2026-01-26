@@ -35,10 +35,12 @@ package com.android.org.conscrypt;
 
 import static com.android.org.conscrypt.TestUtils.doEngineHandshake;
 import static com.android.org.conscrypt.TestUtils.newTextMessage;
+
 import static org.junit.Assert.assertEquals;
 
 import java.nio.ByteBuffer;
 import java.util.Locale;
+
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLException;
@@ -92,7 +94,7 @@ public final class EngineWrapBenchmark {
 
         // Complete the initial TLS handshake.
         doEngineHandshake(clientEngine, serverEngine, clientApplicationBuffer, clientPacketBuffer,
-                serverApplicationBuffer, serverPacketBuffer, true);
+                          serverApplicationBuffer, serverPacketBuffer, true);
 
         // Populate the pre-encrypted buffer for use with the unwrap benchmark.
         preEncryptedBuffer = bufferType.newBuffer(clientEngine.getSession().getPacketBufferSize());
@@ -152,10 +154,9 @@ public final class EngineWrapBenchmark {
             throw new RuntimeException("Operation returned unexpected result " + result);
         }
         if (result.bytesConsumed() != src.limit()) {
-            throw new RuntimeException(
-                    String.format(Locale.US,
-                            "Operation didn't consume all bytes. Expected %d, consumed %d.",
-                            src.limit(), result.bytesConsumed()));
+            throw new RuntimeException(String.format(
+                    Locale.US, "Operation didn't consume all bytes. Expected %d, consumed %d.",
+                    src.limit(), result.bytesConsumed()));
         }
     }
 }

@@ -17,8 +17,9 @@
 
 package com.android.org.conscrypt.ct;
 
-import java.security.cert.X509Certificate;
 import com.android.org.conscrypt.Internal;
+
+import java.security.cert.X509Certificate;
 
 /**
  * @hide This class is not part of the Android public SDK API

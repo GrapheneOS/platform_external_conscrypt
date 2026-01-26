@@ -72,8 +72,8 @@ public class SSLEngines {
      * @throws IllegalArgumentException if the given engine is not a platform engine
      */
     @FlaggedApi(com.android.org.conscrypt.net.flags.Flags.FLAG_ENCRYPTED_CLIENT_HELLO_PLATFORM)
-    public static void setEchConfigList(
-            @NonNull SSLEngine engine, @NonNull EchConfigList echConfigList) {
+    public static void setEchConfigList(@NonNull SSLEngine engine,
+                                        @NonNull EchConfigList echConfigList) {
         checkSupported(engine);
         Conscrypt.setEchConfigList(engine, echConfigList.toBytes());
     }
@@ -102,7 +102,8 @@ public class SSLEngines {
      */
     @Nullable
     public static byte[] exportKeyingMaterial(@NonNull SSLEngine engine, @NonNull String label,
-            @Nullable byte[] context, int length) throws SSLException {
+                                              @Nullable byte[] context, int length)
+            throws SSLException {
         checkSupported(engine);
         return Conscrypt.exportKeyingMaterial(engine, label, context, length);
     }

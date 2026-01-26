@@ -36,7 +36,6 @@ import javax.crypto.spec.IvParameterSpec;
  */
 @Internal
 public class OpenSSLCipherChaCha20 extends OpenSSLCipher {
-
     private static final int BLOCK_SIZE_BYTES = 64;
     private static final int NONCE_SIZE_BYTES = 12;
 
@@ -73,7 +72,7 @@ public class OpenSSLCipherChaCha20 extends OpenSSLCipher {
 
     @Override
     int updateInternal(byte[] input, int inputOffset, int inputLen, byte[] output, int outputOffset,
-            int maximumLen) throws ShortBufferException {
+                       int maximumLen) throws ShortBufferException {
         if (inputLen > output.length - outputOffset) {
             throw new ShortBufferWithoutStackTraceException("Insufficient output space");
         }
@@ -86,7 +85,7 @@ public class OpenSSLCipherChaCha20 extends OpenSSLCipher {
             byte[] singleBlockOut = new byte[BLOCK_SIZE_BYTES];
             System.arraycopy(input, inputOffset, singleBlock, currentBlockConsumedBytes, len);
             NativeCrypto.chacha20_encrypt_decrypt(singleBlock, 0, singleBlockOut, 0,
-                    BLOCK_SIZE_BYTES, encodedKey, iv, blockCounter);
+                                                  BLOCK_SIZE_BYTES, encodedKey, iv, blockCounter);
             System.arraycopy(singleBlockOut, currentBlockConsumedBytes, output, outputOffset, len);
             currentBlockConsumedBytes += len;
             if (currentBlockConsumedBytes < BLOCK_SIZE_BYTES) {
@@ -99,8 +98,8 @@ public class OpenSSLCipherChaCha20 extends OpenSSLCipher {
             inputLenRemaining -= len;
             blockCounter++;
         }
-        NativeCrypto.chacha20_encrypt_decrypt(input, inputOffset, output,
-                outputOffset, inputLenRemaining, encodedKey, iv, blockCounter);
+        NativeCrypto.chacha20_encrypt_decrypt(input, inputOffset, output, outputOffset,
+                                              inputLenRemaining, encodedKey, iv, blockCounter);
         currentBlockConsumedBytes = inputLenRemaining % BLOCK_SIZE_BYTES;
         blockCounter += inputLenRemaining / BLOCK_SIZE_BYTES;
         return inputLen;
@@ -137,8 +136,8 @@ public class OpenSSLCipherChaCha20 extends OpenSSLCipher {
     }
 
     @Override
-    protected int engineDoFinal(
-            byte[] input, int inputOffset, int inputLen, byte[] output, int outputOffset)
+    protected int engineDoFinal(byte[] input, int inputOffset, int inputLen, byte[] output,
+                                int outputOffset)
             throws ShortBufferException, IllegalBlockSizeException, BadPaddingException {
         if (output == null) {
             throw new NullPointerException("output == null");
@@ -175,7 +174,7 @@ public class OpenSSLCipherChaCha20 extends OpenSSLCipher {
     void checkSupportedKeySize(int keySize) throws InvalidKeyException {
         if (keySize != 32) {
             throw new InvalidKeyException("Unsupported key size: " + keySize
-                    + " bytes (must be 32)");
+                                          + " bytes (must be 32)");
         }
     }
 
@@ -207,5 +206,4 @@ public class OpenSSLCipherChaCha20 extends OpenSSLCipher {
     int getOutputSizeForUpdate(int inputLen) {
         return inputLen;
     }
-
 }

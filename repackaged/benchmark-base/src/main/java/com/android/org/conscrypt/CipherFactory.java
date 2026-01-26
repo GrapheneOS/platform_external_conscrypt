@@ -17,6 +17,7 @@
 package com.android.org.conscrypt;
 
 import java.security.NoSuchAlgorithmException;
+
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 
@@ -25,5 +26,5 @@ import javax.crypto.NoSuchPaddingException;
  * @hide This class is not part of the Android public SDK API
  */
 public interface CipherFactory {
-  Cipher newCipher(String transformation) throws NoSuchPaddingException, NoSuchAlgorithmException;
+    Cipher newCipher(String transformation) throws NoSuchPaddingException, NoSuchAlgorithmException;
 }

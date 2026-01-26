@@ -17,11 +17,12 @@
 
 package com.android.org.conscrypt.ct;
 
+import com.android.org.conscrypt.Internal;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import com.android.org.conscrypt.Internal;
 
 /**
  * SignedCertificateTimestamp structure, as defined by RFC6962 Section 3.2.
@@ -78,9 +79,8 @@ public class SignedCertificateTimestamp {
     // and affects the verification process.
     private final Origin origin;
 
-    public SignedCertificateTimestamp(Version version, byte[] logId,
-                                      long timestamp, byte[] extensions,
-                                      DigitallySigned signature, Origin origin) {
+    public SignedCertificateTimestamp(Version version, byte[] logId, long timestamp,
+                                      byte[] extensions, DigitallySigned signature, Origin origin) {
         this.version = version;
         this.logId = logId;
         this.timestamp = timestamp;
@@ -118,8 +118,8 @@ public class SignedCertificateTimestamp {
             throw new SerializationException("Unsupported SCT version " + version);
         }
 
-        return new SignedCertificateTimestamp(Version.V1,
-                Serialization.readFixedBytes(input, Constants.LOGID_LENGTH),
+        return new SignedCertificateTimestamp(
+                Version.V1, Serialization.readFixedBytes(input, Constants.LOGID_LENGTH),
                 Serialization.readLong(input, Constants.TIMESTAMP_LENGTH),
                 Serialization.readVariableBytes(input, Constants.EXTENSIONS_LENGTH_BYTES),
                 DigitallySigned.decode(input), origin);
@@ -140,7 +140,7 @@ public class SignedCertificateTimestamp {
             throws SerializationException {
         Serialization.writeNumber(output, version.value(), Constants.VERSION_LENGTH);
         Serialization.writeNumber(output, SignatureType.CERTIFICATE_TIMESTAMP.value(),
-                Constants.SIGNATURE_TYPE_LENGTH);
+                                  Constants.SIGNATURE_TYPE_LENGTH);
         Serialization.writeNumber(output, timestamp, Constants.TIMESTAMP_LENGTH);
         certEntry.encode(output);
         Serialization.writeVariableBytes(output, extensions, Constants.EXTENSIONS_LENGTH_BYTES);
@@ -159,12 +159,10 @@ public class SignedCertificateTimestamp {
     /**
      * TLS encode the signed part of the SCT, as described by RFC6962 section 3.2.
      */
-    public byte[] encodeTBS(CertificateEntry certEntry)
-            throws SerializationException {
+    public byte[] encodeTBS(CertificateEntry certEntry) throws SerializationException {
         int bufferSize = encodedLength(certEntry);
         ByteArrayOutputStream output = new ByteArrayOutputStream(bufferSize);
         encodeTBS(output, certEntry);
         return output.toByteArray();
     }
 }
-

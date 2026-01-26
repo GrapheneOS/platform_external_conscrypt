@@ -195,7 +195,7 @@ public class HttpsURLConnectionTest {
         // cannot control network availability.
         assumeFalse("Skipping test. Connection not available", result instanceof ConnectException);
         assertTrue("Connection failure other than timeout received",
-                result instanceof SocketTimeoutException);
+                   result instanceof SocketTimeoutException);
     }
 
     @Test
@@ -257,8 +257,8 @@ public class HttpsURLConnectionTest {
         }
 
         @Override
-        public Socket createSocket(
-                InetAddress address, int port, InetAddress localAddress, int localPort) {
+        public Socket createSocket(InetAddress address, int port, InetAddress localAddress,
+                                   int localPort) {
             throw new UnsupportedOperationException();
         }
 
