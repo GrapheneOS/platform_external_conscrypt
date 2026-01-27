@@ -606,7 +606,6 @@ public final class NativeCrypto {
 
     // --- RAND ----------------------------------------------------------------
 
-    @FastNative
     static native void RAND_bytes(byte[] output);
 
     // --- X509_NAME -----------------------------------------------------------

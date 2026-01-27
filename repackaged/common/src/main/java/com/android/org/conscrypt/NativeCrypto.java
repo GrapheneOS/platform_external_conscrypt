@@ -623,7 +623,6 @@ public final class NativeCrypto {
     // --- RAND ----------------------------------------------------------------
 
     @android.compat.annotation.UnsupportedAppUsage
-    @FastNative
     static native void RAND_bytes(byte[] output);
 
     // --- X509_NAME -----------------------------------------------------------
