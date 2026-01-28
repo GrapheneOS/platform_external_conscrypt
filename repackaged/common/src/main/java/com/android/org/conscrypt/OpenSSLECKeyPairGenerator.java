@@ -67,8 +67,8 @@ public final class OpenSSLECKeyPairGenerator extends KeyPairGenerator {
             }
         }
 
-        final OpenSSLKey key = new OpenSSLKey(
-                NativeCrypto.EC_KEY_generate_key(group.getNativeRef()));
+        final OpenSSLKey key =
+                new OpenSSLKey(NativeCrypto.EC_KEY_generate_key(group.getNativeRef()));
         return new KeyPair(new OpenSSLECPublicKey(group, key), new OpenSSLECPrivateKey(group, key));
     }
 
@@ -107,8 +107,8 @@ public final class OpenSSLECKeyPairGenerator extends KeyPairGenerator {
              * Store the group in a temporary variable until we know this is a
              * valid group.
              */
-            final OpenSSLECGroupContext possibleGroup = OpenSSLECGroupContext
-                    .getCurveByName(curveName);
+            final OpenSSLECGroupContext possibleGroup =
+                    OpenSSLECGroupContext.getCurveByName(curveName);
             if (possibleGroup == null) {
                 throw new InvalidAlgorithmParameterException("unknown curve name: " + curveName);
             }
@@ -130,7 +130,7 @@ public final class OpenSSLECKeyPairGenerator extends KeyPairGenerator {
         }
         if (invalidCurves.size() > 0) {
             throw new AssertionError("Invalid curve names: "
-                    + Arrays.toString(invalidCurves.toArray()));
+                                     + Arrays.toString(invalidCurves.toArray()));
         }
     }
 }

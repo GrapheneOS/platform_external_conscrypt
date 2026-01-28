@@ -25,8 +25,10 @@ import java.io.ObjectOutputStream;
 import java.security.PrivateKey;
 import java.util.Arrays;
 
-/** An OpenSSL ML-DSA private key. 
- * @hide This class is not part of the Android public SDK API*/
+/**
+ * An OpenSSL ML-DSA private key.
+ * @hide This class is not part of the Android public SDK API
+ */
 public class OpenSslMlDsaPrivateKey implements PrivateKey, OpenSSLKeyHolder {
     private static final long serialVersionUID = 0x3bacc385e8e106a3L;
 
@@ -85,7 +87,7 @@ public class OpenSslMlDsaPrivateKey implements PrivateKey, OpenSSLKeyHolder {
 
     OpenSslMlDsaPrivateKey(OpenSSLKey key, MlDsaAlgorithm algorithm) {
         if (NativeCrypto.EVP_PKEY_type(key.getNativeRef())
-                != OpenSslMlDsaKeyFactory.getPKeyType(algorithm)) {
+            != OpenSslMlDsaKeyFactory.getPKeyType(algorithm)) {
             throw new IllegalArgumentException("Invalid key type");
         }
         this.algorithm = algorithm;

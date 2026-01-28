@@ -130,7 +130,8 @@ public final class OpenSSLXDHKeyFactory extends KeyFactorySpi {
             }
         }
         throw new InvalidKeySpecException("Unsupported key type and key spec combination; key="
-                + key.getClass().getName() + ", keySpec=" + keySpec.getName());
+                                          + key.getClass().getName()
+                                          + ", keySpec=" + keySpec.getName());
     }
 
     @Override
@@ -161,8 +162,8 @@ public final class OpenSSLXDHKeyFactory extends KeyFactorySpi {
                 throw new InvalidKeyException(e);
             }
         } else {
-            throw new InvalidKeyException(
-                    "Key must be XEC public or private key; was " + key.getClass().getName());
+            throw new InvalidKeyException("Key must be XEC public or private key; was "
+                                          + key.getClass().getName());
         }
     }
 
@@ -206,9 +207,9 @@ public final class OpenSSLXDHKeyFactory extends KeyFactorySpi {
             KeySpec result = (KeySpec) c.newInstance(javaX25519AlgorithmSpec, privateKey.getU());
             return result;
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException
-                | InvocationTargetException e) {
-            throw new InvalidKeySpecException(
-                    "Could not find java.security.spec.XECPrivateKeySpec", e);
+                 | InvocationTargetException e) {
+            throw new InvalidKeySpecException("Could not find java.security.spec.XECPrivateKeySpec",
+                                              e);
         }
     }
 
@@ -228,13 +229,13 @@ public final class OpenSSLXDHKeyFactory extends KeyFactorySpi {
             Constructor<?> c = OpenSSLXDHKeyFactory.javaXecPublicKeySpec.getConstructor(
                     AlgorithmParameterSpec.class, BigInteger.class);
             @SuppressWarnings("unchecked")
-            KeySpec result = (KeySpec) c.newInstance(
-                    javaX25519AlgorithmSpec, uToBigInteger(publicKey.getU()));
+            KeySpec result = (KeySpec) c.newInstance(javaX25519AlgorithmSpec,
+                                                     uToBigInteger(publicKey.getU()));
             return result;
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException
-                | InvocationTargetException e) {
-            throw new InvalidKeySpecException(
-                    "Could not find java.security.spec.XECPublicKeySpec", e);
+                 | InvocationTargetException e) {
+            throw new InvalidKeySpecException("Could not find java.security.spec.XECPublicKeySpec",
+                                              e);
         }
     }
 }

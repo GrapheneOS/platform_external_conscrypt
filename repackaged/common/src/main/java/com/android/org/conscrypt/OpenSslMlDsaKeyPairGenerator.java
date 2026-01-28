@@ -33,8 +33,10 @@ public class OpenSslMlDsaKeyPairGenerator extends KeyPairGenerator {
         super(algorithm);
     }
 
-    /** ML-DSA-65 
-     * @hide This class is not part of the Android public SDK API*/
+    /**
+     * ML-DSA-65
+     * @hide This class is not part of the Android public SDK API
+     */
     public static class MlDsa65 extends OpenSslMlDsaKeyPairGenerator {
         public MlDsa65() {
             super("ML-DSA-65");
@@ -49,21 +51,26 @@ public class OpenSslMlDsaKeyPairGenerator extends KeyPairGenerator {
             byte[] privateKeyBytes = new byte[32];
             NativeCrypto.RAND_bytes(privateKeyBytes);
             byte[] publicKeyBytes = NativeCrypto.MLDSA65_public_key_from_seed(privateKeyBytes);
-            return new KeyPair(new OpenSslMlDsaPublicKey(publicKeyBytes, MlDsaAlgorithm.ML_DSA_65),
+            return new KeyPair(
+                    new OpenSslMlDsaPublicKey(publicKeyBytes, MlDsaAlgorithm.ML_DSA_65),
                     new OpenSslMlDsaPrivateKey(privateKeyBytes, MlDsaAlgorithm.ML_DSA_65));
         }
     }
 
-    /** ML-DSA uses ML-DSA-65. 
-     * @hide This class is not part of the Android public SDK API*/
+    /**
+     * ML-DSA uses ML-DSA-65.
+     * @hide This class is not part of the Android public SDK API
+     */
     public static class MlDsa extends MlDsa65 {
         public MlDsa() {
             super("ML-DSA");
         }
     }
 
-    /** ML-DSA-87 
-     * @hide This class is not part of the Android public SDK API*/
+    /**
+     * ML-DSA-87
+     * @hide This class is not part of the Android public SDK API
+     */
     public static final class MlDsa87 extends OpenSslMlDsaKeyPairGenerator {
         public MlDsa87() {
             super("ML-DSA-87");
@@ -74,7 +81,8 @@ public class OpenSslMlDsaKeyPairGenerator extends KeyPairGenerator {
             byte[] privateKeyBytes = new byte[32];
             NativeCrypto.RAND_bytes(privateKeyBytes);
             byte[] publicKeyBytes = NativeCrypto.MLDSA87_public_key_from_seed(privateKeyBytes);
-            return new KeyPair(new OpenSslMlDsaPublicKey(publicKeyBytes, MlDsaAlgorithm.ML_DSA_87),
+            return new KeyPair(
+                    new OpenSslMlDsaPublicKey(publicKeyBytes, MlDsaAlgorithm.ML_DSA_87),
                     new OpenSslMlDsaPrivateKey(privateKeyBytes, MlDsaAlgorithm.ML_DSA_87));
         }
     }

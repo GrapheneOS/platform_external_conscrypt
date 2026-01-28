@@ -19,16 +19,16 @@ package com.android.org.conscrypt.java.security;
 
 import static org.junit.Assert.assertNotNull;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 
 /**
  * @hide This class is not part of the Android public SDK API
  */
 public abstract class AbstractKeyPairGeneratorTest {
-
     private final String algorithmName;
     private final TestHelper<KeyPair> helper;
 

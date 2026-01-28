@@ -18,14 +18,16 @@ package com.android.org.conscrypt.javax.net.ssl;
 
 import static org.junit.Assert.assertEquals;
 
+import com.android.org.conscrypt.TestUtils;
+
 import java.io.IOException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+
 import javax.net.ssl.SSLSocket;
-import com.android.org.conscrypt.TestUtils;
 
 /**
  * TestSSLSocketPair is a convenience class for other tests that want
@@ -67,8 +69,8 @@ public final class TestSSLSocketPair {
      * caching. Optionally specify serverCipherSuites for testing
      * cipher suite negotiation.
      */
-    public TestSSLSocketPair connect(
-            final String[] clientCipherSuites, final String[] serverCipherSuites) {
+    public TestSSLSocketPair connect(final String[] clientCipherSuites,
+                                     final String[] serverCipherSuites) {
         try {
             ExecutorService executor = Executors.newFixedThreadPool(2);
             Future<Void> s = executor.submit(new Callable<Void>() {

@@ -182,8 +182,8 @@ public class LogInfo {
      *
      * @return the result of the verification
      */
-    public VerifiedSCT.Status verifySingleSCT(
-            SignedCertificateTimestamp sct, CertificateEntry entry) {
+    public VerifiedSCT.Status verifySingleSCT(SignedCertificateTimestamp sct,
+                                              CertificateEntry entry) {
         if (!Arrays.equals(sct.getLogID(), getID())) {
             return VerifiedSCT.Status.UNKNOWN_LOG;
         }

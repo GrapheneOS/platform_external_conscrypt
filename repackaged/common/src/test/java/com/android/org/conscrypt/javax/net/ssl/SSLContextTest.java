@@ -80,7 +80,6 @@ import javax.net.ssl.X509KeyManager;
  */
 @RunWith(JUnit4.class)
 public class SSLContextTest {
-
     @Test
     public void test_SSLContext_getDefault() throws Exception {
         SSLContext sslContext = SSLContext.getDefault();
@@ -145,9 +144,9 @@ public class SSLContextTest {
         // Test the scenario where only a PSKKeyManager is provided and no TrustManagers are
         // provided.
         SSLContext sslContext = SSLContext.getInstance("TLS");
-        sslContext.init(new KeyManager[] { PSKKeyManagerProxy.getConscryptPSKKeyManager(
+        sslContext.init(new KeyManager[] {PSKKeyManagerProxy.getConscryptPSKKeyManager(
                                 new PSKKeyManagerProxy())},
-                new TrustManager[0], null);
+                        new TrustManager[0], null);
         List<String> expectedCipherSuites =
                 new ArrayList<String>(StandardNames.CIPHER_SUITES_TLS13);
         expectedCipherSuites.addAll(StandardNames.CIPHER_SUITES_DEFAULT_PSK);
@@ -161,8 +160,8 @@ public class SSLContextTest {
         SSLContext sslContext = SSLContext.getInstance("TLS");
         sslContext.init(new KeyManager[] {PSKKeyManagerProxy.getConscryptPSKKeyManager(
                                 new PSKKeyManagerProxy())},
-                null, // Use default trust managers, one of which is an X.509 one.
-                null);
+                        null, // Use default trust managers, one of which is an X.509 one.
+                        null);
         // The TLS 1.3 cipher suites appear before the PSK ones, so we need to dedup them
         Set<String> expectedCipherSuiteSet = new LinkedHashSet<String>();
         expectedCipherSuiteSet.addAll(StandardNames.CIPHER_SUITES_TLS13);
@@ -175,10 +174,10 @@ public class SSLContextTest {
         sslContext = SSLContext.getInstance("TLS");
         // Just an arbitrary X509KeyManager -- it won't be invoked in this test.
         X509KeyManager x509KeyManager = new RandomPrivateKeyX509ExtendedKeyManager(null);
-        sslContext.init(
-                new KeyManager[] {x509KeyManager,
-                        PSKKeyManagerProxy.getConscryptPSKKeyManager(new PSKKeyManagerProxy())},
-                new TrustManager[0], null);
+        sslContext.init(new KeyManager[] {x509KeyManager,
+                                          PSKKeyManagerProxy.getConscryptPSKKeyManager(
+                                                  new PSKKeyManagerProxy())},
+                        new TrustManager[0], null);
         assertEnabledCipherSuites(expectedCipherSuites, sslContext);
     }
 
@@ -207,9 +206,10 @@ public class SSLContextTest {
             context.init(null, null, null);
 
             StandardNames.assertSSLContextEnabledProtocols(
-                    tlsVersion, ((SSLSocket) context.getSocketFactory().createSocket())
-                                        .getEnabledProtocols());
-            StandardNames.assertSSLContextEnabledProtocols(tlsVersion,
+                    tlsVersion,
+                    ((SSLSocket) context.getSocketFactory().createSocket()).getEnabledProtocols());
+            StandardNames.assertSSLContextEnabledProtocols(
+                    tlsVersion,
                     ((SSLServerSocket) context.getServerSocketFactory().createServerSocket())
                             .getEnabledProtocols());
             StandardNames.assertSSLContextEnabledProtocols(
@@ -219,23 +219,23 @@ public class SSLContextTest {
         }
     }
 
-    private static void assertEnabledCipherSuites(
-            List<String> expectedCipherSuites, SSLContext sslContext) throws Exception {
+    private static void assertEnabledCipherSuites(List<String> expectedCipherSuites,
+                                                  SSLContext sslContext) throws Exception {
         TestUtils.assumeSetEndpointIdentificationAlgorithmAvailable();
-        assertContentsInOrder(
-                expectedCipherSuites, sslContext.createSSLEngine().getEnabledCipherSuites());
         assertContentsInOrder(expectedCipherSuites,
-                sslContext.createSSLEngine().getSSLParameters().getCipherSuites());
-        assertContentsInOrder(
-                expectedCipherSuites, sslContext.getSocketFactory().getDefaultCipherSuites());
-        assertContentsInOrder(
-                expectedCipherSuites, sslContext.getServerSocketFactory().getDefaultCipherSuites());
+                              sslContext.createSSLEngine().getEnabledCipherSuites());
+        assertContentsInOrder(expectedCipherSuites,
+                              sslContext.createSSLEngine().getSSLParameters().getCipherSuites());
+        assertContentsInOrder(expectedCipherSuites,
+                              sslContext.getSocketFactory().getDefaultCipherSuites());
+        assertContentsInOrder(expectedCipherSuites,
+                              sslContext.getServerSocketFactory().getDefaultCipherSuites());
 
         SSLSocket sslSocket = (SSLSocket) sslContext.getSocketFactory().createSocket();
         try {
             assertContentsInOrder(expectedCipherSuites, sslSocket.getEnabledCipherSuites());
-            assertContentsInOrder(
-                    expectedCipherSuites, sslSocket.getSSLParameters().getCipherSuites());
+            assertContentsInOrder(expectedCipherSuites,
+                                  sslSocket.getSSLParameters().getCipherSuites());
         } finally {
             try {
                 sslSocket.close();
@@ -274,8 +274,8 @@ public class SSLContextTest {
         } catch (Exception expected) {
             if (javaVersion() >= 9) {
                 assertTrue("Expected NullPointerException on Java 9, was "
-                                + expected.getClass().getName(),
-                        expected instanceof NullPointerException);
+                                   + expected.getClass().getName(),
+                           expected instanceof NullPointerException);
             } else {
                 assertTrue(
                         "Expected IllegalArgumentException, was " + expected.getClass().getName(),
@@ -288,12 +288,12 @@ public class SSLContextTest {
         } catch (Exception expected) {
             if (javaVersion() >= 9) {
                 assertTrue("Expected NullPointerException on Java 9, was "
-                        + expected.getClass().getName(),
-                    expected instanceof NullPointerException);
+                                   + expected.getClass().getName(),
+                           expected instanceof NullPointerException);
             } else {
                 assertTrue(
-                    "Expected IllegalArgumentException, was " + expected.getClass().getName(),
-                    expected instanceof IllegalArgumentException);
+                        "Expected IllegalArgumentException, was " + expected.getClass().getName(),
+                        expected instanceof IllegalArgumentException);
             }
         }
         for (String protocol : StandardNames.SSL_CONTEXT_PROTOCOLS) {
@@ -347,7 +347,7 @@ public class SSLContextTest {
         }
         try {
             sslContext.init(new KeyManager[] {new KeyManager(){}},
-                    new TrustManager[] {new TrustManager(){}}, null);
+                            new TrustManager[] {new TrustManager(){}}, null);
             fail();
         } catch (KeyManagementException expected) {
             // Ignored.
@@ -382,14 +382,15 @@ public class SSLContextTest {
         invokeWithHighestPrioritySecurityProvider(provider, new Callable<Void>() {
             @Override
             public Void call() throws Exception {
+                assertEquals(
+                        ThrowExceptionKeyAndTrustManagerFactoryProvider.class,
+                        TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+                                .getProvider()
+                                .getClass());
                 assertEquals(ThrowExceptionKeyAndTrustManagerFactoryProvider.class,
-                    TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
-                        .getProvider()
-                        .getClass());
-                assertEquals(ThrowExceptionKeyAndTrustManagerFactoryProvider.class,
-                    KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm())
-                        .getProvider()
-                        .getClass());
+                             KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm())
+                                     .getProvider()
+                                     .getClass());
 
                 KeyManager[] keyManagers = new KeyManager[0];
                 TrustManager[] trustManagers = new TrustManager[0];
@@ -419,19 +420,18 @@ public class SSLContextTest {
         invokeWithHighestPrioritySecurityProvider(provider, new Callable<Void>() {
             @Override
             public Void call() throws Exception {
+                assertEquals(
+                        ThrowExceptionKeyAndTrustManagerFactoryProvider.class,
+                        TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+                                .getProvider()
+                                .getClass());
                 assertEquals(ThrowExceptionKeyAndTrustManagerFactoryProvider.class,
-                    TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
-                        .getProvider()
-                        .getClass());
-                assertEquals(ThrowExceptionKeyAndTrustManagerFactoryProvider.class,
-                    KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm())
-                        .getProvider()
-                        .getClass());
+                             KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm())
+                                     .getProvider()
+                                     .getClass());
 
-                KeyManager[] keyManagers = new KeyManager[]{new KeyManager() {
-                }};
-                TrustManager[] trustManagers = new TrustManager[]{new TrustManager() {
-                }};
+                KeyManager[] keyManagers = new KeyManager[] {new KeyManager(){}};
+                TrustManager[] trustManagers = new TrustManager[] {new TrustManager(){}};
                 for (String protocol : StandardNames.SSL_CONTEXT_PROTOCOLS) {
                     if (protocol.equals(StandardNames.SSL_CONTEXT_PROTOCOLS_DEFAULT)) {
                         // Default SSLContext is provided in an already initialized state
@@ -452,14 +452,14 @@ public class SSLContextTest {
     public static class ThrowExceptionKeyAndTrustManagerFactoryProvider extends Provider {
         public ThrowExceptionKeyAndTrustManagerFactoryProvider() {
             super("ThrowExceptionKeyAndTrustManagerProvider", 1.0,
-                    "SSLContextTest fake KeyManagerFactory  and TrustManagerFactory provider");
+                  "SSLContextTest fake KeyManagerFactory  and TrustManagerFactory provider");
 
             put("TrustManagerFactory." + TrustManagerFactory.getDefaultAlgorithm(),
-                    ThrowExceptionTrustManagagerFactorySpi.class.getName());
+                ThrowExceptionTrustManagagerFactorySpi.class.getName());
             put("TrustManagerFactory.PKIX", ThrowExceptionTrustManagagerFactorySpi.class.getName());
 
             put("KeyManagerFactory." + KeyManagerFactory.getDefaultAlgorithm(),
-                    ThrowExceptionKeyManagagerFactorySpi.class.getName());
+                ThrowExceptionKeyManagagerFactorySpi.class.getName());
             put("KeyManagerFactory.PKIX", ThrowExceptionKeyManagagerFactorySpi.class.getName());
         }
     }
@@ -513,8 +513,9 @@ public class SSLContextTest {
      *
      * @return result returned by the {@code callable}.
      */
-    private static <T> T invokeWithHighestPrioritySecurityProvider(
-            Provider provider, Callable<T> callable) throws Exception {
+    private static <T> T invokeWithHighestPrioritySecurityProvider(Provider provider,
+                                                                   Callable<T> callable)
+            throws Exception {
         int providerPosition = -1;
         try {
             providerPosition = Security.insertProviderAt(provider, 1);
@@ -628,11 +629,11 @@ public class SSLContextTest {
             assertNotNull(sessionContext);
 
             if (protocol.equals(StandardNames.SSL_CONTEXT_PROTOCOLS_DEFAULT)) {
-                assertSame(
-                        SSLContext.getInstance(protocol).getServerSessionContext(), sessionContext);
+                assertSame(SSLContext.getInstance(protocol).getServerSessionContext(),
+                           sessionContext);
             } else {
-                assertNotSame(
-                        SSLContext.getInstance(protocol).getServerSessionContext(), sessionContext);
+                assertNotSame(SSLContext.getInstance(protocol).getServerSessionContext(),
+                              sessionContext);
             }
         }
     }
@@ -645,11 +646,11 @@ public class SSLContextTest {
             assertNotNull(sessionContext);
 
             if (protocol.equals(StandardNames.SSL_CONTEXT_PROTOCOLS_DEFAULT)) {
-                assertSame(
-                        SSLContext.getInstance(protocol).getClientSessionContext(), sessionContext);
+                assertSame(SSLContext.getInstance(protocol).getClientSessionContext(),
+                           sessionContext);
             } else {
-                assertNotSame(
-                        SSLContext.getInstance(protocol).getClientSessionContext(), sessionContext);
+                assertNotSame(SSLContext.getInstance(protocol).getClientSessionContext(),
+                              sessionContext);
             }
         }
     }
@@ -696,15 +697,14 @@ public class SSLContextTest {
         assertNotNull(defaultTlsProvider);
         Provider finalDefaultTlsProvider = defaultTlsProvider;
         assertThrows(NoSuchAlgorithmException.class,
-                () -> SSLContext.getInstance("SSLv3", finalDefaultTlsProvider));
+                     () -> SSLContext.getInstance("SSLv3", finalDefaultTlsProvider));
     }
 
     private static void assertContentsInOrder(List<String> expected, String... actual) {
         List<String> actualList = Arrays.asList(actual);
         if (expected.size() != actual.length) {
             fail("Unexpected length. Expected len <" + expected.size() + ">, actual len <"
-                    + actual.length + ">, expected <" + expected + ">, actual <" + actualList
-                    + ">");
+                 + actual.length + ">, expected <" + expected + ">, actual <" + actualList + ">");
         }
 
         if (isWindows()) {

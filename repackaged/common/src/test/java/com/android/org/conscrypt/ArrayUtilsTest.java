@@ -22,11 +22,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 /**
  * @hide This class is not part of the Android public SDK API
@@ -42,19 +43,18 @@ public class ArrayUtilsTest {
             }
         }
         assertThrows(ArrayIndexOutOfBoundsException.class,
-                () -> ArrayUtils.checkOffsetAndCount(data.length, 0, data.length + 1));
+                     () -> ArrayUtils.checkOffsetAndCount(data.length, 0, data.length + 1));
         assertThrows(ArrayIndexOutOfBoundsException.class,
-                () -> ArrayUtils.checkOffsetAndCount(data.length, data.length, 1));
-
+                     () -> ArrayUtils.checkOffsetAndCount(data.length, data.length, 1));
     }
 
     @Test
     public void offsetCount_Empty() {
         ArrayUtils.checkOffsetAndCount(0, 0, 0);
         assertThrows(ArrayIndexOutOfBoundsException.class,
-                () -> ArrayUtils.checkOffsetAndCount(0, 0, 1));
+                     () -> ArrayUtils.checkOffsetAndCount(0, 0, 1));
         assertThrows(ArrayIndexOutOfBoundsException.class,
-                () -> ArrayUtils.checkOffsetAndCount(0, 1, 0));
+                     () -> ArrayUtils.checkOffsetAndCount(0, 1, 0));
     }
 
     @Test
@@ -69,16 +69,16 @@ public class ArrayUtilsTest {
 
     @Test
     public void concatStringValues() {
-        String[] expected = new String[] { "a", "b", "c",};
+        String[] expected = new String[] {
+                "a",
+                "b",
+                "c",
+        };
 
-        assertArrayEquals(expected,
-                ArrayUtils.concatValues(new String[] {}, "a", "b", "c"));
-        assertArrayEquals(expected,
-                ArrayUtils.concatValues(new String[] { "a" }, "b", "c"));
-        assertArrayEquals(expected,
-                ArrayUtils.concatValues(new String[] { "a", "b" }, "c"));
-        assertArrayEquals(expected,
-                ArrayUtils.concatValues(new String[] { "a", "b", "c" }));
+        assertArrayEquals(expected, ArrayUtils.concatValues(new String[] {}, "a", "b", "c"));
+        assertArrayEquals(expected, ArrayUtils.concatValues(new String[] {"a"}, "b", "c"));
+        assertArrayEquals(expected, ArrayUtils.concatValues(new String[] {"a", "b"}, "c"));
+        assertArrayEquals(expected, ArrayUtils.concatValues(new String[] {"a", "b", "c"}));
     }
 
     @Test
@@ -111,7 +111,7 @@ public class ArrayUtilsTest {
         assertArrayEquals(bytes("fedcba"), ArrayUtils.reverse(bytes("abcdef")));
     }
 
- static byte[] bytes(String string) {
+    static byte[] bytes(String string) {
         return string.getBytes(StandardCharsets.UTF_8);
     }
 }

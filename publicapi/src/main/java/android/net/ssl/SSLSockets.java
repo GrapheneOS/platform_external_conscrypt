@@ -72,8 +72,8 @@ public class SSLSockets {
      * @throws IllegalArgumentException if the given socket is not a platform socket
      */
     @FlaggedApi(com.android.org.conscrypt.net.flags.Flags.FLAG_ENCRYPTED_CLIENT_HELLO_PLATFORM)
-    public static void setEchConfigList(
-            @NonNull SSLSocket socket, @NonNull EchConfigList echConfigList) {
+    public static void setEchConfigList(@NonNull SSLSocket socket,
+                                        @NonNull EchConfigList echConfigList) {
         checkSupported(socket);
         Conscrypt.setEchConfigList(socket, echConfigList.toBytes());
     }
@@ -102,7 +102,8 @@ public class SSLSockets {
      */
     @Nullable
     public static byte[] exportKeyingMaterial(@NonNull SSLSocket socket, @NonNull String label,
-            @Nullable byte[] context, int length) throws SSLException {
+                                              @Nullable byte[] context, int length)
+            throws SSLException {
         checkSupported(socket);
         return Conscrypt.exportKeyingMaterial(socket, label, context, length);
     }

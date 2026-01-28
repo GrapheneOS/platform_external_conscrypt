@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.X509ExtendedKeyManager;
 import javax.security.auth.x500.X500Principal;
@@ -49,7 +50,6 @@ import javax.security.auth.x500.X500Principal;
  * @see javax.net.ssl.KeyManager
  */
 class KeyManagerImpl extends X509ExtendedKeyManager {
-
     // hashed key store information
     private final HashMap<String, PrivateKeyEntry> hash;
 
@@ -83,7 +83,7 @@ class KeyManagerImpl extends X509ExtendedKeyManager {
                     hash.put(alias, entry);
                 }
             } catch (KeyStoreException | UnrecoverableEntryException
-                    | NoSuchAlgorithmException ignored) {
+                     | NoSuchAlgorithmException ignored) {
                 // Ignored.
             }
         }
@@ -97,7 +97,7 @@ class KeyManagerImpl extends X509ExtendedKeyManager {
 
     @Override
     public String chooseServerAlias(String keyType, Principal[] issuers, Socket socket) {
-        final String[] al = chooseAlias(new String[] { keyType }, issuers);
+        final String[] al = chooseAlias(new String[] {keyType}, issuers);
         return (al == null ? null : al[0]);
     }
 
@@ -117,17 +117,16 @@ class KeyManagerImpl extends X509ExtendedKeyManager {
             }
         }
         return null;
-
     }
 
     @Override
     public String[] getClientAliases(String keyType, Principal[] issuers) {
-        return chooseAlias(new String[] { keyType }, issuers);
+        return chooseAlias(new String[] {keyType}, issuers);
     }
 
     @Override
     public String[] getServerAliases(String keyType, Principal[] issuers) {
-        return chooseAlias(new String[] { keyType }, issuers);
+        return chooseAlias(new String[] {keyType}, issuers);
     }
 
     @Override
@@ -142,14 +141,15 @@ class KeyManagerImpl extends X509ExtendedKeyManager {
     }
 
     @Override
-    public String chooseEngineClientAlias(String[] keyTypes, Principal[] issuers, SSLEngine engine) {
+    public String chooseEngineClientAlias(String[] keyTypes, Principal[] issuers,
+                                          SSLEngine engine) {
         final String[] al = chooseAlias(keyTypes, issuers);
         return (al == null ? null : al[0]);
     }
 
     @Override
     public String chooseEngineServerAlias(String keyType, Principal[] issuers, SSLEngine engine) {
-        final String[] al = chooseAlias(new String[] { keyType }, issuers);
+        final String[] al = chooseAlias(new String[] {keyType}, issuers);
         return (al == null ? null : al[0]);
     }
 
@@ -164,9 +164,10 @@ class KeyManagerImpl extends X509ExtendedKeyManager {
             final Certificate[] chain = entry.getValue().getCertificateChain();
             final Certificate cert = chain[0];
             final String certKeyAlg = cert.getPublicKey().getAlgorithm();
-            final String certSigAlg = (cert instanceof X509Certificate
-                                       ? ((X509Certificate) cert).getSigAlgName().toUpperCase(Locale.US)
-                                       : null);
+            final String certSigAlg =
+                    (cert instanceof X509Certificate
+                             ? ((X509Certificate) cert).getSigAlgName().toUpperCase(Locale.US)
+                             : null);
             for (String keyAlgorithm : keyTypes) {
                 if (keyAlgorithm == null) {
                     continue;
@@ -192,7 +193,7 @@ class KeyManagerImpl extends X509ExtendedKeyManager {
                  */
                 // sig algorithm does not match
                 if (sigAlgorithm != null && certSigAlg != null
-                        && !certSigAlg.contains(sigAlgorithm)) {
+                    && !certSigAlg.contains(sigAlgorithm)) {
                     continue;
                 }
                 // no issuers to match, just add to return list and continue

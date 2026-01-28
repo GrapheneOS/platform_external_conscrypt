@@ -31,8 +31,10 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 
-/** An implementation of a {@link KeyFactorySpi} for MLDSA keys based on BoringSSL. 
- * @hide This class is not part of the Android public SDK API*/
+/**
+ * An implementation of a {@link KeyFactorySpi} for MLDSA keys based on BoringSSL.
+ * @hide This class is not part of the Android public SDK API
+ */
 @Internal
 public abstract class OpenSslMlDsaKeyFactory extends KeyFactorySpi {
     private final MlDsaAlgorithm defaultAlgorithm;
@@ -43,8 +45,10 @@ public abstract class OpenSslMlDsaKeyFactory extends KeyFactorySpi {
 
     abstract boolean supportsAlgorithm(MlDsaAlgorithm algorithm);
 
-    /** ML-DSA 
-     * @hide This class is not part of the Android public SDK API*/
+    /**
+     * ML-DSA
+     * @hide This class is not part of the Android public SDK API
+     */
     public static class MlDsa extends OpenSslMlDsaKeyFactory {
         public MlDsa() {
             super(MlDsaAlgorithm.ML_DSA_65);
@@ -56,8 +60,10 @@ public abstract class OpenSslMlDsaKeyFactory extends KeyFactorySpi {
         }
     }
 
-    /** ML-DSA-65 
-     * @hide This class is not part of the Android public SDK API*/
+    /**
+     * ML-DSA-65
+     * @hide This class is not part of the Android public SDK API
+     */
     public static class MlDsa65 extends OpenSslMlDsaKeyFactory {
         public MlDsa65() {
             super(MlDsaAlgorithm.ML_DSA_65);
@@ -68,8 +74,10 @@ public abstract class OpenSslMlDsaKeyFactory extends KeyFactorySpi {
         }
     }
 
-    /** ML-DSA-87 
-     * @hide This class is not part of the Android public SDK API*/
+    /**
+     * ML-DSA-87
+     * @hide This class is not part of the Android public SDK API
+     */
     public static class MlDsa87 extends OpenSslMlDsaKeyFactory {
         public MlDsa87() {
             super(MlDsaAlgorithm.ML_DSA_87);
@@ -135,7 +143,7 @@ public abstract class OpenSslMlDsaKeyFactory extends KeyFactorySpi {
         }
         if (!(keySpec instanceof EncodedKeySpec)) {
             throw new InvalidKeySpecException("Currently only EncodedKeySpec is supported; was "
-                    + keySpec.getClass().getName());
+                                              + keySpec.getClass().getName());
         }
         EncodedKeySpec encodedKeySpec = (EncodedKeySpec) keySpec;
         if (encodedKeySpec.getFormat().equalsIgnoreCase("raw")) {
@@ -147,10 +155,10 @@ public abstract class OpenSslMlDsaKeyFactory extends KeyFactorySpi {
         }
         byte[] encoded = encodedKeySpec.getEncoded();
         try {
-            OpenSSLKey key =
-                    new OpenSSLKey(NativeCrypto.EVP_PKEY_from_subject_public_key_info(encoded,
-                            new int[] {NativeConstants.EVP_PKEY_ML_DSA_65,
-                                    NativeConstants.EVP_PKEY_ML_DSA_87}));
+            OpenSSLKey key = new OpenSSLKey(NativeCrypto.EVP_PKEY_from_subject_public_key_info(
+                    encoded,
+                    new int[] {NativeConstants.EVP_PKEY_ML_DSA_65,
+                               NativeConstants.EVP_PKEY_ML_DSA_87}));
             return makePublicKey(key);
         } catch (OpenSSLX509CertificateFactory.ParsingException e) {
             throw new InvalidKeySpecException(
@@ -193,7 +201,7 @@ public abstract class OpenSslMlDsaKeyFactory extends KeyFactorySpi {
         }
         if (!(keySpec instanceof EncodedKeySpec)) {
             throw new InvalidKeySpecException("Currently only EncodedKeySpec is supported; was "
-                    + keySpec.getClass().getName());
+                                              + keySpec.getClass().getName());
         }
         EncodedKeySpec encodedKeySpec = (EncodedKeySpec) keySpec;
         if (encodedKeySpec.getFormat().equalsIgnoreCase("raw")) {
@@ -206,9 +214,10 @@ public abstract class OpenSslMlDsaKeyFactory extends KeyFactorySpi {
 
         byte[] encoded = encodedKeySpec.getEncoded();
         try {
-            OpenSSLKey key = new OpenSSLKey(NativeCrypto.EVP_PKEY_from_private_key_info(encoded,
+            OpenSSLKey key = new OpenSSLKey(NativeCrypto.EVP_PKEY_from_private_key_info(
+                    encoded,
                     new int[] {NativeConstants.EVP_PKEY_ML_DSA_65,
-                            NativeConstants.EVP_PKEY_ML_DSA_87}));
+                               NativeConstants.EVP_PKEY_ML_DSA_87}));
             return makePrivateKey(key);
         } catch (OpenSSLX509CertificateFactory.ParsingException e) {
             throw new InvalidKeySpecException(
@@ -257,7 +266,8 @@ public abstract class OpenSslMlDsaKeyFactory extends KeyFactorySpi {
             }
         }
         throw new InvalidKeySpecException("Unsupported key type and key spec combination; key="
-                + key.getClass().getName() + ", keySpec=" + keySpec.getName());
+                                          + key.getClass().getName()
+                                          + ", keySpec=" + keySpec.getName());
     }
 
     @Override

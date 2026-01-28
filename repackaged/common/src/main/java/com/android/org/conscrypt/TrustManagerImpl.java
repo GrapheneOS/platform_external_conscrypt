@@ -171,8 +171,8 @@ public final class TrustManagerImpl
     }
 
     @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
-    public TrustManagerImpl(
-            KeyStore keyStore, CertPinManager manager, ConscryptCertStore certStore) {
+    public TrustManagerImpl(KeyStore keyStore, CertPinManager manager,
+                            ConscryptCertStore certStore) {
         CertPathValidator validatorLocal = null;
         CertificateFactory factoryLocal = null;
         KeyStore rootKeyStoreLocal = null;
@@ -186,7 +186,7 @@ public final class TrustManagerImpl
 
             // if we have an AndroidCAStore, we will lazily load CAs
             if ("AndroidCAStore".equals(keyStore.getType())
-                    && Platform.supportsConscryptCertStore()) {
+                && Platform.supportsConscryptCertStore()) {
                 rootKeyStoreLocal = keyStore;
                 trustedCertificateStoreLocal =
                         (certStore != null) ? certStore : Platform.newDefaultCertStore();
@@ -194,8 +194,8 @@ public final class TrustManagerImpl
             } else {
                 trustedCertificateStoreLocal = certStore;
                 acceptedIssuersLocal = acceptedIssuers(keyStore);
-                trustedCertificateIndexLocal
-                        = new TrustedCertificateIndex(trustAnchors(acceptedIssuersLocal));
+                trustedCertificateIndexLocal =
+                        new TrustedCertificateIndex(trustAnchors(acceptedIssuersLocal));
             }
 
         } catch (Exception e) {
@@ -285,9 +285,9 @@ public final class TrustManagerImpl
      * For backward compatibility with older Android API that used String for the hostname only.
      */
     public List<X509Certificate> checkClientTrusted(X509Certificate[] chain, String authType,
-            String hostname) throws CertificateException {
+                                                    String hostname) throws CertificateException {
         return checkTrusted(chain, null /* ocspData */, null /* tlsSctData */, authType, hostname,
-                true);
+                            true);
     }
 
     private static SSLSession getHandshakeSessionOrThrow(SSLSocket sslSocket)
@@ -336,10 +336,10 @@ public final class TrustManagerImpl
     @android.compat.annotation.UnsupportedAppUsage
     @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
     @Override
-    public List<X509Certificate> checkServerTrusted(
-            X509Certificate[] chain, String authType, String hostname) throws CertificateException {
+    public List<X509Certificate> checkServerTrusted(X509Certificate[] chain, String authType,
+                                                    String hostname) throws CertificateException {
         return checkTrusted(chain, null /* ocspData */, null /* tlsSctData */, authType, hostname,
-                false);
+                            false);
     }
 
     /**
@@ -347,12 +347,12 @@ public final class TrustManagerImpl
      * Socket (e.g., Cronet).
      */
     @android.annotation.FlaggedApi(com.android.org.conscrypt.flags.Flags
-                    .FLAG_CERTIFICATE_TRANSPARENCY_CHECKSERVERTRUSTED_API)
+                                           .FLAG_CERTIFICATE_TRANSPARENCY_CHECKSERVERTRUSTED_API)
     @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
     @Override
     public List<X509Certificate>
     checkServerTrusted(X509Certificate[] chain, byte[] ocspData, byte[] tlsSctData, String authType,
-            String hostname) throws CertificateException {
+                       String hostname) throws CertificateException {
         return checkTrusted(chain, ocspData, tlsSctData, authType, hostname, false);
     }
 
@@ -362,8 +362,9 @@ public final class TrustManagerImpl
      * Throws {@link CertificateException} when no trusted chain can be found from {@code certs}.
      */
     @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
-    public List<X509Certificate> getTrustedChainForServer(
-            X509Certificate[] certs, String authType, Socket socket) throws CertificateException {
+    public List<X509Certificate> getTrustedChainForServer(X509Certificate[] certs, String authType,
+                                                          Socket socket)
+            throws CertificateException {
         SSLSession session = null;
         SSLParameters parameters = null;
         if (socket instanceof SSLSocket) {
@@ -381,13 +382,14 @@ public final class TrustManagerImpl
      */
     @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
     public List<X509Certificate> getTrustedChainForServer(X509Certificate[] certs, String authType,
-            SSLEngine engine) throws CertificateException {
+                                                          SSLEngine engine)
+            throws CertificateException {
         SSLSession session = engine.getHandshakeSession();
         if (session == null) {
             throw new CertificateException("Not in handshake; no session available");
         }
         return checkTrusted(certs, authType, session, engine.getSSLParameters(),
-                false /* client auth */);
+                            false /* client auth */);
     }
 
     @Override
@@ -409,7 +411,8 @@ public final class TrustManagerImpl
      * the certificates used for making the trust decision.
      */
     public List<X509Certificate> checkServerTrusted(X509Certificate[] chain, String authType,
-            SSLSession session) throws CertificateException {
+                                                    SSLSession session)
+            throws CertificateException {
         return checkTrusted(chain, authType, session, null, false /* client auth */);
     }
 
@@ -423,8 +426,8 @@ public final class TrustManagerImpl
     }
 
     private List<X509Certificate> checkTrusted(X509Certificate[] certs, String authType,
-            SSLSession session, SSLParameters parameters, boolean clientAuth)
-                    throws CertificateException {
+                                               SSLSession session, SSLParameters parameters,
+                                               boolean clientAuth) throws CertificateException {
         byte[] ocspData = null;
         byte[] tlsSctData = null;
         String hostname = null;
@@ -462,7 +465,7 @@ public final class TrustManagerImpl
                     ocspResponses = (List<byte[]>) rawResponses;
                 }
             } catch (NoSuchMethodException | SecurityException | IllegalAccessException
-                    | IllegalArgumentException ignored) {
+                     | IllegalArgumentException ignored) {
                 // Method not available, fall through and return null
             } catch (InvocationTargetException e) {
                 throw new RuntimeException(e.getCause());
@@ -492,7 +495,7 @@ public final class TrustManagerImpl
                 data = (byte[]) rawData;
             }
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException
-                | IllegalArgumentException ignored) {
+                 | IllegalArgumentException ignored) {
             // Method not available, fall through and return null
         } catch (InvocationTargetException e) {
             throw new RuntimeException(e.getCause());
@@ -501,8 +504,8 @@ public final class TrustManagerImpl
     }
 
     private List<X509Certificate> checkTrusted(X509Certificate[] certs, byte[] ocspData,
-            byte[] tlsSctData, String authType, String host, boolean clientAuth)
-            throws CertificateException {
+                                               byte[] tlsSctData, String authType, String host,
+                                               boolean clientAuth) throws CertificateException {
         if (certs == null || certs.length == 0 || authType == null || authType.isEmpty()) {
             throw new IllegalArgumentException("null or zero-length parameter");
         }
@@ -524,8 +527,8 @@ public final class TrustManagerImpl
             untrustedChain.add(leaf);
         }
         used.add(leaf);
-        return checkTrustedRecursive(certs, ocspData, tlsSctData, host, clientAuth,
-                untrustedChain, trustedChain, used);
+        return checkTrustedRecursive(certs, ocspData, tlsSctData, host, clientAuth, untrustedChain,
+                                     trustedChain, used);
     }
 
     /**
@@ -552,9 +555,12 @@ public final class TrustManagerImpl
      * for trust decisions (e.g. showing the user a click through page based on the specific error).
      */
     private List<X509Certificate> checkTrustedRecursive(X509Certificate[] certs, byte[] ocspData,
-            byte[] tlsSctData, String host, boolean clientAuth,
-            List<X509Certificate> untrustedChain, List<TrustAnchor> trustAnchorChain,
-            Set<X509Certificate> used) throws CertificateException {
+                                                        byte[] tlsSctData, String host,
+                                                        boolean clientAuth,
+                                                        List<X509Certificate> untrustedChain,
+                                                        List<TrustAnchor> trustAnchorChain,
+                                                        Set<X509Certificate> used)
+            throws CertificateException {
         CertificateException lastException = null;
         X509Certificate current;
         if (trustAnchorChain.isEmpty()) {
@@ -569,7 +575,7 @@ public final class TrustManagerImpl
         // 1. If the current certificate in the chain is self-signed verify the chain as is.
         if (current.getIssuerDN().equals(current.getSubjectDN())) {
             return verifyChain(untrustedChain, trustAnchorChain, host, clientAuth, ocspData,
-                    tlsSctData);
+                               tlsSctData);
         }
 
         // 2. Try building a chain via any trust anchors that issued the current certificate.
@@ -590,7 +596,7 @@ public final class TrustManagerImpl
             trustAnchorChain.add(anchor);
             try {
                 return checkTrustedRecursive(certs, ocspData, tlsSctData, host, clientAuth,
-                        untrustedChain, trustAnchorChain, used);
+                                             untrustedChain, trustAnchorChain, used);
             } catch (CertificateException ex) {
                 lastException = ex;
             }
@@ -605,7 +611,7 @@ public final class TrustManagerImpl
         if (!trustAnchorChain.isEmpty()) {
             if (!seenIssuer) {
                 return verifyChain(untrustedChain, trustAnchorChain, host, clientAuth, ocspData,
-                        tlsSctData);
+                                   tlsSctData);
             }
 
             // Otherwise all chains based on the current trust anchor were rejected, fail.
@@ -627,15 +633,17 @@ public final class TrustManagerImpl
                     candidateIssuer.checkValidity();
                     ChainStrengthAnalyzer.checkCert(candidateIssuer);
                 } catch (CertificateException ex) {
-                    lastException = new CertificateException("Unacceptable certificate: "
-                            + candidateIssuer.getSubjectX500Principal(), ex);
+                    lastException = new CertificateException(
+                            "Unacceptable certificate: "
+                                    + candidateIssuer.getSubjectX500Principal(),
+                            ex);
                     continue;
                 }
                 used.add(candidateIssuer);
                 untrustedChain.add(candidateIssuer);
                 try {
                     return checkTrustedRecursive(certs, ocspData, tlsSctData, host, clientAuth,
-                            untrustedChain, trustAnchorChain, used);
+                                                 untrustedChain, trustAnchorChain, used);
                 } catch (CertificateException ex) {
                     lastException = ex;
                 }
@@ -658,7 +666,7 @@ public final class TrustManagerImpl
             untrustedChain.add(intermediateCert);
             try {
                 return checkTrustedRecursive(certs, ocspData, tlsSctData, host, clientAuth,
-                        untrustedChain, trustAnchorChain, used);
+                                             untrustedChain, trustAnchorChain, used);
             } catch (CertificateException ex) {
                 lastException = ex;
             }
@@ -680,13 +688,13 @@ public final class TrustManagerImpl
     }
 
     private List<X509Certificate> verifyChain(List<X509Certificate> untrustedChain,
-            List<TrustAnchor> trustAnchorChain, String host, boolean clientAuth, byte[] ocspData,
-            byte[] tlsSctData)
-            throws CertificateException {
+                                              List<TrustAnchor> trustAnchorChain, String host,
+                                              boolean clientAuth, byte[] ocspData,
+                                              byte[] tlsSctData) throws CertificateException {
         try {
             // build the cert path from the list of certs sans trust anchors
-            // TODO: check whether this is slow and should be replaced by a minimalistic CertPath impl
-            // since we already have built the path.
+            // TODO: check whether this is slow and should be replaced by a minimalistic CertPath
+            // impl since we already have built the path.
             CertPath certPath = factory.generateCertPath(untrustedChain);
 
             // Check that there are at least some trust anchors
@@ -710,7 +718,7 @@ public final class TrustManagerImpl
 
             // Check Certificate Transparency (if required).
             if (!clientAuth && host != null && ct != null
-                    && policy.isCertificateTransparencyVerificationRequired(host)) {
+                && policy.isCertificateTransparencyVerificationRequired(host)) {
                 ct.checkCT(wholeChain, ocspData, tlsSctData, host);
             }
 
@@ -812,7 +820,6 @@ public final class TrustManagerImpl
         return sortedAnchors;
     }
 
-
     /**
      * Comparator for sorting {@link TrustAnchor}s using a {@link CertificatePriorityComparator}.
      */
@@ -842,7 +849,6 @@ public final class TrustManagerImpl
      * clients, this includes anyExtendedKeyUsage and clientAuth.
      */
     private static class ExtendedKeyUsagePKIXCertPathChecker extends PKIXCertPathChecker {
-
         private static final String EKU_OID = "2.5.29.37";
 
         private static final String EKU_anyExtendedKeyUsage = "2.5.29.37.0";
@@ -940,8 +946,7 @@ public final class TrustManagerImpl
      * Find all possible issuing trust anchors of {@code cert}.
      */
     private Set<TrustAnchor> findAllTrustAnchorsByIssuerAndSignature(X509Certificate cert) {
-        Set<TrustAnchor> indexedAnchors =
-                trustedCertificateIndex.findAllByIssuerAndSignature(cert);
+        Set<TrustAnchor> indexedAnchors = trustedCertificateIndex.findAllByIssuerAndSignature(cert);
         if (!indexedAnchors.isEmpty() || trustedCertificateStore == null) {
             return indexedAnchors;
         }

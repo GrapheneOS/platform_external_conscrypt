@@ -44,7 +44,7 @@ public class ConscryptNetworkSecurityPolicy implements NetworkSecurityPolicy {
     public CertificateTransparencyVerificationReason getCertificateTransparencyVerificationReason(
             String hostname) {
         if (Platform.isSdkGreater(33)
-                && com.android.libcore.Flags.networkSecurityPolicyReasonCtEnabledApi()) {
+            && com.android.libcore.Flags.networkSecurityPolicyReasonCtEnabledApi()) {
             CertificateTransparencyVerificationReason reason = plaformCtReasonToConscryptReason(
                     policy.getCertificateTransparencyVerificationReason(hostname));
             if (reason != CertificateTransparencyVerificationReason.UNKNOWN) {
@@ -79,7 +79,7 @@ public class ConscryptNetworkSecurityPolicy implements NetworkSecurityPolicy {
         // Domain encryption is enabled if it is supported by the platform AND
         // the API is available in libcore.
         if (org.conscrypt.net.flags.Flags.encryptedClientHelloPlatform()
-                && com.android.libcore.Flags.networkSecurityPolicyEchApi()) {
+            && com.android.libcore.Flags.networkSecurityPolicyEchApi()) {
             return platformToConscryptEncryptionMode(policy.getDomainEncryptionMode(hostname));
         }
         return DomainEncryptionMode.UNKNOWN;

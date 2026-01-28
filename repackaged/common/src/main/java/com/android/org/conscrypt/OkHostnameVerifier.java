@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
+
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
 
@@ -51,8 +52,8 @@ public final class OkHostnameVerifier implements ConscryptHostnameVerifier {
      * hostnames; they will be verified as IP addresses (which is a more strict
      * verification).
      */
-    private static final Pattern VERIFY_AS_IP_ADDRESS = Pattern.compile(
-            "([0-9a-fA-F]*:[0-9a-fA-F:.]*)|([\\d.]+)");
+    private static final Pattern VERIFY_AS_IP_ADDRESS =
+            Pattern.compile("([0-9a-fA-F]*:[0-9a-fA-F:.]*)|([\\d.]+)");
 
     private static final int ALT_DNS_NAME = 2;
     private static final int ALT_IPA_NAME = 7;
@@ -86,9 +87,8 @@ public final class OkHostnameVerifier implements ConscryptHostnameVerifier {
     }
 
     public boolean verify(String host, X509Certificate certificate) {
-        return verifyAsIpAddress(host)
-                ? verifyIpAddress(host, certificate)
-                : verifyHostName(host, certificate);
+        return verifyAsIpAddress(host) ? verifyIpAddress(host, certificate)
+                                       : verifyHostName(host, certificate);
     }
 
     static boolean verifyAsIpAddress(String host) {
@@ -188,12 +188,12 @@ public final class OkHostnameVerifier implements ConscryptHostnameVerifier {
         // Basic sanity checks
         // Check length == 0 instead of .isEmpty() to support Java 5.
         if (hostName == null || hostName.length() == 0 || hostName.startsWith(".")
-                || hostName.endsWith("..")) {
+            || hostName.endsWith("..")) {
             // Invalid domain name
             return false;
         }
         if (pattern == null || pattern.length() == 0 || pattern.startsWith(".")
-                || pattern.endsWith("..")) {
+            || pattern.endsWith("..")) {
             // Invalid pattern/domain name
             return false;
         }
@@ -233,18 +233,20 @@ public final class OkHostnameVerifier implements ConscryptHostnameVerifier {
         //    For example, *.example.com matches test.example.com but does not match
         //    sub.test.example.com.
         // 3. Wildcard patterns for single-label domain names are not permitted.
-        // 4. Android-added: if strictWildcardMode is true then wildcards matching top-level domains,
+        // 4. Android-added: if strictWildcardMode is true then wildcards matching top-level
+        // domains,
         //    e.g. *.com, are not permitted.
 
         if (!pattern.startsWith("*.") || pattern.indexOf('*', 1) != -1) {
-            // Asterisk (*) is only permitted in the left-most domain name label and must be the only
-            // character in that label
+            // Asterisk (*) is only permitted in the left-most domain name label and must be the
+            // only character in that label
             return false;
         }
 
-        // Optimization: check whether hostName is too short to match the pattern. hostName must be at
-        // least as long as the pattern because asterisk must match the whole left-most label and
-        // hostName starts with a non-empty label. Thus, asterisk has to match one or more characters.
+        // Optimization: check whether hostName is too short to match the pattern. hostName must be
+        // at least as long as the pattern because asterisk must match the whole left-most label and
+        // hostName starts with a non-empty label. Thus, asterisk has to match one or more
+        // characters.
         if (hostName.length() < pattern.length()) {
             // hostName too short to match the pattern.
             return false;
@@ -277,7 +279,7 @@ public final class OkHostnameVerifier implements ConscryptHostnameVerifier {
         // Check that asterisk did not match across domain name labels.
         int suffixStartIndexInHostName = hostName.length() - suffix.length();
         if ((suffixStartIndexInHostName > 0)
-                && (hostName.lastIndexOf('.', suffixStartIndexInHostName - 1) != -1)) {
+            && (hostName.lastIndexOf('.', suffixStartIndexInHostName - 1) != -1)) {
             // Asterisk is matching across domain name labels -- not permitted.
             return false;
         }

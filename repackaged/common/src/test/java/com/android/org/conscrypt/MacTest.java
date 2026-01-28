@@ -19,12 +19,18 @@ package com.android.org.conscrypt;
 
 import static com.android.org.conscrypt.TestUtils.decodeHex;
 import static com.android.org.conscrypt.TestUtils.encodeHex;
+
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -40,15 +46,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import tests.util.ServiceTester;
 
+import tests.util.ServiceTester;
 
 /**
  * @hide This class is not part of the Android public SDK API
@@ -88,24 +91,24 @@ public class MacTest {
             byte[] expectedBytes = decodeHex(expected);
             SecretKeySpec secretKey = new SecretKeySpec(keyBytes, "RawBytes");
 
-            String baseFailMsg = String.format("Mac=%s\nKey=%s\nMsg=%s\nExpected=%s",
-                    algorithm, key, msg, expected);
+            String baseFailMsg = String.format("Mac=%s\nKey=%s\nMsg=%s\nExpected=%s", algorithm,
+                                               key, msg, expected);
 
             // Calculate using Mac.update(byte[])
             byte[] macBytes = generateMacUsingUpdate(algorithm, secretKey, msgBytes);
-            assertArrayEquals(failMessage("Using update()", baseFailMsg, macBytes),
-                    expectedBytes, macBytes);
+            assertArrayEquals(failMessage("Using update()", baseFailMsg, macBytes), expectedBytes,
+                              macBytes);
 
             // Calculate using Mac.final(byte[])
             macBytes = generateMacUsingFinal(algorithm, secretKey, msgBytes);
-            assertArrayEquals(failMessage("Using final()", baseFailMsg, macBytes),
-                    expectedBytes, macBytes);
+            assertArrayEquals(failMessage("Using final()", baseFailMsg, macBytes), expectedBytes,
+                              macBytes);
 
             // Calculate using Mac.update(ByteBuffer) with a single non-direct ByteBuffer
             ByteBuffer nondirectBuffer = ByteBuffer.wrap(msgBytes);
             macBytes = generateMac(algorithm, secretKey, nondirectBuffer);
             assertArrayEquals(failMessage("Non-direct ByteBuffer", baseFailMsg, macBytes),
-                    expectedBytes, macBytes);
+                              expectedBytes, macBytes);
 
             // Calculate using Mac.update(ByteBuffer) with a single direct ByteBuffer
             ByteBuffer directBuffer = ByteBuffer.allocateDirect(msgBytes.length);
@@ -113,29 +116,29 @@ public class MacTest {
             directBuffer.flip();
             macBytes = generateMac(algorithm, secretKey, directBuffer);
             assertArrayEquals(failMessage("Direct ByteBuffer", baseFailMsg, macBytes),
-                    expectedBytes, macBytes);
+                              expectedBytes, macBytes);
 
             // Calculate using Mac.update(ByteBuffer) with a multiple non-direct ByteBuffers
             nondirectBuffer.flip();
             macBytes = generateMac(algorithm, secretKey, split(nondirectBuffer));
             assertArrayEquals(failMessage("Multiple non-direct ByteBuffers", baseFailMsg, macBytes),
-                    expectedBytes, macBytes);
+                              expectedBytes, macBytes);
 
             // Calculate using Mac.update(ByteBuffer) with a multiple direct ByteBuffers
             directBuffer.flip();
             macBytes = generateMac(algorithm, secretKey, split(directBuffer));
             assertArrayEquals(failMessage("Multiple direct ByteBuffers", baseFailMsg, macBytes),
-                    expectedBytes, macBytes);
+                              expectedBytes, macBytes);
 
             // Calculated using a pre-loved Mac
             macBytes = generateReusingMac(algorithm, keyBytes, msgBytes);
-            assertArrayEquals(failMessage("Re-use Mac", baseFailMsg, macBytes),
-                    expectedBytes, macBytes);
+            assertArrayEquals(failMessage("Re-use Mac", baseFailMsg, macBytes), expectedBytes,
+                              macBytes);
 
             // Calculated using a pre-loved Mac with the same key
             macBytes = generateReusingMacSameKey(algorithm, secretKey, msgBytes);
             assertArrayEquals(failMessage("Re-use Mac same key", baseFailMsg, macBytes),
-                    expectedBytes, macBytes);
+                              expectedBytes, macBytes);
         }
     }
 
@@ -262,7 +265,7 @@ public class MacTest {
                 .skipCombination("BC", "PBEWITHHMACSHA512");
     }
 
-    private static class DummyParameterSpec implements AlgorithmParameterSpec { }
+    private static class DummyParameterSpec implements AlgorithmParameterSpec {}
 
     @Test
     public void algorithmParameters() {
@@ -363,7 +366,7 @@ public class MacTest {
 
     private byte[] generateMac(String algorithm, SecretKeySpec key, ByteBuffer buffer)
             throws Exception {
-        return generateMac(algorithm, key, new ByteBuffer[] { buffer });
+        return generateMac(algorithm, key, new ByteBuffer[] {buffer});
     }
 
     private byte[] generateMac(String algorithm, SecretKeySpec key, ByteBuffer[] buffers)

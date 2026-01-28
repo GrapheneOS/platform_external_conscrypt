@@ -16,9 +16,10 @@
  */
 package com.android.org.conscrypt.tlswire.record;
 
+import com.android.org.conscrypt.tlswire.util.TlsProtocolVersion;
+
 import java.io.DataInput;
 import java.io.IOException;
-import com.android.org.conscrypt.tlswire.util.TlsProtocolVersion;
 
 /**
  * TLS Record Protocol record from TLS 1.2 RFC 5246.

@@ -34,6 +34,7 @@
 package com.android.org.conscrypt;
 
 import java.nio.ByteBuffer;
+
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLEngineResult.HandshakeStatus;
@@ -116,7 +117,7 @@ public final class EngineHandshakeBenchmark {
             doHalfHandshake(client, server, clientPacketBuffer, serverApplicationBuffer);
 
             if (client.getHandshakeStatus() == HandshakeStatus.NOT_HANDSHAKING
-                    && server.getHandshakeStatus() == HandshakeStatus.NOT_HANDSHAKING) {
+                && server.getHandshakeStatus() == HandshakeStatus.NOT_HANDSHAKING) {
                 return;
             }
 
@@ -124,15 +125,15 @@ public final class EngineHandshakeBenchmark {
             doHalfHandshake(server, client, serverPacketBuffer, clientApplicationBuffer);
 
             if (client.getHandshakeStatus() == HandshakeStatus.NOT_HANDSHAKING
-                    && server.getHandshakeStatus() == HandshakeStatus.NOT_HANDSHAKING) {
+                && server.getHandshakeStatus() == HandshakeStatus.NOT_HANDSHAKING) {
                 return;
             }
         }
     }
 
     private void doHalfHandshake(SSLEngine sender, SSLEngine receiver,
-            ByteBuffer senderPacketBuffer, ByteBuffer receiverApplicationBuffer)
-            throws SSLException {
+                                 ByteBuffer senderPacketBuffer,
+                                 ByteBuffer receiverApplicationBuffer) throws SSLException {
         SSLEngineResult senderResult;
         SSLEngineResult receiverResult;
 

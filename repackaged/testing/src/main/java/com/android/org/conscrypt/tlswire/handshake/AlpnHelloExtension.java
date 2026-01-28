@@ -30,7 +30,6 @@ import java.util.List;
  * @hide This class is not part of the Android public SDK API
  */
 public class AlpnHelloExtension extends HelloExtension {
-
     public List<String> protocols;
 
     @Override

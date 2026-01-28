@@ -100,7 +100,7 @@ public class KeyFactoryTestRSA extends AbstractKeyFactoryTest<RSAPublicKeySpec, 
 
         try {
             factory.getKeySpec(new TestPrivateKey(DefaultKeys.getPrivateKey("RSA"), "Invalid"),
-                    RSAPrivateKeySpec.class);
+                               RSAPrivateKeySpec.class);
             fail();
         } catch (InvalidKeySpecException e) {
             // expected
@@ -108,7 +108,7 @@ public class KeyFactoryTestRSA extends AbstractKeyFactoryTest<RSAPublicKeySpec, 
 
         try {
             factory.getKeySpec(new TestPrivateKey(DefaultKeys.getPrivateKey("RSA"), "Invalid"),
-                    RSAPrivateCrtKeySpec.class);
+                               RSAPrivateCrtKeySpec.class);
             fail();
         } catch (InvalidKeySpecException e) {
             // expected
@@ -116,7 +116,7 @@ public class KeyFactoryTestRSA extends AbstractKeyFactoryTest<RSAPublicKeySpec, 
 
         try {
             factory.getKeySpec(new TestPublicKey(DefaultKeys.getPublicKey("RSA"), "Invalid"),
-                    RSAPublicKeySpec.class);
+                               RSAPublicKeySpec.class);
             fail();
         } catch (InvalidKeySpecException e) {
             // expected

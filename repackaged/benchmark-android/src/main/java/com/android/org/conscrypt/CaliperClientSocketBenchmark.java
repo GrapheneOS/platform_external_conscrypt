@@ -17,11 +17,12 @@
 
 package com.android.org.conscrypt;
 
+import com.android.org.conscrypt.ClientSocketBenchmark.Config;
+
 import com.google.caliper.AfterExperiment;
 import com.google.caliper.BeforeExperiment;
 import com.google.caliper.Benchmark;
 import com.google.caliper.Param;
-import com.android.org.conscrypt.ClientSocketBenchmark.Config;
 
 /**
  * Benchmark for comparing performance of client socket implementations.
@@ -29,71 +30,66 @@ import com.android.org.conscrypt.ClientSocketBenchmark.Config;
  */
 @SuppressWarnings("unused")
 public class CaliperClientSocketBenchmark {
+    private final CaliperConfig config = new CaliperConfig();
 
-  private final CaliperConfig config = new CaliperConfig();
+    @Param public AndroidEndpointFactory socketType;
 
-  @Param
-  public AndroidEndpointFactory socketType;
+    @Param({"64", "512", "4096"}) public int messageSize;
 
-  @Param({"64", "512", "4096"})
-  public int messageSize;
+    @Param({TestUtils.TEST_CIPHER}) public String cipher;
 
-  @Param({TestUtils.TEST_CIPHER})
-  public String cipher;
+    @Param public BenchmarkProtocol protocol;
 
-  @Param
-  public BenchmarkProtocol protocol;
+    @Param public ChannelType channelType;
 
-  @Param
-  public ChannelType channelType;
+    private ClientSocketBenchmark benchmark;
 
-  private ClientSocketBenchmark benchmark;
-
-  @BeforeExperiment
-  public void setup() throws Exception {
-    benchmark = new ClientSocketBenchmark(config);
-  }
-
-  @AfterExperiment
-  public void teardown() throws Exception {
-    benchmark.close();
-  }
-
-  @Benchmark
-  public final void time(int numMessages) throws Exception {
-    benchmark.time(numMessages);
-  }
-
-  private final class CaliperConfig implements Config {
-    @Override
-    public EndpointFactory clientFactory() {
-      return socketType;
+    @BeforeExperiment
+    public void setup() throws Exception {
+        benchmark = new ClientSocketBenchmark(config);
     }
 
-    @Override
-    public EndpointFactory serverFactory() {
-      // Use the same server for all benchmarks, since we're looking at the perf of the client.
-      return AndroidEndpointFactory.CONSCRYPT_ENGINE;
+    @AfterExperiment
+    public void teardown() throws Exception {
+        benchmark.close();
     }
 
-    @Override
-    public int messageSize() {
-      return messageSize;
+    @Benchmark
+    public final void time(int numMessages) throws Exception {
+        benchmark.time(numMessages);
     }
 
-    @Override
-    public String cipher() {
-      return cipher;
-    }
+    private final class CaliperConfig implements Config {
+        @Override
+        public EndpointFactory clientFactory() {
+            return socketType;
+        }
 
-    @Override
-    public ChannelType channelType() {
-      return channelType;
-    }
+        @Override
+        public EndpointFactory serverFactory() {
+            // Use the same server for all benchmarks, since we're looking at the perf of the
+            // client.
+            return AndroidEndpointFactory.CONSCRYPT_ENGINE;
+        }
 
-    @Override
-    public BenchmarkProtocol protocol() {
-      return protocol;
+        @Override
+        public int messageSize() {
+            return messageSize;
+        }
+
+        @Override
+        public String cipher() {
+            return cipher;
+        }
+
+        @Override
+        public ChannelType channelType() {
+            return channelType;
+        }
+
+        @Override
+        public BenchmarkProtocol protocol() {
+            return protocol;
+        }
     }
-  }
 }

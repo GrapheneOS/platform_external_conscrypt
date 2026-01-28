@@ -74,7 +74,8 @@ public class SpakeTest {
             Executors.newCachedThreadPool(t -> new Thread(threadGroup, t));
 
     private Pair<SSLContext, SSLContext> createContexts(PakeClientKeyManagerParameters clientParams,
-            PakeServerKeyManagerParameters serverParams) throws Exception {
+                                                        PakeServerKeyManagerParameters serverParams)
+            throws Exception {
         InetAddress hostC = TestUtils.getLoopbackAddress();
         InetAddress hostS = TestUtils.getLoopbackAddress();
 
@@ -462,17 +463,15 @@ public class SpakeTest {
     public void testSpake2PlusAndOthersInvalid() throws Exception {
         byte[] password = new byte[] {1, 2, 3};
 
-        PakeOption option =
-                new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
-                        .addMessageComponent("password", password)
-                        .build();
+        PakeOption option = new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
+                                    .addMessageComponent("password", password)
+                                    .build();
 
-        PakeClientKeyManagerParameters pakeParams =
-                new PakeClientKeyManagerParameters.Builder()
-                        .setClientId(CLIENT_ID.clone())
-                        .setServerId(SERVER_ID.clone())
-                        .addOption(option)
-                        .build();
+        PakeClientKeyManagerParameters pakeParams = new PakeClientKeyManagerParameters.Builder()
+                                                            .setClientId(CLIENT_ID.clone())
+                                                            .setServerId(SERVER_ID.clone())
+                                                            .addOption(option)
+                                                            .build();
 
         KeyManagerFactory kmf = KeyManagerFactory.getInstance("PAKE");
         kmf.init(pakeParams);
@@ -494,26 +493,23 @@ public class SpakeTest {
 
         SSLContext sslContext = SSLContext.getInstance("TlsV1.3");
         // Should throw due to both SPAKE and x509 key managers
-        assertThrows(
-                KeyManagementException.class,
-                () -> sslContext.init(keyManagersWithx509, trustManagers, null));
+        assertThrows(KeyManagementException.class,
+                     () -> sslContext.init(keyManagersWithx509, trustManagers, null));
     }
 
     @Test
     public void testSpake2PlusNoTrustOrKeyInvalid() throws Exception {
         byte[] password = new byte[] {1, 2, 3};
 
-        PakeOption option =
-                new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
-                        .addMessageComponent("password", password)
-                        .build();
+        PakeOption option = new PakeOption.Builder("SPAKE2PLUS_PRERELEASE")
+                                    .addMessageComponent("password", password)
+                                    .build();
 
-        PakeClientKeyManagerParameters pakeParams =
-                new PakeClientKeyManagerParameters.Builder()
-                        .setClientId(CLIENT_ID.clone())
-                        .setServerId(SERVER_ID.clone())
-                        .addOption(option)
-                        .build();
+        PakeClientKeyManagerParameters pakeParams = new PakeClientKeyManagerParameters.Builder()
+                                                            .setClientId(CLIENT_ID.clone())
+                                                            .setServerId(SERVER_ID.clone())
+                                                            .addOption(option)
+                                                            .build();
 
         KeyManagerFactory kmf = KeyManagerFactory.getInstance("PAKE");
         kmf.init(pakeParams);
@@ -527,8 +523,8 @@ public class SpakeTest {
         SSLContext sslContext = SSLContext.getInstance("TlsV1.3");
         assertThrows(KeyManagementException.class, () -> sslContext.init(keyManagers, null, null));
 
-        assertThrows(
-                KeyManagementException.class, () -> sslContext.init(null, trustManagers, null));
+        assertThrows(KeyManagementException.class,
+                     () -> sslContext.init(null, trustManagers, null));
     }
 
     @Test

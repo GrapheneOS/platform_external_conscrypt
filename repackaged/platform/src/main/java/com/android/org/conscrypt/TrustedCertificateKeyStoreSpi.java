@@ -32,7 +32,6 @@ import java.util.Enumeration;
  */
 @Internal
 public final class TrustedCertificateKeyStoreSpi extends KeyStoreSpi {
-
     private final TrustedCertificateStore store = new TrustedCertificateStore();
 
     @Override
@@ -62,8 +61,7 @@ public final class TrustedCertificateKeyStoreSpi extends KeyStoreSpi {
     }
 
     @Override
-    public void engineSetKeyEntry(
-            String alias, Key key, char[] password, Certificate[] chain) {
+    public void engineSetKeyEntry(String alias, Key key, char[] password, Certificate[] chain) {
         throw new UnsupportedOperationException();
     }
 

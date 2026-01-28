@@ -40,7 +40,6 @@ import javax.net.ssl.SSLContext;
  */
 @RunWith(JUnit4.class)
 public class ConscryptTest {
-
     /**
      * This confirms that the version machinery is working.
      */

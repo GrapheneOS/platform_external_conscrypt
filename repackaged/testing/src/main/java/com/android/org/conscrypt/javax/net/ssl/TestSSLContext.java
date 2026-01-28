@@ -18,6 +18,9 @@ package com.android.org.conscrypt.javax.net.ssl;
 
 import static org.junit.Assert.assertTrue;
 
+import com.android.org.conscrypt.TestUtils;
+import com.android.org.conscrypt.java.security.TestKeyStore;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -35,6 +38,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
+
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
@@ -42,8 +46,6 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import com.android.org.conscrypt.TestUtils;
-import com.android.org.conscrypt.java.security.TestKeyStore;
 
 /**
  * TestSSLContext is a convenience class for other tests that
@@ -171,10 +173,11 @@ public final class TestSSLContext {
         return (InetSocketAddress) ois.readObject();
     }
     private TestSSLContext(KeyStore clientKeyStore, char[] clientStorePassword,
-            KeyStore serverKeyStore, char[] serverStorePassword, KeyManager[] clientKeyManagers,
-            KeyManager[] serverKeyManagers, X509TrustManager clientTrustManager,
-            X509TrustManager serverTrustManager, SSLContext clientContext,
-            SSLContext serverContext, SSLServerSocket serverSocket, InetAddress host, int port) {
+                           KeyStore serverKeyStore, char[] serverStorePassword,
+                           KeyManager[] clientKeyManagers, KeyManager[] serverKeyManagers,
+                           X509TrustManager clientTrustManager, X509TrustManager serverTrustManager,
+                           SSLContext clientContext, SSLContext serverContext,
+                           SSLServerSocket serverSocket, InetAddress host, int port) {
         this.clientKeyStore = clientKeyStore;
         this.clientStorePassword = clientStorePassword;
         this.serverKeyStore = serverKeyStore;
@@ -325,11 +328,11 @@ public final class TestSSLContext {
                 clientContext = clientContext != null
                         ? clientContext
                         : createSSLContext(clientProtocol, clientKeyManagers,
-                                  new TrustManager[] {clientTrustManager});
+                                           new TrustManager[] {clientTrustManager});
                 serverContext = serverContext != null
                         ? serverContext
                         : createSSLContext(serverProtocol, serverKeyManagers,
-                                  new TrustManager[] {serverTrustManager});
+                                           new TrustManager[] {serverTrustManager});
             }
 
             // Create the context.
@@ -344,10 +347,10 @@ public final class TestSSLContext {
                 InetAddress host = TestUtils.getLoopbackAddress();
                 serverSocket.bind(new InetSocketAddress(host, 0));
                 int port = serverSocket.getLocalPort();
-                return new TestSSLContext(client != null ? client.keyStore : null,
-                        clientStorePassword, server != null ? server.keyStore : null,
-                        serverStorePassword, clientKeyManagers, serverKeyManagers,
-                        (X509TrustManager) clientTrustManager,
+                return new TestSSLContext(
+                        client != null ? client.keyStore : null, clientStorePassword,
+                        server != null ? server.keyStore : null, serverStorePassword,
+                        clientKeyManagers, serverKeyManagers, (X509TrustManager) clientTrustManager,
                         (X509TrustManager) serverTrustManager, clientContext, serverContext,
                         serverSocket, host, port);
             } catch (RuntimeException e) {
@@ -379,7 +382,7 @@ public final class TestSSLContext {
      * using the certificates authorities from the same KeyStore.
      */
     public static SSLContext createSSLContext(final String protocol, final KeyManager[] keyManagers,
-            final TrustManager[] trustManagers) {
+                                              final TrustManager[] trustManagers) {
         try {
             SSLContext context = SSLContext.getInstance(protocol);
             context.init(keyManagers, trustManagers, new SecureRandom());
@@ -419,13 +422,15 @@ public final class TestSSLContext {
         }
         assertTrue(found);
     }
-    public static void assertServerCertificateChain(
-            X509TrustManager trustManager, Certificate[] serverChain) throws CertificateException {
+    public static void assertServerCertificateChain(X509TrustManager trustManager,
+                                                    Certificate[] serverChain)
+            throws CertificateException {
         X509Certificate[] chain = (X509Certificate[]) serverChain;
         trustManager.checkServerTrusted(chain, chain[0].getPublicKey().getAlgorithm());
     }
-    public static void assertClientCertificateChain(
-            X509TrustManager trustManager, Certificate[] clientChain) throws CertificateException {
+    public static void assertClientCertificateChain(X509TrustManager trustManager,
+                                                    Certificate[] clientChain)
+            throws CertificateException {
         X509Certificate[] chain = (X509Certificate[]) clientChain;
         trustManager.checkClientTrusted(chain, chain[0].getPublicKey().getAlgorithm());
     }
@@ -433,8 +438,8 @@ public final class TestSSLContext {
      * Returns an SSLSocketFactory that calls setWantClientAuth and
      * setNeedClientAuth as specified on all returned sockets.
      */
-    public static SSLSocketFactory clientAuth(
-            final SSLSocketFactory sf, final boolean want, final boolean need) {
+    public static SSLSocketFactory clientAuth(final SSLSocketFactory sf, final boolean want,
+                                              final boolean need) {
         return new SSLSocketFactory() {
             private SSLSocket set(Socket socket) {
                 SSLSocket s = (SSLSocket) socket;
@@ -457,7 +462,7 @@ public final class TestSSLContext {
             }
             @Override
             public Socket createSocket(InetAddress address, int port, InetAddress localAddress,
-                    int localPort) throws IOException {
+                                       int localPort) throws IOException {
                 return set(sf.createSocket(address, port));
             }
             @Override

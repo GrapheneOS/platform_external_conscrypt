@@ -43,7 +43,7 @@ public abstract class OpenSSLAeadCipherAES extends OpenSSLAeadCipher {
                 return;
             default:
                 throw new InvalidKeyException("Unsupported key size: " + keyLength
-                    + " bytes (must be 16 or 32)");
+                                              + " bytes (must be 16 or 32)");
         }
     }
 
@@ -59,7 +59,7 @@ public abstract class OpenSSLAeadCipherAES extends OpenSSLAeadCipher {
 
     @Override
     protected AlgorithmParameterSpec getParameterSpec(AlgorithmParameters params)
-        throws InvalidAlgorithmParameterException {
+            throws InvalidAlgorithmParameterException {
         if (params != null) {
             AlgorithmParameterSpec spec = Platform.fromGCMParameters(params);
             if (spec != null) {
@@ -77,8 +77,7 @@ public abstract class OpenSSLAeadCipherAES extends OpenSSLAeadCipher {
             return null;
         }
 
-        AlgorithmParameterSpec spec = Platform.toGCMParameterSpec(
-            tagLengthInBytes * 8, iv);
+        AlgorithmParameterSpec spec = Platform.toGCMParameterSpec(tagLengthInBytes * 8, iv);
         if (spec == null) {
             // The platform doesn't support GCMParameterSpec. Fall back to
             // the generic AES parameters so at least the caller can get the
@@ -92,7 +91,7 @@ public abstract class OpenSSLAeadCipherAES extends OpenSSLAeadCipher {
             return params;
         } catch (NoSuchAlgorithmException e) {
             // We should not get here.
-            throw (Error) new AssertionError("GCM not supported").initCause(e);
+            throw(Error) new AssertionError("GCM not supported").initCause(e);
         } catch (InvalidParameterSpecException e) {
             // This may happen since Conscrypt doesn't provide this itself.
             return null;
@@ -115,7 +114,6 @@ public abstract class OpenSSLAeadCipherAES extends OpenSSLAeadCipher {
      * @hide This class is not part of the Android public SDK API
      */
     public static class GCM extends OpenSSLAeadCipherAES {
-
         public GCM() {
             super(Mode.GCM);
         }
@@ -147,8 +145,8 @@ public abstract class OpenSSLAeadCipherAES extends OpenSSLAeadCipher {
             @Override
             void checkSupportedKeySize(int keyLength) throws InvalidKeyException {
                 if (keyLength != 16) { // 128 bits
-                    throw new InvalidKeyException(
-                        "Unsupported key size: " + keyLength + " bytes (must be 16)");
+                    throw new InvalidKeyException("Unsupported key size: " + keyLength
+                                                  + " bytes (must be 16)");
                 }
             }
         }
@@ -162,8 +160,8 @@ public abstract class OpenSSLAeadCipherAES extends OpenSSLAeadCipher {
             @Override
             void checkSupportedKeySize(int keyLength) throws InvalidKeyException {
                 if (keyLength != 32) { // 256 bits
-                    throw new InvalidKeyException(
-                        "Unsupported key size: " + keyLength + " bytes (must be 32)");
+                    throw new InvalidKeyException("Unsupported key size: " + keyLength
+                                                  + " bytes (must be 32)");
                 }
             }
         }
@@ -191,11 +189,11 @@ public abstract class OpenSSLAeadCipherAES extends OpenSSLAeadCipher {
 
         @Override
         void checkSupportedTagLength(int tagLengthInBits)
-            throws InvalidAlgorithmParameterException {
+                throws InvalidAlgorithmParameterException {
             // GCM_SIV only supports full-size tags
             if (tagLengthInBits != DEFAULT_TAG_SIZE_BITS) {
-                throw new InvalidAlgorithmParameterException(
-                    "Tag length must be " + DEFAULT_TAG_SIZE_BITS + " bits");
+                throw new InvalidAlgorithmParameterException("Tag length must be "
+                                                             + DEFAULT_TAG_SIZE_BITS + " bits");
             }
         }
 
@@ -219,8 +217,8 @@ public abstract class OpenSSLAeadCipherAES extends OpenSSLAeadCipher {
             @Override
             void checkSupportedKeySize(int keyLength) throws InvalidKeyException {
                 if (keyLength != 16) { // 128 bits
-                    throw new InvalidKeyException(
-                        "Unsupported key size: " + keyLength + " bytes (must be 16)");
+                    throw new InvalidKeyException("Unsupported key size: " + keyLength
+                                                  + " bytes (must be 16)");
                 }
             }
         }
@@ -234,8 +232,8 @@ public abstract class OpenSSLAeadCipherAES extends OpenSSLAeadCipher {
             @Override
             void checkSupportedKeySize(int keyLength) throws InvalidKeyException {
                 if (keyLength != 32) { // 256 bits
-                    throw new InvalidKeyException(
-                        "Unsupported key size: " + keyLength + " bytes (must be 32)");
+                    throw new InvalidKeyException("Unsupported key size: " + keyLength
+                                                  + " bytes (must be 32)");
                 }
             }
         }

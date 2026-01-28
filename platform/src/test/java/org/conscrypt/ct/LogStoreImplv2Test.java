@@ -24,7 +24,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import org.conscrypt.OpenSSLKey;
 import org.conscrypt.metrics.NoopStatsLog;
-
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,8 +57,8 @@ public class LogStoreImplv2Test {
             return true;
         }
         @Override
-        public PolicyCompliance doesResultConformToPolicy(
-                VerificationResult result, X509Certificate leaf) {
+        public PolicyCompliance doesResultConformToPolicy(VerificationResult result,
+                                                          X509Certificate leaf) {
             return PolicyCompliance.COMPLY;
         }
     };
@@ -70,8 +69,8 @@ public class LogStoreImplv2Test {
             return false;
         }
         @Override
-        public PolicyCompliance doesResultConformToPolicy(
-                VerificationResult result, X509Certificate leaf) {
+        public PolicyCompliance doesResultConformToPolicy(VerificationResult result,
+                                                          X509Certificate leaf) {
             return PolicyCompliance.COMPLY;
         }
     };
@@ -205,9 +204,10 @@ public class LogStoreImplv2Test {
         TimeSupplier fakeTime = new TimeSupplier(/* currentTimeInMs= */ JAN2024);
         LogStore store = new LogStoreImplv2(alwaysCompliantStorePolicy, logList, metrics, fakeTime);
         byte[] pem = ("-----BEGIN PUBLIC KEY-----\n"
-                + "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEHblsqctplMVc5ramA7vSuNxUQxcomQwGAVAdnWTAWUYr"
-                + "3MgDHQW0LagJ95lB7QT75Ve6JgT2EVLOFGU7L3YrwA=="
-                + "\n-----END PUBLIC KEY-----\n")
+                      + "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEHblsqctplMVc5ramA7vSuNxUQxcomQwGAVAdnW"
+                      + "TAWUYr"
+                      + "3MgDHQW0LagJ95lB7QT75Ve6JgT2EVLOFGU7L3YrwA=="
+                      + "\n-----END PUBLIC KEY-----\n")
                              .getBytes(US_ASCII);
         ByteArrayInputStream is = new ByteArrayInputStream(pem);
         LogInfo log1 =
@@ -223,7 +223,7 @@ public class LogStoreImplv2Test {
         assertEquals("An existing logId should be returned", log1, store.getKnownLog(log1Id));
         assertEquals("One metric update should be emitted", 1, metrics.states.size());
         assertEquals("The metric update for log list state should be compliant",
-                LogStore.State.COMPLIANT, metrics.states.get(0));
+                     LogStore.State.COMPLIANT, metrics.states.get(0));
     }
 
     @Test
@@ -234,11 +234,11 @@ public class LogStoreImplv2Test {
         TimeSupplier fakeTime = new TimeSupplier(/* currentTimeInMs= */ JAN2024);
         LogStore store = new LogStoreImplv2(alwaysCompliantStorePolicy, logList, metrics, fakeTime);
 
-        assertEquals(
-                "The log state should be malformed", LogStore.State.MALFORMED, store.getState());
+        assertEquals("The log state should be malformed", LogStore.State.MALFORMED,
+                     store.getState());
         assertEquals("One metric update should be emitted", 1, metrics.states.size());
         assertEquals("The metric update for log list state should be malformed",
-                LogStore.State.MALFORMED, metrics.states.get(0));
+                     LogStore.State.MALFORMED, metrics.states.get(0));
     }
 
     @Test
@@ -248,11 +248,11 @@ public class LogStoreImplv2Test {
         TimeSupplier fakeTime = new TimeSupplier(/* currentTimeInMs= */ JAN2022);
         LogStore store = new LogStoreImplv2(alwaysCompliantStorePolicy, logList, metrics, fakeTime);
 
-        assertEquals(
-                "The log state should be malformed", LogStore.State.MALFORMED, store.getState());
+        assertEquals("The log state should be malformed", LogStore.State.MALFORMED,
+                     store.getState());
         assertEquals("One metric update should be emitted", 1, metrics.states.size());
         assertEquals("The metric update for log list state should be malformed",
-                LogStore.State.MALFORMED, metrics.states.get(0));
+                     LogStore.State.MALFORMED, metrics.states.get(0));
     }
 
     @Test
@@ -263,11 +263,11 @@ public class LogStoreImplv2Test {
         LogStore store =
                 new LogStoreImplv2(alwaysCompliantStorePolicy, missingLogList, metrics, fakeTime);
 
-        assertEquals(
-                "The log state should be not found", LogStore.State.NOT_FOUND, store.getState());
+        assertEquals("The log state should be not found", LogStore.State.NOT_FOUND,
+                     store.getState());
         assertEquals("One metric update should be emitted", 1, metrics.states.size());
         assertEquals("The metric update for log list state should be not found",
-                LogStore.State.NOT_FOUND, metrics.states.get(0));
+                     LogStore.State.NOT_FOUND, metrics.states.get(0));
     }
 
     @Test
@@ -282,8 +282,8 @@ public class LogStoreImplv2Test {
         Files.deleteIfExists(grandparentDir);
         TimeSupplier fakeTime = new TimeSupplier(/* currentTimeInMs= */ JAN2024);
         LogStore store = new LogStoreImplv2(alwaysCompliantStorePolicy, logList, metrics, fakeTime);
-        assertEquals(
-                "The log state should be not found", LogStore.State.NOT_FOUND, store.getState());
+        assertEquals("The log state should be not found", LogStore.State.NOT_FOUND,
+                     store.getState());
 
         // Act
         Files.createDirectory(grandparentDir);
@@ -293,13 +293,13 @@ public class LogStoreImplv2Test {
         // Assert
         // 5min < 10min, we should not check the log list yet.
         fakeTime.setCurrentTimeInMs(JAN2024 + 5L * 60 * 1000);
-        assertEquals(
-                "The log state should be not found", LogStore.State.NOT_FOUND, store.getState());
+        assertEquals("The log state should be not found", LogStore.State.NOT_FOUND,
+                     store.getState());
 
         // 12min, the log list should be reloadable.
         fakeTime.setCurrentTimeInMs(JAN2024 + 12L * 60 * 1000);
-        assertEquals(
-                "The log state should be compliant", LogStore.State.COMPLIANT, store.getState());
+        assertEquals("The log state should be compliant", LogStore.State.COMPLIANT,
+                     store.getState());
     }
 
     @Test
@@ -314,8 +314,8 @@ public class LogStoreImplv2Test {
         Files.deleteIfExists(grandparentDir);
         TimeSupplier fakeTime = new TimeSupplier(/* currentTimeInMs= */ JAN2024 + 100L * 60 * 1000);
         LogStore store = new LogStoreImplv2(alwaysCompliantStorePolicy, logList, metrics, fakeTime);
-        assertEquals(
-                "The log state should be not found", LogStore.State.NOT_FOUND, store.getState());
+        assertEquals("The log state should be not found", LogStore.State.NOT_FOUND,
+                     store.getState());
 
         Files.createDirectory(grandparentDir);
         Files.createDirectory(parentDir);
@@ -323,8 +323,8 @@ public class LogStoreImplv2Test {
         // Move back in time.
         fakeTime.setCurrentTimeInMs(JAN2024);
 
-        assertEquals(
-                "The log state should be compliant", LogStore.State.COMPLIANT, store.getState());
+        assertEquals("The log state should be compliant", LogStore.State.COMPLIANT,
+                     store.getState());
     }
 
     @Test
@@ -339,8 +339,8 @@ public class LogStoreImplv2Test {
         // 12min, the log list should be reloadable.
         fakeTime.setCurrentTimeInMs(JAN2024 + 12L * 60 * 1000);
 
-        assertEquals(
-                "The log should have been refreshed", LogStore.State.NOT_FOUND, store.getState());
+        assertEquals("The log should have been refreshed", LogStore.State.NOT_FOUND,
+                     store.getState());
     }
 
     @Test
@@ -358,8 +358,8 @@ public class LogStoreImplv2Test {
         // 12min, the log list should be reloadable.
         fakeTime.setCurrentTimeInMs(JAN2024 + 12L * 60 * 1000);
 
-        assertEquals(
-                "The log should have been refreshed", LogStore.State.NOT_FOUND, store.getState());
+        assertEquals("The log should have been refreshed", LogStore.State.NOT_FOUND,
+                     store.getState());
     }
 
     private Path writeLogList(String content) throws IOException {

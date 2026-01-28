@@ -22,13 +22,13 @@ import static org.junit.Assert.assertNotNull;
 import java.security.AlgorithmParameters;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+
 import javax.crypto.KeyAgreement;
 
 /**
  * @hide This class is not part of the Android public SDK API
  */
 public class AlgorithmParameterKeyAgreementHelper extends TestHelper<AlgorithmParameters> {
-
     private final String algorithmName;
 
     public AlgorithmParameterKeyAgreementHelper(String algorithmName) {

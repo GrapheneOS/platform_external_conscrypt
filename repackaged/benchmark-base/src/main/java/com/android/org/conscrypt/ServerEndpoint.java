@@ -30,6 +30,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
@@ -79,8 +80,8 @@ final class ServerEndpoint {
     private volatile Future<?> processFuture;
 
     ServerEndpoint(SSLSocketFactory socketFactory, SSLServerSocketFactory serverSocketFactory,
-            ChannelType channelType, int messageSize, String[] protocols,
-            String[] cipherSuites) throws IOException {
+                   ChannelType channelType, int messageSize, String[] protocols,
+                   String[] cipherSuites) throws IOException {
         this.serverSocket = channelType.newServerSocket(serverSocketFactory);
         this.socketFactory = socketFactory;
         this.channelType = channelType;

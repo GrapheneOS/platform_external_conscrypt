@@ -111,8 +111,9 @@ public class XmlConfigSource implements ConfigSource {
                 mContext = null;
                 mInitialized = true;
             } catch (Resources.NotFoundException | XmlPullParserException | IOException
-                    | ParserException e) {
-                throw new RuntimeException("Failed to parse XML configuration from "
+                     | ParserException e) {
+                throw new RuntimeException(
+                        "Failed to parse XML configuration from "
                                 + mContext.getResources().getResourceEntryName(mResourceId),
                         e);
             }
@@ -123,8 +124,8 @@ public class XmlConfigSource implements ConfigSource {
             throws IOException, XmlPullParserException, ParserException {
         String digestAlgorithm = parser.getAttributeValue(null, "digest");
         if (!Pin.isSupportedDigestAlgorithm(digestAlgorithm)) {
-            throw new ParserException(
-                    parser, "Unsupported pin digest algorithm: " + digestAlgorithm);
+            throw new ParserException(parser,
+                                      "Unsupported pin digest algorithm: " + digestAlgorithm);
         }
         if (parser.next() != XmlPullParser.TEXT) {
             throw new ParserException(parser, "Missing pin digest");
@@ -139,8 +140,9 @@ public class XmlConfigSource implements ConfigSource {
         int expectedLength = Pin.getDigestLength(digestAlgorithm);
         if (decodedDigest.length != expectedLength) {
             throw new ParserException(parser,
-                    "digest length " + decodedDigest.length + " does not match expected length for "
-                            + digestAlgorithm + " of " + expectedLength);
+                                      "digest length " + decodedDigest.length
+                                              + " does not match expected length for "
+                                              + digestAlgorithm + " of " + expectedLength);
         }
         if (parser.next() != XmlPullParser.END_TAG) {
             throw new ParserException(parser, "pin contains additional elements");
@@ -210,8 +212,8 @@ public class XmlConfigSource implements ConfigSource {
         return parser.getAttributeValue(/* namespace= */ null, "mode");
     }
 
-    private CertificatesEntryRef parseCertificatesEntry(
-            XmlResourceParser parser, boolean defaultOverridePins)
+    private CertificatesEntryRef parseCertificatesEntry(XmlResourceParser parser,
+                                                        boolean defaultOverridePins)
             throws IOException, XmlPullParserException, ParserException {
         boolean overridePins =
                 parser.getAttributeBooleanValue(null, "overridePins", defaultOverridePins);
@@ -235,15 +237,15 @@ public class XmlConfigSource implements ConfigSource {
             source = WfaCertificateSource.getInstance();
         } else {
             throw new ParserException(parser,
-                    "Unknown certificates src. "
-                            + "Should be one of system|user|@resourceVal");
+                                      "Unknown certificates src. "
+                                              + "Should be one of system|user|@resourceVal");
         }
         XmlUtils.skipCurrentTag(parser);
         return new CertificatesEntryRef(source, overridePins, disableCT);
     }
 
-    private Collection<CertificatesEntryRef> parseTrustAnchors(
-            XmlResourceParser parser, boolean defaultOverridePins)
+    private Collection<CertificatesEntryRef> parseTrustAnchors(XmlResourceParser parser,
+                                                               boolean defaultOverridePins)
             throws IOException, XmlPullParserException, ParserException {
         int outerDepth = parser.getDepth();
         List<CertificatesEntryRef> anchors = new ArrayList<>();
@@ -303,7 +305,8 @@ public class XmlConfigSource implements ConfigSource {
                 seenTrustAnchors = true;
             } else if ("pin-set".equals(tagName)) {
                 if (configType != CONFIG_DOMAIN) {
-                    throw new ParserException(parser,
+                    throw new ParserException(
+                            parser,
                             "pin-set element not allowed in " + getConfigString(configType));
                 }
                 if (seenPinSet) {
@@ -313,21 +316,23 @@ public class XmlConfigSource implements ConfigSource {
                 seenPinSet = true;
             } else if ("domain-config".equals(tagName)) {
                 if (configType != CONFIG_DOMAIN) {
-                    throw new ParserException(parser,
+                    throw new ParserException(
+                            parser,
                             "Nested domain-config not allowed in " + getConfigString(configType));
                 }
                 builders.addAll(parseConfigEntry(parser, seenDomains, builder, configType));
             } else if ("certificateTransparency".equals(tagName)) {
                 if (configType != CONFIG_BASE && configType != CONFIG_DOMAIN) {
                     throw new ParserException(parser,
-                            "certificateTransparency not allowed in "
-                                    + getConfigString(configType));
+                                              "certificateTransparency not allowed in "
+                                                      + getConfigString(configType));
                 }
                 builder.setCertificateTransparencyVerificationRequired(
                         parseCertificateTransparency(parser));
             } else if ("domainEncryption".equals(tagName)) {
                 if (configType != CONFIG_BASE && configType != CONFIG_DOMAIN) {
-                    throw new ParserException(parser,
+                    throw new ParserException(
+                            parser,
                             "domainEncryption not allowed in " + getConfigString(configType));
                 }
                 builder.setDomainEncryptionMode(parseDomainEncryptionMode(parser));
@@ -342,7 +347,7 @@ public class XmlConfigSource implements ConfigSource {
     }
 
     private void addDebugAnchorsIfNeeded(NetworkSecurityConfig.Builder debugConfigBuilder,
-            NetworkSecurityConfig.Builder builder) {
+                                         NetworkSecurityConfig.Builder builder) {
         if (debugConfigBuilder == null || !debugConfigBuilder.hasCertificatesEntryRefs()) {
             return;
         }

@@ -96,9 +96,9 @@ public class ManifestConfigSource implements ConfigSource {
                         (mApplicationInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
                 if (DBG) {
                     Log.d(LOG_TAG,
-                            "Using Network Security Config from resource "
-                                    + mContext.getResources().getResourceEntryName(configResource)
-                                    + " debugBuild: " + debugBuild);
+                          "Using Network Security Config from resource "
+                                  + mContext.getResources().getResourceEntryName(configResource)
+                                  + " debugBuild: " + debugBuild);
                 }
                 source = new XmlConfigSource(mContext, configResource, mApplicationInfo);
             } else {
@@ -113,8 +113,8 @@ public class ManifestConfigSource implements ConfigSource {
                 boolean usesCleartextTraffic =
                         (mApplicationInfo.flags & ApplicationInfo.FLAG_USES_CLEARTEXT_TRAFFIC) != 0
                         && !mApplicationInfo.isInstantApp();
-                if (CompatChanges.isChangeEnabled(DEPRECATE_USES_CLEARTEXT_TRAFFIC) &&
-                    deprecateUsesCleartextTraffic2()) {
+                if (CompatChanges.isChangeEnabled(DEPRECATE_USES_CLEARTEXT_TRAFFIC)
+                    && deprecateUsesCleartextTraffic2()) {
                     usesCleartextTraffic = false;
                 }
                 source = new DefaultConfigSource(usesCleartextTraffic, mApplicationInfo);

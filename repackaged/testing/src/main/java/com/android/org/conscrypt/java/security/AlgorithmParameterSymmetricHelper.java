@@ -30,7 +30,6 @@ import javax.crypto.KeyGenerator;
  * @hide This class is not part of the Android public SDK API
  */
 public class AlgorithmParameterSymmetricHelper extends TestHelper<AlgorithmParameters> {
-
     private static final String plainData = "some data to encrypt and decrypt";
     private final String algorithmName;
     private final int keySize;
@@ -53,8 +52,7 @@ public class AlgorithmParameterSymmetricHelper extends TestHelper<AlgorithmParam
 
         Key key = generator.generateKey();
         String transformation = algorithmName;
-        if (blockmode != null)
-        {
+        if (blockmode != null) {
             transformation += "/" + blockmode;
         }
 

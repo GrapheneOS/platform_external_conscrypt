@@ -18,18 +18,17 @@
 package com.android.org.conscrypt.java.security;
 
 import java.security.KeyPair;
+
 import javax.crypto.Cipher;
 
 /**
  * @hide This class is not part of the Android public SDK API
  */
 public class CipherAsymmetricCryptHelper extends CipherHelper<KeyPair> {
-
     private static final String plainData = "some data to encrypt and decrypt test";
 
     public CipherAsymmetricCryptHelper(String algorithmName) {
-        super(algorithmName, plainData, Cipher.ENCRYPT_MODE,
-                Cipher.DECRYPT_MODE);
+        super(algorithmName, plainData, Cipher.ENCRYPT_MODE, Cipher.DECRYPT_MODE);
     }
 
     @Override

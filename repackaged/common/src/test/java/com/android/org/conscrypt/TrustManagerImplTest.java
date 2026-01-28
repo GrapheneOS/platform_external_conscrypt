@@ -50,7 +50,6 @@ import javax.net.ssl.X509TrustManager;
  */
 @RunWith(JUnit4.class)
 public class TrustManagerImplTest {
-
     /**
      * Ensure that our non-standard behavior of learning to trust new
      * intermediate CAs does not regress. http://b/3404902
@@ -60,23 +59,23 @@ public class TrustManagerImplTest {
         TestUtils.assumeExtendedTrustManagerAvailable();
         // chain3 should be server/intermediate/root
         KeyStore.PrivateKeyEntry pke = TestKeyStore.getServer().getPrivateKey("RSA", "RSA");
-        X509Certificate[] chain3 = (X509Certificate[])pke.getCertificateChain();
+        X509Certificate[] chain3 = (X509Certificate[]) pke.getCertificateChain();
         X509Certificate root = chain3[2];
         X509Certificate intermediate = chain3[1];
         X509Certificate server = chain3[0];
-        X509Certificate[] chain2 =  new X509Certificate[] { server, intermediate };
-        X509Certificate[] chain1 =  new X509Certificate[] { server };
+        X509Certificate[] chain2 = new X509Certificate[] {server, intermediate};
+        X509Certificate[] chain1 = new X509Certificate[] {server};
 
         // Normal behavior
-        assertValid(chain3,   trustManager(root));
-        assertValid(chain2,   trustManager(root));
+        assertValid(chain3, trustManager(root));
+        assertValid(chain2, trustManager(root));
         assertInvalid(chain1, trustManager(root));
-        assertValid(chain3,   trustManager(intermediate));
-        assertValid(chain2,   trustManager(intermediate));
-        assertValid(chain1,   trustManager(intermediate));
-        assertValid(chain3,   trustManager(server));
-        assertValid(chain2,   trustManager(server));
-        assertValid(chain1,   trustManager(server));
+        assertValid(chain3, trustManager(intermediate));
+        assertValid(chain2, trustManager(intermediate));
+        assertValid(chain1, trustManager(intermediate));
+        assertValid(chain3, trustManager(server));
+        assertValid(chain2, trustManager(server));
+        assertValid(chain1, trustManager(server));
 
         // non-standard behavior
         X509TrustManager tm = trustManager(root);
@@ -95,14 +94,13 @@ public class TrustManagerImplTest {
         TestUtils.assumeExtendedTrustManagerAvailable();
         // chain3 should be server/intermediate/root
         KeyStore.PrivateKeyEntry pke = TestKeyStore.getServer().getPrivateKey("RSA", "RSA");
-        X509Certificate[] chain3 = (X509Certificate[])pke.getCertificateChain();
+        X509Certificate[] chain3 = (X509Certificate[]) pke.getCertificateChain();
         X509Certificate root = chain3[2];
         X509Certificate intermediate = chain3[1];
         X509Certificate server = chain3[0];
 
-        X509Certificate[] chain4 = new X509Certificate[] { server, intermediate,
-                                                           server, intermediate
-        };
+        X509Certificate[] chain4 =
+                new X509Certificate[] {server, intermediate, server, intermediate};
         assertValid(chain4, trustManager(root));
     }
 
@@ -118,8 +116,8 @@ public class TrustManagerImplTest {
         // build the chains we'll use for testing
         X509Certificate intermediate = chain3[1];
         X509Certificate server = chain3[0];
-        X509Certificate[] chain2 =  new X509Certificate[] { server, intermediate };
-        X509Certificate[] chain1 =  new X509Certificate[] { server };
+        X509Certificate[] chain2 = new X509Certificate[] {server, intermediate};
+        X509Certificate[] chain1 = new X509Certificate[] {server};
 
         assertTrue(tm instanceof TrustManagerImpl);
         TrustManagerImpl tmi = (TrustManagerImpl) tm;
@@ -148,7 +146,8 @@ public class TrustManagerImplTest {
             // Without endpoint identification this should pass despite the mismatched hostname
             params.setEndpointIdentificationAlgorithm(null);
 
-            List<X509Certificate> certs = tmi.getTrustedChainForServer(chain, "RSA",
+            List<X509Certificate> certs = tmi.getTrustedChainForServer(
+                    chain, "RSA",
                     new FakeSSLSocket(new FakeSSLSession(badHostname, chain), params));
             assertEquals(Arrays.asList(chain), certs);
 
@@ -156,13 +155,15 @@ public class TrustManagerImplTest {
             params.setEndpointIdentificationAlgorithm("HTTPS");
 
             try {
-                tmi.getTrustedChainForServer(chain, "RSA",
+                tmi.getTrustedChainForServer(
+                        chain, "RSA",
                         new FakeSSLSocket(new FakeSSLSession(badHostname, chain), params));
                 fail();
             } catch (CertificateException expected) {
             }
 
-            certs = tmi.getTrustedChainForServer(chain, "RSA",
+            certs = tmi.getTrustedChainForServer(
+                    chain, "RSA",
                     new FakeSSLSocket(new FakeSSLSession(goodHostname, chain), params));
             assertEquals(Arrays.asList(chain), certs);
 
@@ -170,17 +171,19 @@ public class TrustManagerImplTest {
             // always passes.  Both scenarios should pass.
             Conscrypt.setHostnameVerifier(tmi, new ConscryptHostnameVerifier() {
                 @Override
-                public boolean verify(
-                        X509Certificate[] certificates, String s, SSLSession sslSession) {
+                public boolean verify(X509Certificate[] certificates, String s,
+                                      SSLSession sslSession) {
                     return true;
                 }
             });
 
-            certs = tmi.getTrustedChainForServer(chain, "RSA",
+            certs = tmi.getTrustedChainForServer(
+                    chain, "RSA",
                     new FakeSSLSocket(new FakeSSLSession(badHostname, chain), params));
             assertEquals(Arrays.asList(chain), certs);
 
-            certs = tmi.getTrustedChainForServer(chain, "RSA",
+            certs = tmi.getTrustedChainForServer(
+                    chain, "RSA",
                     new FakeSSLSocket(new FakeSSLSession(goodHostname, chain), params));
             assertEquals(Arrays.asList(chain), certs);
 
@@ -190,13 +193,15 @@ public class TrustManagerImplTest {
                     tmi, Conscrypt.wrapHostnameVerifier(new TestHostnameVerifier()));
 
             try {
-                tmi.getTrustedChainForServer(chain, "RSA",
+                tmi.getTrustedChainForServer(
+                        chain, "RSA",
                         new FakeSSLSocket(new FakeSSLSession(badHostname, chain), params));
                 fail();
             } catch (CertificateException expected) {
             }
 
-            certs = tmi.getTrustedChainForServer(chain, "RSA",
+            certs = tmi.getTrustedChainForServer(
+                    chain, "RSA",
                     new FakeSSLSocket(new FakeSSLSession(goodHostname, chain), params));
             assertEquals(Arrays.asList(chain), certs);
 
@@ -204,13 +209,15 @@ public class TrustManagerImplTest {
             Conscrypt.setHostnameVerifier(tmi, null);
 
             try {
-                tmi.getTrustedChainForServer(chain, "RSA",
+                tmi.getTrustedChainForServer(
+                        chain, "RSA",
                         new FakeSSLSocket(new FakeSSLSession(badHostname, chain), params));
                 fail();
             } catch (CertificateException expected) {
             }
 
-            certs = tmi.getTrustedChainForServer(chain, "RSA",
+            certs = tmi.getTrustedChainForServer(
+                    chain, "RSA",
                     new FakeSSLSocket(new FakeSSLSession(goodHostname, chain), params));
             assertEquals(Arrays.asList(chain), certs);
         } finally {

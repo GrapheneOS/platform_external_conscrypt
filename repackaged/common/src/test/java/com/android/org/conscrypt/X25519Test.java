@@ -18,6 +18,7 @@
 package com.android.org.conscrypt;
 
 import static com.android.org.conscrypt.TestUtils.decodeHex;
+
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
@@ -58,8 +59,10 @@ public class X25519Test {
         TestUtils.assumeAllowsUnsignedCrypto();
     }
 
-    /** Implements a KeySpec that contains the raw bytes of a key. 
-     * @hide This class is not part of the Android public SDK API*/
+    /**
+     * Implements a KeySpec that contains the raw bytes of a key.
+     * @hide This class is not part of the Android public SDK API
+     */
     public static final class RawKeySpec extends EncodedKeySpec {
         public RawKeySpec(byte[] encoded) {
             super(encoded);
@@ -138,7 +141,7 @@ public class X25519Test {
         assertArrayEquals(privateKey.getEncoded(), privateKey2.getEncoded());
 
         assertThrows(InvalidKeySpecException.class,
-                () -> keyFactory.getKeySpec(privateKey, X509EncodedKeySpec.class));
+                     () -> keyFactory.getKeySpec(privateKey, X509EncodedKeySpec.class));
     }
 
     @Test
@@ -146,13 +149,13 @@ public class X25519Test {
         byte[] invalidEncoding = decodeHex("012345");
         KeyFactory keyFactory = KeyFactory.getInstance("X25519", conscryptProvider);
         assertThrows(InvalidKeySpecException.class,
-                () -> keyFactory.generatePrivate(new PKCS8EncodedKeySpec(invalidEncoding)));
+                     () -> keyFactory.generatePrivate(new PKCS8EncodedKeySpec(invalidEncoding)));
         assertThrows(InvalidKeySpecException.class,
-                () -> keyFactory.generatePublic(new X509EncodedKeySpec(invalidEncoding)));
+                     () -> keyFactory.generatePublic(new X509EncodedKeySpec(invalidEncoding)));
         assertThrows(InvalidKeySpecException.class,
-                () -> keyFactory.generatePrivate(new RawKeySpec(invalidEncoding)));
+                     () -> keyFactory.generatePrivate(new RawKeySpec(invalidEncoding)));
         assertThrows(InvalidKeySpecException.class,
-                () -> keyFactory.generatePublic(new RawKeySpec(invalidEncoding)));
+                     () -> keyFactory.generatePublic(new RawKeySpec(invalidEncoding)));
     }
 
     @Test
@@ -179,7 +182,7 @@ public class X25519Test {
         assertArrayEquals(publicKey.getEncoded(), publicKey2.getEncoded());
 
         assertThrows(InvalidKeySpecException.class,
-                () -> keyFactory.getKeySpec(publicKey, PKCS8EncodedKeySpec.class));
+                     () -> keyFactory.getKeySpec(publicKey, PKCS8EncodedKeySpec.class));
     }
 
     @Test

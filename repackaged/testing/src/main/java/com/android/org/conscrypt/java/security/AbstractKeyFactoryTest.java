@@ -16,6 +16,8 @@
  */
 package com.android.org.conscrypt.java.security;
 
+import org.junit.Test;
+
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
@@ -26,19 +28,20 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Test;
+
 import tests.util.ServiceTester;
 
 /**
  * @hide This class is not part of the Android public SDK API
  */
-public abstract class AbstractKeyFactoryTest<PublicKeySpec extends KeySpec, PrivateKeySpec extends KeySpec> {
+public abstract class AbstractKeyFactoryTest<PublicKeySpec extends KeySpec, PrivateKeySpec
+                                                     extends KeySpec> {
     protected final String algorithmName;
     private final Class<PublicKeySpec> publicKeySpecClass;
     private final Class<PrivateKeySpec> privateKeySpecClass;
 
     protected AbstractKeyFactoryTest(String algorithmName, Class<PublicKeySpec> publicKeySpecClass,
-            Class<PrivateKeySpec> privateKeySpecClass) {
+                                     Class<PrivateKeySpec> privateKeySpecClass) {
         this.algorithmName = algorithmName;
         this.publicKeySpecClass = publicKeySpecClass;
         this.privateKeySpecClass = privateKeySpecClass;
@@ -105,7 +108,7 @@ public abstract class AbstractKeyFactoryTest<PublicKeySpec extends KeySpec, Priv
     protected void check(KeyPair keyPair) throws Exception {}
 
     protected List<KeyPair> getKeys() throws NoSuchAlgorithmException, InvalidKeySpecException {
-        return Arrays.asList(new KeyPair(
-                DefaultKeys.getPublicKey(algorithmName), DefaultKeys.getPrivateKey(algorithmName)));
+        return Arrays.asList(new KeyPair(DefaultKeys.getPublicKey(algorithmName),
+                                         DefaultKeys.getPrivateKey(algorithmName)));
     }
 }

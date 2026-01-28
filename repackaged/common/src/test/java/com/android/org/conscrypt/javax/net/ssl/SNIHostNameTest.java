@@ -19,13 +19,16 @@ package com.android.org.conscrypt.javax.net.ssl;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Arrays;
-import javax.net.ssl.SNIHostName;
-import javax.net.ssl.StandardConstants;
 import com.android.org.conscrypt.TestUtils;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.util.Arrays;
+
+import javax.net.ssl.SNIHostName;
+import javax.net.ssl.StandardConstants;
 
 /**
  * @hide This class is not part of the Android public SDK API
@@ -38,11 +41,11 @@ public class SNIHostNameTest {
 
         // From draft-josefsson-idn-test-vectors-00 section 5.2
         byte[] idnEncoded = new byte[] {
-            (byte) 0xE4, (byte) 0xBB, (byte) 0x96, (byte) 0xE4, (byte) 0xBB, (byte) 0xAC,
-            (byte) 0xE4, (byte) 0xB8, (byte) 0xBA, (byte) 0xE4, (byte) 0xBB, (byte) 0x80,
-            (byte) 0xE4, (byte) 0xB9, (byte) 0x88, (byte) 0xE4, (byte) 0xB8, (byte) 0x8D,
-            (byte) 0xE8, (byte) 0xAF, (byte) 0xB4, (byte) 0xE4, (byte) 0xB8, (byte) 0xAD,
-            (byte) 0xE6, (byte) 0x96, (byte) 0x87,
+                (byte) 0xE4, (byte) 0xBB, (byte) 0x96, (byte) 0xE4, (byte) 0xBB, (byte) 0xAC,
+                (byte) 0xE4, (byte) 0xB8, (byte) 0xBA, (byte) 0xE4, (byte) 0xBB, (byte) 0x80,
+                (byte) 0xE4, (byte) 0xB9, (byte) 0x88, (byte) 0xE4, (byte) 0xB8, (byte) 0x8D,
+                (byte) 0xE8, (byte) 0xAF, (byte) 0xB4, (byte) 0xE4, (byte) 0xB8, (byte) 0xAD,
+                (byte) 0xE6, (byte) 0x96, (byte) 0x87,
         };
 
         SNIHostName hostName = new SNIHostName(idnEncoded);

@@ -130,8 +130,8 @@ public class HpkeContextSender extends HpkeContext {
             throw new InvalidKeyException("Sender private key is null");
         }
         // Remaining argument checks are performed by the SPI
-        spi.engineInitSender(
-                recipientKey, info, senderKey, HpkeSpi.DEFAULT_PSK, HpkeSpi.DEFAULT_PSK_ID);
+        spi.engineInitSender(recipientKey, info, senderKey, HpkeSpi.DEFAULT_PSK,
+                             HpkeSpi.DEFAULT_PSK_ID);
     }
 
     /**
@@ -168,7 +168,7 @@ public class HpkeContextSender extends HpkeContext {
      * @throws IllegalStateException if this HpkeContextSender has already been initialised
      */
     public void init(PublicKey recipientKey, byte[] info, PrivateKey senderKey, byte[] psk,
-            byte[] psk_id) throws InvalidKeyException {
+                     byte[] psk_id) throws InvalidKeyException {
         if (senderKey == null) {
             throw new InvalidKeyException("Sender private key is null");
         }
@@ -193,7 +193,7 @@ public class HpkeContextSender extends HpkeContext {
         if (sKe == null) {
             throw new IllegalArgumentException("null seed");
         }
-        spi.engineInitSenderForTesting(
-                recipientKey, info, null, HpkeSpi.DEFAULT_PSK, HpkeSpi.DEFAULT_PSK, sKe);
+        spi.engineInitSenderForTesting(recipientKey, info, null, HpkeSpi.DEFAULT_PSK,
+                                       HpkeSpi.DEFAULT_PSK, sKe);
     }
 }

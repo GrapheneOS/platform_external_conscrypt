@@ -21,7 +21,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
 import android.net.ssl.PakeClientKeyManagerParameters;
-import android.net.ssl.PakeServerKeyManagerParameters;
 import android.net.ssl.PakeOption;
 import android.net.ssl.PakeServerKeyManagerParameters;
 

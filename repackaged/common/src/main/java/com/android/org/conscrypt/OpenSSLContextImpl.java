@@ -100,9 +100,10 @@ public abstract class OpenSSLContextImpl extends SSLContextSpi {
                         (ServerSessionContext)
                                 defaultSslContextImpl.engineGetServerSessionContext();
             }
-            sslParameters = new SSLParametersImpl(defaultSslContextImpl.getKeyManagers(),
-                    defaultSslContextImpl.getTrustManagers(), null, clientSessionContext,
-                    serverSessionContext, protocols);
+            sslParameters =
+                    new SSLParametersImpl(defaultSslContextImpl.getKeyManagers(),
+                                          defaultSslContextImpl.getTrustManagers(), null,
+                                          clientSessionContext, serverSessionContext, protocols);
         }
     }
 
@@ -119,8 +120,8 @@ public abstract class OpenSSLContextImpl extends SSLContextSpi {
     @Override
     public void engineInit(KeyManager[] kms, TrustManager[] tms, SecureRandom sr)
             throws KeyManagementException {
-        sslParameters = new SSLParametersImpl(
-                kms, tms, sr, clientSessionContext, serverSessionContext, protocols);
+        sslParameters = new SSLParametersImpl(kms, tms, sr, clientSessionContext,
+                                              serverSessionContext, protocols);
     }
 
     @Override

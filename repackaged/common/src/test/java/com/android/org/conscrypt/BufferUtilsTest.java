@@ -23,14 +23,15 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 
-import java.nio.ByteBuffer;
 import com.android.org.conscrypt.TestUtils.BufferType;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
+import java.nio.ByteBuffer;
 
 /**
  * @hide This class is not part of the Android public SDK API
@@ -42,31 +43,29 @@ public class BufferUtilsTest {
 
     private static final int[][] TEST_SIZES = {
             // All even numbers as several tests use size/2
-            { 0 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 2 },
-            { 2, 0, 0, 0 },
-            { 100, 200, 300 },
-            { 1000, 2000, 3000 },
-            { K16 },
-            { 0, 0, K16 },
-            { K16, 0, 0 },
-            { K64 },
-            { 0, 0, K64 },
-            { K64, 0, 0 },
-            { 100, 100, K64 },
-            { K64, 100, 100 },
-            { K64, K64, K64 },
+            {0},
+            {0, 0, 0, 0},
+            {0, 0, 0, 2},
+            {2, 0, 0, 0},
+            {100, 200, 300},
+            {1000, 2000, 3000},
+            {K16},
+            {0, 0, K16},
+            {K16, 0, 0},
+            {K64},
+            {0, 0, K64},
+            {K64, 0, 0},
+            {100, 100, K64},
+            {K64, 100, 100},
+            {K64, K64, K64},
     };
-
 
     @Parameters(name = "{0}")
     public static BufferType[] data() {
-        return new BufferType[] { BufferType.HEAP, BufferType.DIRECT };
+        return new BufferType[] {BufferType.HEAP, BufferType.DIRECT};
     }
 
-    @Parameter
-    public BufferType bufferType;
+    @Parameter public BufferType bufferType;
 
     @Test
     public void checkNotNull() {
@@ -88,7 +87,7 @@ public class BufferUtilsTest {
     public void remaining() {
         for (int[] sizes : TEST_SIZES) {
             assertEquals(arraySum(sizes),
-                    BufferUtils.remaining(bufferType.newRandomBuffers(sizes)));
+                         BufferUtils.remaining(bufferType.newRandomBuffers(sizes)));
         }
     }
 
@@ -101,10 +100,10 @@ public class BufferUtilsTest {
             BufferUtils.consume(buffers, 0);
             assertEquals(totalSize, BufferUtils.remaining(buffers));
 
-            BufferUtils.consume(buffers,totalSize / 2);
+            BufferUtils.consume(buffers, totalSize / 2);
             assertEquals(totalSize / 2, BufferUtils.remaining(buffers));
 
-            BufferUtils.consume(buffers,totalSize / 2);
+            BufferUtils.consume(buffers, totalSize / 2);
             assertEquals(0, BufferUtils.remaining(buffers));
 
             if (totalSize > 0) {

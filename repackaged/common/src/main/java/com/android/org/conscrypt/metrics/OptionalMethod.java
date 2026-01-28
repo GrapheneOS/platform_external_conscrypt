@@ -46,8 +46,8 @@ public final class OptionalMethod {
         this.cachedMethod = initializeMethod(clazz, methodName, methodParams);
     }
 
-    private static Method initializeMethod(
-            Class<?> clazz, String methodName, Class<?>... methodParams) {
+    private static Method initializeMethod(Class<?> clazz, String methodName,
+                                           Class<?>... methodParams) {
         try {
             for (Class<?> paramClass : methodParams) {
                 if (paramClass == null) {

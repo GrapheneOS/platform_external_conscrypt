@@ -66,7 +66,7 @@ public final class NetworkSecurityConfigProvider extends Provider {
         int pos = Security.insertProviderAt(new NetworkSecurityConfigProvider(), 1);
         if (pos != 1) {
             throw new RuntimeException("Failed to install provider as highest priority provider."
-                    + " Provider was installed at position " + pos);
+                                       + " Provider was installed at position " + pos);
         }
         libcore.net.NetworkSecurityPolicy.setInstance(new ConfigNetworkSecurityPolicy(config));
     }
@@ -83,9 +83,9 @@ public final class NetworkSecurityConfigProvider extends Provider {
         String mProcessName = context.getApplicationInfo().processName;
         if (defaultConfig != null) {
             if (defaultConfig.isCleartextTrafficPermitted()
-                    != config.isCleartextTrafficPermitted()) {
+                != config.isCleartextTrafficPermitted()) {
                 Log.w(LOG_TAG,
-                        mProcessName + ": New config does not match the previously set config.");
+                      mProcessName + ": New config does not match the previously set config.");
 
                 if (defaultConfig.hasPerDomainConfigs() || config.hasPerDomainConfigs()) {
                     throw new RuntimeException("Found multiple conflicting per-domain rules");

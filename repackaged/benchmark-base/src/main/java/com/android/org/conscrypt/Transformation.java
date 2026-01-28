@@ -17,12 +17,14 @@
 
 package com.android.org.conscrypt;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+
 import javax.crypto.KeyGenerator;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 /**
  * Supported cipher transformations.
@@ -55,7 +57,9 @@ public enum Transformation {
         return keyGen.newEncryptKey();
     }
 
-    private interface KeyGen { Key newEncryptKey(); }
+    private interface KeyGen {
+        Key newEncryptKey();
+    }
 
     private static final class RsaKeyGen implements KeyGen {
         @Override

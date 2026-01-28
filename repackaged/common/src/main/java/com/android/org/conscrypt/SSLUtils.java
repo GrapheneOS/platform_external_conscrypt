@@ -124,9 +124,9 @@ final class SSLUtils {
         static final int STATE_HANDSHAKE_COMPLETED = 3;
 
         /**
-         * The handshake call returned but the listeners have not yet been notified. This is expected
-         * behaviour in cut-through mode, where SSL_do_handshake returns before the handshake is
-         * complete. We can now start writing data to the socket.
+         * The handshake call returned but the listeners have not yet been notified. This is
+         * expected behaviour in cut-through mode, where SSL_do_handshake returns before the
+         * handshake is complete. We can now start writing data to the socket.
          */
         static final int STATE_READY_HANDSHAKE_CUT_THROUGH = 4;
 
@@ -198,7 +198,8 @@ final class SSLUtils {
     }
 
     private static X509Certificate decodeX509Certificate(CertificateFactory certificateFactory,
-            byte[] bytes) throws java.security.cert.CertificateException {
+                                                         byte[] bytes)
+            throws java.security.cert.CertificateException {
         if (certificateFactory != null) {
             return (X509Certificate) certificateFactory.generateCertificate(
                     new ByteArrayInputStream(bytes));
@@ -262,10 +263,12 @@ final class SSLUtils {
      *
      * @param clientCertificateTypes
      *         {@code ClientCertificateType} values provided by the server.
-     *         See https://www.ietf.org/assignments/tls-parameters/tls-parameters.xml#tls-parameters-2.
+     *         See
+     * https://www.ietf.org/assignments/tls-parameters/tls-parameters.xml#tls-parameters-2.
      * @param signatureAlgs
      *         {@code SignatureScheme} values provided by the server.
-     *         See https://www.ietf.org/assignments/tls-parameters/tls-parameters.xml#tls-signaturescheme
+     *         See
+     * https://www.ietf.org/assignments/tls-parameters/tls-parameters.xml#tls-signaturescheme
      * @return supported key types that can be used in {@code X509KeyManager.chooseClientAlias} and
      * {@code X509ExtendedKeyManager.chooseEngineClientAlias}.  If the inputs imply a preference
      * order, the returned set will have an iteration order that respects that preference order,
@@ -274,7 +277,7 @@ final class SSLUtils {
      * Visible for testing.
      */
     static Set<String> getSupportedClientKeyTypes(byte[] clientCertificateTypes,
-            int[] signatureAlgs) {
+                                                  int[] signatureAlgs) {
         Set<String> fromClientCerts = new HashSet<>(clientCertificateTypes.length);
         for (byte keyTypeCode : clientCertificateTypes) {
             String keyType = SSLUtils.getClientKeyType(keyTypeCode);
@@ -343,7 +346,8 @@ final class SSLUtils {
      * plaintext source bytes.
      */
     static int calculateOutNetBufSize(int pendingBytes) {
-        return min(SSL3_RT_MAX_PACKET_SIZE,
+        return min(
+                SSL3_RT_MAX_PACKET_SIZE,
                 MAX_ENCRYPTION_OVERHEAD_LENGTH + min(MAX_ENCRYPTION_OVERHEAD_DIFF, pendingBytes));
     }
 
@@ -398,10 +402,11 @@ final class SSLUtils {
         for (int i = 0; i < protocols.length;) {
             int protocolLength = protocols[i];
             if (protocolLength < 0 || protocolLength > protocols.length - i) {
-                throw new IllegalArgumentException(
-                    "Protocol has invalid length (" + protocolLength + " at position " + i
-                        + "): " + (protocols.length < 50
-                        ? Arrays.toString(protocols) : protocols.length + " byte array"));
+                throw new IllegalArgumentException("Protocol has invalid length (" + protocolLength
+                                                   + " at position " + i + "): "
+                                                   + (protocols.length < 50
+                                                              ? Arrays.toString(protocols)
+                                                              : protocols.length + " byte array"));
             }
 
             numProtocols++;
@@ -450,8 +455,8 @@ final class SSLUtils {
             // Verify that the length is valid here, so that we don't attempt to allocate an array
             // below if the threshold is violated.
             if (protocolLength == 0 || protocolLength > MAX_PROTOCOL_LENGTH) {
-                throw new IllegalArgumentException(
-                    "protocol[" + i + "] has invalid length: " + protocolLength);
+                throw new IllegalArgumentException("protocol[" + i
+                                                   + "] has invalid length: " + protocolLength);
             }
 
             // Include a 1-byte prefix for each protocol.
@@ -469,8 +474,8 @@ final class SSLUtils {
                 char c = protocol.charAt(ci);
                 if (c > Byte.MAX_VALUE) {
                     // Enforce US-ASCII
-                    throw new IllegalArgumentException("Protocol contains invalid character: "
-                        + c + "(protocol=" + protocol + ")");
+                    throw new IllegalArgumentException("Protocol contains invalid character: " + c
+                                                       + "(protocol=" + protocol + ")");
                 }
                 data[dataIndex++] = (byte) c;
             }

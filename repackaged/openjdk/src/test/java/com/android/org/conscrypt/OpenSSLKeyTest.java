@@ -70,35 +70,35 @@ public class OpenSSLKeyTest {
             + "sudhqm8rNr8zWFAEZ48jpcv7whYfkjCIh4z0uVNOq9dspolJaW14yg==\n"
             + "-----END RSA PRIVATE KEY-----";
 
-    static final BigInteger RSA_MODULUS =
-            new BigInteger("dc6ecf1a97d9c7af304d8f5e2dbe1bb61dd8ecc5e0875036a2a076d362938829"
-                            + "4acbd63e67e1c2c792885d77327158c07e12bba86f85fd755e1344e9cd1f1cd3"
-                            + "08f67b7931c12ff088c8e861721c6c55b488dea0d45ea7ef567291fd2e384f03"
-                            + "64a09f7f38e695df886b9338a8ab02816e134d43831950a10544caba2e1bed0f"
-                            + "2ab013944d79bb49ecae65c6510a1676c3d688099dce475a879c6d045ef82cd1"
-                            + "9842220bed5503da130a8c59a19840a6bc856f57dca52f63a0fc7d0910761636"
-                            + "8f99bfcb6ef9eed36c416847ee5fc281d1ffd85eea6b7f95d724ea8fd8a171e2"
-                            + "ead7f17101991deaaec6f5813c672beda0a53cea8ebee1aacc10b422f3a40571",
-                    16);
+    static final BigInteger RSA_MODULUS = new BigInteger(
+            "dc6ecf1a97d9c7af304d8f5e2dbe1bb61dd8ecc5e0875036a2a076d362938829"
+                    + "4acbd63e67e1c2c792885d77327158c07e12bba86f85fd755e1344e9cd1f1cd3"
+                    + "08f67b7931c12ff088c8e861721c6c55b488dea0d45ea7ef567291fd2e384f03"
+                    + "64a09f7f38e695df886b9338a8ab02816e134d43831950a10544caba2e1bed0f"
+                    + "2ab013944d79bb49ecae65c6510a1676c3d688099dce475a879c6d045ef82cd1"
+                    + "9842220bed5503da130a8c59a19840a6bc856f57dca52f63a0fc7d0910761636"
+                    + "8f99bfcb6ef9eed36c416847ee5fc281d1ffd85eea6b7f95d724ea8fd8a171e2"
+                    + "ead7f17101991deaaec6f5813c672beda0a53cea8ebee1aacc10b422f3a40571",
+            16);
 
     static final BigInteger RSA_PUBLIC_EXPONENT = new BigInteger("10001", 16);
-    static final BigInteger RSA_PRIVATE_EXPONENT =
-            new BigInteger("1917e22aa853a9d8271b053196ea77d41d04b73b756a61f6be3f9f174437003e"
-                            + "971daa377372ef4df1bfe547eeed99495c70bc7d19a8faa7f43c2451ab4099f2"
-                            + "ea27c8f98c70ee08a7419bb6901b6d37ba740447f1b50ecfff9ace44b090c769"
-                            + "def82bfffb15c0c4f00e32f5b5b9b5f0cefb9285977477c9c4c44681b8430492"
-                            + "c9bf2a19b0395e8f82fbd10af65744e5feed9ebc97a46fe20877a635a9c017e2"
-                            + "71a1fd466a76820fac500ee83845e12a66b596c2d728f3da9f34d4971291f4e6"
-                            + "13e6825df950a3bd4509f9d3b12da304fe5b00c443ff33326b8bfb3fe111fd4b"
-                            + "8872822c7f2832dafa0fe10d9aba22310849e978e51c8aa9da7bc1c07511d883",
-                    16);
+    static final BigInteger RSA_PRIVATE_EXPONENT = new BigInteger(
+            "1917e22aa853a9d8271b053196ea77d41d04b73b756a61f6be3f9f174437003e"
+                    + "971daa377372ef4df1bfe547eeed99495c70bc7d19a8faa7f43c2451ab4099f2"
+                    + "ea27c8f98c70ee08a7419bb6901b6d37ba740447f1b50ecfff9ace44b090c769"
+                    + "def82bfffb15c0c4f00e32f5b5b9b5f0cefb9285977477c9c4c44681b8430492"
+                    + "c9bf2a19b0395e8f82fbd10af65744e5feed9ebc97a46fe20877a635a9c017e2"
+                    + "71a1fd466a76820fac500ee83845e12a66b596c2d728f3da9f34d4971291f4e6"
+                    + "13e6825df950a3bd4509f9d3b12da304fe5b00c443ff33326b8bfb3fe111fd4b"
+                    + "8872822c7f2832dafa0fe10d9aba22310849e978e51c8aa9da7bc1c07511d883",
+            16);
 
     @Test
     public void test_fromPublicKeyPemInputStream() throws Exception {
         ByteArrayInputStream is =
                 new ByteArrayInputStream(RSA_PUBLIC_KEY.getBytes(StandardCharsets.UTF_8));
         OpenSSLKey key = OpenSSLKey.fromPublicKeyPemInputStream(is);
-        OpenSSLRSAPublicKey publicKey = (OpenSSLRSAPublicKey)key.getPublicKey();
+        OpenSSLRSAPublicKey publicKey = (OpenSSLRSAPublicKey) key.getPublicKey();
         assertEquals(RSA_MODULUS, publicKey.getModulus());
         assertEquals(RSA_PUBLIC_EXPONENT, publicKey.getPublicExponent());
     }
@@ -108,7 +108,7 @@ public class OpenSSLKeyTest {
         ByteArrayInputStream is =
                 new ByteArrayInputStream(RSA_PRIVATE_KEY.getBytes(StandardCharsets.UTF_8));
         OpenSSLKey key = OpenSSLKey.fromPrivateKeyPemInputStream(is);
-        OpenSSLRSAPrivateKey privateKey = (OpenSSLRSAPrivateKey)key.getPrivateKey();
+        OpenSSLRSAPrivateKey privateKey = (OpenSSLRSAPrivateKey) key.getPrivateKey();
         assertEquals(RSA_MODULUS, privateKey.getModulus());
         assertEquals(RSA_PRIVATE_EXPONENT, privateKey.getPrivateExponent());
     }

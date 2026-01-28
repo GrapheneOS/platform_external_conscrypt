@@ -70,8 +70,8 @@ public class KeyFactoryTestEC extends AbstractKeyFactoryTest<ECPublicKeySpec, EC
         return Arrays.asList(
                 new KeyPair(DefaultKeys.getPublicKey("EC"), DefaultKeys.getPrivateKey("EC")),
                 new KeyPair(new TestPublicKey(DefaultKeys.getPublicKey("EC")),
-                        new TestPrivateKey(DefaultKeys.getPrivateKey("EC"))),
+                            new TestPrivateKey(DefaultKeys.getPrivateKey("EC"))),
                 new KeyPair(new TestECPublicKey((ECPublicKey) DefaultKeys.getPublicKey("EC")),
-                        new TestECPrivateKey((ECPrivateKey) DefaultKeys.getPrivateKey("EC"))));
+                            new TestECPrivateKey((ECPrivateKey) DefaultKeys.getPrivateKey("EC"))));
     }
 }

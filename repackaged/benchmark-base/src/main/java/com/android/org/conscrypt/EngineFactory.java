@@ -22,7 +22,6 @@ import javax.net.ssl.SSLEngine;
  * Factory for {@link SSLEngine} instances.
  */
 interface EngineFactory {
-
     SSLEngine newClientEngine(String cipher, boolean useAlpn);
 
     SSLEngine newServerEngine(String cipher, boolean useAlpn);

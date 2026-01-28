@@ -19,6 +19,7 @@ package com.android.org.conscrypt;
 
 import java.nio.ByteBuffer;
 import java.security.Key;
+
 import javax.crypto.Cipher;
 
 /**
@@ -29,13 +30,7 @@ public final class CipherEncryptBenchmark {
     /**
      * @hide This class is not part of the Android public SDK API
      */
-    public enum BufferType {
-        ARRAY,
-        HEAP_HEAP,
-        HEAP_DIRECT,
-        DIRECT_DIRECT,
-        DIRECT_HEAP
-    }
+    public enum BufferType { ARRAY, HEAP_HEAP, HEAP_DIRECT, DIRECT_DIRECT, DIRECT_HEAP }
 
     /**
      * Provider for the benchmark configuration
@@ -83,7 +78,8 @@ public final class CipherEncryptBenchmark {
         }
 
         final int messageSize(String transformation) throws Exception {
-            Cipher conscryptCipher = Cipher.getInstance(transformation, TestUtils.getConscryptProvider());
+            Cipher conscryptCipher =
+                    Cipher.getInstance(transformation, TestUtils.getConscryptProvider());
             conscryptCipher.init(Cipher.ENCRYPT_MODE, key);
             return conscryptCipher.getBlockSize() > 0 ? conscryptCipher.getBlockSize() : 128;
         }
@@ -138,8 +134,8 @@ public final class CipherEncryptBenchmark {
                     output = ByteBuffer.allocate(outputSize);
                     break;
                 default: {
-                    throw new IllegalStateException(
-                            "Unexpected buffertype: " + config.bufferType());
+                    throw new IllegalStateException("Unexpected buffertype: "
+                                                    + config.bufferType());
                 }
             }
         }

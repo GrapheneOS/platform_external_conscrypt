@@ -110,8 +110,8 @@ public class NetworkSecurityTrustManager extends X509ExtendedTrustManager {
      * This interface is used by Conscrypt and android.net.http.X509TrustManagerExtensions do not
      * modify without modifying those callers.
      */
-    public List<X509Certificate> checkServerTrusted(
-            X509Certificate[] certs, String authType, String host) throws CertificateException {
+    public List<X509Certificate> checkServerTrusted(X509Certificate[] certs, String authType,
+                                                    String host) throws CertificateException {
         List<X509Certificate> trustedChain = mDelegate.checkServerTrusted(certs, authType, host);
         checkPins(trustedChain);
         return trustedChain;
@@ -122,7 +122,8 @@ public class NetworkSecurityTrustManager extends X509ExtendedTrustManager {
      * modify without modifying those callers.
      */
     public List<X509Certificate> checkServerTrusted(X509Certificate[] certs, byte[] ocspData,
-            byte[] tlsSctData, String authType, String host) throws CertificateException {
+                                                    byte[] tlsSctData, String authType, String host)
+            throws CertificateException {
         List<X509Certificate> trustedChain =
                 mDelegate.checkServerTrusted(certs, ocspData, tlsSctData, authType, host);
         checkPins(trustedChain);
@@ -144,7 +145,7 @@ public class NetworkSecurityTrustManager extends X509ExtendedTrustManager {
     private void checkPins(List<X509Certificate> chain) throws CertificateException {
         PinSet pinSet = mNetworkSecurityConfig.getPins();
         if (pinSet.pins.isEmpty() || System.currentTimeMillis() > pinSet.expirationTime
-                || !isPinningEnforced(chain)) {
+            || !isPinningEnforced(chain)) {
             return;
         }
         Set<String> pinAlgorithms = pinSet.getPinAlgorithms();

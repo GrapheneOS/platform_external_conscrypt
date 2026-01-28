@@ -45,7 +45,7 @@ public final class OpenSslEdDsaKeyFactory extends KeyFactorySpi {
             return new OpenSslEdDsaPublicKey((EncodedKeySpec) keySpec);
         }
         throw new InvalidKeySpecException("Must use X509EncodedKeySpec or Raw EncodedKeySpec; was "
-                + keySpec.getClass().getName());
+                                          + keySpec.getClass().getName());
     }
 
     @Override
@@ -57,7 +57,7 @@ public final class OpenSslEdDsaKeyFactory extends KeyFactorySpi {
             return new OpenSslEdDsaPrivateKey((EncodedKeySpec) keySpec);
         }
         throw new InvalidKeySpecException("Must use PKCS8EncodedKeySpec or Raw EncodedKeySpec; was "
-                + keySpec.getClass().getName());
+                                          + keySpec.getClass().getName());
     }
 
     @Override
@@ -70,7 +70,7 @@ public final class OpenSslEdDsaKeyFactory extends KeyFactorySpi {
             throw new InvalidKeySpecException("keySpec == null");
         }
         if (!key.getAlgorithm().equals("EdDSA") && !key.getAlgorithm().equals("Ed25519")
-                && !key.getAlgorithm().equals("1.3.101.112")) {
+            && !key.getAlgorithm().equals("1.3.101.112")) {
             throw new InvalidKeySpecException("Key must be an EdDSA or Ed25519 key");
         }
         if (key.getEncoded() == null) {
@@ -104,7 +104,8 @@ public final class OpenSslEdDsaKeyFactory extends KeyFactorySpi {
             }
         }
         throw new InvalidKeySpecException("Unsupported key type and key spec combination; key="
-                + key.getClass().getName() + ", keySpec=" + keySpec.getName());
+                                          + key.getClass().getName()
+                                          + ", keySpec=" + keySpec.getName());
     }
 
     @Override
@@ -135,8 +136,8 @@ public final class OpenSslEdDsaKeyFactory extends KeyFactorySpi {
                 throw new InvalidKeyException(e);
             }
         } else {
-            throw new InvalidKeyException(
-                    "Key must be XEC public or private key; was " + key.getClass().getName());
+            throw new InvalidKeyException("Key must be XEC public or private key; was "
+                                          + key.getClass().getName());
         }
     }
 }

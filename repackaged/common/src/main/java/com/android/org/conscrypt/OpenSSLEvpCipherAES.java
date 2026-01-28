@@ -53,8 +53,7 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
             case PKCS5PADDING:
                 return;
             default:
-                throw new NoSuchPaddingException(
-                        "Unsupported padding " + padding.toString());
+                throw new NoSuchPaddingException("Unsupported padding " + padding.toString());
         }
     }
 
@@ -152,8 +151,7 @@ public abstract class OpenSSLEvpCipherAES extends OpenSSLEvpCipher {
                 case 32: // AES 256
                     return;
                 default:
-                    throw new InvalidKeyException("Unsupported key size: " + keyLength
-                        + " bytes");
+                    throw new InvalidKeyException("Unsupported key size: " + keyLength + " bytes");
             }
         }
     }

@@ -18,12 +18,19 @@
 package com.android.org.conscrypt.javax.net.ssl;
 
 import static com.android.org.conscrypt.Conscrypt.isConscrypt;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import com.android.org.conscrypt.TestUtils;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -33,19 +40,15 @@ import java.util.Deque;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.SSLSocket;
-import com.android.org.conscrypt.TestUtils;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 /**
  * @hide This class is not part of the Android public SDK API
  */
 @RunWith(Parameterized.class)
 public class SSLSessionContextTest {
-
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<?> data() {
         // We can't support TLS 1.3 without our own trust manager (which requires
@@ -65,7 +68,9 @@ public class SSLSessionContextTest {
 
     private TestSSLContext newTestContext() {
         return TestSSLContext.newBuilder()
-            .clientProtocol(protocol).serverProtocol(protocol).build();
+                .clientProtocol(protocol)
+                .serverProtocol(protocol)
+                .build();
     }
 
     private boolean isTls13() {
@@ -143,16 +148,16 @@ public class SSLSessionContextTest {
         int expectedClientSessionCacheSize = expectedClientSslSessionCacheSize(c);
         int expectedServerSessionCacheSize = expectedServerSslSessionCacheSize(c);
         assertEquals(expectedClientSessionCacheSize,
-                c.clientContext.getClientSessionContext().getSessionCacheSize());
+                     c.clientContext.getClientSessionContext().getSessionCacheSize());
         assertEquals(expectedServerSessionCacheSize,
-                c.serverContext.getServerSessionContext().getSessionCacheSize());
+                     c.serverContext.getServerSessionContext().getSessionCacheSize());
         c.close();
 
         TestSSLSocketPair s = TestSSLSocketPair.create(newTestContext()).connect();
         assertEquals(expectedClientSessionCacheSize,
-                s.c.clientContext.getClientSessionContext().getSessionCacheSize());
+                     s.c.clientContext.getClientSessionContext().getSessionCacheSize());
         assertEquals(expectedServerSessionCacheSize,
-                s.c.serverContext.getServerSessionContext().getSessionCacheSize());
+                     s.c.serverContext.getServerSessionContext().getSessionCacheSize());
         s.close();
     }
 
@@ -161,15 +166,15 @@ public class SSLSessionContextTest {
         TestSSLContext c = newTestContext();
         int expectedClientSessionCacheSize = expectedClientSslSessionCacheSize(c);
         int expectedServerSessionCacheSize = expectedServerSslSessionCacheSize(c);
-        assertNoConnectSetSessionCacheSizeBehavior(
-                expectedClientSessionCacheSize, c.clientContext.getClientSessionContext());
-        assertNoConnectSetSessionCacheSizeBehavior(
-                expectedServerSessionCacheSize, c.serverContext.getServerSessionContext());
+        assertNoConnectSetSessionCacheSizeBehavior(expectedClientSessionCacheSize,
+                                                   c.clientContext.getClientSessionContext());
+        assertNoConnectSetSessionCacheSizeBehavior(expectedServerSessionCacheSize,
+                                                   c.serverContext.getServerSessionContext());
         c.close();
     }
 
-    private static void assertNoConnectSetSessionCacheSizeBehavior(
-            int expectedDefault, SSLSessionContext s) {
+    private static void assertNoConnectSetSessionCacheSizeBehavior(int expectedDefault,
+                                                                   SSLSessionContext s) {
         try {
             s.setSessionCacheSize(-1);
             fail();
@@ -303,16 +308,16 @@ public class SSLSessionContextTest {
         TestSSLContext c = newTestContext();
         int expectedCacheTimeout = expectedSslSessionCacheTimeout(c);
         assertEquals(expectedCacheTimeout,
-                c.clientContext.getClientSessionContext().getSessionTimeout());
+                     c.clientContext.getClientSessionContext().getSessionTimeout());
         assertEquals(expectedCacheTimeout,
-                c.serverContext.getServerSessionContext().getSessionTimeout());
+                     c.serverContext.getServerSessionContext().getSessionTimeout());
         c.close();
 
         TestSSLSocketPair s = TestSSLSocketPair.create(newTestContext()).connect();
         assertEquals(expectedCacheTimeout,
-                s.c.clientContext.getClientSessionContext().getSessionTimeout());
+                     s.c.clientContext.getClientSessionContext().getSessionTimeout());
         assertEquals(expectedCacheTimeout,
-                s.c.serverContext.getServerSessionContext().getSessionTimeout());
+                     s.c.serverContext.getServerSessionContext().getSessionTimeout());
         s.close();
     }
 
@@ -321,9 +326,9 @@ public class SSLSessionContextTest {
         TestSSLContext c = newTestContext();
         int expectedCacheTimeout = expectedSslSessionCacheTimeout(c);
         assertEquals(expectedCacheTimeout,
-                c.clientContext.getClientSessionContext().getSessionTimeout());
+                     c.clientContext.getClientSessionContext().getSessionTimeout());
         assertEquals(expectedCacheTimeout,
-                c.serverContext.getServerSessionContext().getSessionTimeout());
+                     c.serverContext.getServerSessionContext().getSessionTimeout());
         c.clientContext.getClientSessionContext().setSessionTimeout(0);
         c.serverContext.getServerSessionContext().setSessionTimeout(0);
         assertEquals(0, c.clientContext.getClientSessionContext().getSessionTimeout());
@@ -358,19 +363,19 @@ public class SSLSessionContextTest {
 
     private static void assertSSLSessionContextSize(int expected, TestSSLContext c) {
         assertSSLSessionContextSize(expected, c.clientContext.getClientSessionContext(),
-                c.serverContext.getServerSessionContext());
+                                    c.serverContext.getServerSessionContext());
         assertSSLSessionContextSize(0, c.serverContext.getClientSessionContext(),
-                c.clientContext.getServerSessionContext());
+                                    c.clientContext.getServerSessionContext());
     }
 
-    private static void assertSSLSessionContextSize(
-            int expected, SSLSessionContext client, SSLSessionContext server) {
+    private static void assertSSLSessionContextSize(int expected, SSLSessionContext client,
+                                                    SSLSessionContext server) {
         assertSSLSessionContextSize(expected, client, false);
         assertSSLSessionContextSize(expected, server, true);
     }
 
-    private static void assertSSLSessionContextSize(
-            int expected, SSLSessionContext s, boolean server) {
+    private static void assertSSLSessionContextSize(int expected, SSLSessionContext s,
+                                                    boolean server) {
         if (server && TestSSLContext.sslServerSocketSupportsSessionTickets()) {
             assertEquals(0, numSessions(s));
         } else {
@@ -380,24 +385,24 @@ public class SSLSessionContextTest {
 
     private static void assertSSLSessionContextSizeAtLeast(int expected, TestSSLContext c) {
         assertSSLSessionContextSizeAtLeast(expected, c.clientContext.getClientSessionContext(),
-            c.serverContext.getServerSessionContext());
+                                           c.serverContext.getServerSessionContext());
         assertSSLSessionContextSizeAtLeast(0, c.serverContext.getClientSessionContext(),
-            c.clientContext.getServerSessionContext());
+                                           c.clientContext.getServerSessionContext());
     }
 
-    private static void assertSSLSessionContextSizeAtLeast(
-        int expected, SSLSessionContext client, SSLSessionContext server) {
+    private static void assertSSLSessionContextSizeAtLeast(int expected, SSLSessionContext client,
+                                                           SSLSessionContext server) {
         assertSSLSessionContextSizeAtLeast(expected, client, false);
         assertSSLSessionContextSizeAtLeast(expected, server, true);
     }
 
-    private static void assertSSLSessionContextSizeAtLeast(
-        int expected, SSLSessionContext s, boolean server) {
+    private static void assertSSLSessionContextSizeAtLeast(int expected, SSLSessionContext s,
+                                                           boolean server) {
         if (server && TestSSLContext.sslServerSocketSupportsSessionTickets()) {
             assertEquals(0, numSessions(s));
         } else {
             assertTrue("numSessions: " + numSessions(s) + ", expected at least: " + expected,
-                numSessions(s) >= expected);
+                       numSessions(s) >= expected);
         }
     }
 
@@ -416,5 +421,4 @@ public class SSLSessionContextTest {
     private static int numSessions(SSLSessionContext s) {
         return Collections.list(s.getIds()).size();
     }
-
 }

@@ -17,10 +17,11 @@
 
 package com.android.org.conscrypt;
 
+import com.android.org.conscrypt.EngineHandshakeBenchmark.Config;
+
 import com.google.caliper.BeforeExperiment;
 import com.google.caliper.Benchmark;
 import com.google.caliper.Param;
-import com.android.org.conscrypt.EngineHandshakeBenchmark.Config;
 
 /**
  * Cipher benchmarks. Only runs on AES currently because of the combinatorial
@@ -31,11 +32,9 @@ import com.android.org.conscrypt.EngineHandshakeBenchmark.Config;
 public class CaliperAlpnBenchmark {
     private final CaliperConfig config = new CaliperConfig();
 
-    @Param({TestUtils.TEST_CIPHER})
-    public String a_cipher;
+    @Param({TestUtils.TEST_CIPHER}) public String a_cipher;
 
-    @Param
-    public BufferType b_buffer;
+    @Param public BufferType b_buffer;
 
     @Param({"CONSCRYPT_UNPOOLED"}) public AndroidEngineFactory c_engine;
 

@@ -97,9 +97,9 @@ public class XwingTest {
 
         PrivateKey unused = keyFactory.generatePrivate(new RawKeySpec(new byte[32]));
         assertThrows(InvalidKeySpecException.class,
-                () -> keyFactory.generatePrivate(new RawKeySpec(new byte[31])));
+                     () -> keyFactory.generatePrivate(new RawKeySpec(new byte[31])));
         assertThrows(InvalidKeySpecException.class,
-                () -> keyFactory.generatePrivate(new RawKeySpec(new byte[33])));
+                     () -> keyFactory.generatePrivate(new RawKeySpec(new byte[33])));
     }
 
     @Test
@@ -111,9 +111,11 @@ public class XwingTest {
         byte[] rawPublicKey = publicKeySpec.getEncoded();
 
         PublicKey unused = keyFactory.generatePublic(new RawKeySpec(new byte[rawPublicKey.length]));
-        assertThrows(InvalidKeySpecException.class,
+        assertThrows(
+                InvalidKeySpecException.class,
                 () -> keyFactory.generatePublic(new RawKeySpec(new byte[rawPublicKey.length - 1])));
-        assertThrows(InvalidKeySpecException.class,
+        assertThrows(
+                InvalidKeySpecException.class,
                 () -> keyFactory.generatePublic(new RawKeySpec(new byte[rawPublicKey.length + 1])));
     }
 
@@ -125,9 +127,9 @@ public class XwingTest {
         KeyFactory keyFactory = KeyFactory.getInstance("XWING", conscryptProvider);
 
         assertThrows(UnsupportedOperationException.class,
-                () -> keyFactory.getKeySpec(keyPair.getPrivate(), PKCS8EncodedKeySpec.class));
+                     () -> keyFactory.getKeySpec(keyPair.getPrivate(), PKCS8EncodedKeySpec.class));
         assertThrows(UnsupportedOperationException.class,
-                () -> keyFactory.getKeySpec(keyPair.getPublic(), X509EncodedKeySpec.class));
+                     () -> keyFactory.getKeySpec(keyPair.getPublic(), X509EncodedKeySpec.class));
     }
 
     @Test
@@ -136,10 +138,10 @@ public class XwingTest {
         KeyPair keyPair = keyGen.generateKeyPair();
 
         ObjectOutputStream oos = new ObjectOutputStream(new ByteArrayOutputStream(16384));
-        assertThrows(
-                UnsupportedOperationException.class, () -> oos.writeObject(keyPair.getPrivate()));
-        assertThrows(
-                UnsupportedOperationException.class, () -> oos.writeObject(keyPair.getPublic()));
+        assertThrows(UnsupportedOperationException.class,
+                     () -> oos.writeObject(keyPair.getPrivate()));
+        assertThrows(UnsupportedOperationException.class,
+                     () -> oos.writeObject(keyPair.getPublic()));
     }
 
     @Test

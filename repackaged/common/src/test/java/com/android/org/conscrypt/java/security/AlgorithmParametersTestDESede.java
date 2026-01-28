@@ -41,7 +41,6 @@ import tests.util.ServiceTester;
  */
 @RunWith(JUnit4.class)
 public class AlgorithmParametersTestDESede extends AbstractAlgorithmParametersTest {
-
     // BEGIN Android-Added: Allow access to deprecated BC algorithms.
     // Allow access to deprecated BC algorithms in this test, so we can ensure they
     // continue to work
@@ -50,9 +49,9 @@ public class AlgorithmParametersTestDESede extends AbstractAlgorithmParametersTe
             EnableDeprecatedBouncyCastleAlgorithmsRule.getInstance();
     // END Android-Added: Allow access to deprecated BC algorithms.
 
-    private static final byte[] parameterData = new byte[] {
-        (byte) 0x04, (byte) 0x08, (byte) 0x68, (byte) 0xC8,
-        (byte) 0xFF, (byte) 0x64, (byte) 0x72, (byte) 0xF5 };
+    private static final byte[] parameterData =
+            new byte[] {(byte) 0x04, (byte) 0x08, (byte) 0x68, (byte) 0xC8,
+                        (byte) 0xFF, (byte) 0x64, (byte) 0x72, (byte) 0xF5};
 
     // See README.ASN1 for how to understand and reproduce this data
 
@@ -60,27 +59,27 @@ public class AlgorithmParametersTestDESede extends AbstractAlgorithmParametersTe
     private static final String ENCODED_DATA = "BAgECGjI/2Ry9Q==";
 
     public AlgorithmParametersTestDESede() {
-        super("DESede", new AlgorithmParameterSymmetricHelper("DESede", "CBC/PKCS5PADDING", 112), new IvParameterSpec(parameterData));
+        super("DESede", new AlgorithmParameterSymmetricHelper("DESede", "CBC/PKCS5PADDING", 112),
+              new IvParameterSpec(parameterData));
     }
 
     @Test
     public void testEncoding() throws Exception {
         ServiceTester.test("AlgorithmParameters")
-            .withAlgorithm("DESEDE")
-            .run(new ServiceTester.Test() {
-                @Override
-                public void test(Provider p, String algorithm) throws Exception {
-                    AlgorithmParameters params = AlgorithmParameters.getInstance("DESede", p);
+                .withAlgorithm("DESEDE")
+                .run(new ServiceTester.Test() {
+                    @Override
+                    public void test(Provider p, String algorithm) throws Exception {
+                        AlgorithmParameters params = AlgorithmParameters.getInstance("DESede", p);
 
-                    params.init(new IvParameterSpec(parameterData));
-                    assertEquals(ENCODED_DATA, TestUtils.encodeBase64(params.getEncoded()));
+                        params.init(new IvParameterSpec(parameterData));
+                        assertEquals(ENCODED_DATA, TestUtils.encodeBase64(params.getEncoded()));
 
-                    params = AlgorithmParameters.getInstance("DESede", p);
-                    params.init(TestUtils.decodeBase64(ENCODED_DATA));
-                    assertArrayEquals(parameterData,
-                        params.getParameterSpec(IvParameterSpec.class).getIV());
-                }
-            });
+                        params = AlgorithmParameters.getInstance("DESede", p);
+                        params.init(TestUtils.decodeBase64(ENCODED_DATA));
+                        assertArrayEquals(parameterData,
+                                          params.getParameterSpec(IvParameterSpec.class).getIV());
+                    }
+                });
     }
-
 }

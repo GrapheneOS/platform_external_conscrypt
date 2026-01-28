@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 import java.security.InvalidKeyException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
+
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactorySpi;
 
@@ -31,10 +32,8 @@ import javax.crypto.SecretKeyFactorySpi;
  */
 @Internal
 public class ScryptSecretKeyFactory extends SecretKeyFactorySpi {
-
     @Override
     protected SecretKey engineGenerateSecret(KeySpec inKeySpec) throws InvalidKeySpecException {
-
         char[] password;
         byte[] salt;
         int n, r, p, keyOutputBits;
@@ -70,8 +69,8 @@ public class ScryptSecretKeyFactory extends SecretKeyFactorySpi {
             return new ScryptKey(NativeCrypto.Scrypt_generate_key(
                     new String(password).getBytes("UTF-8"), salt, n, r, p, keyOutputBits / 8));
         } catch (UnsupportedEncodingException e) {
-                // Impossible according to the Java docs: UTF-8 is always supported.
-                throw new IllegalStateException(e);
+            // Impossible according to the Java docs: UTF-8 is always supported.
+            throw new IllegalStateException(e);
         }
     }
 
@@ -82,8 +81,8 @@ public class ScryptSecretKeyFactory extends SecretKeyFactorySpi {
     }
 
     @Override
-    protected KeySpec engineGetKeySpec(
-            SecretKey secretKey, @SuppressWarnings("rawtypes") Class aClass)
+    protected KeySpec engineGetKeySpec(SecretKey secretKey,
+                                       @SuppressWarnings("rawtypes") Class aClass)
             throws InvalidKeySpecException {
         if (secretKey == null) {
             throw new InvalidKeySpecException("Null KeySpec");

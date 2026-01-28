@@ -64,7 +64,7 @@ public class CpuFeatures {
                 EVP_has_aes_hardware.setAccessible(true);
                 return ((Integer) EVP_has_aes_hardware.invoke(null)) == 1;
             } catch (NoSuchMethodException | IllegalArgumentException | IllegalAccessException
-                    | SecurityException ignored) {
+                     | SecurityException ignored) {
                 // Ignored
             } catch (InvocationTargetException e) {
                 throw new IllegalArgumentException(e);
@@ -75,7 +75,8 @@ public class CpuFeatures {
     }
 
     private static Class<?> findNativeCrypto() {
-        for (String packageName : new String[]{"com.android.com.android.org.conscrypt", "com.android.org.conscrypt"}) {
+        for (String packageName :
+             new String[] {"com.android.com.android.org.conscrypt", "com.android.org.conscrypt"}) {
             String name = packageName + ".NativeCrypto";
             try {
                 return Class.forName(name);

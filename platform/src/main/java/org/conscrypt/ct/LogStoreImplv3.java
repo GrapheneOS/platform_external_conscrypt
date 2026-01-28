@@ -128,7 +128,7 @@ public class LogStoreImplv3 implements LogStore {
 
     public LogStoreImplv3(Policy policy) {
         this(policy, getPathForCompatVersion(COMPAT_VERSION), Platform.getStatsLog(),
-                new SystemTimeSupplier());
+             new SystemTimeSupplier());
     }
 
     public LogStoreImplv3(Policy policy, Path logPath, StatsLog metrics, Supplier<Long> clock) {
@@ -231,7 +231,7 @@ public class LogStoreImplv3 implements LogStore {
     private synchronized void resetLogListIfRequired() {
         long now = clock.get();
         if (now >= this.logListLastChecked
-                && now < this.logListLastChecked + LOG_LIST_CHECK_INTERVAL_IN_MS) {
+            && now < this.logListLastChecked + LOG_LIST_CHECK_INTERVAL_IN_MS) {
             return;
         }
         this.logListLastChecked = now;
@@ -325,7 +325,7 @@ public class LogStoreImplv3 implements LogStore {
             //  positives when validating SCTs.
             if (logInfo.getStateAt(clock.get()) == LogInfo.STATE_UNKNOWN) {
                 throw new IllegalArgumentException("Log current state is "
-                        + "unknown, logId: " + encodedLogId);
+                                                   + "unknown, logId: " + encodedLogId);
             }
 
             logCache.put(new ByteArray(logId), logInfo);
@@ -371,7 +371,7 @@ public class LogStoreImplv3 implements LogStore {
     private static PublicKey parsePubKey(byte[] key) {
         // TODO(tweek): Replace with NativeCrypto.EVP_PKEY_from_subject_public_key_info
         byte[] pem = ("-----BEGIN PUBLIC KEY-----\n" + Base64.getEncoder().encodeToString(key)
-                + "\n-----END PUBLIC KEY-----")
+                      + "\n-----END PUBLIC KEY-----")
                              .getBytes(US_ASCII);
         PublicKey pubkey;
         try {

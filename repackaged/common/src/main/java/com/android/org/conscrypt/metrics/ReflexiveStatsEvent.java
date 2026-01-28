@@ -60,7 +60,8 @@ public class ReflexiveStatsEvent {
     /* Used by older CTS test */
     @Deprecated
     public static ReflexiveStatsEvent buildEvent(int atomId, boolean success, int protocol,
-            int cipherSuite, int duration, int source, int[] uids) {
+                                                 int cipherSuite, int duration, int source,
+                                                 int[] uids) {
         ReflexiveStatsEvent.Builder builder = ReflexiveStatsEvent.newBuilder();
         builder.setAtomId(atomId);
         builder.writeBoolean(success);
@@ -75,8 +76,8 @@ public class ReflexiveStatsEvent {
 
     /* Used by older CTS test */
     @Deprecated
-    public static ReflexiveStatsEvent buildEvent(
-            int atomId, boolean success, int protocol, int cipherSuite, int duration, int source) {
+    public static ReflexiveStatsEvent buildEvent(int atomId, boolean success, int protocol,
+                                                 int cipherSuite, int duration, int source) {
         ReflexiveStatsEvent.Builder builder = ReflexiveStatsEvent.newBuilder();
         builder.setAtomId(atomId);
         builder.writeBoolean(success);

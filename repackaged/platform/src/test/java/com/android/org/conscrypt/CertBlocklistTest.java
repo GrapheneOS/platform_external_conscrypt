@@ -91,7 +91,8 @@ public class CertBlocklistTest {
         assertUntrusted(chain, getTrustManager(blocklistedCa));
     }
 
-    /** Test that the path building correctly routes around a blocklisted cert where there are
+    /**
+     * Test that the path building correctly routes around a blocklisted cert where there are
      * other valid paths available. This prevents breakage where a cert was cross signed by a
      * blocklisted CA but is still valid due to also being cross signed by CAs that remain trusted.
      * Path:

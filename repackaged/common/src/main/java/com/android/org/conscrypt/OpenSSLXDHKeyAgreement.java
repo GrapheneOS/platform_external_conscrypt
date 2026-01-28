@@ -27,8 +27,7 @@ import java.security.PublicKey;
  */
 @Internal
 public final class OpenSSLXDHKeyAgreement extends OpenSSLBaseDHKeyAgreement<byte[]> {
-    public OpenSSLXDHKeyAgreement() {
-    }
+    public OpenSSLXDHKeyAgreement() {}
 
     @Override
     protected byte[] convertPublicKey(PublicKey key) throws InvalidKeyException {
@@ -49,11 +48,9 @@ public final class OpenSSLXDHKeyAgreement extends OpenSSLBaseDHKeyAgreement<byte
     }
 
     @Override
-    protected int computeKey(byte[] buffer, byte[] theirPublicKey, byte[] ourPrivateKey) throws InvalidKeyException {
-        if (!NativeCrypto.X25519(
-                buffer,
-                ourPrivateKey,
-                theirPublicKey)) {
+    protected int computeKey(byte[] buffer, byte[] theirPublicKey, byte[] ourPrivateKey)
+            throws InvalidKeyException {
+        if (!NativeCrypto.X25519(buffer, ourPrivateKey, theirPublicKey)) {
             throw new InvalidKeyException("Error running X25519");
         }
 

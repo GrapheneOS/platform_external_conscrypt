@@ -246,7 +246,8 @@ public final class CertBlocklistImpl implements CertBlocklist {
                 try {
                     bl.add(new BigInteger(value, 16));
                 } catch (NumberFormatException e) {
-                    logger.log(Level.WARNING, "Tried to blacklist invalid serial number " + value, e);
+                    logger.log(Level.WARNING, "Tried to blacklist invalid serial number " + value,
+                               e);
                 }
             }
         }
@@ -294,12 +295,12 @@ public final class CertBlocklistImpl implements CertBlocklist {
                 // Blocklist statically included in Conscrypt. See constants/.
                 for (int i = 0; i < StaticBlocklist.PUBLIC_KEYS.length; i++) {
                     bl.put(new ByteArray(StaticBlocklist.PUBLIC_KEYS[i]),
-                            new Entry(Origin.SHA256_BUILT_IN, /* index= */ i));
+                           new Entry(Origin.SHA256_BUILT_IN, /* index= */ i));
                 }
                 break;
             default:
-                throw new RuntimeException(
-                        "Unknown hashType: " + hashType + ". Expected SHA-1 or SHA-256");
+                throw new RuntimeException("Unknown hashType: " + hashType
+                                           + ". Expected SHA-1 or SHA-256");
         }
 
         MessageDigest md;
@@ -333,8 +334,8 @@ public final class CertBlocklistImpl implements CertBlocklist {
         return bl;
     }
 
-    private static Entry isPublicKeyBlockListed(
-            byte[] encodedPublicKey, Map<ByteArray, Entry> blocklist, String hashType) {
+    private static Entry isPublicKeyBlockListed(byte[] encodedPublicKey,
+                                                Map<ByteArray, Entry> blocklist, String hashType) {
         MessageDigest md;
         try {
             md = MessageDigest.getInstance(hashType);

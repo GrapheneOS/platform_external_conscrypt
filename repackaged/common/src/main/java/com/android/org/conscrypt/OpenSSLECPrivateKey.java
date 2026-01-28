@@ -53,8 +53,8 @@ final class OpenSSLECPrivateKey implements ECPrivateKey, OpenSSLKeyHolder {
     }
 
     OpenSSLECPrivateKey(OpenSSLKey key) {
-        this.group = new OpenSSLECGroupContext(new NativeRef.EC_GROUP(
-                NativeCrypto.EC_KEY_get1_group(key.getNativeRef())));
+        this.group = new OpenSSLECGroupContext(
+                new NativeRef.EC_GROUP(NativeCrypto.EC_KEY_get1_group(key.getNativeRef())));
         this.key = key;
     }
 
@@ -63,7 +63,7 @@ final class OpenSSLECPrivateKey implements ECPrivateKey, OpenSSLKeyHolder {
             group = OpenSSLECGroupContext.getInstance(ecKeySpec.getParams());
             final BigInteger privKey = ecKeySpec.getS();
             key = new OpenSSLKey(NativeCrypto.EVP_PKEY_new_EC_KEY(group.getNativeRef(), null,
-                    privKey.toByteArray()));
+                                                                  privKey.toByteArray()));
         } catch (Exception e) {
             throw new InvalidKeySpecException(e);
         }
@@ -84,8 +84,8 @@ final class OpenSSLECPrivateKey implements ECPrivateKey, OpenSSLKeyHolder {
      * using the key will be delegated to the {@code Signature}/{@code Cipher} implementation of the
      * provider which accepts the key.
      */
-    static OpenSSLKey wrapJCAPrivateKeyForTLSStackOnly(PrivateKey privateKey,
-            PublicKey publicKey) throws InvalidKeyException {
+    static OpenSSLKey wrapJCAPrivateKeyForTLSStackOnly(PrivateKey privateKey, PublicKey publicKey)
+            throws InvalidKeyException {
         ECParameterSpec params = null;
         if (privateKey instanceof ECKey) {
             params = ((ECKey) privateKey).getParams();
@@ -94,7 +94,7 @@ final class OpenSSLECPrivateKey implements ECPrivateKey, OpenSSLKeyHolder {
         }
         if (params == null) {
             throw new InvalidKeyException("EC parameters not available. Private: " + privateKey
-                    + ", public: " + publicKey);
+                                          + ", public: " + publicKey);
         }
         return wrapJCAPrivateKeyForTLSStackOnly(privateKey, params);
     }
@@ -105,7 +105,8 @@ final class OpenSSLECPrivateKey implements ECPrivateKey, OpenSSLKeyHolder {
      * provider which accepts the key.
      */
     static OpenSSLKey wrapJCAPrivateKeyForTLSStackOnly(PrivateKey privateKey,
-            ECParameterSpec params) throws InvalidKeyException {
+                                                       ECParameterSpec params)
+            throws InvalidKeyException {
         if (params == null) {
             if (privateKey instanceof ECKey) {
                 params = ((ECKey) privateKey).getParams();
@@ -122,20 +123,21 @@ final class OpenSSLECPrivateKey implements ECPrivateKey, OpenSSLKeyHolder {
             throw new InvalidKeyException("Invalid EC parameters: " + params);
         }
 
-        return new OpenSSLKey(
-                NativeCrypto.getECPrivateKeyWrapper(privateKey, group.getNativeRef()), true);
+        return new OpenSSLKey(NativeCrypto.getECPrivateKeyWrapper(privateKey, group.getNativeRef()),
+                              true);
     }
 
     private static OpenSSLKey wrapPlatformKey(ECPrivateKey ecPrivateKey,
-            OpenSSLECGroupContext group) throws InvalidKeyException {
-        return new OpenSSLKey(NativeCrypto.getECPrivateKeyWrapper(ecPrivateKey,
-                group.getNativeRef()), true);
+                                              OpenSSLECGroupContext group)
+            throws InvalidKeyException {
+        return new OpenSSLKey(
+                NativeCrypto.getECPrivateKeyWrapper(ecPrivateKey, group.getNativeRef()), true);
     }
 
     static OpenSSLKey getInstance(ECPrivateKey ecPrivateKey) throws InvalidKeyException {
         try {
-            OpenSSLECGroupContext group = OpenSSLECGroupContext.getInstance(ecPrivateKey
-                    .getParams());
+            OpenSSLECGroupContext group =
+                    OpenSSLECGroupContext.getInstance(ecPrivateKey.getParams());
 
             /*
              * If the key is not encodable (PKCS11-like key), then wrap it and
@@ -147,7 +149,7 @@ final class OpenSSLECPrivateKey implements ECPrivateKey, OpenSSLKeyHolder {
 
             final BigInteger privKey = ecPrivateKey.getS();
             return new OpenSSLKey(NativeCrypto.EVP_PKEY_new_EC_KEY(group.getNativeRef(), null,
-                    privKey.toByteArray()));
+                                                                   privKey.toByteArray()));
         } catch (Exception e) {
             throw new InvalidKeyException(e);
         }
@@ -249,8 +251,8 @@ final class OpenSSLECPrivateKey implements ECPrivateKey, OpenSSLKeyHolder {
         } catch (ParsingException e) {
             throw new IOException(e);
         }
-        group = new OpenSSLECGroupContext(new NativeRef.EC_GROUP(
-                NativeCrypto.EC_KEY_get1_group(key.getNativeRef())));
+        group = new OpenSSLECGroupContext(
+                new NativeRef.EC_GROUP(NativeCrypto.EC_KEY_get1_group(key.getNativeRef())));
     }
 
     private void writeObject(ObjectOutputStream stream) throws IOException {

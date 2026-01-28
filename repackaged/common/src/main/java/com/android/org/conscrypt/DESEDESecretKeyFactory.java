@@ -20,6 +20,7 @@ package com.android.org.conscrypt;
 import java.security.InvalidKeyException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
+
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactorySpi;
 import javax.crypto.spec.DESedeKeySpec;
@@ -32,7 +33,6 @@ import javax.crypto.spec.SecretKeySpec;
  */
 @Internal
 public class DESEDESecretKeyFactory extends SecretKeyFactorySpi {
-
     public DESEDESecretKeyFactory() {}
 
     @Override
@@ -55,21 +55,23 @@ public class DESEDESecretKeyFactory extends SecretKeyFactorySpi {
             DESedeKeySpec desKeySpec = (DESedeKeySpec) keySpec;
             return new SecretKeySpec(desKeySpec.getKey(), "DESEDE");
         } else {
-            throw new InvalidKeySpecException(
-                    "Unsupported KeySpec class: " + keySpec.getClass().getName());
+            throw new InvalidKeySpecException("Unsupported KeySpec class: "
+                                              + keySpec.getClass().getName());
         }
     }
 
     @Override
     protected KeySpec engineGetKeySpec(SecretKey secretKey,
-            @SuppressWarnings("rawtypes") Class aClass) throws InvalidKeySpecException {
+                                       @SuppressWarnings("rawtypes") Class aClass)
+            throws InvalidKeySpecException {
         if (secretKey == null) {
             throw new InvalidKeySpecException("Null SecretKey");
         }
         if (aClass == SecretKeySpec.class) {
             try {
                 if (!DESedeKeySpec.isParityAdjusted(secretKey.getEncoded(), 0)) {
-                    throw new InvalidKeySpecException("SecretKey is not a parity-adjusted DESEDE key");
+                    throw new InvalidKeySpecException(
+                            "SecretKey is not a parity-adjusted DESEDE key");
                 }
             } catch (InvalidKeyException e) {
                 throw new InvalidKeySpecException(e);

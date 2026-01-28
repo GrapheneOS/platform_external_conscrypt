@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 /**
@@ -76,8 +77,9 @@ public class DelegatingSSLSocketFactory extends SSLSocketFactory {
     }
     @Override
     public Socket createSocket(InetAddress address, int port, InetAddress localAddress,
-            int localPort) throws IOException {
-        SSLSocket socket = (SSLSocket) mDelegate.createSocket(address, port, localAddress, localPort);
+                               int localPort) throws IOException {
+        SSLSocket socket =
+                (SSLSocket) mDelegate.createSocket(address, port, localAddress, localPort);
         return configureSocket(socket);
     }
 }

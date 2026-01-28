@@ -17,8 +17,9 @@
 
 package com.android.org.conscrypt;
 
-import static java.lang.Math.min;
 import static com.android.org.conscrypt.Preconditions.checkArgument;
+
+import static java.lang.Math.min;
 
 import java.nio.ByteBuffer;
 
@@ -106,8 +107,8 @@ public final class BufferUtils {
      * {@code consume()} method.
      *
      */
-    public static ByteBuffer copyNoConsume(
-            ByteBuffer[] buffers, ByteBuffer destination, int maxAmount) {
+    public static ByteBuffer copyNoConsume(ByteBuffer[] buffers, ByteBuffer destination,
+                                           int maxAmount) {
         checkArgument(destination.remaining() >= maxAmount, "Destination buffer too small");
         int needed = maxAmount;
         for (ByteBuffer buffer : buffers) {

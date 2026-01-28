@@ -65,8 +65,8 @@ public final class ServerSocketBenchmark {
 
         final ChannelType channelType = config.channelType();
 
-        server = config.serverFactory().newServer(
-                channelType, config.messageSize(), getCommonProtocolSuites(), ciphers(config));
+        server = config.serverFactory().newServer(channelType, config.messageSize(),
+                                                  getCommonProtocolSuites(), ciphers(config));
         server.setMessageProcessor(new MessageProcessor() {
             @Override
             public void processMessage(byte[] inMessage, int numBytes, OutputStream os) {
@@ -89,8 +89,8 @@ public final class ServerSocketBenchmark {
         Future<?> connectedFuture = server.start();
 
         // Always use the same client for consistency across the benchmarks.
-        client = config.clientFactory().newClient(
-                ChannelType.CHANNEL, server.port(), getCommonProtocolSuites(), ciphers(config));
+        client = config.clientFactory().newClient(ChannelType.CHANNEL, server.port(),
+                                                  getCommonProtocolSuites(), ciphers(config));
         client.start();
 
         // Wait for the initial connection to complete.

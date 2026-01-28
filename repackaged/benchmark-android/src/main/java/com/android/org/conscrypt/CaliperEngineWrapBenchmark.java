@@ -33,12 +33,14 @@
 
 package com.android.org.conscrypt;
 
+import com.android.org.conscrypt.EngineWrapBenchmark.Config;
+
 import com.google.caliper.AfterExperiment;
 import com.google.caliper.BeforeExperiment;
 import com.google.caliper.Benchmark;
 import com.google.caliper.Param;
+
 import javax.net.ssl.SSLException;
-import com.android.org.conscrypt.EngineWrapBenchmark.Config;
 
 /**
  * Benchmark comparing performance of various engine implementations to conscrypt.
@@ -48,14 +50,11 @@ import com.android.org.conscrypt.EngineWrapBenchmark.Config;
 public class CaliperEngineWrapBenchmark {
     private final CaliperConfig config = new CaliperConfig();
 
-    @Param({TestUtils.TEST_CIPHER})
-    public String a_cipher;
+    @Param({TestUtils.TEST_CIPHER}) public String a_cipher;
 
-    @Param
-    public BufferType b_buffer;
+    @Param public BufferType b_buffer;
 
-    @Param({"64", "512", "4096"})
-    public int c_message;
+    @Param({"64", "512", "4096"}) public int c_message;
 
     @Param({"CONSCRYPT_UNPOOLED"}) public AndroidEngineFactory d_engine;
 
@@ -85,7 +84,6 @@ public class CaliperEngineWrapBenchmark {
     }
 
     private final class CaliperConfig implements Config {
-
         @Override
         public BufferType bufferType() {
             return b_buffer;

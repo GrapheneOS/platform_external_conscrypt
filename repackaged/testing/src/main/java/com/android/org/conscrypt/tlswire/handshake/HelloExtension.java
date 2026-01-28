@@ -16,12 +16,13 @@
  */
 package com.android.org.conscrypt.tlswire.handshake;
 
+import com.android.org.conscrypt.tlswire.util.IoUtils;
+
 import java.io.DataInput;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
-import com.android.org.conscrypt.tlswire.util.IoUtils;
 
 /**
  * {@code HelloExtension} struct from TLS 1.2 RFC 5246.
@@ -52,7 +53,8 @@ public class HelloExtension {
         TYPE_TO_NAME.put(13, "signature_algorithms");
         TYPE_TO_NAME.put(14, "use_srtp");
         TYPE_TO_NAME.put(15, "heartbeat");
-        TYPE_TO_NAME.put(TYPE_APPLICATION_LAYER_PROTOCOL_NEGOTIATION, "application_layer_protocol_negotiation");
+        TYPE_TO_NAME.put(TYPE_APPLICATION_LAYER_PROTOCOL_NEGOTIATION,
+                         "application_layer_protocol_negotiation");
         TYPE_TO_NAME.put(17, "status_request_v2");
         TYPE_TO_NAME.put(18, "signed_certificate_timestamp");
         TYPE_TO_NAME.put(19, "client_certificate_type");

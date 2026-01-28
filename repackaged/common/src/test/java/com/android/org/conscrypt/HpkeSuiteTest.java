@@ -22,6 +22,7 @@ import static com.android.org.conscrypt.HpkeSuite.AEAD_AES_256_GCM;
 import static com.android.org.conscrypt.HpkeSuite.AEAD_CHACHA20POLY1305;
 import static com.android.org.conscrypt.HpkeSuite.KDF_HKDF_SHA256;
 import static com.android.org.conscrypt.HpkeSuite.KEM_DHKEM_X25519_HKDF_SHA256;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
@@ -44,21 +45,24 @@ public class HpkeSuiteTest {
 
     @Test
     public void testConstructor_invalidKem_throwsArgumentException() {
-        final IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-                () -> new HpkeSuite(700, KDF_HKDF_SHA256, AEAD_AES_128_GCM));
+        final IllegalArgumentException e =
+                assertThrows(IllegalArgumentException.class,
+                             () -> new HpkeSuite(700, KDF_HKDF_SHA256, AEAD_AES_128_GCM));
         assertTrue(e.getMessage().contains("Unknown"));
     }
 
     @Test
     public void testConstructor_invalidKdf_throwsArgumentException() {
-        final IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+        final IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
                 () -> new HpkeSuite(KEM_DHKEM_X25519_HKDF_SHA256, 800, AEAD_AES_128_GCM));
         assertTrue(e.getMessage().contains("Unknown"));
     }
 
     @Test
     public void testConstructor_invalidAead_throwsArgumentException() {
-        final IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+        final IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
                 () -> new HpkeSuite(KEM_DHKEM_X25519_HKDF_SHA256, KDF_HKDF_SHA256, 900));
         assertTrue(e.getMessage().contains("Unknown"));
     }

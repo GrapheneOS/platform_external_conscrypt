@@ -34,7 +34,6 @@ import javax.net.ssl.SSLSessionContext;
  * Supports SSL session caches.
  */
 abstract class AbstractSessionContext implements SSLSessionContext {
-
     /**
      * Maximum lifetime of a session (in seconds) after which it's considered invalid and should not
      * be used to for new connections.
@@ -51,8 +50,7 @@ abstract class AbstractSessionContext implements SSLSessionContext {
     private final Map<ByteArray, NativeSslSession> sessions =
             new LinkedHashMap<ByteArray, NativeSslSession>() {
                 @Override
-                protected boolean removeEldestEntry(
-                        Map.Entry<ByteArray, NativeSslSession> eldest) {
+                protected boolean removeEldestEntry(Map.Entry<ByteArray, NativeSslSession> eldest) {
                     // NOTE: does not take into account any session that may have become
                     // invalid.
                     if (maximumSize > 0 && size() > maximumSize) {
@@ -217,7 +215,8 @@ abstract class AbstractSessionContext implements SSLSessionContext {
         try {
             if (isValid()) {
                 NativeCrypto.SSL_CTX_set_spake_credential(context, pwArray, idProverArray,
-                        idVerifierArray, isClient, handshakeLimit, sslCtxNativePointer, this);
+                                                          idVerifierArray, isClient, handshakeLimit,
+                                                          sslCtxNativePointer, this);
             }
         } finally {
             lock.writeLock().unlock();

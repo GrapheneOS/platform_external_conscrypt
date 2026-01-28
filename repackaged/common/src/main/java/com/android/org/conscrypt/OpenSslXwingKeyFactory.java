@@ -28,8 +28,10 @@ import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
-/** An implementation of a {@link KeyFactorySpi} for XWING keys based on BoringSSL. 
- * @hide This class is not part of the Android public SDK API*/
+/**
+ * An implementation of a {@link KeyFactorySpi} for XWING keys based on BoringSSL.
+ * @hide This class is not part of the Android public SDK API
+ */
 @Internal
 public final class OpenSslXwingKeyFactory extends KeyFactorySpi {
     public OpenSslXwingKeyFactory() {}
@@ -42,8 +44,8 @@ public final class OpenSslXwingKeyFactory extends KeyFactorySpi {
         if (keySpec instanceof EncodedKeySpec) {
             return new OpenSslXwingPublicKey((EncodedKeySpec) keySpec);
         }
-        throw new InvalidKeySpecException(
-                "Currently only EncodedKeySpec is supported; was " + keySpec.getClass().getName());
+        throw new InvalidKeySpecException("Currently only EncodedKeySpec is supported; was "
+                                          + keySpec.getClass().getName());
     }
 
     @Override
@@ -54,8 +56,8 @@ public final class OpenSslXwingKeyFactory extends KeyFactorySpi {
         if (keySpec instanceof EncodedKeySpec) {
             return new OpenSslXwingPrivateKey((EncodedKeySpec) keySpec);
         }
-        throw new InvalidKeySpecException(
-                "Currently only EncodedKeySpec is supported; was " + keySpec.getClass().getName());
+        throw new InvalidKeySpecException("Currently only EncodedKeySpec is supported; was "
+                                          + keySpec.getClass().getName());
     }
 
     @Override
@@ -85,7 +87,8 @@ public final class OpenSslXwingKeyFactory extends KeyFactorySpi {
             }
         }
         throw new InvalidKeySpecException("Unsupported key type and key spec combination; key="
-                + key.getClass().getName() + ", keySpec=" + keySpec.getName());
+                                          + key.getClass().getName()
+                                          + ", keySpec=" + keySpec.getName());
     }
 
     @Override

@@ -17,8 +17,10 @@
 
 package com.android.org.conscrypt;
 
-/** ML-DSA algorithm. 
- * @hide This class is not part of the Android public SDK API*/
+/**
+ * ML-DSA algorithm.
+ * @hide This class is not part of the Android public SDK API
+ */
 public enum MlDsaAlgorithm {
     ML_DSA_65("ML-DSA-65", 1952),
     ML_DSA_87("ML-DSA-87", 2592);

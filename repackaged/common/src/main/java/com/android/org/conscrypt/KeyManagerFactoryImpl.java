@@ -41,11 +41,10 @@ import javax.net.ssl.ManagerFactoryParameters;
  */
 @Internal
 public class KeyManagerFactoryImpl extends KeyManagerFactorySpi {
-
     // source of key material
     private KeyStore keyStore;
 
-    //password
+    // password
     private char[] pwd;
 
     /**
@@ -53,8 +52,7 @@ public class KeyManagerFactoryImpl extends KeyManagerFactorySpi {
      */
     @Override
     protected void engineInit(KeyStore ks, char[] password)
-            throws KeyStoreException, NoSuchAlgorithmException,
-            UnrecoverableKeyException {
+            throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException {
         if (ks != null) {
             keyStore = ks;
             if (password != null) {
@@ -66,7 +64,8 @@ public class KeyManagerFactoryImpl extends KeyManagerFactorySpi {
             keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             String keyStoreName = System.getProperty("javax.net.ssl.keyStore");
             String keyStorePwd = null;
-            if (keyStoreName == null || keyStoreName.equalsIgnoreCase("NONE") || keyStoreName.isEmpty()) {
+            if (keyStoreName == null || keyStoreName.equalsIgnoreCase("NONE")
+                || keyStoreName.isEmpty()) {
                 try {
                     keyStore.load(null, null);
                 } catch (IOException e) {
@@ -95,9 +94,7 @@ public class KeyManagerFactoryImpl extends KeyManagerFactorySpi {
                     IoUtils.closeQuietly(fis);
                 }
             }
-
         }
-
     }
 
     /**
@@ -106,9 +103,7 @@ public class KeyManagerFactoryImpl extends KeyManagerFactorySpi {
     @Override
     protected void engineInit(ManagerFactoryParameters spec)
             throws InvalidAlgorithmParameterException {
-        throw new InvalidAlgorithmParameterException(
-                "ManagerFactoryParameters not supported");
-
+        throw new InvalidAlgorithmParameterException("ManagerFactoryParameters not supported");
     }
 
     /**
@@ -119,6 +114,6 @@ public class KeyManagerFactoryImpl extends KeyManagerFactorySpi {
         if (keyStore == null) {
             throw new IllegalStateException("KeyManagerFactory is not initialized");
         }
-        return new KeyManager[] { new KeyManagerImpl(keyStore, pwd) };
+        return new KeyManager[] {new KeyManagerImpl(keyStore, pwd)};
     }
 }

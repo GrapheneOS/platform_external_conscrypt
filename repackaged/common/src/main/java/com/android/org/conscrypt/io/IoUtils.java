@@ -17,10 +17,11 @@
 
 package com.android.org.conscrypt.io;
 
+import com.android.org.conscrypt.Internal;
+
 import java.io.Closeable;
 import java.io.InterruptedIOException;
 import java.net.Socket;
-import com.android.org.conscrypt.Internal;
 
 /**
  * @hide This class is not part of the Android public SDK API

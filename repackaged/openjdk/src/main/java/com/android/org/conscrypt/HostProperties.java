@@ -85,7 +85,8 @@ class HostProperties {
     enum Architecture {
         X86_64,
         X86_32 {
-            @Override public String getFileComponent() {
+            @Override
+            public String getFileComponent() {
                 return "x86";
             }
         },
@@ -168,8 +169,7 @@ class HostProperties {
             f = new File("/tmp");
         }
 
-        logger.log(Level.WARNING,
-                "Failed to get the temporary directory; falling back to: {0}", f);
+        logger.log(Level.WARNING, "Failed to get the temporary directory; falling back to: {0}", f);
         return f;
     }
 
@@ -291,5 +291,4 @@ class HostProperties {
     }
 
     private HostProperties() {}
-
 }

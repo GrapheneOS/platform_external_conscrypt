@@ -111,8 +111,7 @@ public final class OpenSSLKey {
      *
      * @throws InvalidKeyException if parsing fails
      */
-    static OpenSSLKey fromPrivateKeyPemInputStream(InputStream is)
-            throws InvalidKeyException {
+    static OpenSSLKey fromPrivateKeyPemInputStream(InputStream is) throws InvalidKeyException {
         OpenSSLBIOInputStream bis = new OpenSSLBIOInputStream(is, true);
         try {
             long keyCtx = NativeCrypto.PEM_read_bio_PrivateKey(bis.getBioContext());
@@ -136,8 +135,8 @@ public final class OpenSSLKey {
      * @param publicKey corresponding public key or {@code null} if not available. Some opaque
      *        private keys cannot be used by the TLS/SSL stack without the public key.
      */
-    static OpenSSLKey fromPrivateKeyForTLSStackOnly(
-            PrivateKey privateKey, PublicKey publicKey) throws InvalidKeyException {
+    static OpenSSLKey fromPrivateKeyForTLSStackOnly(PrivateKey privateKey, PublicKey publicKey)
+            throws InvalidKeyException {
         OpenSSLKey result = getOpenSSLKey(privateKey);
         if (result != null) {
             return result;
@@ -160,8 +159,8 @@ public final class OpenSSLKey {
      *        be used by the TLS/SSL stack without the parameters because the private key itself
      *        might not expose the parameters.
      */
-    static OpenSSLKey fromECPrivateKeyForTLSStackOnly(
-            PrivateKey key, ECParameterSpec ecParams) throws InvalidKeyException {
+    static OpenSSLKey fromECPrivateKeyForTLSStackOnly(PrivateKey key, ECParameterSpec ecParams)
+            throws InvalidKeyException {
         OpenSSLKey result = getOpenSSLKey(key);
         if (result != null) {
             return result;
@@ -215,7 +214,8 @@ public final class OpenSSLKey {
      * provider which accepts the key.
      */
     private static OpenSSLKey wrapJCAPrivateKeyForTLSStackOnly(PrivateKey privateKey,
-            PublicKey publicKey) throws InvalidKeyException {
+                                                               PublicKey publicKey)
+            throws InvalidKeyException {
         String keyAlgorithm = privateKey.getAlgorithm();
         if ("RSA".equals(keyAlgorithm)) {
             return OpenSSLRSAPrivateKey.wrapJCAPrivateKeyForTLSStackOnly(privateKey, publicKey);

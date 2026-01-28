@@ -70,8 +70,8 @@ public final class PakeClientKeyManagerParameters implements ManagerFactoryParam
      * @param serverId The ID of the server involved in the PAKE exchange.
      * @param options  A list of available PAKE options.
      */
-    private PakeClientKeyManagerParameters(
-            byte[] clientId, byte[] serverId, List<PakeOption> options) {
+    private PakeClientKeyManagerParameters(byte[] clientId, byte[] serverId,
+                                           List<PakeOption> options) {
         this.clientId = clientId;
         this.serverId = serverId;
         this.options = Collections.unmodifiableList(new ArrayList<>(options));

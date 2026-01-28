@@ -121,7 +121,7 @@ public class NetworkSecurityPolicy {
     @Retention(RetentionPolicy.SOURCE)
     @IntDef(prefix = {"DOMAIN_ENCRYPTION_MODE_"},
             value = {DOMAIN_ENCRYPTION_MODE_UNKNOWN, DOMAIN_ENCRYPTION_MODE_DISABLED,
-                    DOMAIN_ENCRYPTION_MODE_OPPORTUNISTIC, DOMAIN_ENCRYPTION_MODE_ENABLED})
+                     DOMAIN_ENCRYPTION_MODE_OPPORTUNISTIC, DOMAIN_ENCRYPTION_MODE_ENABLED})
     public @interface DomainEncryptionMode {}
 
     /**

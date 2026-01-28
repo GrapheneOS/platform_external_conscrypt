@@ -19,6 +19,7 @@ package com.android.org.conscrypt;
 import java.security.Principal;
 import java.security.cert.Certificate;
 import java.util.List;
+
 import javax.net.ssl.ExtendedSSLSession;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSessionContext;
@@ -30,8 +31,9 @@ import javax.net.ssl.SSLSessionContext;
 class Java7ExtendedSSLSession extends ExtendedSSLSession implements ConscryptSession {
     // TODO: use BoringSSL API to actually fetch the real data
     private static final String[] LOCAL_SUPPORTED_SIGNATURE_ALGORITHMS = new String[] {
-            "SHA512withRSA", "SHA512withECDSA", "SHA384withRSA", "SHA384withECDSA", "SHA256withRSA",
-            "SHA256withECDSA", "SHA224withRSA", "SHA224withECDSA", "SHA1withRSA", "SHA1withECDSA",
+            "SHA512withRSA", "SHA512withECDSA", "SHA384withRSA", "SHA384withECDSA",
+            "SHA256withRSA", "SHA256withECDSA", "SHA224withRSA", "SHA224withECDSA",
+            "SHA1withRSA",   "SHA1withECDSA",
     };
     // TODO: use BoringSSL API to actually fetch the real data
     private static final String[] PEER_SUPPORTED_SIGNATURE_ALGORITHMS =
@@ -124,7 +126,7 @@ class Java7ExtendedSSLSession extends ExtendedSSLSession implements ConscryptSes
 
     @Override
     public java.security.cert.X509Certificate[] getPeerCertificates()
-        throws SSLPeerUnverifiedException {
+            throws SSLPeerUnverifiedException {
         return delegate.getPeerCertificates();
     }
 

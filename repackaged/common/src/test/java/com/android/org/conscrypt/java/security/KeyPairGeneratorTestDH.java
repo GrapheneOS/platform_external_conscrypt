@@ -24,7 +24,6 @@ import org.junit.runners.JUnit4;
  */
 @RunWith(JUnit4.class)
 public class KeyPairGeneratorTestDH extends AbstractKeyPairGeneratorTest {
-
     public KeyPairGeneratorTestDH() {
         super("DH", new KeyAgreementHelper("DH"));
     }

@@ -53,34 +53,34 @@ public class NetworkSecurityConfigTests {
 
     private static final byte[] TEST_CA_BYTES =
             hexToBytes("3082036130820249a003020102020900bd54597d6750ea62300d06092a86"
-                    + "4886f70d01010b05003047310b3009060355040613025553310b30090603"
-                    + "5504080c0243413110300e060355040a0c07416e64726f69643119301706"
-                    + "035504030c104e53436f6e6669672054657374204341301e170d31363032"
-                    + "32343030313130325a170d3136303332353030313130325a3047310b3009"
-                    + "060355040613025553310b300906035504080c0243413110300e06035504"
-                    + "0a0c07416e64726f69643119301706035504030c104e53436f6e66696720"
-                    + "5465737420434130820122300d06092a864886f70d01010105000382010f"
-                    + "003082010a0282010100e15ce8fd5794029841e760d68d6e0159c9c67630"
-                    + "089775bc728d83dae7e29e23fe5f6e113b789f4c5b22f052300ec6d5faa5"
-                    + "724432e7bac96682792ef6e9617c939c4329dce8788cbdf3a11b621fac9e"
-                    + "2edbec2d7e5e07296bbb544b89263137a6a31573a2362e05ca8ff9c886bf"
-                    + "52df4ff93c45475145a40a83f2670e23669220a5a4bf2c6860edb78d3022"
-                    + "192fb5dc5e8c118f70870f89da292dfe522751462f020ed556653c8b07f8"
-                    + "89712a6e8196c457a637439e3073d7d917ab55aa51a146826367f7b5922a"
-                    + "64fb2f95099de21eb98341fa76faa79ffbda123fe5b8adc614b16174e8b0"
-                    + "dfdac2bbc4d526d2487ad2b009d53996ec23ffbd732112efa66b02030100"
-                    + "01a350304e301d0603551d0e04160414f66e1a95486c879edd60a5756bc2"
-                    + "f1f4677e128e301f0603551d23041830168014f66e1a95486c879edd60a5"
-                    + "756bc2f1f4677e128e300c0603551d13040530030101ff300d06092a8648"
-                    + "86f70d01010b05000382010100d2856130dccae24e5f8901900d94bc642f"
-                    + "85466ab7cfa1066399077a168cd4b56603a9e2af9d2e58aec13101e338a4"
-                    + "8e95e9c7a84d7991f0d381d4965eaada1b80fbbd8277445f449babe64f53"
-                    + "ba625387460b592a1a97b14b8251115e6610350021a6e716ae22b905f8d4"
-                    + "eae24e668e71b12ab51fd2f2bb600e074487dec720c3db14dbca504844b6"
-                    + "933bb0248283ea95464747689c37d706d4839c7d0e9bd86abf98ddce5d36"
-                    + "8b38bfe5062353e28d5be378827fade1caa6bba3df9cd9ebf83d839eae52"
-                    + "780181f31973f15f982686ba6d899f7b644fd1f26c8ebb99f4c986faaf4c"
-                    + "1b9e3d9d391943ce3fb9fa2e631bd66b8ef3d47fd85acf09ea3a30f15f");
+                       + "4886f70d01010b05003047310b3009060355040613025553310b30090603"
+                       + "5504080c0243413110300e060355040a0c07416e64726f69643119301706"
+                       + "035504030c104e53436f6e6669672054657374204341301e170d31363032"
+                       + "32343030313130325a170d3136303332353030313130325a3047310b3009"
+                       + "060355040613025553310b300906035504080c0243413110300e06035504"
+                       + "0a0c07416e64726f69643119301706035504030c104e53436f6e66696720"
+                       + "5465737420434130820122300d06092a864886f70d01010105000382010f"
+                       + "003082010a0282010100e15ce8fd5794029841e760d68d6e0159c9c67630"
+                       + "089775bc728d83dae7e29e23fe5f6e113b789f4c5b22f052300ec6d5faa5"
+                       + "724432e7bac96682792ef6e9617c939c4329dce8788cbdf3a11b621fac9e"
+                       + "2edbec2d7e5e07296bbb544b89263137a6a31573a2362e05ca8ff9c886bf"
+                       + "52df4ff93c45475145a40a83f2670e23669220a5a4bf2c6860edb78d3022"
+                       + "192fb5dc5e8c118f70870f89da292dfe522751462f020ed556653c8b07f8"
+                       + "89712a6e8196c457a637439e3073d7d917ab55aa51a146826367f7b5922a"
+                       + "64fb2f95099de21eb98341fa76faa79ffbda123fe5b8adc614b16174e8b0"
+                       + "dfdac2bbc4d526d2487ad2b009d53996ec23ffbd732112efa66b02030100"
+                       + "01a350304e301d0603551d0e04160414f66e1a95486c879edd60a5756bc2"
+                       + "f1f4677e128e301f0603551d23041830168014f66e1a95486c879edd60a5"
+                       + "756bc2f1f4677e128e300c0603551d13040530030101ff300d06092a8648"
+                       + "86f70d01010b05000382010100d2856130dccae24e5f8901900d94bc642f"
+                       + "85466ab7cfa1066399077a168cd4b56603a9e2af9d2e58aec13101e338a4"
+                       + "8e95e9c7a84d7991f0d381d4965eaada1b80fbbd8277445f449babe64f53"
+                       + "ba625387460b592a1a97b14b8251115e6610350021a6e716ae22b905f8d4"
+                       + "eae24e668e71b12ab51fd2f2bb600e074487dec720c3db14dbca504844b6"
+                       + "933bb0248283ea95464747689c37d706d4839c7d0e9bd86abf98ddce5d36"
+                       + "8b38bfe5062353e28d5be378827fade1caa6bba3df9cd9ebf83d839eae52"
+                       + "780181f31973f15f982686ba6d899f7b644fd1f26c8ebb99f4c986faaf4c"
+                       + "1b9e3d9d391943ce3fb9fa2e631bd66b8ef3d47fd85acf09ea3a30f15f");
 
     private static final X509Certificate TEST_CA_CERT;
 
@@ -99,7 +99,7 @@ public class NetworkSecurityConfigTests {
         byte[] data = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {
             data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-                    + Character.digit(s.charAt(i + 1), 16));
+                                  + Character.digit(s.charAt(i + 1), 16));
         }
         return data;
     }
@@ -132,8 +132,8 @@ public class NetworkSecurityConfigTests {
     public void testEmptyPerNetworkSecurityConfig() throws Exception {
         ArraySet<Pair<Domain, NetworkSecurityConfig>> domainMap =
                 new ArraySet<Pair<Domain, NetworkSecurityConfig>>();
-        domainMap.add(new Pair<Domain, NetworkSecurityConfig>(
-                new Domain("android.com", true), getEmptyConfig()));
+        domainMap.add(new Pair<Domain, NetworkSecurityConfig>(new Domain("android.com", true),
+                                                              getEmptyConfig()));
         NetworkSecurityConfig defaultConfig = getSystemStoreConfig();
         SSLContext context =
                 TestUtils.getSSLContext(new TestConfigSource(domainMap, defaultConfig));
@@ -206,8 +206,8 @@ public class NetworkSecurityConfigTests {
     public void testMostSpecificNetworkSecurityConfig() throws Exception {
         ArraySet<Pair<Domain, NetworkSecurityConfig>> domainMap =
                 new ArraySet<Pair<Domain, NetworkSecurityConfig>>();
-        domainMap.add(new Pair<Domain, NetworkSecurityConfig>(
-                new Domain("android.com", true), getEmptyConfig()));
+        domainMap.add(new Pair<Domain, NetworkSecurityConfig>(new Domain("android.com", true),
+                                                              getEmptyConfig()));
         domainMap.add(new Pair<Domain, NetworkSecurityConfig>(
                 new Domain("developer.android.com", false), getSystemStoreConfig()));
         SSLContext context =
@@ -221,15 +221,15 @@ public class NetworkSecurityConfigTests {
         // First try connecting to a subdomain of a domain entry that includes subdomains.
         ArraySet<Pair<Domain, NetworkSecurityConfig>> domainMap =
                 new ArraySet<Pair<Domain, NetworkSecurityConfig>>();
-        domainMap.add(new Pair<Domain, NetworkSecurityConfig>(
-                new Domain("android.com", true), getSystemStoreConfig()));
+        domainMap.add(new Pair<Domain, NetworkSecurityConfig>(new Domain("android.com", true),
+                                                              getSystemStoreConfig()));
         SSLContext context =
                 TestUtils.getSSLContext(new TestConfigSource(domainMap, getEmptyConfig()));
         TestUtils.assertConnectionSucceeds(context, "developer.android.com", 443);
         // Now try without including subdomains.
         domainMap = new ArraySet<Pair<Domain, NetworkSecurityConfig>>();
-        domainMap.add(new Pair<Domain, NetworkSecurityConfig>(
-                new Domain("android.com", false), getSystemStoreConfig()));
+        domainMap.add(new Pair<Domain, NetworkSecurityConfig>(new Domain("android.com", false),
+                                                              getSystemStoreConfig()));
         context = TestUtils.getSSLContext(new TestConfigSource(domainMap, getEmptyConfig()));
         TestUtils.assertConnectionFails(context, "developer.android.com", 443);
     }
