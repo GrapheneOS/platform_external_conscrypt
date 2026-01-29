@@ -120,16 +120,7 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
     @Override public abstract void setEchConfigList(byte[] echConfigList);
 
     @android.compat.annotation.UnsupportedAppUsage(maxTargetSdk = 30, trackingBug = 170729553)
-    @Override
-    public abstract void setChannelIdEnabled(boolean enabled);
-
-    @android.compat.annotation.UnsupportedAppUsage(maxTargetSdk = 30, trackingBug = 170729553)
-    @Override
-    public abstract byte[] getChannelId() throws SSLException;
-
-    @android.compat.annotation.UnsupportedAppUsage(maxTargetSdk = 30, trackingBug = 170729553)
     @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
-    @Override
     public abstract void setChannelIdPrivateKey(PrivateKey privateKey);
 
     /**
@@ -157,7 +148,8 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
      */
     @android.compat.annotation.UnsupportedAppUsage(
             maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
-            publicAlternatives = "Use {@code "
+            publicAlternatives =
+                    "Use {@code "
                     + "javax.net.ssl.SSLParameters#setApplicationProtocols(java.lang.String[])}.")
     @Override
     @Deprecated
@@ -185,7 +177,8 @@ public abstract class OpenSSLSocketImpl extends AbstractConscryptSocket {
      */
     @android.compat.annotation.UnsupportedAppUsage(
             maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
-            publicAlternatives = "Use {@code "
+            publicAlternatives =
+                    "Use {@code "
                     + "javax.net.ssl.SSLParameters#setApplicationProtocols(java.lang.String[])}.")
     @libcore.api.CorePlatformApi(status = libcore.api.CorePlatformApi.Status.STABLE)
     @Override

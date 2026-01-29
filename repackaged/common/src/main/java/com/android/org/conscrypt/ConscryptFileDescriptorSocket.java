@@ -96,12 +96,6 @@ class ConscryptFileDescriptorSocket extends OpenSSLSocketImpl
      */
     private final Object guard = Platform.closeGuardGet();
 
-    /**
-     * Private key for the TLS Channel ID extension. This field is client-side
-     * only. Set during startHandshake.
-     */
-    private OpenSSLKey channelIdPrivateKey;
-
     private final ActiveSession activeSession;
     /**
      * A snapshot of the active session when the engine was closed.
@@ -203,7 +197,7 @@ class ConscryptFileDescriptorSocket extends OpenSSLSocketImpl
             Platform.closeGuardOpen(guard, "close");
 
             // Prepare the SSL object for the handshake.
-            ssl.initialize(getHostname(), channelIdPrivateKey);
+            ssl.initialize(getHostname());
 
             // For clients, offer to resume a previously cached session to avoid the
             // full TLS handshake.
@@ -800,102 +794,10 @@ class ConscryptFileDescriptorSocket extends OpenSSLSocketImpl
     }
 
     /**
-     * Enables/disables TLS Channel ID for this server socket.
-     *
-     * <p>This method needs to be invoked before the handshake starts.
-     *
-     * @throws IllegalStateException if this is a client socket or if the handshake has already
-     *         started.
+     * No-op.
      */
     @Override
-    public final void setChannelIdEnabled(boolean enabled) {
-        if (getUseClientMode()) {
-            throw new IllegalStateException("Client mode");
-        }
-
-        synchronized (ssl) {
-            if (state != STATE_NEW) {
-                throw new IllegalStateException(
-                        "Could not enable/disable Channel ID after the initial handshake has"
-                        + " begun.");
-            }
-        }
-        sslParameters.channelIdEnabled = enabled;
-    }
-
-    /**
-     * Gets the TLS Channel ID for this server socket. Channel ID is only available once the
-     * handshake completes.
-     *
-     * @return channel ID or {@code null} if not available.
-     *
-     * @throws IllegalStateException if this is a client socket or if the handshake has not yet
-     *         completed.
-     * @throws SSLException if channel ID is available but could not be obtained.
-     */
-    @Override
-    public final byte[] getChannelId() throws SSLException {
-        if (getUseClientMode()) {
-            throw new IllegalStateException("Client mode");
-        }
-
-        synchronized (ssl) {
-            if (state != STATE_READY) {
-                throw new IllegalStateException(
-                        "Channel ID is only available after handshake completes");
-            }
-        }
-        return ssl.getTlsChannelId();
-    }
-
-    /**
-     * Sets the {@link PrivateKey} to be used for TLS Channel ID by this client socket.
-     *
-     * <p>This method needs to be invoked before the handshake starts.
-     *
-     * @param privateKey private key (enables TLS Channel ID) or {@code null} for no key (disables
-     *        TLS Channel ID). The private key must be an Elliptic Curve (EC) key based on the NIST
-     *        P-256 curve (aka SECG secp256r1 or ANSI X9.62 prime256v1).
-     *
-     * @throws IllegalStateException if this is a server socket or if the handshake has already
-     *         started.
-     */
-    @Override
-    public final void setChannelIdPrivateKey(PrivateKey privateKey) {
-        if (!getUseClientMode()) {
-            throw new IllegalStateException("Server mode");
-        }
-
-        synchronized (ssl) {
-            if (state != STATE_NEW) {
-                throw new IllegalStateException(
-                        "Could not change Channel ID private key after the initial handshake has"
-                        + " begun.");
-            }
-        }
-
-        if (privateKey == null) {
-            sslParameters.channelIdEnabled = false;
-            channelIdPrivateKey = null;
-        } else {
-            sslParameters.channelIdEnabled = true;
-            try {
-                ECParameterSpec ecParams = null;
-                if (privateKey instanceof ECKey) {
-                    ecParams = ((ECKey) privateKey).getParams();
-                }
-                if (ecParams == null) {
-                    // Assume this is a P-256 key, as specified in the contract of this method.
-                    ecParams =
-                            OpenSSLECGroupContext.getCurveByName("prime256v1").getECParameterSpec();
-                }
-                channelIdPrivateKey =
-                        OpenSSLKey.fromECPrivateKeyForTLSStackOnly(privateKey, ecParams);
-            } catch (InvalidKeyException e) {
-                // Will have error in startHandshake
-            }
-        }
-    }
+    public final void setChannelIdPrivateKey(PrivateKey privateKey) {}
 
     @Override
     byte[] getTlsUnique() {

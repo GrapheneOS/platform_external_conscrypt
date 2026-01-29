@@ -27,7 +27,6 @@ import javax.net.ssl.SSLServerSocket;
  */
 final class ConscryptServerSocket extends SSLServerSocket {
     private final SSLParametersImpl sslParameters;
-    private boolean channelIdEnabled;
     private boolean useEngineSocket;
 
     ConscryptServerSocket(SSLParametersImpl sslParameters) throws IOException {
@@ -114,20 +113,6 @@ final class ConscryptServerSocket extends SSLServerSocket {
     }
 
     /**
-     * Enables/disables the TLS Channel ID extension for this server socket.
-     */
-    void setChannelIdEnabled(boolean enabled) {
-        channelIdEnabled = enabled;
-    }
-
-    /**
-     * Checks whether the TLS Channel ID extension is enabled for this server socket.
-     */
-    boolean isChannelIdEnabled() {
-        return channelIdEnabled;
-    }
-
-    /**
      * This method enables the cipher suites listed by
      * getSupportedCipherSuites().
      *
@@ -179,7 +164,6 @@ final class ConscryptServerSocket extends SSLServerSocket {
             socket = Platform.createFileDescriptorSocket(sslParameters);
         }
 
-        socket.setChannelIdEnabled(channelIdEnabled);
         implAccept(socket);
         return socket;
     }
