@@ -36,6 +36,16 @@ public interface LogStore {
         NON_COMPLIANT,
     }
 
+    /**
+     * Thrown when the LogStore was found to be unusable while retrieving a log's information.
+     * @hide This class is not part of the Android public SDK API
+     */
+    public class InvalidLogException extends Exception {
+        public InvalidLogException(Throwable cause) {
+            super(cause);
+        }
+    }
+
     State getState();
 
     int getMajorVersion();
@@ -48,5 +58,5 @@ public interface LogStore {
 
     long getTimestamp();
 
-    LogInfo getKnownLog(byte[] logId);
+    LogInfo getKnownLog(byte[] logId) throws InvalidLogException;
 }

@@ -73,8 +73,20 @@ public class CertificateTransparency {
                                                 getVerificationReason(host));
             return;
         }
-        VerificationResult result =
-                verifier.verifySignedCertificateTimestamps(chain, tlsData, ocspData);
+
+        VerificationResult result;
+        try {
+            result = verifier.verifySignedCertificateTimestamps(chain, tlsData, ocspData);
+        } catch (LogStore.InvalidLogException e) {
+            /* Fail open. While validating an SCT, we found out that some data
+             * in the LogStore is unusable. It is likely that the LogStore is
+             * corrupted. */
+            statsLog.reportCTVerificationResult(logStore,
+                                                /* VerificationResult */ null,
+                                                /* PolicyCompliance */ null,
+                                                getVerificationReason(host));
+            return;
+        }
 
         X509Certificate leaf = chain.get(0);
         PolicyCompliance compliance = policy.doesResultConformToPolicy(result, leaf);
