@@ -476,19 +476,6 @@ public class NativeCryptoTest {
     }
 
     @Test
-    public void test_SSL_use_PrivateKey_for_tls_channel_id() throws Exception {
-        long c = NativeCrypto.SSL_CTX_new();
-        long s = NativeCrypto.SSL_new(c, null);
-
-        // Use the key natively. This works because the initChannelIdKey method ensures that the
-        // key is backed by OpenSSL.
-        NativeCrypto.SSL_set1_tls_channel_id(s, null, CHANNEL_ID_PRIVATE_KEY.getNativeRef());
-
-        NativeCrypto.SSL_free(s, null);
-        NativeCrypto.SSL_CTX_free(c, null);
-    }
-
-    @Test
     public void SSL_get_mode_withNullShouldThrow() throws Exception {
         assertThrows(NullPointerException.class, () -> NativeCrypto.SSL_get_mode(NULL, null));
     }
@@ -995,7 +982,6 @@ public class NativeCryptoTest {
      */
     public static class Hooks {
         String negotiatedCipherSuite;
-        private OpenSSLKey channelIdPrivateKey;
         boolean pskEnabled;
         byte[] pskKey;
         List<String> enabledCipherSuites;
@@ -1027,9 +1013,6 @@ public class NativeCryptoTest {
             NativeCrypto.setEnabledCipherSuites(s, null, cipherSuites.toArray(new String[0]),
                                                 new String[] {"TLSv1.2"});
 
-            if (channelIdPrivateKey != null) {
-                NativeCrypto.SSL_set1_tls_channel_id(s, null, channelIdPrivateKey.getNativeRef());
-            }
             return s;
         }
         public void configureCallbacks(@SuppressWarnings("unused")
@@ -1258,9 +1241,6 @@ public class NativeCryptoTest {
     static class ServerHooks extends Hooks {
         private final OpenSSLKey privateKey;
         private final byte[][] certificates;
-        private boolean channelIdEnabled;
-        private byte[] channelIdAfterHandshake;
-        private Throwable channelIdAfterHandshakeException;
 
         private String pskIdentityHint;
 
@@ -1279,9 +1259,6 @@ public class NativeCryptoTest {
             if (privateKey != null && certificates != null) {
                 NativeCrypto.setLocalCertsAndPrivateKey(s, null, certificates,
                                                         privateKey.getNativeRef());
-            }
-            if (channelIdEnabled) {
-                NativeCrypto.SSL_enable_tls_channel_id(s, null);
             }
             if (pskEnabled) {
                 NativeCrypto.set_SSL_psk_server_callback_enabled(s, null, true);
@@ -1304,13 +1281,6 @@ public class NativeCryptoTest {
         public void afterHandshake(long session, long ssl, long context, Socket socket,
                                    FileDescriptor fd, SSLHandshakeCallbacks callback)
                 throws Exception {
-            if (channelIdEnabled) {
-                try {
-                    channelIdAfterHandshake = NativeCrypto.SSL_get_tls_channel_id(ssl, null);
-                } catch (Exception e) {
-                    channelIdAfterHandshakeException = e;
-                }
-            }
             super.afterHandshake(session, ssl, context, socket, fd, callback);
         }
 
@@ -1662,114 +1632,6 @@ public class NativeCryptoTest {
             // Manually close peer socket when testing timeout
             IoUtils.closeQuietly(clientSocket);
         }
-    }
-
-    @Test
-    public void test_SSL_do_handshake_with_channel_id_normal() throws Exception {
-        // Normal handshake with TLS Channel ID.
-        final ServerSocket listener = newServerSocket();
-        Hooks cHooks = new Hooks();
-        cHooks.channelIdPrivateKey = CHANNEL_ID_PRIVATE_KEY;
-        // TLS Channel ID currently requires ECDHE-based key exchanges.
-        cHooks.enabledCipherSuites = Collections.singletonList("ECDHE-RSA-AES128-SHA");
-        ServerHooks sHooks = new ServerHooks(SERVER_PRIVATE_KEY, ENCODED_SERVER_CERTIFICATES);
-        sHooks.channelIdEnabled = true;
-        sHooks.enabledCipherSuites = cHooks.enabledCipherSuites;
-        Future<TestSSLHandshakeCallbacks> client = handshake(listener, 0, true, cHooks, null, null);
-        Future<TestSSLHandshakeCallbacks> server =
-                handshake(listener, 0, false, sHooks, null, null);
-        TestSSLHandshakeCallbacks clientCallback = client.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
-        TestSSLHandshakeCallbacks serverCallback = server.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
-        assertTrue(clientCallback.verifyCertificateChainCalled);
-        assertEqualCertificateChains(SERVER_CERTIFICATE_REFS, clientCallback.certificateChainRefs);
-        assertEquals("ECDHE_RSA", clientCallback.authMethod);
-        assertFalse(serverCallback.verifyCertificateChainCalled);
-        assertFalse(clientCallback.clientCertificateRequestedCalled);
-        assertFalse(serverCallback.clientCertificateRequestedCalled);
-        assertFalse(clientCallback.clientPSKKeyRequestedInvoked);
-        assertFalse(serverCallback.clientPSKKeyRequestedInvoked);
-        assertFalse(clientCallback.serverPSKKeyRequestedInvoked);
-        assertFalse(serverCallback.serverPSKKeyRequestedInvoked);
-        assertTrue(clientCallback.onNewSessionEstablishedInvoked);
-        assertTrue(serverCallback.onNewSessionEstablishedInvoked);
-        assertTrue(clientCallback.handshakeCompletedCalled);
-        assertTrue(serverCallback.handshakeCompletedCalled);
-        assertNull(sHooks.channelIdAfterHandshakeException);
-        assertFalse(clientCallback.serverCertificateRequestedInvoked);
-        assertTrue(serverCallback.serverCertificateRequestedInvoked);
-        assertEqualByteArrays(CHANNEL_ID, sHooks.channelIdAfterHandshake);
-    }
-
-    @Test
-    public void test_SSL_do_handshake_with_channel_id_not_supported_by_server() throws Exception {
-        // Client tries to use TLS Channel ID but the server does not enable/offer the extension.
-        final ServerSocket listener = newServerSocket();
-        Hooks cHooks = new Hooks();
-        cHooks.channelIdPrivateKey = CHANNEL_ID_PRIVATE_KEY;
-        // TLS Channel ID currently requires ECDHE-based key exchanges.
-        cHooks.enabledCipherSuites = Collections.singletonList("ECDHE-RSA-AES128-SHA");
-        ServerHooks sHooks = new ServerHooks(SERVER_PRIVATE_KEY, ENCODED_SERVER_CERTIFICATES);
-        sHooks.channelIdEnabled = false;
-        sHooks.enabledCipherSuites = cHooks.enabledCipherSuites;
-        Future<TestSSLHandshakeCallbacks> client = handshake(listener, 0, true, cHooks, null, null);
-        Future<TestSSLHandshakeCallbacks> server =
-                handshake(listener, 0, false, sHooks, null, null);
-        TestSSLHandshakeCallbacks clientCallback = client.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
-        TestSSLHandshakeCallbacks serverCallback = server.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
-        assertTrue(clientCallback.verifyCertificateChainCalled);
-        assertEqualCertificateChains(SERVER_CERTIFICATE_REFS, clientCallback.certificateChainRefs);
-        assertEquals("ECDHE_RSA", clientCallback.authMethod);
-        assertFalse(serverCallback.verifyCertificateChainCalled);
-        assertFalse(clientCallback.clientCertificateRequestedCalled);
-        assertFalse(serverCallback.clientCertificateRequestedCalled);
-        assertFalse(clientCallback.clientPSKKeyRequestedInvoked);
-        assertFalse(serverCallback.clientPSKKeyRequestedInvoked);
-        assertFalse(clientCallback.serverPSKKeyRequestedInvoked);
-        assertFalse(serverCallback.serverPSKKeyRequestedInvoked);
-        assertTrue(clientCallback.onNewSessionEstablishedInvoked);
-        assertTrue(serverCallback.onNewSessionEstablishedInvoked);
-        assertTrue(clientCallback.handshakeCompletedCalled);
-        assertTrue(serverCallback.handshakeCompletedCalled);
-        assertFalse(clientCallback.serverCertificateRequestedInvoked);
-        assertTrue(serverCallback.serverCertificateRequestedInvoked);
-        assertNull(sHooks.channelIdAfterHandshakeException);
-        assertNull(sHooks.channelIdAfterHandshake);
-    }
-
-    @Test
-    public void test_SSL_do_handshake_with_channel_id_not_enabled_by_client() throws Exception {
-        // Client does not use TLS Channel ID when the server has the extension enabled/offered.
-        final ServerSocket listener = newServerSocket();
-        Hooks cHooks = new Hooks();
-        cHooks.channelIdPrivateKey = null;
-        // TLS Channel ID currently requires ECDHE-based key exchanges.
-        cHooks.enabledCipherSuites = Collections.singletonList("ECDHE-RSA-AES128-SHA");
-        ServerHooks sHooks = new ServerHooks(SERVER_PRIVATE_KEY, ENCODED_SERVER_CERTIFICATES);
-        sHooks.channelIdEnabled = true;
-        sHooks.enabledCipherSuites = cHooks.enabledCipherSuites;
-        Future<TestSSLHandshakeCallbacks> client = handshake(listener, 0, true, cHooks, null, null);
-        Future<TestSSLHandshakeCallbacks> server =
-                handshake(listener, 0, false, sHooks, null, null);
-        TestSSLHandshakeCallbacks clientCallback = client.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
-        TestSSLHandshakeCallbacks serverCallback = server.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
-        assertTrue(clientCallback.verifyCertificateChainCalled);
-        assertEqualCertificateChains(SERVER_CERTIFICATE_REFS, clientCallback.certificateChainRefs);
-        assertEquals("ECDHE_RSA", clientCallback.authMethod);
-        assertFalse(serverCallback.verifyCertificateChainCalled);
-        assertFalse(clientCallback.clientCertificateRequestedCalled);
-        assertFalse(serverCallback.clientCertificateRequestedCalled);
-        assertFalse(clientCallback.clientPSKKeyRequestedInvoked);
-        assertFalse(serverCallback.clientPSKKeyRequestedInvoked);
-        assertFalse(clientCallback.serverPSKKeyRequestedInvoked);
-        assertFalse(serverCallback.serverPSKKeyRequestedInvoked);
-        assertTrue(clientCallback.onNewSessionEstablishedInvoked);
-        assertTrue(serverCallback.onNewSessionEstablishedInvoked);
-        assertTrue(clientCallback.handshakeCompletedCalled);
-        assertTrue(serverCallback.handshakeCompletedCalled);
-        assertFalse(clientCallback.serverCertificateRequestedInvoked);
-        assertTrue(serverCallback.serverCertificateRequestedInvoked);
-        assertNull(sHooks.channelIdAfterHandshakeException);
-        assertNull(sHooks.channelIdAfterHandshake);
     }
 
     @Test

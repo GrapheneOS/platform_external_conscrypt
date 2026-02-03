@@ -122,12 +122,6 @@ final class SSLParametersImpl implements Cloneable {
     private Boolean useSni;
 
     /**
-     * Whether the TLS Channel ID extension is enabled. This field is
-     * server-side only.
-     */
-    boolean channelIdEnabled;
-
-    /**
      * Initializes the parameters. Naturally this constructor is used
      * in SSLContextImpl.engineInit method which directly passes its
      * parameters. In other words this constructor holds all
@@ -252,7 +246,6 @@ final class SSLParametersImpl implements Cloneable {
         this.echConfigList =
                 (sslParams.echConfigList == null) ? null : sslParams.echConfigList.clone();
         this.useSni = sslParams.useSni;
-        this.channelIdEnabled = sslParams.channelIdEnabled;
     }
 
     /**

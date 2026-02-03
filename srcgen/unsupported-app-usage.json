@@ -12,11 +12,6 @@
     "publicAlternatives": "Use {@code javax.net.ssl.SSLParameters#getApplicationProtocols()}."
   },
   {
-    "@location": "method:com.android.org.conscrypt.AbstractConscryptSocket#getChannelId()",
-    "maxTargetSdk": 30,
-    "trackingBug": 170729553
-  },
-  {
     "@location": "method:com.android.org.conscrypt.AbstractConscryptSocket#getHostname()",
     "maxTargetSdk": 30,
     "trackingBug": 170729553
@@ -45,16 +40,6 @@
     "@location": "method:com.android.org.conscrypt.AbstractConscryptSocket#setApplicationProtocols(String[])",
     "maxTargetSdk": "dalvik.annotation.compat.VersionCodes.Q",
     "publicAlternatives": "Use {@code javax.net.ssl.SSLParameters#setApplicationProtocols(java.lang.String[])}."
-  },
-  {
-    "@location": "method:com.android.org.conscrypt.AbstractConscryptSocket#setChannelIdEnabled(boolean)",
-    "maxTargetSdk": 30,
-    "trackingBug": 170729553
-  },
-  {
-    "@location": "method:com.android.org.conscrypt.AbstractConscryptSocket#setChannelIdPrivateKey(PrivateKey)",
-    "maxTargetSdk": 30,
-    "trackingBug": 170729553
   },
   {
     "@location": "method:com.android.org.conscrypt.AbstractConscryptSocket#setHandshakeTimeout(int)",
@@ -297,11 +282,6 @@
     "publicAlternatives": "Use {@code javax.net.ssl.SSLSocket#getApplicationProtocol()}."
   },
   {
-    "@location": "method:com.android.org.conscrypt.OpenSSLSocketImpl#getChannelId()",
-    "maxTargetSdk": 30,
-    "trackingBug": 170729553
-  },
-  {
     "@location": "method:com.android.org.conscrypt.OpenSSLSocketImpl#getHostname()",
     "maxTargetSdk": 30,
     "trackingBug": 170729553
@@ -328,11 +308,6 @@
     "@location": "method:com.android.org.conscrypt.OpenSSLSocketImpl#setAlpnProtocols(String[])",
     "maxTargetSdk": "dalvik.annotation.compat.VersionCodes.Q",
     "publicAlternatives": "Use {@code javax.net.ssl.SSLParameters#setApplicationProtocols(java.lang.String[])}."
-  },
-  {
-    "@location": "method:com.android.org.conscrypt.OpenSSLSocketImpl#setChannelIdEnabled(boolean)",
-    "maxTargetSdk": 30,
-    "trackingBug": 170729553
   },
   {
     "@location": "method:com.android.org.conscrypt.OpenSSLSocketImpl#setChannelIdPrivateKey(PrivateKey)",

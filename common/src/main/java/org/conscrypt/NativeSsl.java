@@ -275,10 +275,6 @@ final class NativeSsl {
         return NativeCrypto.SSL_get_servername(ssl, this);
     }
 
-    byte[] getTlsChannelId() throws SSLException {
-        return NativeCrypto.SSL_get_tls_channel_id(ssl, this);
-    }
-
     private static int toBoringSslGroup(String javaNamedGroup) {
         switch (javaNamedGroup) {
             case "X25519":
@@ -344,7 +340,7 @@ final class NativeSsl {
         NativeCrypto.SSL_set1_groups(ssl, sslHolder, new int[0]);
     }
 
-    void initialize(String hostname, OpenSSLKey channelIdPrivateKey) throws IOException {
+    void initialize(String hostname) throws IOException {
         boolean enableSessionCreation = parameters.getEnableSessionCreation();
         if (!enableSessionCreation) {
             NativeCrypto.SSL_set_session_creation_enabled(ssl, this, false);
@@ -450,7 +446,6 @@ final class NativeSsl {
         if (!parameters.isSpake()) {
             setCertificateValidation();
         }
-        setTlsChannelId(channelIdPrivateKey);
     }
 
     void configureServerCertificate() throws IOException {
@@ -565,23 +560,6 @@ final class NativeSsl {
                     NativeCrypto.SSL_use_psk_identity_hint(ssl, this, identityHint);
                 }
             }
-        }
-    }
-
-    private void setTlsChannelId(OpenSSLKey channelIdPrivateKey) throws SSLException {
-        if (!parameters.channelIdEnabled) {
-            return;
-        }
-
-        if (parameters.getUseClientMode()) {
-            // Client-side TLS Channel ID
-            if (channelIdPrivateKey == null) {
-                throw new SSLHandshakeException("Invalid TLS channel ID key specified");
-            }
-            NativeCrypto.SSL_set1_tls_channel_id(ssl, this, channelIdPrivateKey.getNativeRef());
-        } else {
-            // Server-side TLS Channel ID
-            NativeCrypto.SSL_enable_tls_channel_id(ssl, this);
         }
     }
 

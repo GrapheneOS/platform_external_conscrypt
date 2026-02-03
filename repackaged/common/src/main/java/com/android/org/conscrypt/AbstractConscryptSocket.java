@@ -651,45 +651,6 @@ abstract class AbstractConscryptSocket extends SSLSocket {
     abstract void setEchConfigList(byte[] echConfigList);
 
     /**
-     * Enables/disables TLS Channel ID for this server socket.
-     *
-     * <p>This method needs to be invoked before the handshake starts.
-     *
-     * @throws IllegalStateException if this is a client socket or if the handshake has already
-     *         started.
-     */
-    @android.compat.annotation.UnsupportedAppUsage(maxTargetSdk = 30, trackingBug = 170729553)
-    abstract void setChannelIdEnabled(boolean enabled);
-
-    /**
-     * Gets the TLS Channel ID for this server socket. Channel ID is only available once the
-     * handshake completes.
-     *
-     * @return channel ID or {@code null} if not available.
-     *
-     * @throws IllegalStateException if this is a client socket or if the handshake has not yet
-     *         completed.
-     * @throws SSLException if channel ID is available but could not be obtained.
-     */
-    @android.compat.annotation.UnsupportedAppUsage(maxTargetSdk = 30, trackingBug = 170729553)
-    abstract byte[] getChannelId() throws SSLException;
-
-    /**
-     * Sets the {@link PrivateKey} to be used for TLS Channel ID by this client socket.
-     *
-     * <p>This method needs to be invoked before the handshake starts.
-     *
-     * @param privateKey private key (enables TLS Channel ID) or {@code null} for no key (disables
-     *        TLS Channel ID). The private key must be an Elliptic Curve (EC) key based on the NIST
-     *        P-256 curve (aka SECG secp256r1 or ANSI X9.62 prime256v1).
-     *
-     * @throws IllegalStateException if this is a server socket or if the handshake has already
-     *         started.
-     */
-    @android.compat.annotation.UnsupportedAppUsage(maxTargetSdk = 30, trackingBug = 170729553)
-    abstract void setChannelIdPrivateKey(PrivateKey privateKey);
-
-    /**
      * Returns the protocol agreed upon by client and server, or {@code null} if
      * no protocol was agreed upon.
      *
@@ -711,7 +672,8 @@ abstract class AbstractConscryptSocket extends SSLSocket {
      */
     @android.compat.annotation.UnsupportedAppUsage(
             maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
-            publicAlternatives = "Use {@code "
+            publicAlternatives =
+                    "Use {@code "
                     + "javax.net.ssl.SSLParameters#setApplicationProtocols(java.lang.String[])}.")
     @Deprecated
     abstract void
@@ -727,7 +689,8 @@ abstract class AbstractConscryptSocket extends SSLSocket {
      */
     @android.compat.annotation.UnsupportedAppUsage(
             maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
-            publicAlternatives = "Use {@code "
+            publicAlternatives =
+                    "Use {@code "
                     + "javax.net.ssl.SSLParameters#setApplicationProtocols(java.lang.String[])}.")
     @Deprecated
     abstract void
@@ -740,7 +703,8 @@ abstract class AbstractConscryptSocket extends SSLSocket {
      */
     @android.compat.annotation.UnsupportedAppUsage(
             maxTargetSdk = dalvik.annotation.compat.VersionCodes.Q,
-            publicAlternatives = "Use {@code "
+            publicAlternatives =
+                    "Use {@code "
                     + "javax.net.ssl.SSLParameters#setApplicationProtocols(java.lang.String[])}.")
     @SuppressWarnings("MissingOverride") // For compiling pre Java 9.
     abstract void setApplicationProtocols(String[] protocols);

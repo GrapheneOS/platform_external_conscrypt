@@ -477,19 +477,7 @@ class ConscryptEngineSocket extends OpenSSLSocketImpl implements SSLParametersIm
     }
 
     @Override
-    public final void setChannelIdEnabled(boolean enabled) {
-        engine.setChannelIdEnabled(enabled);
-    }
-
-    @Override
-    public final byte[] getChannelId() throws SSLException {
-        return engine.getChannelId();
-    }
-
-    @Override
-    public final void setChannelIdPrivateKey(PrivateKey privateKey) {
-        engine.setChannelIdPrivateKey(privateKey);
-    }
+    public final void setChannelIdPrivateKey(PrivateKey privateKey) {}
 
     @Override
     byte[] getTlsUnique() {

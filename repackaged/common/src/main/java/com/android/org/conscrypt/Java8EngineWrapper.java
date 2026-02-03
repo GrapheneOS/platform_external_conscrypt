@@ -79,21 +79,6 @@ final class Java8EngineWrapper extends AbstractConscryptEngine {
     }
 
     @Override
-    void setChannelIdEnabled(boolean enabled) {
-        delegate.setChannelIdEnabled(enabled);
-    }
-
-    @Override
-    byte[] getChannelId() throws SSLException {
-        return delegate.getChannelId();
-    }
-
-    @Override
-    void setChannelIdPrivateKey(PrivateKey privateKey) {
-        delegate.setChannelIdPrivateKey(privateKey);
-    }
-
-    @Override
     void setHandshakeListener(HandshakeListener handshakeListener) {
         delegate.setHandshakeListener(handshakeListener);
     }
