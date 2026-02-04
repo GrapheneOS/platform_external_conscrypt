@@ -72,7 +72,7 @@ public class LogStoreImplv3 implements LogStore {
         String androidData = System.getenv("ANDROID_DATA");
         // /data/misc/keychain/ct/v1/current/log_list.json
         logListPrefix = Paths.get(androidData, "misc", "keychain", "ct");
-        logListSuffix = Paths.get("current", "log_list.fbs");
+        logListSuffix = Paths.get("current", "log_list.ctfb");
         logListDeprecatedJsonSuffix = Paths.get("current", "log_list.json");
     }
 
