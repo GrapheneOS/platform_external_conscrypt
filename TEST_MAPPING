@@ -33,6 +33,18 @@
     },
     {
       "name": "ConscryptPrivateTestCases"
+    },
+    {
+      "name": "CtsNetSecConfigCertificateTransparencyTestCases"
+    },
+    {
+      "name": "CtsNetSecConfigCertificateTransparencyDefaultTestCases"
+    },
+    {
+      "name": "NetSecConfigCertificateTransparencySctLogListTestCases"
+    },
+    {
+      "name": "NetSecConfigCertificateTransparencySctNoLogListTestCases"
     }
   ],
   "postsubmit": [
