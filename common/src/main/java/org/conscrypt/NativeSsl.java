@@ -584,6 +584,14 @@ final class NativeSsl {
         }
     }
 
+    String getEchNameOverride() {
+        return NativeCrypto.SSL_get0_ech_name_override(ssl, this);
+    }
+
+    byte[] getEchRetryConfigs() {
+        return NativeCrypto.SSL_get0_ech_retry_configs(ssl, this);
+    }
+
     private void setCertificateValidation() throws SSLException {
         // setup peer certificate verification
         if (!isClient()) {

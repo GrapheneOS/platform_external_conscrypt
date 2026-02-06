@@ -350,6 +350,13 @@ final class SSLUtils {
                 MAX_ENCRYPTION_OVERHEAD_LENGTH + min(MAX_ENCRYPTION_OVERHEAD_DIFF, pendingBytes));
     }
 
+    static SSLException toEchRejectedException(Throwable e, String hostname, byte[] retryConfigs) {
+        if (e instanceof EchRejectedException) {
+            return Platform.wrapEchRejectedException((EchRejectedException) e, hostname,
+                                                     retryConfigs);
+        }
+        return new EchRejectedException(e.getMessage());
+    }
     /**
      * Wraps the given exception if it's not already a {@link SSLHandshakeException}.
      */
