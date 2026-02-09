@@ -268,6 +268,7 @@ public class LogStoreImplv3 implements LogStore {
             lastModified = Files.getLastModifiedTime(logPath).toMillis();
             channel = FileChannel.open(logPath);
             map = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+            channel.close();
         } catch (IOException e) {
             return State.NOT_FOUND;
         }
