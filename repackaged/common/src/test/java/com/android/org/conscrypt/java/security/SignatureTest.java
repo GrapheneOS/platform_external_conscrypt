@@ -96,11 +96,31 @@ public class SignatureTest {
     private final byte[] EMPTY_DATA = new byte[20];
 
     @Test
-    @NonCts(reason = NonCtsReasons.INTERNAL_APIS)
-    @NonMts(reason = NonMtsReasons.API_LEVEL_GATING)
     public void test_getInstance() throws Exception {
         ServiceTester
                 .test("Signature")
+                .withAlgorithm("SHA512withRSA")
+                .withAlgorithm("NONEWITHDSA")
+                .withAlgorithm("SHA224WITHDSA")
+                .withAlgorithm("SHA256withRSA/PSS")
+                .withAlgorithm("SHA512withRSA/PSS")
+                .withAlgorithm("SHA384withRSA")
+                .withAlgorithm("SHA224withRSA")
+                .withAlgorithm("NONEwithRSA")
+                .withAlgorithm("SHA384withECDSA")
+                .withAlgorithm("SHA1withDSA")
+                .withAlgorithm("SHA384withRSA/PSS")
+                .withAlgorithm("NONEwithECDSA")
+                .withAlgorithm("SHA256WITHDSA")
+                .withAlgorithm("MD5withRSA")
+                .withAlgorithm("SHA224withECDSA")
+                .withAlgorithm("SHA256withECDSA")
+                .withAlgorithm("SHA512withECDSA")
+                .withAlgorithm("SHA1withRSA/PSS")
+                .withAlgorithm("SHA224withRSA/PSS")
+                .withAlgorithm("SHA1withRSA")
+                .withAlgorithm("SHA256withRSA")
+                .withAlgorithm("SHA1withECDSA")
                 // Do not test AndroidKeyStore's Signature. It needs an AndroidKeyStore-specific
                 // key. It's OKish not to test AndroidKeyStore's Signature here because it's tested
                 // by cts/tests/test/keystore.

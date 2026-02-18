@@ -86,11 +86,20 @@ public class KeyPairGeneratorTest {
     // END Android-Added: Allow access to deprecated BC algorithms.
 
     @Test
-    @NonCts(reason = NonCtsReasons.INTERNAL_APIS)
-    @NonMts(reason = NonMtsReasons.API_LEVEL_GATING)
     public void test_getInstance() throws Exception {
         ServiceTester
                 .test("KeyPairGenerator")
+                .withAlgorithm("RSA")
+                .withAlgorithm("XWING")
+                .withAlgorithm("DSA")
+                .withAlgorithm("DH")
+                .withAlgorithm("ML-DSA-65")
+                .withAlgorithm("ML-DSA-87")
+                .withAlgorithm("EdDSA")
+                .withAlgorithm("SLH-DSA-SHA2-128S")
+                .withAlgorithm("XDH")
+                .withAlgorithm("ML-DSA")
+                .withAlgorithm("EC")
                 // Do not test AndroidKeyStore Provider. It does not accept vanilla public keys for
                 // signature verification. It's OKish not to test here because it's tested by
                 // cts/tests/tests/keystore.
