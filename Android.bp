@@ -663,7 +663,7 @@ java_sdk_library {
         "androidx.annotation_annotation",
         "unsupportedappusage",
         "conscrypt.module.platform.api.stubs",
-        "modules-xml-utils",
+        "modules-utils-xml",
         "networksecurity-aconfig-flags-lib",
     ],
     static_libs: [
