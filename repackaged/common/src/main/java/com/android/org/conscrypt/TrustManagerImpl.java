@@ -35,6 +35,8 @@
 
 package com.android.org.conscrypt;
 
+import com.android.org.conscrypt.metrics.CertificateValidationFailureReason;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Socket;
@@ -683,6 +685,8 @@ public final class TrustManagerImpl
         // 7. If no errors were encountered above then verifyChain was never called because it was
         // not possible to build a valid chain to a trusted certificate.
         CertPath certPath = factory.generateCertPath(untrustedChain);
+        Platform.getStatsLog().reportCertificationValidationFailure(
+                CertificateValidationFailureReason.NO_TRUST_ANCHOR, certs.length);
         throw new CertificateException(new CertPathValidatorException(
                 "Trust anchor for certification path not found.", null, certPath, -1));
     }

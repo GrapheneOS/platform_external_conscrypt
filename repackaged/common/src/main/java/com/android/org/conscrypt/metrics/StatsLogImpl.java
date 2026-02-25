@@ -37,6 +37,9 @@ import static com.android.org.conscrypt.metrics.ConscryptStatsLog.CERTIFICATE_TR
 import static com.android.org.conscrypt.metrics.ConscryptStatsLog.CERTIFICATE_TRANSPARENCY_VERIFICATION_REPORTED__RESULT__RESULT_FAIL_OPEN_NO_LOG_LIST_AVAILABLE;
 import static com.android.org.conscrypt.metrics.ConscryptStatsLog.CERTIFICATE_TRANSPARENCY_VERIFICATION_REPORTED__RESULT__RESULT_SUCCESS;
 import static com.android.org.conscrypt.metrics.ConscryptStatsLog.CERTIFICATE_TRANSPARENCY_VERIFICATION_REPORTED__RESULT__RESULT_UNKNOWN;
+import static com.android.org.conscrypt.metrics.ConscryptStatsLog.CERTIFICATE_VALIDATION_FAILURE_REPORTED;
+import static com.android.org.conscrypt.metrics.ConscryptStatsLog.CERTIFICATE_VALIDATION_FAILURE_REPORTED__REASON__CERTIFICATE_VALIDATION_FAILURE_REASON_NO_TRUST_ANCHOR;
+import static com.android.org.conscrypt.metrics.ConscryptStatsLog.CERTIFICATE_VALIDATION_FAILURE_REPORTED__REASON__CERTIFICATE_VALIDATION_FAILURE_REASON_UNKNOWN;
 import static com.android.org.conscrypt.metrics.ConscryptStatsLog.TLS_HANDSHAKE_REPORTED;
 
 import com.android.org.conscrypt.CertBlocklistEntry;
@@ -213,6 +216,12 @@ public final class StatsLogImpl implements StatsLog {
     public void reportBlocklistHit(CertBlocklistEntry entry) {
         write(CERTIFICATE_BLOCKLIST_BLOCK_REPORTED, blocklistOriginToMetrics(entry.getOrigin()),
               entry.getIndex(), getUid());
+    }
+
+    @Override
+    public void reportCertificationValidationFailure(CertificateValidationFailureReason reason,
+                                                     int chainLength) {
+        write(CERTIFICATE_VALIDATION_FAILURE_REPORTED, reason.getId(), chainLength, getUid());
     }
 
     private static final boolean sdkVersionBiggerThan32;
