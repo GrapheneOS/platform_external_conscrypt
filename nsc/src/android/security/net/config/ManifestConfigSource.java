@@ -23,11 +23,10 @@ import static com.android.org.conscrypt.net.flags.Flags.networkSecurityConfigLoc
 import android.annotation.FlaggedApi;
 import android.app.compat.CompatChanges;
 import android.compat.annotation.ChangeId;
-import android.compat.annotation.EnabledAfter;
 import android.compat.annotation.Overridable;
+import android.compat.annotation.Disabled;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
-import android.os.Build;
 import android.util.Log;
 import android.util.Pair;
 
@@ -49,7 +48,7 @@ public class ManifestConfigSource implements ConfigSource {
      * cleartext traffic via their Network Security Config.
      */
     @ChangeId
-    @EnabledAfter(targetSdkVersion = Build.VERSION_CODES.CINNAMON_BUN)
+    @Disabled
     static final long DEPRECATE_USES_CLEARTEXT_TRAFFIC = 415007211L;
 
     public ManifestConfigSource(Context context) {
