@@ -45,6 +45,35 @@ public final class OpenSSLProvider extends Provider {
     private static final String STANDARD_RSA_PUBLIC_KEY_INTERFACE_CLASS_NAME =
             "java.security.interfaces.RSAPublicKey";
 
+    private static final String OPENSSL_CONTEXT_IMPL_CLASS_NAME = PREFIX + "OpenSSLContextImpl";
+    private static final String TLS1_SSL_CONTEXT_SUFFIX = "$TLSv1";
+    private static final String TLS11_SSL_CONTEXT_SUFFIX = "$TLSv11";
+    private static final String TLS12_SSL_CONTEXT_SUFFIX = "$TLSv12";
+    private static final String TLS13_SSL_CONTEXT_SUFFIX = "$TLSv13";
+
+    private static final String KEY_HOLDER_CLASS_NAME = PREFIX + "OpenSSLKeyHolder";
+
+    private static final String RSA_KEY_CLASSES = PREFIX + "OpenSSLRSAPrivateKey"
+            + "|" + STANDARD_RSA_PRIVATE_KEY_INTERFACE_CLASS_NAME + "|" + PREFIX
+            + "OpenSSLRSAPublicKey"
+            + "|" + STANDARD_RSA_PUBLIC_KEY_INTERFACE_CLASS_NAME;
+
+    private static final String SIGNATURE_KEY_CLASSES = KEY_HOLDER_CLASS_NAME + "|"
+            + STANDARD_RSA_PRIVATE_KEY_INTERFACE_CLASS_NAME + "|"
+            + STANDARD_EC_PRIVATE_KEY_INTERFACE_CLASS_NAME + "|"
+            + STANDARD_RSA_PUBLIC_KEY_INTERFACE_CLASS_NAME;
+
+    private static final String ECDH_KEY_CLASSES =
+            KEY_HOLDER_CLASS_NAME + "|" + STANDARD_EC_PRIVATE_KEY_INTERFACE_CLASS_NAME;
+
+    private static final String XDH_KEY_CLASSES = KEY_HOLDER_CLASS_NAME + "|"
+            + STANDARD_XEC_PRIVATE_KEY_INTERFACE_CLASS_NAME + "|" + PREFIX
+            + "OpenSSLX25519PrivateKey";
+
+    private static final String RAW_FORMAT = "RAW";
+    private static final String PKCS8_FORMAT = "PKCS#8";
+    private static final String SIGNATURE_KEY_FORMATS = "PKCS#8|X.509";
+
     public OpenSSLProvider() {
         this(Platform.getDefaultProviderName());
     }
@@ -74,28 +103,26 @@ public final class OpenSSLProvider extends Provider {
         Platform.setup(deprecatedTlsV1, enabledTlsV1);
 
         /* === SSL Contexts === */
-        String classOpenSSLContextImpl = PREFIX + "OpenSSLContextImpl";
-        String tls12SSLContextSuffix = "$TLSv12";
-        String tls13SSLContextSuffix = "$TLSv13";
         String defaultSSLContextSuffix;
         switch (defaultTlsProtocol) {
             case "TLSv1.2":
-                defaultSSLContextSuffix = tls12SSLContextSuffix;
+                defaultSSLContextSuffix = TLS12_SSL_CONTEXT_SUFFIX;
                 break;
             case "TLSv1.3":
-                defaultSSLContextSuffix = tls13SSLContextSuffix;
+                defaultSSLContextSuffix = TLS13_SSL_CONTEXT_SUFFIX;
                 break;
             default:
                 throw new IllegalArgumentException("Choice of default protocol is unsupported: "
                                                    + defaultTlsProtocol);
         }
         // Keep SSL as an alias to TLS
-        put("SSLContext.SSL", classOpenSSLContextImpl + defaultSSLContextSuffix);
-        put("SSLContext.TLS", classOpenSSLContextImpl + defaultSSLContextSuffix);
-        put("SSLContext.TLSv1", classOpenSSLContextImpl + "$TLSv1");
-        put("SSLContext.TLSv1.1", classOpenSSLContextImpl + "$TLSv11");
-        put("SSLContext.TLSv1.2", classOpenSSLContextImpl + tls12SSLContextSuffix);
-        put("SSLContext.TLSv1.3", classOpenSSLContextImpl + tls13SSLContextSuffix);
+        String defaultSslContext = OPENSSL_CONTEXT_IMPL_CLASS_NAME + defaultSSLContextSuffix;
+        put("SSLContext.SSL", defaultSslContext);
+        put("SSLContext.TLS", defaultSslContext);
+        put("SSLContext.TLSv1", OPENSSL_CONTEXT_IMPL_CLASS_NAME + TLS1_SSL_CONTEXT_SUFFIX);
+        put("SSLContext.TLSv1.1", OPENSSL_CONTEXT_IMPL_CLASS_NAME + TLS11_SSL_CONTEXT_SUFFIX);
+        put("SSLContext.TLSv1.2", OPENSSL_CONTEXT_IMPL_CLASS_NAME + TLS12_SSL_CONTEXT_SUFFIX);
+        put("SSLContext.TLSv1.3", OPENSSL_CONTEXT_IMPL_CLASS_NAME + TLS13_SSL_CONTEXT_SUFFIX);
         put("SSLContext.Default", PREFIX + "DefaultSSLContextImpl" + defaultSSLContextSuffix);
 
         if (includeTrustManager) {
@@ -605,32 +632,25 @@ public final class OpenSSLProvider extends Provider {
         // Accept only keys for which any of the following is true:
         // * the key is from this provider (subclass of OpenSSLKeyHolder),
         // * the key provides its key material in "RAW" encoding via Key.getEncoded.
-        String supportedKeyClasses = PREFIX + "OpenSSLKeyHolder";
-        String supportedKeyFormats = "RAW";
-        putImplClassWithKeyConstraints("Mac." + algorithm, PREFIX + className, supportedKeyClasses,
-                                       supportedKeyFormats);
+        putImplClassWithKeyConstraints("Mac." + algorithm, PREFIX + className,
+                                       KEY_HOLDER_CLASS_NAME, RAW_FORMAT);
     }
 
     private void putSymmetricCipherImplClass(String transformation, String className) {
         // Accept only keys for which any of the following is true:
         // * the key provides its key material in "RAW" encoding via Key.getEncoded.
         String supportedKeyClasses = null; // ignored -- filtered based on encoding format only
-        String supportedKeyFormats = "RAW";
         putImplClassWithKeyConstraints("Cipher." + transformation, PREFIX + className,
-                                       supportedKeyClasses, supportedKeyFormats);
+                                       supportedKeyClasses, RAW_FORMAT);
     }
 
     private void putRSACipherImplClass(String transformation, String className) {
         // Accept only keys for which any of the following is true:
         // * the key is instance of OpenSSLRSAPrivateKey, RSAPrivateKey, OpenSSLRSAPublicKey, or
         //   RSAPublicKey.
-        String supportedKeyClasses = PREFIX + "OpenSSLRSAPrivateKey"
-                + "|" + STANDARD_RSA_PRIVATE_KEY_INTERFACE_CLASS_NAME + "|" + PREFIX
-                + "OpenSSLRSAPublicKey"
-                + "|" + STANDARD_RSA_PUBLIC_KEY_INTERFACE_CLASS_NAME;
         String supportedKeyFormats = null; // ignored -- filtered based on class only
         putImplClassWithKeyConstraints("Cipher." + transformation, PREFIX + className,
-                                       supportedKeyClasses, supportedKeyFormats);
+                                       RSA_KEY_CLASSES, supportedKeyFormats);
     }
 
     private void putSignatureImplClass(String algorithm, String className) {
@@ -641,26 +661,17 @@ public final class OpenSSLProvider extends Provider {
         //   some reason this provider's Signature implementation does not unconditionally accept
         //   transparent public keys -- it only accepts them if they provide their key material in
         //   encoded form (see above).
-        String supportedKeyClasses = PREFIX + "OpenSSLKeyHolder"
-                + "|" + STANDARD_RSA_PRIVATE_KEY_INTERFACE_CLASS_NAME + "|"
-                + STANDARD_EC_PRIVATE_KEY_INTERFACE_CLASS_NAME + "|"
-                + STANDARD_RSA_PUBLIC_KEY_INTERFACE_CLASS_NAME;
-        String supportedKeyFormats = "PKCS#8|X.509";
         putImplClassWithKeyConstraints("Signature." + algorithm, PREFIX + className,
-                                       supportedKeyClasses, supportedKeyFormats);
+                                       SIGNATURE_KEY_CLASSES, SIGNATURE_KEY_FORMATS);
     }
 
     private void putRAWRSASignatureImplClass(String className) {
         // Accept only keys for which any of the following is true:
         // * the key is instance of OpenSSLRSAPrivateKey, RSAPrivateKey, OpenSSLRSAPublicKey, or
         //   RSAPublicKey.
-        String supportedKeyClasses = PREFIX + "OpenSSLRSAPrivateKey"
-                + "|" + STANDARD_RSA_PRIVATE_KEY_INTERFACE_CLASS_NAME + "|" + PREFIX
-                + "OpenSSLRSAPublicKey"
-                + "|" + STANDARD_RSA_PUBLIC_KEY_INTERFACE_CLASS_NAME;
         String supportedKeyFormats = null; // ignored -- filtered based on class only
-        putImplClassWithKeyConstraints("Signature.NONEwithRSA", PREFIX + className,
-                                       supportedKeyClasses, supportedKeyFormats);
+        putImplClassWithKeyConstraints("Signature.NONEwithRSA", PREFIX + className, RSA_KEY_CLASSES,
+                                       supportedKeyFormats);
     }
 
     private void putECDHKeyAgreementImplClass(String className) {
@@ -668,11 +679,8 @@ public final class OpenSSLProvider extends Provider {
         // * the key is from this provider (subclass of OpenSSLKeyHolder),
         // * the key provides its key material in "PKCS#8" encoding via Key.getEncoded.
         // * the key is a transparent EC private key (subclass of ECPrivateKey).
-        String supportedKeyClasses = PREFIX + "OpenSSLKeyHolder"
-                + "|" + STANDARD_EC_PRIVATE_KEY_INTERFACE_CLASS_NAME;
-        String supportedKeyFormats = "PKCS#8";
-        putImplClassWithKeyConstraints("KeyAgreement.ECDH", PREFIX + className, supportedKeyClasses,
-                                       supportedKeyFormats);
+        putImplClassWithKeyConstraints("KeyAgreement.ECDH", PREFIX + className, ECDH_KEY_CLASSES,
+                                       PKCS8_FORMAT);
     }
 
     private void putXDHKeyAgreementImplClass(String className) {
@@ -680,12 +688,8 @@ public final class OpenSSLProvider extends Provider {
         // * the key is from this provider (subclass of OpenSSLKeyHolder),
         // * the key provides its key material in "PKCS#8" encoding via Key.getEncoded.
         // * the key is a transparent XEC private key (subclass of XECPrivateKey).
-        String supportedKeyClasses = PREFIX + "OpenSSLKeyHolder"
-                + "|" + STANDARD_XEC_PRIVATE_KEY_INTERFACE_CLASS_NAME + "|" + PREFIX
-                + "OpenSSLX25519PrivateKey";
-        String supportedKeyFormats = "PKCS#8";
-        putImplClassWithKeyConstraints("KeyAgreement.XDH", PREFIX + className, supportedKeyClasses,
-                                       supportedKeyFormats);
+        putImplClassWithKeyConstraints("KeyAgreement.XDH", PREFIX + className, XDH_KEY_CLASSES,
+                                       PKCS8_FORMAT);
 
         put("Alg.Alias.KeyAgreement.X25519", "XDH");
     }
