@@ -4,9 +4,6 @@
       "name": "CtsLibcoreTestCases",
       "options": [
         {
-          "include-filter": "com.android.org.conscrypt"
-        },
-        {
           "include-filter": "libcore.java.security"
         },
         {
@@ -14,6 +11,14 @@
         },
         {
           "include-filter": "libcore.java.net"
+        }
+      ]
+    },
+    {
+      "name": "CtsConscryptTestCases",
+      "options": [
+        {
+          "include-filter": "com.android.org.conscrypt"
         },
         {
           "include-filter": "android.net.ssl"
