@@ -72,6 +72,18 @@ public final class ConscryptStatsLog {
      */
     public static final int CERTIFICATE_BLOCKLIST_BLOCK_REPORTED = 1143;
 
+    /**
+     * CertificateValidationFailureReported certificate_validation_failure_reported<br>
+     * Usage: StatsLog.write(StatsLog.CERTIFICATE_VALIDATION_FAILURE_REPORTED, int reason, int chain_length, int uid);<br>
+     */
+    public static final int CERTIFICATE_VALIDATION_FAILURE_REPORTED = 1326;
+
+    /**
+     * TlsEncryptedClientHelloHandshakeReported tls_encrypted_client_hello_handshake_reported<br>
+     * Usage: StatsLog.write(StatsLog.TLS_ENCRYPTED_CLIENT_HELLO_HANDSHAKE_REPORTED, int result, int usage_reason, int skip_reason, int failure_reason, int handshake_duration_millis, int uid);<br>
+     */
+    public static final int TLS_ENCRYPTED_CLIENT_HELLO_HANDSHAKE_REPORTED = 1327;
+
     // Constants for enum values.
 
     // Values for TlsHandshakeReported.protocol
@@ -126,10 +138,14 @@ public final class ConscryptStatsLog {
     // Values for CertificateTransparencyLogListStateChanged.loaded_compat_version
     public static final int CERTIFICATE_TRANSPARENCY_LOG_LIST_STATE_CHANGED__LOADED_COMPAT_VERSION__COMPAT_VERSION_UNKNOWN = 0;
     public static final int CERTIFICATE_TRANSPARENCY_LOG_LIST_STATE_CHANGED__LOADED_COMPAT_VERSION__COMPAT_VERSION_V1 = 1;
+    public static final int CERTIFICATE_TRANSPARENCY_LOG_LIST_STATE_CHANGED__LOADED_COMPAT_VERSION__COMPAT_VERSION_V2 = 2;
+    public static final int CERTIFICATE_TRANSPARENCY_LOG_LIST_STATE_CHANGED__LOADED_COMPAT_VERSION__COMPAT_VERSION_V3 = 3;
 
     // Values for CertificateTransparencyLogListStateChanged.min_compat_version
     public static final int CERTIFICATE_TRANSPARENCY_LOG_LIST_STATE_CHANGED__MIN_COMPAT_VERSION__COMPAT_VERSION_UNKNOWN = 0;
     public static final int CERTIFICATE_TRANSPARENCY_LOG_LIST_STATE_CHANGED__MIN_COMPAT_VERSION__COMPAT_VERSION_V1 = 1;
+    public static final int CERTIFICATE_TRANSPARENCY_LOG_LIST_STATE_CHANGED__MIN_COMPAT_VERSION__COMPAT_VERSION_V2 = 2;
+    public static final int CERTIFICATE_TRANSPARENCY_LOG_LIST_STATE_CHANGED__MIN_COMPAT_VERSION__COMPAT_VERSION_V3 = 3;
 
     // Values for ConscryptServiceUsed.algorithm
     public static final int CONSCRYPT_SERVICE_USED__ALGORITHM__UNKNOWN_ALGORITHM = 0;
@@ -178,6 +194,8 @@ public final class ConscryptStatsLog {
     public static final int CERTIFICATE_TRANSPARENCY_VERIFICATION_REPORTED__RESULT__RESULT_FAILURE_SCTS_NOT_COMPLIANT = 4;
     public static final int CERTIFICATE_TRANSPARENCY_VERIFICATION_REPORTED__RESULT__RESULT_FAIL_OPEN_NO_LOG_LIST_AVAILABLE = 5;
     public static final int CERTIFICATE_TRANSPARENCY_VERIFICATION_REPORTED__RESULT__RESULT_FAIL_OPEN_LOG_LIST_NOT_COMPLIANT = 6;
+    public static final int CERTIFICATE_TRANSPARENCY_VERIFICATION_REPORTED__RESULT__RESULT_FAIL_OPEN_LOG_LIST_DATE_INVALID = 7;
+    public static final int CERTIFICATE_TRANSPARENCY_VERIFICATION_REPORTED__RESULT__RESULT_FAIL_OPEN_LOG_LIST_DATE_EXPIRED = 8;
 
     // Values for CertificateTransparencyVerificationReported.reason
     public static final int CERTIFICATE_TRANSPARENCY_VERIFICATION_REPORTED__REASON__REASON_UNKNOWN = 0;
@@ -192,6 +210,7 @@ public final class ConscryptStatsLog {
     public static final int CERTIFICATE_TRANSPARENCY_VERIFICATION_REPORTED__POLICY_COMPATIBILITY_VERSION__COMPAT_VERSION_UNKNOWN = 0;
     public static final int CERTIFICATE_TRANSPARENCY_VERIFICATION_REPORTED__POLICY_COMPATIBILITY_VERSION__COMPAT_VERSION_V1 = 1;
     public static final int CERTIFICATE_TRANSPARENCY_VERIFICATION_REPORTED__POLICY_COMPATIBILITY_VERSION__COMPAT_VERSION_V2 = 2;
+    public static final int CERTIFICATE_TRANSPARENCY_VERIFICATION_REPORTED__POLICY_COMPATIBILITY_VERSION__COMPAT_VERSION_V3 = 3;
 
     // Values for CertificateBlocklistBlockReported.source
     public static final int CERTIFICATE_BLOCKLIST_BLOCK_REPORTED__SOURCE__BLOCKLIST_SOURCE_UNKNOWN = 0;
@@ -201,6 +220,40 @@ public final class ConscryptStatsLog {
     public static final int CERTIFICATE_BLOCKLIST_BLOCK_REPORTED__SOURCE__BLOCKLIST_SOURCE_SHA256_TEST = 4;
     public static final int CERTIFICATE_BLOCKLIST_BLOCK_REPORTED__SOURCE__BLOCKLIST_SOURCE_SHA256_BUILT_IN = 5;
     public static final int CERTIFICATE_BLOCKLIST_BLOCK_REPORTED__SOURCE__BLOCKLIST_SOURCE_SHA256_FILE = 6;
+
+    // Values for CertificateValidationFailureReported.reason
+    public static final int CERTIFICATE_VALIDATION_FAILURE_REPORTED__REASON__CERTIFICATE_VALIDATION_FAILURE_REASON_UNKNOWN = 0;
+    public static final int CERTIFICATE_VALIDATION_FAILURE_REPORTED__REASON__CERTIFICATE_VALIDATION_FAILURE_REASON_NO_TRUST_ANCHOR = 1;
+
+    // Values for TlsEncryptedClientHelloHandshakeReported.result
+    public static final int TLS_ENCRYPTED_CLIENT_HELLO_HANDSHAKE_REPORTED__RESULT__ECH_RESULT_UNKNOWN = 0;
+    public static final int TLS_ENCRYPTED_CLIENT_HELLO_HANDSHAKE_REPORTED__RESULT__ECH_RESULT_SUCCESS = 1;
+    public static final int TLS_ENCRYPTED_CLIENT_HELLO_HANDSHAKE_REPORTED__RESULT__ECH_RESULT_SUCCESS_GREASE = 2;
+    public static final int TLS_ENCRYPTED_CLIENT_HELLO_HANDSHAKE_REPORTED__RESULT__ECH_RESULT_FAILURE = 3;
+    public static final int TLS_ENCRYPTED_CLIENT_HELLO_HANDSHAKE_REPORTED__RESULT__ECH_RESULT_SKIPPED = 4;
+
+    // Values for TlsEncryptedClientHelloHandshakeReported.usage_reason
+    public static final int TLS_ENCRYPTED_CLIENT_HELLO_HANDSHAKE_REPORTED__USAGE_REASON__ECH_REASON_UNKNOWN = 0;
+    public static final int TLS_ENCRYPTED_CLIENT_HELLO_HANDSHAKE_REPORTED__USAGE_REASON__ECH_REASON_DEFAULT = 1;
+    public static final int TLS_ENCRYPTED_CLIENT_HELLO_HANDSHAKE_REPORTED__USAGE_REASON__ECH_REASON_SDK_TARGET = 2;
+    public static final int TLS_ENCRYPTED_CLIENT_HELLO_HANDSHAKE_REPORTED__USAGE_REASON__ECH_REASON_NSC_APP_OPT_IN = 3;
+    public static final int TLS_ENCRYPTED_CLIENT_HELLO_HANDSHAKE_REPORTED__USAGE_REASON__ECH_REASON_NSC_DOMAIN_OPT_IN = 4;
+
+    // Values for TlsEncryptedClientHelloHandshakeReported.skip_reason
+    public static final int TLS_ENCRYPTED_CLIENT_HELLO_HANDSHAKE_REPORTED__SKIP_REASON__ECH_SKIP_REASON_UNKNOWN = 0;
+    public static final int TLS_ENCRYPTED_CLIENT_HELLO_HANDSHAKE_REPORTED__SKIP_REASON__ECH_SKIP_REASON_SDK_TARGET = 1;
+    public static final int TLS_ENCRYPTED_CLIENT_HELLO_HANDSHAKE_REPORTED__SKIP_REASON__ECH_SKIP_REASON_NSC_APP_OPT_OUT = 2;
+    public static final int TLS_ENCRYPTED_CLIENT_HELLO_HANDSHAKE_REPORTED__SKIP_REASON__ECH_SKIP_REASON_NSC_DOMAIN_OPT_OUT = 3;
+    public static final int TLS_ENCRYPTED_CLIENT_HELLO_HANDSHAKE_REPORTED__SKIP_REASON__ECH_SKIP_REASON_NO_CONFIG = 4;
+    public static final int TLS_ENCRYPTED_CLIENT_HELLO_HANDSHAKE_REPORTED__SKIP_REASON__ECH_SKIP_REASON_SERVER_SNI_MISMATCH = 5;
+    public static final int TLS_ENCRYPTED_CLIENT_HELLO_HANDSHAKE_REPORTED__SKIP_REASON__ECH_SKIP_REASON_UNSUPPORTED_TLS_VERSION = 6;
+
+    // Values for TlsEncryptedClientHelloHandshakeReported.failure_reason
+    public static final int TLS_ENCRYPTED_CLIENT_HELLO_HANDSHAKE_REPORTED__FAILURE_REASON__ECH_FAILURE_REASON_UNKNOWN = 0;
+    public static final int TLS_ENCRYPTED_CLIENT_HELLO_HANDSHAKE_REPORTED__FAILURE_REASON__ECH_FAILURE_REASON_SERVER_REJECTION = 1;
+    public static final int TLS_ENCRYPTED_CLIENT_HELLO_HANDSHAKE_REPORTED__FAILURE_REASON__ECH_FAILURE_REASON_INVALID_CONFIG = 2;
+    public static final int TLS_ENCRYPTED_CLIENT_HELLO_HANDSHAKE_REPORTED__FAILURE_REASON__ECH_FAILURE_REASON_INCONSISTENT_NEGOTIATION = 3;
+    public static final int TLS_ENCRYPTED_CLIENT_HELLO_HANDSHAKE_REPORTED__FAILURE_REASON__ECH_FAILURE_REASON_NO_RETRY_CONFIGS = 4;
 
     // Write methods
     public static void write(int code, boolean arg1, int arg2, int arg3, int arg4, int arg5, int[] arg6) {
@@ -248,6 +301,20 @@ public final class ConscryptStatsLog {
         builder.writeInt(arg1);
         builder.writeInt(arg2);
         builder.writeInt(arg3);
+
+        builder.usePooledBuffer();
+        ReflexiveStatsLog.write(builder.build());
+    }
+
+    public static void write(int code, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6) {
+        final ReflexiveStatsEvent.Builder builder = ReflexiveStatsEvent.newBuilder();
+        builder.setAtomId(code);
+        builder.writeInt(arg1);
+        builder.writeInt(arg2);
+        builder.writeInt(arg3);
+        builder.writeInt(arg4);
+        builder.writeInt(arg5);
+        builder.writeInt(arg6);
 
         builder.usePooledBuffer();
         ReflexiveStatsLog.write(builder.build());
