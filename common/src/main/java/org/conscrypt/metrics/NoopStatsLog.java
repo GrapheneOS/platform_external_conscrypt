@@ -41,4 +41,7 @@ public class NoopStatsLog implements StatsLog {
                                            CertificateTransparencyVerificationReason reason) {}
 
     public void reportBlocklistHit(CertBlocklistEntry entry) {}
+
+    public void reportCertificationValidationFailure(CertificateValidationFailureReason reason,
+                                                     int chainLength) {}
 }
