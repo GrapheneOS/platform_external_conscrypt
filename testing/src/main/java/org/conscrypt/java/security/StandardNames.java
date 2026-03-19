@@ -190,7 +190,7 @@ public final class StandardNames {
     }
 
     public static final Set<String> KEY_TYPES = new HashSet<String>(
-            Arrays.asList("RSA", "DSA", "DH_RSA", "DH_DSA", "EC", "EC_EC", "EC_RSA"));
+            Arrays.asList("RSA", "DSA", "DH_RSA", "DH_DSA", "EC", "EC_EC", "EC_RSA", "EdDSA"));
     static {
         if (IS_RI) {
             // DH_* are specified by standard names, but do not seem to be supported by RI

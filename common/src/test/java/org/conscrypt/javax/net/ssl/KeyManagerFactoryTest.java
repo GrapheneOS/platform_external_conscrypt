@@ -50,9 +50,11 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.List;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
@@ -81,6 +83,19 @@ public class KeyManagerFactoryTest {
 
     private TestKeyStore getTestKeyStore() throws Exception {
         return testKeyStore;
+    }
+
+    // Remove legacy EC_EC type, which Jdk now considers invalid. (may or may not be a bug:
+    // https://bugs.openjdk.org/browse/JDK-8379191)
+    // Also remove EdDSA, which is not supported by Bouncy Castle.
+    private static String[] removeUnsupportedTypes(String[] input) {
+        List<String> list = new ArrayList<>();
+        for (String s : input) {
+            if (s != null && !s.equals("EC_EC") && !s.equals("EdDSA")) {
+                list.add(s);
+            }
+        }
+        return list.toArray(new String[0]);
     }
 
     @Test
@@ -193,14 +208,13 @@ public class KeyManagerFactoryTest {
 
     private void test_X509KeyManager(X509KeyManager km, boolean empty, String algorithm)
             throws Exception {
-        String[] keyTypes = keyTypes(algorithm);
+        String[] keyTypes = removeUnsupportedTypes(keyTypes(algorithm));
         for (String keyType : keyTypes) {
             String[] aliases = km.getClientAliases(keyType, null);
             if (empty || keyType == null || keyType.isEmpty()) {
                 assertNull(keyType, aliases);
                 continue;
             }
-            assertNotNull(keyType, aliases);
             for (String alias : aliases) {
                 test_X509KeyManager_alias(km, alias, keyType, false, empty);
             }
@@ -239,7 +253,7 @@ public class KeyManagerFactoryTest {
 
     private void test_X509ExtendedKeyManager(X509ExtendedKeyManager km, boolean empty,
                                              String algorithm) throws Exception {
-        String[] keyTypes = keyTypes(algorithm);
+        String[] keyTypes = removeUnsupportedTypes(keyTypes(algorithm));
         String[][] rotatedTypes = rotate(nonEmpty(keyTypes));
         for (String[] keyList : rotatedTypes) {
             String alias = km.chooseEngineClientAlias(keyList, null, null);
