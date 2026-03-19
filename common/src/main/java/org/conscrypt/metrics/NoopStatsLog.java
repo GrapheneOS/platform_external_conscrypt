@@ -44,4 +44,6 @@ public class NoopStatsLog implements StatsLog {
 
     public void reportCertificationValidationFailure(CertificateValidationFailureReason reason,
                                                      int chainLength) {}
+
+    public void reportTlsEchHandshake(TlsEncryptedClientHelloHandshake handshake) {}
 }
