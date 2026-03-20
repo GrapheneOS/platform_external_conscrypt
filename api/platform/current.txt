@@ -1,6 +1,5 @@
 // Signature format: 6.0
 // - style=java
-// - strip-java-lang-prefix=legacy
 package android.net.ssl {
 
   @FlaggedApi("com.android.org.conscrypt.net.flags.encrypted_client_hello_platform") public class EchConfigList {
@@ -46,8 +45,8 @@ package com.android.org.conscrypt {
     method public int getSessionCacheSize();
     method public int getSessionTimeout();
     method public void setPersistentCache(com.android.org.conscrypt.SSLClientSessionCache);
-    method public void setSessionCacheSize(int) throws java.lang.IllegalArgumentException;
-    method public void setSessionTimeout(int) throws java.lang.IllegalArgumentException;
+    method public void setSessionCacheSize(int) throws IllegalArgumentException;
+    method public void setSessionTimeout(int) throws IllegalArgumentException;
   }
 
   public final class Conscrypt {
@@ -129,8 +128,8 @@ package com.android.org.conscrypt {
 
   public class TrustedCertificateStore implements com.android.org.conscrypt.ConscryptCertStore {
     ctor public TrustedCertificateStore();
-    method public java.util.Set<java.lang.String> aliases();
-    method public java.util.Set<java.lang.String> allSystemAliases();
+    method public java.util.Set<String> aliases();
+    method public java.util.Set<String> allSystemAliases();
     method public boolean containsAlias(String);
     method public void deleteCertificateEntry(String) throws java.security.cert.CertificateException, java.io.IOException;
     method public java.util.Set<java.security.cert.X509Certificate> findAllIssuers(java.security.cert.X509Certificate);
@@ -147,7 +146,7 @@ package com.android.org.conscrypt {
     method public static final boolean isUser(String);
     method public boolean isUserAddedCertificate(java.security.cert.X509Certificate);
     method public static void setDefaultUserDirectory(java.io.File);
-    method public java.util.Set<java.lang.String> userAliases();
+    method public java.util.Set<String> userAliases();
   }
 
 }
