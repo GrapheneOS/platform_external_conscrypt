@@ -1,6 +1,5 @@
 // Signature format: 6.0
 // - style=java
-// - normalize-final-modifier=no
 // - overloaded-method-order=source
 // - strip-java-lang-prefix=legacy
 package android.net.ssl {
@@ -43,13 +42,13 @@ package com.android.org.conscrypt {
   }
 
   public final class ClientSessionContext implements javax.net.ssl.SSLSessionContext {
-    method public final java.util.Enumeration<byte[]> getIds();
-    method public final javax.net.ssl.SSLSession getSession(byte[]);
-    method public final int getSessionCacheSize();
-    method public final int getSessionTimeout();
+    method public java.util.Enumeration<byte[]> getIds();
+    method public javax.net.ssl.SSLSession getSession(byte[]);
+    method public int getSessionCacheSize();
+    method public int getSessionTimeout();
     method public void setPersistentCache(com.android.org.conscrypt.SSLClientSessionCache);
-    method public final void setSessionCacheSize(int) throws java.lang.IllegalArgumentException;
-    method public final void setSessionTimeout(int) throws java.lang.IllegalArgumentException;
+    method public void setSessionCacheSize(int) throws java.lang.IllegalArgumentException;
+    method public void setSessionTimeout(int) throws java.lang.IllegalArgumentException;
   }
 
   public final class Conscrypt {
