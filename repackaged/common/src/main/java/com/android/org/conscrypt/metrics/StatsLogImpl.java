@@ -41,6 +41,7 @@ import static com.android.org.conscrypt.metrics.ConscryptStatsLog.CERTIFICATE_VA
 import static com.android.org.conscrypt.metrics.ConscryptStatsLog.CERTIFICATE_VALIDATION_FAILURE_REPORTED__REASON__CERTIFICATE_VALIDATION_FAILURE_REASON_NO_TRUST_ANCHOR;
 import static com.android.org.conscrypt.metrics.ConscryptStatsLog.CERTIFICATE_VALIDATION_FAILURE_REPORTED__REASON__CERTIFICATE_VALIDATION_FAILURE_REASON_UNKNOWN;
 import static com.android.org.conscrypt.metrics.ConscryptStatsLog.TLS_HANDSHAKE_REPORTED;
+import static com.android.org.conscrypt.metrics.ConscryptStatsLog.TLS_ENCRYPTED_CLIENT_HELLO_HANDSHAKE_REPORTED;
 
 import com.android.org.conscrypt.CertBlocklistEntry;
 import com.android.org.conscrypt.Internal;
@@ -224,6 +225,18 @@ public final class StatsLogImpl implements StatsLog {
         write(CERTIFICATE_VALIDATION_FAILURE_REPORTED, reason.getId(), chainLength, getUid());
     }
 
+    @Override
+    public void reportTlsEchHandshake(TlsEncryptedClientHelloHandshake handshake) {
+        write(
+            TLS_ENCRYPTED_CLIENT_HELLO_HANDSHAKE_REPORTED,
+            handshake.getResult().getMetricsValue(),
+            handshake.getUsageReason().getMetricsValue(),
+            handshake.getSkipReason().getMetricsValue(),
+            handshake.getFailureReason().getMetricsValue(),
+            handshake.getHandshakeDurationMillis(),
+            getUid());
+    }
+
     private static final boolean sdkVersionBiggerThan32;
 
     static {
@@ -267,5 +280,11 @@ public final class StatsLogImpl implements StatsLog {
 
     private void write(int atomId, int origin, int index, int uid) {
         ConscryptStatsLog.write(atomId, origin, index, uid);
+    }
+
+    private void write(int atomId, int result, int usageReason, int skipReason, int failureReason,
+                       int handshakeDurationMillis, int uid) {
+        ConscryptStatsLog.write(atomId, result, usageReason, skipReason, failureReason,
+                                handshakeDurationMillis, uid);
     }
 }

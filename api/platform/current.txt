@@ -1,4 +1,5 @@
-// Signature format: 2.0
+// Signature format: 6.0
+// - style=java
 package android.net.ssl {
 
   @FlaggedApi("com.android.org.conscrypt.net.flags.encrypted_client_hello_platform") public class EchConfigList {
@@ -39,13 +40,13 @@ package com.android.org.conscrypt {
   }
 
   public final class ClientSessionContext implements javax.net.ssl.SSLSessionContext {
-    method public final java.util.Enumeration<byte[]> getIds();
-    method public final javax.net.ssl.SSLSession getSession(byte[]);
-    method public final int getSessionCacheSize();
-    method public final int getSessionTimeout();
+    method public java.util.Enumeration<byte[]> getIds();
+    method public javax.net.ssl.SSLSession getSession(byte[]);
+    method public int getSessionCacheSize();
+    method public int getSessionTimeout();
     method public void setPersistentCache(com.android.org.conscrypt.SSLClientSessionCache);
-    method public final void setSessionCacheSize(int) throws java.lang.IllegalArgumentException;
-    method public final void setSessionTimeout(int) throws java.lang.IllegalArgumentException;
+    method public void setSessionCacheSize(int) throws IllegalArgumentException;
+    method public void setSessionTimeout(int) throws IllegalArgumentException;
   }
 
   public final class Conscrypt {
@@ -60,8 +61,8 @@ package com.android.org.conscrypt {
   }
 
   @FlaggedApi("com.android.org.conscrypt.net.flags.conscryptx509trustmanager") public interface ConscryptX509TrustManager {
-    method @FlaggedApi("com.android.org.conscrypt.net.flags.conscryptx509trustmanager") public java.util.List<java.security.cert.X509Certificate> checkServerTrusted(java.security.cert.X509Certificate[], String, String) throws java.security.cert.CertificateException;
     method @FlaggedApi("com.android.org.conscrypt.net.flags.conscryptx509trustmanager") public java.util.List<java.security.cert.X509Certificate> checkServerTrusted(java.security.cert.X509Certificate[], byte[], byte[], String, String) throws java.security.cert.CertificateException;
+    method @FlaggedApi("com.android.org.conscrypt.net.flags.conscryptx509trustmanager") public java.util.List<java.security.cert.X509Certificate> checkServerTrusted(java.security.cert.X509Certificate[], String, String) throws java.security.cert.CertificateException;
   }
 
   public final class FileClientSessionCache {
@@ -83,8 +84,8 @@ package com.android.org.conscrypt {
     method public final int getSoTimeout() throws java.net.SocketException;
     method public void removeHandshakeCompletedListener(javax.net.ssl.HandshakeCompletedListener);
     method public final void sendUrgentData(int) throws java.io.IOException;
-    method @Deprecated public final void setAlpnProtocols(String[]);
     method @Deprecated public final void setAlpnProtocols(byte[]);
+    method @Deprecated public final void setAlpnProtocols(String[]);
     method public abstract void setChannelIdPrivateKey(java.security.PrivateKey);
     method public void setHandshakeTimeout(int) throws java.net.SocketException;
     method public void setHostname(String);
@@ -104,9 +105,9 @@ package com.android.org.conscrypt {
     method public void checkClientTrusted(java.security.cert.X509Certificate[], String) throws java.security.cert.CertificateException;
     method public void checkClientTrusted(java.security.cert.X509Certificate[], String, java.net.Socket) throws java.security.cert.CertificateException;
     method public void checkClientTrusted(java.security.cert.X509Certificate[], String, javax.net.ssl.SSLEngine) throws java.security.cert.CertificateException;
+    method @FlaggedApi("com.android.org.conscrypt.flags.certificate_transparency_checkservertrusted_api") public java.util.List<java.security.cert.X509Certificate> checkServerTrusted(java.security.cert.X509Certificate[], byte[], byte[], String, String) throws java.security.cert.CertificateException;
     method public void checkServerTrusted(java.security.cert.X509Certificate[], String) throws java.security.cert.CertificateException;
     method public java.util.List<java.security.cert.X509Certificate> checkServerTrusted(java.security.cert.X509Certificate[], String, String) throws java.security.cert.CertificateException;
-    method @FlaggedApi("com.android.org.conscrypt.flags.certificate_transparency_checkservertrusted_api") public java.util.List<java.security.cert.X509Certificate> checkServerTrusted(java.security.cert.X509Certificate[], byte[], byte[], String, String) throws java.security.cert.CertificateException;
     method public void checkServerTrusted(java.security.cert.X509Certificate[], String, java.net.Socket) throws java.security.cert.CertificateException;
     method public void checkServerTrusted(java.security.cert.X509Certificate[], String, javax.net.ssl.SSLEngine) throws java.security.cert.CertificateException;
     method public java.security.cert.X509Certificate[] getAcceptedIssuers();
@@ -127,8 +128,8 @@ package com.android.org.conscrypt {
 
   public class TrustedCertificateStore implements com.android.org.conscrypt.ConscryptCertStore {
     ctor public TrustedCertificateStore();
-    method public java.util.Set<java.lang.String> aliases();
-    method public java.util.Set<java.lang.String> allSystemAliases();
+    method public java.util.Set<String> aliases();
+    method public java.util.Set<String> allSystemAliases();
     method public boolean containsAlias(String);
     method public void deleteCertificateEntry(String) throws java.security.cert.CertificateException, java.io.IOException;
     method public java.util.Set<java.security.cert.X509Certificate> findAllIssuers(java.security.cert.X509Certificate);
@@ -145,7 +146,7 @@ package com.android.org.conscrypt {
     method public static final boolean isUser(String);
     method public boolean isUserAddedCertificate(java.security.cert.X509Certificate);
     method public static void setDefaultUserDirectory(java.io.File);
-    method public java.util.Set<java.lang.String> userAliases();
+    method public java.util.Set<String> userAliases();
   }
 
 }

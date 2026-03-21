@@ -1,7 +1,8 @@
-// Signature format: 2.0
+// Signature format: 6.0
+// - style=java
 package com.android.org.conscrypt {
 
-  public class OpenSSLMessageDigestJDK extends java.security.MessageDigestSpi implements java.lang.Cloneable {
+  public class OpenSSLMessageDigestJDK extends java.security.MessageDigestSpi implements Cloneable {
     method protected byte[] engineDigest();
     method protected void engineReset();
     method protected void engineUpdate(byte);

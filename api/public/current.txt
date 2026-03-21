@@ -1,4 +1,5 @@
-// Signature format: 2.0
+// Signature format: 6.0
+// - style=java
 package android.net.ssl {
 
   @FlaggedApi("com.android.org.conscrypt.net.flags.encrypted_client_hello_platform") public class EchConfigList {
