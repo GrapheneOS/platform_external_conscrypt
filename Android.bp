@@ -414,7 +414,6 @@ java_library {
         obfuscate: false,
         protect_api_surface: true,
         include: "r8_include_list.txt",
-        proguard_compatibility: false,
     },
 }
 
