@@ -17,4 +17,7 @@
 
 package com.android.org.conscrypt;
 
-@Internal enum DomainEncryptionMode { UNKNOWN, DISABLED, OPPORTUNISTIC, ENABLED, REQUIRED }
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
+@Internal public enum DomainEncryptionMode { UNKNOWN, DISABLED, OPPORTUNISTIC, ENABLED, REQUIRED }

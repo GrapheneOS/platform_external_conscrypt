@@ -28,6 +28,7 @@ import static org.conscrypt.NativeConstants.SSL_VERIFY_PEER;
 import org.conscrypt.NativeCrypto.SSLHandshakeCallbacks;
 import org.conscrypt.SSLParametersImpl.AliasChooser;
 import org.conscrypt.SSLParametersImpl.PSKCallbacks;
+import org.conscrypt.metrics.TlsEncryptedClientHelloHandshake;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -63,6 +64,8 @@ final class NativeSsl {
     private X509Certificate[] localCertificates;
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
     private volatile long ssl;
+    private final TlsEncryptedClientHelloHandshake.Builder echHandshakeBuilder =
+            new TlsEncryptedClientHelloHandshake.Builder();
 
     private NativeSsl(long ssl, SSLParametersImpl parameters,
                       SSLHandshakeCallbacks handshakeCallbacks, AliasChooser aliasChooser,
@@ -565,6 +568,11 @@ final class NativeSsl {
 
     private void enableEchBasedOnPolicy(String hostname) throws SSLException {
         EchOptions opts = parameters.getEchOptions(hostname);
+        echHandshakeBuilder
+            .setEchOptions(opts)
+            .setHostname(hostname)
+            .setPolicy(parameters.getPolicy());
+
         if (opts == null) {
             return;
         }
@@ -574,6 +582,8 @@ final class NativeSsl {
             try {
                 NativeCrypto.SSL_set1_ech_config_list(ssl, this, configList);
             } catch (SSLException e) {
+                echHandshakeBuilder.setFailureReason(
+                        TlsEncryptedClientHelloHandshake.FailureReason.INVALID_CONFIG);
                 // The platform may provide a more specialized exception type for this error.
                 throw Platform.wrapInvalidEchDataException(e);
             }
@@ -582,6 +592,10 @@ final class NativeSsl {
         if (opts.isGreaseEnabled()) {
             NativeCrypto.SSL_set_enable_ech_grease(ssl, this, /* enable= */ true);
         }
+    }
+
+    TlsEncryptedClientHelloHandshake.Builder getEchHandshakeMetricsBuilder() {
+        return echHandshakeBuilder;
     }
 
     String getEchNameOverride() {

@@ -17,8 +17,11 @@
 
 package com.android.org.conscrypt;
 
+/**
+ * @hide This class is not part of the Android public SDK API
+ */
 @Internal
-class EchOptions {
+public class EchOptions {
     private final byte[] configList;
     private final boolean enableGrease;
 
@@ -27,11 +30,11 @@ class EchOptions {
         this.enableGrease = enableGrease;
     }
 
-    byte[] getConfigList() {
+    public byte[] getConfigList() {
         return configList;
     }
 
-    boolean isGreaseEnabled() {
+    public boolean isGreaseEnabled() {
         return enableGrease;
     }
 }

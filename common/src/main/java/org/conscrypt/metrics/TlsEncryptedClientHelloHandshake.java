@@ -16,7 +16,10 @@
 
 package org.conscrypt.metrics;
 
+import org.conscrypt.DomainEncryptionMode;
+import org.conscrypt.EchOptions;
 import org.conscrypt.Internal;
+import org.conscrypt.NetworkSecurityPolicy;
 
 /**
  * A TLS handshake with Encrypted Client Hello attempted, for the purpose of reporting.
@@ -96,7 +99,7 @@ public class TlsEncryptedClientHelloHandshake {
         }
     }
 
-    enum FailureReason {
+    public enum FailureReason {
         UNKNOWN(
             ConscryptStatsLog.TLS_ENCRYPTED_CLIENT_HELLO_HANDSHAKE_REPORTED__FAILURE_REASON__ECH_FAILURE_REASON_UNKNOWN),
         SERVER_REJECTION(
@@ -136,26 +139,19 @@ public class TlsEncryptedClientHelloHandshake {
 
     public static final class Builder {
         private Result result = Result.UNKNOWN;
-        private UsageReason usageReason = UsageReason.UNKNOWN;
-        private SkipReason skipReason = SkipReason.UNKNOWN;
+        private EchOptions opts;
         private FailureReason failureReason = FailureReason.UNKNOWN;
+        private NetworkSecurityPolicy policy;
+        private String hostname;
+        private byte[] retryConfigs;
         private int handshakeDurationMillis;
+        private boolean handshakeSuccess;
 
         public Builder() {
         }
 
-        public Builder setResult(Result result) {
-            this.result = result;
-            return this;
-        }
-
-        public Builder setUsageReason(UsageReason usageReason) {
-            this.usageReason = usageReason;
-            return this;
-        }
-
-        public Builder setSkipReason(SkipReason skipReason) {
-            this.skipReason = skipReason;
+        public Builder setEchOptions(EchOptions opts) {
+            this.opts = opts;
             return this;
         }
 
@@ -164,13 +160,83 @@ public class TlsEncryptedClientHelloHandshake {
             return this;
         }
 
+        public Builder setPolicy(NetworkSecurityPolicy policy) {
+            this.policy = policy;
+            return this;
+        }
+
+        public Builder setHostname(String hostname) {
+            this.hostname = hostname;
+            return this;
+        }
+
+        public Builder setRetryConfigs(byte[] retryConfigs) {
+            this.retryConfigs = retryConfigs;
+
+            this.failureReason = (this.retryConfigs == null || this.retryConfigs.length == 0)
+                    ? FailureReason.NO_RETRY_CONFIG
+                    : FailureReason.SERVER_REJECTION;
+
+            return this;
+        }
+
         public Builder setHandshakeDurationMillis(int handshakeDurationMillis) {
             this.handshakeDurationMillis = handshakeDurationMillis;
             return this;
         }
 
+        public Builder setHandshakeSuccess(boolean handshakeSuccess) {
+            this.handshakeSuccess = handshakeSuccess;
+            return this;
+        }
+
+        private Result calculateResult() {
+            if (!handshakeSuccess || failureReason != FailureReason.UNKNOWN) {
+                return Result.FAILURE;
+            }
+
+            if (calculateSkipReason() != SkipReason.UNKNOWN) {
+                return (opts != null && opts.isGreaseEnabled())
+                    ? Result.SUCCESS_WITH_GREASE : Result.SKIPPED;
+            }
+
+            return Result.SUCCESS;
+        }
+
+        private UsageReason calculateUsageReason() {
+            if (opts == null) {
+                // If opts is null, we aren't using ECH so no UsageReason needed.
+                return UsageReason.UNKNOWN;
+            }
+
+            if (policy.getDomainEncryptionMode("") == DomainEncryptionMode.OPPORTUNISTIC ||
+                policy.getDomainEncryptionMode(hostname) == DomainEncryptionMode.OPPORTUNISTIC) {
+                return UsageReason.DEFAULT;
+            }
+
+            return (policy.getDomainEncryptionMode("") == DomainEncryptionMode.ENABLED ||
+                    policy.getDomainEncryptionMode("") == DomainEncryptionMode.REQUIRED)
+                    ? UsageReason.NSC_APP_OPT_IN
+                    : UsageReason.NSC_DOMAIN_OPT_IN;
+        }
+
+        private SkipReason calculateSkipReason() {
+            if (opts == null) {
+                return policy.getDomainEncryptionMode("") == DomainEncryptionMode.DISABLED
+                        ? SkipReason.NSC_APP_OPT_OUT
+                        : SkipReason.NSC_DOMAIN_OPT_OUT;
+            }
+
+            if (opts.getConfigList() == null) {
+                return SkipReason.NO_CONFIG;
+            }
+
+            return SkipReason.UNKNOWN;
+        }
+
         public TlsEncryptedClientHelloHandshake build() {
-            return new TlsEncryptedClientHelloHandshake(result, usageReason, skipReason,
+            return new TlsEncryptedClientHelloHandshake(
+                calculateResult(), calculateUsageReason(), calculateSkipReason(),
                     failureReason, handshakeDurationMillis);
         }
     }
@@ -208,5 +274,15 @@ public class TlsEncryptedClientHelloHandshake {
      */
     public int getHandshakeDurationMillis() {
         return this.handshakeDurationMillis;
+    }
+
+    /**
+     * Returns true if we should emit the ECH handshake atom or not.
+     *
+     * <p>The bulk of handshakes will skip ECH due to no config being provided. Use this as a
+     * heuristic for whether to emit the ECH handshake atom or not.
+     */
+    public boolean shouldReportEchHandshake() {
+        return result != Result.SKIPPED || skipReason != SkipReason.NO_CONFIG;
     }
 }
