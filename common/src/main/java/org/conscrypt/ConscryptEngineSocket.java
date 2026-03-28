@@ -27,6 +27,7 @@ import static javax.net.ssl.SSLEngineResult.Status.CLOSED;
 import static javax.net.ssl.SSLEngineResult.Status.OK;
 
 import org.conscrypt.metrics.StatsLog;
+import org.conscrypt.metrics.TlsEncryptedClientHelloHandshake;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -311,10 +312,19 @@ class ConscryptEngineSocket extends OpenSSLSocketImpl implements SSLParametersIm
                 case STATE_READY_HANDSHAKE_CUT_THROUGH:
                     if (handshakeStartedMillis > 0) {
                         StatsLog statsLog = Platform.getStatsLog();
+                        long duration =
+                                Platform.getMillisSinceBoot() - handshakeStartedMillis;
                         statsLog.countTlsHandshake(
                                 true, engine.getSession().getProtocol(),
-                                engine.getSession().getCipherSuite(),
-                                Platform.getMillisSinceBoot() - handshakeStartedMillis);
+                                engine.getSession().getCipherSuite(), duration);
+                        if (getUseClientMode()) {
+                            TlsEncryptedClientHelloHandshake echHandshake =
+                                    engine.getEchHandshakeForMetrics(
+                                    /* handshakeSuccess= */ true, (int) duration);
+                            if (echHandshake.shouldReportEchHandshake()) {
+                                statsLog.reportTlsEchHandshake(echHandshake);
+                            }
+                        }
                         handshakeStartedMillis = 0;
                     }
                     notify = true;
@@ -327,10 +337,19 @@ class ConscryptEngineSocket extends OpenSSLSocketImpl implements SSLParametersIm
                 case STATE_CLOSED:
                     if (handshakeStartedMillis > 0) {
                         StatsLog statsLog = Platform.getStatsLog();
+                        long duration =
+                                Platform.getMillisSinceBoot() - handshakeStartedMillis;
                         // Handshake was in progress and so must have failed.
                         statsLog.countTlsHandshake(
-                                false, "TLS_PROTO_FAILED", "TLS_CIPHER_FAILED",
-                                Platform.getMillisSinceBoot() - handshakeStartedMillis);
+                                false, "TLS_PROTO_FAILED", "TLS_CIPHER_FAILED", duration);
+                        if (getUseClientMode()) {
+                            TlsEncryptedClientHelloHandshake echHandshake =
+                                    engine.getEchHandshakeForMetrics(
+                                    /* handshakeSuccess= */ false, (int) duration);
+                            if (echHandshake.shouldReportEchHandshake()) {
+                                statsLog.reportTlsEchHandshake(echHandshake);
+                            }
+                        }
                         handshakeStartedMillis = 0;
                     }
                     notify = true;

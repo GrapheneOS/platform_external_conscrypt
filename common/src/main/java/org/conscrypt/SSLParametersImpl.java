@@ -833,7 +833,7 @@ final class SSLParametersImpl implements Cloneable {
         }
     }
 
-    private NetworkSecurityPolicy getPolicy() {
+    NetworkSecurityPolicy getPolicy() {
         // If the TrustManager has a security policy attached, use it. We are using reflection here.
         // The Android framework may provide a high-level TrustManager (e.g., RootTrustManager or
         // NetworkSecurityTrustManager), which we need to query.

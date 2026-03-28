@@ -16,4 +16,4 @@
 
 package org.conscrypt;
 
-@Internal enum DomainEncryptionMode { UNKNOWN, DISABLED, OPPORTUNISTIC, ENABLED, REQUIRED }
+@Internal public enum DomainEncryptionMode { UNKNOWN, DISABLED, OPPORTUNISTIC, ENABLED, REQUIRED }

@@ -17,7 +17,7 @@
 package org.conscrypt;
 
 @Internal
-class EchOptions {
+public class EchOptions {
     private final byte[] configList;
     private final boolean enableGrease;
 
@@ -26,11 +26,11 @@ class EchOptions {
         this.enableGrease = enableGrease;
     }
 
-    byte[] getConfigList() {
+    public byte[] getConfigList() {
         return configList;
     }
 
-    boolean isGreaseEnabled() {
+    public boolean isGreaseEnabled() {
         return enableGrease;
     }
 }

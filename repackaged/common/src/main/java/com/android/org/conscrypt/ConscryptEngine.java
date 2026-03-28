@@ -71,6 +71,7 @@ import static javax.net.ssl.SSLEngineResult.Status.OK;
 import com.android.org.conscrypt.NativeRef.SSL_SESSION;
 import com.android.org.conscrypt.NativeSsl.BioWrapper;
 import com.android.org.conscrypt.SSLParametersImpl.AliasChooser;
+import com.android.org.conscrypt.metrics.TlsEncryptedClientHelloHandshake;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -1033,12 +1034,21 @@ final class ConscryptEngine extends AbstractConscryptEngine
     private SSLException convertException(Throwable e) {
         if (e instanceof SSLHandshakeException || !handshakeFinished) {
             if (e instanceof EchRejectedException) {
-                return SSLUtils.toEchRejectedException(e, ssl.getEchNameOverride(),
-                                                       ssl.getEchRetryConfigs());
+                byte[] retryConfigs = ssl.getEchRetryConfigs();
+                ssl.getEchHandshakeMetricsBuilder().setRetryConfigs(retryConfigs);
+                return SSLUtils.toEchRejectedException(e, ssl.getEchNameOverride(), retryConfigs);
             }
             return SSLUtils.toSSLHandshakeException(e);
         }
         return SSLUtils.toSSLException(e);
+    }
+
+    TlsEncryptedClientHelloHandshake getEchHandshakeForMetrics(
+            boolean handshakeSuccess, int durationMillis) {
+        return ssl.getEchHandshakeMetricsBuilder()
+                .setHandshakeSuccess(handshakeSuccess)
+                .setHandshakeDurationMillis(durationMillis)
+                .build();
     }
 
     /**
